@@ -13,11 +13,11 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
       synchronize: true,
-      // extra: {
-      //   ssl: {
-      //     rejectUnauthorized: false,
-      //   }
-      // }
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        }
+      }
     }
   }
 }
