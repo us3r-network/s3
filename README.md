@@ -2,9 +2,6 @@
 Userscan is the explorer for the Ceramic network, which can index all Ceramic streams in real-time and don't have access to the historical state of Ceramic.  
 Userscan is completely open source.
 
-## Documentation
-https://docs.s3.xyz
-
 ## Online Example Dapp
 https://scan.s3.xyz
 
