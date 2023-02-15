@@ -1,0 +1,21 @@
+{
+  "name": "@us3r/userscan",
+  "version": "0.0.1",
+  "description": "a open source ceramic explorer",
+  "workspaces": [
+    "*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/us3r-network/userscan.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/us3r-network/userscan/issues"
+  },
+  "homepage": "https://github.com/us3r-network/userscan#readme"
+}
