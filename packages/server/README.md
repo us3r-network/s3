@@ -1,6 +1,6 @@
 # Introduction
-userscan is the explorer for the Ceramic network, which can index all Ceramic streams in real-time and don't have access to the historical state of Ceramic. 
-userscan is completely open source.
+Userscan is the explorer for the Ceramic network, which can index all Ceramic streams in real-time and don't have access to the historical state of Ceramic. 
+Userscan is completely open source.
 
 # Quick start
 1. run a postgres db:  `docker-compose up postgres`
