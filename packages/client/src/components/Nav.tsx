@@ -1,18 +1,30 @@
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import GitHubButton from "react-github-btn";
 
-import Logo from './Logo';
+import Logo from "./Logo";
 
 export default function Nav() {
   return (
     <NavContainer>
       <div className="fixed">
-        <Link to={'/'}>
+        <Link to={"/"}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             <span>Alpha</span>
           </div>
         </Link>
+
+        <div className="github-star">
+          <GitHubButton
+            href="https://github.com/us3r-network/userscan"
+            data-color-scheme="no-preference: light; light: light; dark: dark;"
+            data-icon="octicon-star"
+            aria-label="Star buttons/github-buttons on GitHub"
+          >
+            Star
+          </GitHubButton>
+        </div>
       </div>
     </NavContainer>
   );
@@ -37,6 +49,11 @@ const NavContainer = styled.nav`
     align-items: start;
     justify-content: space-between;
     flex-direction: column;
+
+    .github-star {
+      width: 100%;
+      text-align: center;
+    }
   }
 
   a {

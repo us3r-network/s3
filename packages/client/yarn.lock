@@ -5154,6 +5154,11 @@ get-symbol-description@^1.0.0:
     call-bind "^1.0.2"
     get-intrinsic "^1.1.1"
 
+github-buttons@^2.22.0:
+  version "2.24.0"
+  resolved "https://registry.npmjs.org/github-buttons/-/github-buttons-2.24.0.tgz#e2e3d64345be0232809cd86cf727a715aacd7dca"
+  integrity sha512-dHpEno4S2JHjsEKPLSTGDTV50q1d08n3H7VDfNNA1m8cz5DMqLCZDdKWQxy4zyvd6M3tKvlVYLs+/H0BF3DggA==
+
 glob-parent@^5.1.2, glob-parent@~5.1.2:
   version "5.1.2"
   resolved "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz#869832c58034fe68a4093c17dc15e8340d8401c4"
@@ -8053,6 +8058,13 @@ react-ga4@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/react-ga4/-/react-ga4-2.0.0.tgz#d125807cc30b087a6aa24401ec5f1f1c2d176fe9"
   integrity sha512-WHi98hMunzh4ngRdNil8NN6Qly3ZZUkprhbgSqA+NFzovp8zqpYV3jcbKL9FnMdeBQHGhv8AVNCT2oFEE+EFXA==
+
+react-github-btn@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmjs.org/react-github-btn/-/react-github-btn-1.4.0.tgz#92654107e92658e60dd977c7a92b212f806da78d"
+  integrity sha512-lV4FYClAfjWnBfv0iNlJUGhamDgIq6TayD0kPZED6VzHWdpcHmPfsYOZ/CFwLfPv4Zp+F4m8QKTj0oy2HjiGXg==
+  dependencies:
+    github-buttons "^2.22.0"
 
 react-infinite-scroll-component@^6.1.0:
   version "6.1.0"
