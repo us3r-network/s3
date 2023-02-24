@@ -12,10 +12,17 @@ export const MEDIA_BREAK_POINTS = {
 export const MOBILE_BREAK_POINT = 768;
 
 export const FamilyOrAppMap = {
-  'Gitcoin Passport':
-    'kjzl6cwe1jw148h1e14jb5fkf55xmqhmyorp29r9cq356c7ou74ulowf8czjlzs',
+  "Gitcoin Passport":
+    "kjzl6cwe1jw148h1e14jb5fkf55xmqhmyorp29r9cq356c7ou74ulowf8czjlzs",
 };
 
 export const FamilyOrAppMapReverse = Object.fromEntries(
   Object.entries(FamilyOrAppMap).map(([key, value]) => [value, key])
 );
+
+export const Types: { [key: string]: string } = {
+  "0": "TileDocument",
+  "1": "Caip10Link",
+  "2": "Model",
+  "3": "ModelInstanceDocument",
+};

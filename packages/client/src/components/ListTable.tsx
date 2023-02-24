@@ -1,12 +1,12 @@
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import multiavatar from '@multiavatar/multiavatar';
-import dayjs from 'dayjs';
+import styled from "styled-components";
+import { Link } from "react-router-dom";
+import multiavatar from "@multiavatar/multiavatar";
+import dayjs from "dayjs";
 
-import { Stream } from '../types';
-import { sortPubKey } from '../utils/sortPubkey';
-import { TableBox } from './TableBox';
-import { FamilyOrAppMapReverse } from '../constants';
+import { Stream } from "../types";
+import { sortPubKey } from "../utils/sortPubkey";
+import { TableBox } from "./TableBox";
+import { FamilyOrAppMapReverse, Types } from "../constants";
 
 export default function ListTable({
   network,
@@ -25,19 +25,20 @@ export default function ListTable({
             <th>Stream ID</th>
             {showDid && <th>DiD</th>}
             <th>Family or app</th>
-            <th>Tags or type</th>
+            <th>Tags</th>
+            <th>Type</th>
             <th>Schema</th>
             <th>Indexing time</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item, idx) => {
-            const pubkey = item.did.split(':').pop() || '';
+            const pubkey = item.did.split(":").pop() || "";
             return (
               <tr key={item.streamId + idx}>
                 <td>
                   <Link to={`/${network}/stream/${item.streamId}`}>
-                    {sortPubKey(item.streamId, { len: 8, split: '-' })}
+                    {sortPubKey(item.streamId, { len: 8, split: "-" })}
                   </Link>
                 </td>
                 {showDid && (
@@ -67,7 +68,12 @@ export default function ListTable({
                       <Link to={`/${network}/family/${item.familyOrApp}`}>
                         <div className="family">
                           {FamilyOrAppMapReverse[item.familyOrApp] ||
-                            item.familyOrApp}
+                          item.familyOrApp.length > 15
+                            ? sortPubKey(item.familyOrApp, {
+                                len: 8,
+                                split: "-",
+                              })
+                            : item.familyOrApp}
                         </div>
                       </Link>
                     )) || <div className="xxxx">-</div>}
@@ -75,14 +81,16 @@ export default function ListTable({
                 </td>
                 <td>
                   <div className="xxxx">
-                    {(item.tags.length > 0 ? item.tags.join(',') : item.type) ||
-                      '-'}
+                    {item.tags.length > 0 ? item.tags.join(",") : "-"}
                   </div>
+                </td>
+                <td>
+                  <div className="xxxx">{Types[item.type] || "-"}</div>
                 </td>
                 <td>
                   {(item.schema && (
                     <Link to={`/${network}/stream/${item.schema}`}>
-                      {sortPubKey(item.schema, { len: 8, split: '-' })}
+                      {sortPubKey(item.schema, { len: 8, split: "-" })}
                     </Link>
                   )) || <div className="xxxx">-</div>}
                 </td>
@@ -125,7 +133,7 @@ const TableContainer = styled.table`
     opacity: 0.8;
     text-align: start;
 
-    width: 231px !important;
+    width: calc(100% / 7) !important;
     overflow: hidden;
 
     &:first-child {
@@ -133,7 +141,6 @@ const TableContainer = styled.table`
     }
 
     &:last-child {
-      width: 106px !important;
       padding-left: 0px;
       padding-right: 20px;
     }
@@ -143,7 +150,6 @@ const TableContainer = styled.table`
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
-    width: 231px !important;
     overflow: hidden;
     color: #71aaff;
 
@@ -152,7 +158,6 @@ const TableContainer = styled.table`
     }
 
     &:last-child {
-      width: 106px !important;
       padding-left: 0px;
       padding-right: 20px;
     }
@@ -164,13 +169,11 @@ const TableContainer = styled.table`
 
   tbody td {
     height: 88px;
-    /* padding: 10px 0; */
   }
 
   .did-container {
     display: flex;
     gap: 10px;
-    /* justify-content: center; */
 
     & div {
       text-align: start;
@@ -192,12 +195,9 @@ const TableContainer = styled.table`
   }
 
   & .family-container {
-    /* text-align: center; */
-    max-width: 166px;
     overflow: hidden;
     box-sizing: border-box;
     .family {
-      /* margin: 0 auto; */
       font-weight: 400;
       font-size: 12px;
       line-height: 14px;
