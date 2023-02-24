@@ -5,7 +5,7 @@ export type Stream = {
   did: string;
   network: string;
   indexingTime: number;
-  familyOrApp: number | null;
+  familyOrApp: string | null;
   type: string;
   from: string;
   tags: string[];
@@ -20,6 +20,6 @@ export type Stream = {
 };
 
 export enum Network {
-  MAINNET = 'MAINNET',
-  TESTNET = 'TESTNET',
+  MAINNET = "MAINNET",
+  TESTNET = "TESTNET",
 }

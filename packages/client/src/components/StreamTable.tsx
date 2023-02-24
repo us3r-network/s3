@@ -1,14 +1,14 @@
-import styled from 'styled-components';
-import multiavatar from '@multiavatar/multiavatar';
-import dayjs from 'dayjs';
+import styled from "styled-components";
+import multiavatar from "@multiavatar/multiavatar";
+import dayjs from "dayjs";
 
-import { Network, Stream } from '../types';
-import { FamilyOrAppMapReverse } from '../constants';
-import { TableBox } from './TableBox';
-import { useMemo } from 'react';
-import { sortPubKey } from '../utils/sortPubkey';
-import { Link } from 'react-router-dom';
-import Check from './icons/Check';
+import { Network, Stream } from "../types";
+import { FamilyOrAppMapReverse, Types } from "../constants";
+import { TableBox } from "./TableBox";
+import { useMemo } from "react";
+import { sortPubKey } from "../utils/sortPubkey";
+import { Link } from "react-router-dom";
+import Check from "./icons/Check";
 
 export default function StreamTable({
   data,
@@ -18,7 +18,7 @@ export default function StreamTable({
   network: Network;
 }) {
   const pubkey = useMemo(() => {
-    return data.did.split(':').pop() || '';
+    return data.did.split(":").pop() || "";
   }, [data.did]);
 
   const net = network.toLowerCase();
@@ -54,7 +54,7 @@ export default function StreamTable({
         </div>
         <div>
           <span>Type:</span>
-          <div>{data.type}</div>
+          <div>{Types[data.type] || "-"}</div>
         </div>
         <div className="from">
           <span>From:</span>
@@ -71,7 +71,7 @@ export default function StreamTable({
         </div>
         <div>
           <span>Tag:</span>
-          <div>{data.tags.join(' ').trim() || '-'}</div>
+          <div>{data.tags.join(" ").trim() || "-"}</div>
         </div>
         <div>
           <span>Status:</span>
@@ -104,12 +104,12 @@ export default function StreamTable({
                 <a href={`/${net}/stream/${data.schema}`}>{data.schema}</a>
               </div>
             )) ||
-              '-'}
+              "-"}
           </div>
         )}
         <div>
           <span>Commit IDs:</span>
-          <div>{data.commitIds.join('\n')}</div>
+          <div>{data.commitIds.join("\n")}</div>
         </div>
         <div className="content">
           <span>Content:</span>
