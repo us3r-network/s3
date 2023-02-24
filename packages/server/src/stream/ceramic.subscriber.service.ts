@@ -81,7 +81,7 @@ export default class CeramicSubscriberService {
   }
 
   // Store all streams.
-  async store(ceramic: any, network: Network, streamId: string,) {
+  async store(ceramic: any, network: Network, streamId: string) {
     const stream = await ceramic.loadStream(streamId);
     await this.storeStream(network, streamId, stream.allCommitIds, stream.state);
     // save schema stream
