@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
-import styled from 'styled-components';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import styled from "styled-components";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useNavigate } from "react-router-dom";
 
-import { Network } from '../types';
-import ListTable from '../components/ListTable';
-import Search from '../components/Search';
-import NetworkSwitch from '../components/NetworkSwitch';
-import useListData from '../hooks/useListData';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { Network } from "../types";
+import ListTable from "../components/ListTable";
+import Search from "../components/Search";
+import NetworkSwitch from "../components/NetworkSwitch";
+import useListData from "../hooks/useListData";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export default function Home() {
   const [network, setNetwork] = useLocalStorage(
-    'network-select',
+    "network-select",
     Network.MAINNET
   );
   const navigate = useNavigate();
@@ -34,27 +34,30 @@ export default function Home() {
   return (
     <PageBox>
       <FilterBox>
-        <Search
-          searchAction={(text) => {
-            if (text.startsWith('did')) {
-              navigate(`/${network.toLowerCase()}/profile/${text}`);
-            } else if (text.length < 62) {
-              navigate(`/${network.toLowerCase()}/family/${text}`);
-            } else {
-              navigate(`/${network.toLowerCase()}/stream/${text}`);
-            }
-          }}
-        />
-        <NetworkSwitch
-          network={network}
-          networks={Object.values(Network)}
-          networkChangeAction={(n) => {
-            window.scrollTo({ top: 0 });
-            setHasMore(true);
-            setData([]);
-            setNetwork(n as Network);
-          }}
-        />
+        <div className="title">Stream</div>
+        <div>
+          <Search
+            searchAction={(text) => {
+              if (text.startsWith("did")) {
+                navigate(`/${network.toLowerCase()}/profile/${text}`);
+              } else if (text.length < 62) {
+                navigate(`/${network.toLowerCase()}/family/${text}`);
+              } else {
+                navigate(`/${network.toLowerCase()}/stream/${text}`);
+              }
+            }}
+          />
+          <NetworkSwitch
+            network={network}
+            networks={Object.values(Network)}
+            networkChangeAction={(n) => {
+              window.scrollTo({ top: 0 });
+              setHasMore(true);
+              setData([]);
+              setNetwork(n as Network);
+            }}
+          />
+        </div>
       </FilterBox>
       <InfiniteScroll
         dataLength={data.length}
@@ -90,11 +93,20 @@ const PageBox = styled.div`
 const FilterBox = styled.div`
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
   gap: 20px;
   padding: 20px 0;
   position: sticky;
   background-color: #14171a;
   top: 0;
   z-index: 100;
+  > div {
+    display: flex;
+    gap: 20px;
+  }
+
+  .title {
+    font-size: 22px;
+    font-weight: 700;
+  }
 `;

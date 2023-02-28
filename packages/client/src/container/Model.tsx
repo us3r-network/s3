@@ -48,6 +48,7 @@ export default function ModelPage() {
 
   return (
     <PageBox>
+      <div className="title">ComposeDB Models</div>
       <InfiniteScroll
         dataLength={models.length}
         next={() => {
@@ -97,11 +98,21 @@ const Loading = styled.div`
 
 const PageBox = styled.div`
   margin-bottom: 20px;
-  margin-top: 50px;
   .no-more {
     padding: 20px;
     text-align: center;
     color: gray;
+  }
+
+  .title {
+    font-size: 22px;
+    font-weight: 700;
+    padding: 20px 0;
+    position: sticky;
+    background-color: #14171a;
+    top: 0;
+    z-index: 100;
+    line-height: 40px;
   }
 `;
 
