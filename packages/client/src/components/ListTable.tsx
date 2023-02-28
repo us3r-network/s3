@@ -115,7 +115,7 @@ const Avatar = styled.div`
 
 const TableContainer = styled.table`
   width: 100%;
-
+  table-layout: fixed;
   border-collapse: collapse;
 
   tbody tr,
@@ -133,7 +133,6 @@ const TableContainer = styled.table`
     opacity: 0.8;
     text-align: start;
 
-    width: calc(100% / 7) !important;
     overflow: hidden;
 
     &:first-child {
@@ -150,9 +149,8 @@ const TableContainer = styled.table`
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
-    overflow: hidden;
     color: #71aaff;
-
+    overflow: hidden;
     &:first-child {
       padding-left: 20px;
     }
@@ -160,6 +158,12 @@ const TableContainer = styled.table`
     &:last-child {
       padding-left: 0px;
       padding-right: 20px;
+    }
+
+    > div {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding-right: 5px;
     }
   }
 
