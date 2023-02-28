@@ -1,10 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import GitHubButton from "react-github-btn";
 
 import Logo from "./Logo";
 
 export default function Nav() {
+  let location = useLocation();
+  console.log(location.pathname);
+  const modelActive = location.pathname.startsWith("/model");
   return (
     <NavContainer>
       <div className="fixed">
@@ -16,12 +19,18 @@ export default function Nav() {
         </Link>
 
         <div className="nav">
-          <div className="nav-item">
+          <div className={`nav-item ${!modelActive ? "active" : ""}`}>
             <Link to={"/"}>S</Link>
+            <div className="tint-c">
+              <div className="tint">Streams</div>
+            </div>
           </div>
 
-          <div className="nav-item">
+          <div className={`nav-item ${modelActive ? "active" : ""}`}>
             <Link to={"/model"}>M</Link>
+            <div className="tint-c">
+              <div className="tint">ComposeDB Models</div>
+            </div>
           </div>
         </div>
 
@@ -67,6 +76,7 @@ const NavContainer = styled.nav`
       align-items: center;
       gap: 20px;
       .nav-item {
+        position: relative;
         width: 48px;
         height: 48px;
         border: 1px solid #39424c;
@@ -77,6 +87,33 @@ const NavContainer = styled.nav`
         font-size: 26px;
         a {
           color: #fff;
+        }
+
+        .tint-c {
+          position: absolute;
+          left: 0;
+          top: -15px;
+        }
+
+        .tint {
+          position: fixed;
+          display: none;
+          font-size: 16px;
+          width: fit-content;
+          padding: 1px 3px;
+          border: 1px solid #39424c;
+        }
+
+        &:hover {
+          .tint {
+            display: block;
+          }
+        }
+
+        &.active {
+          a {
+            color: #71aaff;
+          }
         }
 
         /* font-weight: 700; */
