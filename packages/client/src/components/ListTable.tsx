@@ -23,7 +23,7 @@ export default function ListTable({
         <thead>
           <tr>
             <th>Stream ID</th>
-            {showDid && <th>DiD</th>}
+            {showDid && <th>DID</th>}
             <th>Family or app</th>
             <th>Tags</th>
             <th>Type</th>
@@ -34,6 +34,10 @@ export default function ListTable({
         <tbody>
           {data.map((item, idx) => {
             const pubkey = item.did.split(":").pop() || "";
+            const tags: string[] = [...item.tags];
+            if (item.content.type) {
+              tags.push(item.content.type);
+            }
             return (
               <tr key={item.streamId + idx}>
                 <td>
@@ -81,7 +85,7 @@ export default function ListTable({
                 </td>
                 <td>
                   <div className="xxxx">
-                    {item.tags.length > 0 ? item.tags.join(",") : "-"}
+                    {tags.length > 0 ? tags.join(",") : "-"}
                   </div>
                 </td>
                 <td>

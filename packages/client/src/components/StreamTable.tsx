@@ -22,6 +22,10 @@ export default function StreamTable({
   }, [data.did]);
 
   const net = network.toLowerCase();
+  const tags = [...data.tags];
+  if (data.content.type) {
+    tags.push(data.content.type);
+  }
 
   return (
     <TableBox>
@@ -70,8 +74,8 @@ export default function StreamTable({
           </div>
         </div>
         <div>
-          <span>Tag:</span>
-          <div>{data.tags.join(" ").trim() || "-"}</div>
+          <span>Tags:</span>
+          <div>{tags.join(" ").trim() || "-"}</div>
         </div>
         <div>
           <span>Status:</span>
