@@ -18,8 +18,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.use("*", function (req, res, next) {
-    // 解决跨域问题
-    res.header("Access-Control-Allow-Origin", "http://localhost:3001");
+    res.header("Access-Control-Allow-Origin", "https://scan.s3.xyz");
     res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     res.header("Access-Control-Allow-Credentials", true);
@@ -31,14 +30,14 @@ async function bootstrap() {
   });
 
 
-  app.use("*", createProxyMiddleware({
+  app.use("/api/*", createProxyMiddleware({
     target: 'https://ceramic-private-clay.3boxlabs.com',
     changeOrigin: true,
   }));
 
   await app.listen(3000);
 
-  const ceramicSubscriberService = app.get(CeramicSubscriberService);
+  // const ceramicSubscriberService = app.get(CeramicSubscriberService);
   // Sub ceramic test network.
   // await ceramicSubscriberService.SubCeramic(
   //   Network.TESTNET,
