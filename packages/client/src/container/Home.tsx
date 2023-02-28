@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <PageBox>
       <FilterBox>
-        <div className="title">Stream</div>
+        <div className="title">Streams</div>
         <div>
           <Search
             searchAction={(text) => {
