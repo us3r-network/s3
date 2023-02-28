@@ -15,6 +15,16 @@ export default function Nav() {
           </div>
         </Link>
 
+        <div className="nav">
+          <div className="nav-item">
+            <Link to={"/"}>S</Link>
+          </div>
+
+          <div className="nav-item">
+            <Link to={"/model"}>M</Link>
+          </div>
+        </div>
+
         <div className="github-star">
           <GitHubButton
             href="https://github.com/us3r-network/userscan"
@@ -49,6 +59,29 @@ const NavContainer = styled.nav`
     align-items: start;
     justify-content: space-between;
     flex-direction: column;
+
+    .nav {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      .nav-item {
+        width: 48px;
+        height: 48px;
+        border: 1px solid #39424c;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        a {
+          color: #fff;
+        }
+
+        /* font-weight: 700; */
+      }
+    }
 
     .github-star {
       width: 100%;
