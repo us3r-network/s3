@@ -11,6 +11,8 @@ import Home from "./container/Home";
 import Nav from "./components/Nav";
 import NoMatch from "./components/NoMatch";
 import { useGAPageView } from "./hooks/useGoogleAnalytics";
+import Model from "./container/Model";
+import ModelStream from "./container/ModelStream";
 
 dayjs.extend(relativeTime);
 
@@ -22,6 +24,9 @@ export default function App() {
         <Route path=":network/stream/:streamId" element={<Stream />} />
         <Route path=":network/profile/:did" element={<Profile />} />
         <Route path=":network/family/:familyOrApp" element={<Family />} />
+
+        <Route path="model" element={<Model />} />
+        <Route path="model/:streamId" element={<ModelStream />} />
 
         <Route path="*" element={<NoMatch />} />
       </Route>

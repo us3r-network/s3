@@ -1,4 +1,5 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+export const CERAMIC_PROXY = process.env.REACT_APP_CERAMIC_PROXY;
 export const USER_API_BASE_URL = process.env.REACT_APP_USER_API_BASE_URL;
 export const MEDIA_BREAK_POINTS = {
   xs: 320,
