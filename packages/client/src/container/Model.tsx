@@ -7,6 +7,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
 import { Link } from "react-router-dom";
 import { CERAMIC_PROXY } from "../constants";
+import { StreamID } from '@ceramicnetwork/streamid';
 
 const ceramicIndexer = new CeramicClient(
   CERAMIC_PROXY || "http://13.215.254.225:3000"
@@ -20,7 +21,7 @@ export default function ModelPage() {
   const fetchModel = useCallback(async () => {
     const page = await ceramicIndexer.index.query({
       first: FirstNum,
-      model: Model.MODEL,
+      model: Model.MODEL as unknown as string | StreamID,
     });
     console.log(page);
     setModels(page.edges);
@@ -31,7 +32,7 @@ export default function ModelPage() {
     async (after?: string) => {
       const page = await ceramicIndexer.index.query({
         first: FirstNum,
-        model: Model.MODEL,
+        model: Model.MODEL as unknown as string | StreamID,
         after,
       });
       setModels([...models, ...page.edges]);
@@ -48,7 +49,10 @@ export default function ModelPage() {
 
   return (
     <PageBox>
-      <div className="title">ComposeDB Models</div>
+      <div className='title-box'>
+        <div className="title">ComposeDB Models</div>
+        <Link to={"/model/create"}>[ + ]</Link>
+      </div>
       <InfiniteScroll
         dataLength={models.length}
         next={() => {
@@ -102,6 +106,12 @@ const PageBox = styled.div`
     padding: 20px;
     text-align: center;
     color: gray;
+  }
+
+  .title-box{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .title {
