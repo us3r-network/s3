@@ -13,6 +13,7 @@ import NoMatch from "./components/NoMatch";
 import { useGAPageView } from "./hooks/useGoogleAnalytics";
 import Model from "./container/Model";
 import ModelStream from "./container/ModelStream";
+import ModelCreate from "./container/ModelCreate";
 
 dayjs.extend(relativeTime);
 
@@ -27,6 +28,7 @@ export default function App() {
 
         <Route path="model" element={<Model />} />
         <Route path="model/:streamId" element={<ModelStream />} />
+        <Route path="model/create" element={<ModelCreate />} />
 
         <Route path="*" element={<NoMatch />} />
       </Route>

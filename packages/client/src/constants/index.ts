@@ -1,5 +1,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export const CERAMIC_PROXY = process.env.REACT_APP_CERAMIC_PROXY;
+export const CERAMIC_NODE = process.env.REACT_APP_CERAMIC_NODE || 'https://ceramic.s3.xyz/'
+export const CERAMIC_NODE_ADMIN_PRIVATE_KEY = process.env.REACT_APP_CERAMIC_NODE_ADMIN_PRIVATE_KEY
 export const USER_API_BASE_URL = process.env.REACT_APP_USER_API_BASE_URL;
 export const MEDIA_BREAK_POINTS = {
   xs: 320,

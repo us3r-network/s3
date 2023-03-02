@@ -39,8 +39,8 @@ export default function ModelPage() {
 
   return (
     <PageBox>
-      <div className="title">
-        <span className="content">ComposeDB Models</span>
+      <div className='title-box'>
+        <div className="title">ComposeDB Models</div>
         <div>
           <Search
             searchAction={(text) => {
@@ -50,6 +50,7 @@ export default function ModelPage() {
             placeholder={"Search by model name"}
           />
         </div>
+        <Link to={"/model/create"}>[ + ]</Link>
       </div>
       <InfiniteScroll
         dataLength={models.length}
@@ -115,6 +116,12 @@ const PageBox = styled.div`
     padding: 20px;
     text-align: center;
     color: gray;
+  }
+
+  .title-box{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .title {
