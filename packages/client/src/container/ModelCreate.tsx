@@ -22,6 +22,8 @@ import FileSaver from "file-saver";
 // };
 export default function ModelCreate() {
   const navigate = useNavigate();
+  const [ceramicNode, setCeramicNode] = useState('');
+  
   const [graphql, setGraphql] = useState('');
   const [composite, setComposite] = useState('');
   const [runtimeDefinition, setRuntimeDefinition] = useState('');
@@ -31,7 +33,7 @@ export default function ModelCreate() {
   // });
 
   const submit = async () => {
-    const result = await submitComposeDBModel(graphql)
+    const result = await submitComposeDBModel(graphql,ceramicNode)
     if (result) {
       setComposite(JSON.stringify(result.composite.toJSON()))
       setRuntimeDefinition(JSON.stringify(result.runtimeDefinition))
@@ -66,6 +68,10 @@ export default function ModelCreate() {
         }}
         schema={mySchema}
       /> */}
+      <input
+        onChange={(e) => {
+          setCeramicNode(e.target.value);
+        }} >{ceramicNode}</input>
       <textarea
         className='model-code'
         onChange={(e) => {

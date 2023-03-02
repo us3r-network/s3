@@ -36,6 +36,7 @@
     "@composedb/devtools": "^0.4.3",
     "@composedb/types": "^0.4.3",
     "dids": "^4.0.0",
+    "did-session":"^2.0.0",
     "@craco/craco": "^7.0.0",
     "@types/file-saver": "^2.0.5",
     "assert": "^2.0.0",
