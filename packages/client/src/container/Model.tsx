@@ -41,6 +41,15 @@ export default function ModelPage() {
     <PageBox>
       <div className='title-box'>
         <div className="title">ComposeDB Models</div>
+        <div>
+          <Search
+            searchAction={(text) => {
+              setSearchText(text);
+              fetchModel();
+            }}
+            placeholder={"Search by model name"}
+          />
+        </div>
         <Link to={"/model/create"}>[ + ]</Link>
       </div>
       <InfiniteScroll
