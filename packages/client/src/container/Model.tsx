@@ -1,58 +1,61 @@
-import { CeramicClient } from "@ceramicnetwork/http-client";
-import { Model } from "@ceramicnetwork/stream-model";
-import { useCallback, useEffect, useState } from "react";
-import { Edge, PageInfo } from "@ceramicnetwork/common";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
 import { Link } from "react-router-dom";
-import { CERAMIC_PROXY } from "../constants";
-
-const ceramicIndexer = new CeramicClient(
-  CERAMIC_PROXY || "http://13.215.254.225:3000"
-);
-const FirstNum = 50;
+import { getModelStreamList, PageSize } from "../api";
+import { ModelStream } from "../types";
+import { sortPubKey } from "../utils/sortPubkey";
+import dayjs from "dayjs";
+import Search from "../components/Search";
 
 export default function ModelPage() {
-  //   const [models, setModels] = useState<Page<any>>();
-  const [models, setModels] = useState<Array<Edge<any>>>([]);
-  const [pageInfo, setPageInfo] = useState<PageInfo>();
+  const [models, setModels] = useState<Array<ModelStream>>([]);
+  const [searchText, setSearchText] = useState("");
+  const [hasMore, setHasMore] = useState(true);
+  const pageNum = useRef(1);
+
   const fetchModel = useCallback(async () => {
-    const page = await ceramicIndexer.index.query({
-      first: FirstNum,
-      model: Model.MODEL,
-    });
-    console.log(page);
-    setModels(page.edges);
-    setPageInfo(page.pageInfo);
-  }, []);
+    const resp = await getModelStreamList({ name: searchText });
+    const list = resp.data.data;
+    setModels(list);
+    setHasMore(list.length >= PageSize);
+    pageNum.current = 1;
+  }, [searchText]);
 
   const fetchMoreModel = useCallback(
-    async (after?: string) => {
-      const page = await ceramicIndexer.index.query({
-        first: FirstNum,
-        model: Model.MODEL,
-        after,
-      });
-      setModels([...models, ...page.edges]);
-      setPageInfo(page.pageInfo);
+    async (pageNumber: number) => {
+      const resp = await getModelStreamList({ pageNumber, name: searchText });
+      const list = resp.data.data;
+      setHasMore(list.length >= PageSize);
+      setModels([...models, ...list]);
     },
-    [models]
+    [models, searchText]
   );
 
   useEffect(() => {
     fetchModel();
   }, [fetchModel]);
 
-  const hasMore = pageInfo?.hasNextPage || true;
-
   return (
     <PageBox>
-      <div className="title">ComposeDB Models</div>
+      <div className="title">
+        <span className="content">ComposeDB Models</span>
+        <div>
+          <Search
+            searchAction={(text) => {
+              setSearchText(text);
+              fetchModel();
+            }}
+            placeholder={"Search by model name"}
+          />
+        </div>
+      </div>
       <InfiniteScroll
         dataLength={models.length}
         next={() => {
-          fetchMoreModel(pageInfo?.endCursor);
+          pageNum.current += 1;
+          fetchMoreModel(pageNum.current);
           console.log("fetch more");
         }}
         hasMore={hasMore}
@@ -65,18 +68,28 @@ export default function ModelPage() {
                 <th>Model Name</th>
                 <th>Description</th>
                 <th>ID</th>
+                <th>Usage Count</th>
+                <th>Release Date</th>
               </tr>
             </thead>
             <tbody>
               {models.map((item, idx) => {
-                const stream = ceramicIndexer.buildStreamFromState(item.node);
-                const streamId = stream.id.toString();
                 return (
-                  <tr key={item.cursor}>
-                    <td>{item.node.content.name}</td>
-                    <td>{item.node.content.description}</td>
+                  <tr key={item.stream_id}>
+                    <td>{item.stream_content.name}</td>
                     <td>
-                      <Link to={`/model/${streamId}`}>{streamId}</Link>
+                      <div>{item.stream_content.description}</div>
+                    </td>
+                    <td>
+                      <Link to={`/model/${item.stream_id}`}>
+                        {sortPubKey(item.stream_id, { len: 8, split: "-" })}
+                      </Link>
+                    </td>
+                    <td>{item.useCount}</td>
+                    <td>
+                      {(item.last_anchored_at &&
+                        dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss")) ||
+                        "-"}
                     </td>
                   </tr>
                 );
@@ -105,20 +118,27 @@ const PageBox = styled.div`
   }
 
   .title {
-    font-size: 22px;
-    font-weight: 700;
+    > span {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 40px;
+    }
+
     padding: 20px 0;
     position: sticky;
     background-color: #14171a;
     top: 0;
     z-index: 100;
-    line-height: 40px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 `;
 
 const TableContainer = styled.table`
   width: 100%;
-
+  table-layout: fixed;
   border-collapse: collapse;
 
   tbody tr,
@@ -163,6 +183,13 @@ const TableContainer = styled.table`
     &:last-child {
       padding-left: 20px;
       padding-right: 0px;
+    }
+
+    > div {
+      padding-right: 20px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding-right: 5px;
     }
   }
 

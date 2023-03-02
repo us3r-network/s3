@@ -1,17 +1,19 @@
-import { useCallback } from 'react';
-import { useState } from 'react';
-import styled from 'styled-components';
+import { useCallback } from "react";
+import { useState } from "react";
+import styled from "styled-components";
 
 export default function Search({
   searchAction,
+  placeholder = "Search by stream id, did or family...",
 }: {
   searchAction: (text: string) => void;
+  placeholder?: string;
 }) {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         searchAction(search);
       }
     },
@@ -29,7 +31,7 @@ export default function Search({
       </span>
       <input
         title="search"
-        placeholder="Search by stream id, did or family..."
+        placeholder={placeholder}
         type="text"
         value={search}
         onChange={(e) => {

@@ -1,29 +1,23 @@
-import { Stream } from "@ceramicnetwork/common";
-import { CeramicClient } from "@ceramicnetwork/http-client";
 import { useEffect, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { getModelStreamInfo } from "../api";
 import BackBtn from "../components/BackBtn";
 import { TableBox } from "../components/TableBox";
-import { CERAMIC_PROXY } from "../constants";
-
-const ceramicIndexer = new CeramicClient(
-  CERAMIC_PROXY || "http://13.215.254.225:3000"
-);
+import { ModelStreamInfo } from "../types";
 
 export default function ModelStream() {
   const { streamId } = useParams();
-  const [stream, setStream] = useState<Stream>();
+  const [stream, setStream] = useState<ModelStreamInfo>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!streamId) return;
     setLoading(true);
-    ceramicIndexer
-      .loadStream(streamId)
-      .then((data) => {
-        setStream(data);
+    getModelStreamInfo(streamId)
+      .then((resp) => {
+        setStream(resp.data.data);
       })
       .finally(() => {
         setLoading(false);
