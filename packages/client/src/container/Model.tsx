@@ -11,26 +11,30 @@ import Search from "../components/Search";
 
 export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
-  const [searchText, setSearchText] = useState("");
+  // const [searchText, setSearchText] = useState("");
+  const searchText = useRef("");
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText });
+    const resp = await getModelStreamList({ name: searchText.current });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
     pageNum.current = 1;
-  }, [searchText]);
+  }, []);
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
-      const resp = await getModelStreamList({ pageNumber, name: searchText });
+      const resp = await getModelStreamList({
+        pageNumber,
+        name: searchText.current,
+      });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setModels([...models, ...list]);
     },
-    [models, searchText]
+    [models]
   );
 
   useEffect(() => {
@@ -39,12 +43,13 @@ export default function ModelPage() {
 
   return (
     <PageBox>
-      <div className='title-box'>
+      <div className="title-box">
         <div className="title">ComposeDB Models</div>
         <div>
           <Search
             searchAction={(text) => {
-              setSearchText(text);
+              searchText.current = text;
+              setModels([]);
               fetchModel();
             }}
             placeholder={"Search by model name"}
@@ -118,7 +123,7 @@ const PageBox = styled.div`
     color: gray;
   }
 
-  .title-box{
+  .title-box {
     display: flex;
     align-items: center;
     justify-content: space-between;
