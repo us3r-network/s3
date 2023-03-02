@@ -5,6 +5,7 @@ import styled from "styled-components";
 import BackBtn from "../components/BackBtn";
 import { submitComposeDBModel } from "../utils/creamic-composedb";
 import FileSaver from "file-saver";
+import { CERAMIC_NODE } from "../constants";
 
 // import { GraphQLEditor, PassedSchema } from 'graphql-editor';
 
@@ -22,8 +23,7 @@ import FileSaver from "file-saver";
 // };
 export default function ModelCreate() {
   const navigate = useNavigate();
-  const [ceramicNode, setCeramicNode] = useState('');
-  
+  const [ceramicNode, setCeramicNode] = useState(CERAMIC_NODE);
   const [graphql, setGraphql] = useState('');
   const [composite, setComposite] = useState('');
   const [runtimeDefinition, setRuntimeDefinition] = useState('');
@@ -33,7 +33,7 @@ export default function ModelCreate() {
   // });
 
   const submit = async () => {
-    const result = await submitComposeDBModel(graphql,ceramicNode)
+    const result = await submitComposeDBModel(graphql, ceramicNode)
     if (result) {
       setComposite(JSON.stringify(result.composite.toJSON()))
       setRuntimeDefinition(JSON.stringify(result.runtimeDefinition))
@@ -69,9 +69,12 @@ export default function ModelCreate() {
         schema={mySchema}
       /> */}
       <input
+        title="ceramic node"
+        type="text"
+        value={ceramicNode}
         onChange={(e) => {
           setCeramicNode(e.target.value);
-        }} >{ceramicNode}</input>
+        }} />
       <textarea
         className='model-code'
         onChange={(e) => {
@@ -87,7 +90,7 @@ export default function ModelCreate() {
         <div>
           <textarea>{runtimeDefinition}</textarea>
           <button onClick={() => {
-            download(runtimeDefinition,'runtime-composite.json')
+            download(runtimeDefinition, 'runtime-composite.json')
           }}>download runtime definition</button>
         </div>
       </div>
