@@ -35,6 +35,7 @@ export default function ModelCreate() {
   const submit = async () => {
     const result = await submitComposeDBModel(graphql, ceramicNode)
     if (result) {
+      console.log(result, '\n', JSON.stringify(result.composite.toJSON()), '\n', JSON.stringify(result.runtimeDefinition))
       setComposite(JSON.stringify(result.composite.toJSON()))
       setRuntimeDefinition(JSON.stringify(result.runtimeDefinition))
     }
@@ -68,31 +69,46 @@ export default function ModelCreate() {
         }}
         schema={mySchema}
       /> */}
+      <h3>ceramic node</h3>
       <input
         title="ceramic node"
+        className='node-input'
+        placeholder="input your ceramic node url here."
         type="text"
         value={ceramicNode}
         onChange={(e) => {
           setCeramicNode(e.target.value);
         }} />
+      <h3>your model's graphql</h3>
       <textarea
         className='model-code'
+        placeholder="input your graphql code here."
         onChange={(e) => {
           setGraphql(e.target.value);
         }} />
       <div className="result-box">
-        <div>
-          <textarea>{composite}</textarea>
-          <button onClick={() => {
-            download(composite, "my-composite.json")
-          }}>download composite</button>
-        </div>
-        <div>
-          <textarea>{runtimeDefinition}</textarea>
-          <button onClick={() => {
-            download(runtimeDefinition, 'runtime-composite.json')
-          }}>download runtime definition</button>
-        </div>
+        {composite &&
+          <div>
+            <h3>your model's composite</h3>
+            <div className='result-text'>{composite}</div>
+            <button onClick={() => {
+              download(composite, "my-composite.json")
+            }}>
+              download composite
+            </button>
+          </div>
+        }
+        {runtimeDefinition &&
+          <div>
+            <h3>your model's runtime definition</h3>
+            <div className='result-text'>{runtimeDefinition}</div>
+            <button onClick={() => {
+              download(runtimeDefinition, 'runtime-composite.json')
+            }}>
+              download runtime definition
+            </button>
+          </div>
+        }
       </div>
     </PageBox >
   );
@@ -119,7 +135,9 @@ const PageBox = styled.div`
     justify-content: space-between;
     margin: 20px 0px ;
   }
-
+  .node-input{
+    width: 50%;
+  }
   .model-code{
     width: 100%;
     height: 300px;
@@ -136,9 +154,8 @@ const PageBox = styled.div`
       width: 50%;
       margin: 20px 0px ;
     }
-    textarea{
+    .result-text{
       width: 100%;
-      height: 300px;
       word-wrap:break-word;
     }
   }
