@@ -1,55 +1,43 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import BackBtn from "../components/BackBtn";
-import { submitComposeDBModel } from "../utils/creamic-composedb";
 import FileSaver from "file-saver";
-import { CERAMIC_NODE } from "../constants";
+import { GraphQLEditor, PassedSchema } from "graphql-editor";
+import { schemas } from "../utils/composedb-types/schemas";
+import { createModel } from "../api";
 
-// import { GraphQLEditor, PassedSchema } from 'graphql-editor';
-
-// const schemas = {
-//   pizza: `
-// type Query{
-// 	pizzas: [Pizza!]
-// }
-// `,
-//   pizzaLibrary: `
-// type Pizza{
-//   name:String;
-// }
-// `,
-// };
 export default function ModelCreate() {
   const navigate = useNavigate();
-  const [ceramicNode, setCeramicNode] = useState(CERAMIC_NODE);
-  const [graphql, setGraphql] = useState('');
-  const [composite, setComposite] = useState('');
-  const [runtimeDefinition, setRuntimeDefinition] = useState('');
-  // const [mySchema, setMySchema] = useState<PassedSchema>({
-  //   code: schemas.pizza,
-  //   libraries: schemas.pizzaLibrary,
-  // });
+  const [composite, setComposite] = useState("");
+  const [runtimeDefinition, setRuntimeDefinition] = useState("");
+  const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
+    code: schemas.code,
+    libraries: schemas.library,
+  });
 
-  const submit = async () => {
-    const result = await submitComposeDBModel(graphql, ceramicNode)
-    if (result) {
-      console.log(result, '\n', JSON.stringify(result.composite.toJSON()), '\n', JSON.stringify(result.runtimeDefinition))
-      setComposite(JSON.stringify(result.composite.toJSON()))
-      setRuntimeDefinition(JSON.stringify(result.runtimeDefinition))
+  const submit = useCallback(async () => {
+    if (!gqlSchema.code) return;
+    try {
+      const resp = await createModel(gqlSchema.code);
+      const { composite, runtimeDefinition } = resp.data.data;
+
+      setComposite(JSON.stringify(composite));
+      setRuntimeDefinition(JSON.stringify(runtimeDefinition));
+    } catch (error) {
+      console.error(error);
     }
-  }
+  }, [gqlSchema.code]);
 
   const download = (text: string, filename: string) => {
-    console.log(text)
+    console.log(text);
     const blob = new Blob([text], {
-      type: 'text/plain;charset=utf-8',
+      type: "text/plain;charset=utf-8",
     });
 
     FileSaver.saveAs(blob, filename);
   };
-
 
   return (
     <PageBox>
@@ -59,64 +47,65 @@ export default function ModelCreate() {
             navigate(-1);
           }}
         />
-        <button onClick={() => {
-          submit()
-        }}>submit</button>
+        <div className="tools">
+          <button
+            onClick={() => {
+              submit();
+            }}
+          >
+            submit
+          </button>
+        </div>
       </div>
-      {/* <GraphQLEditor
-        setSchema={(props) => {
-          setMySchema(props);
-        }}
-        schema={mySchema}
-      /> */}
-      <h3>ceramic node</h3>
-      <input
-        title="ceramic node"
-        className='node-input'
-        placeholder="input your ceramic node url here."
-        type="text"
-        value={ceramicNode}
-        onChange={(e) => {
-          setCeramicNode(e.target.value);
-        }} />
-      <h3>your model's graphql</h3>
-      <textarea
-        className='model-code'
-        placeholder="input your graphql code here."
-        onChange={(e) => {
-          setGraphql(e.target.value);
-        }} />
+      <EditorBox>
+        <GraphQLEditor
+          setSchema={(props) => {
+            setGqlSchema(props);
+          }}
+          schema={gqlSchema}
+        />
+      </EditorBox>
       <div className="result-box">
-        {composite &&
+        {composite && (
           <div>
             <h3>your model's composite</h3>
-            <div className='result-text'>{composite}</div>
-            <button onClick={() => {
-              download(composite, "my-composite.json")
-            }}>
+            <div className="result-text">{composite}</div>
+            <button
+              onClick={() => {
+                download(composite, "my-composite.json");
+              }}
+            >
               download composite
             </button>
           </div>
-        }
-        {runtimeDefinition &&
+        )}
+        {runtimeDefinition && (
           <div>
             <h3>your model's runtime definition</h3>
-            <div className='result-text'>{runtimeDefinition}</div>
-            <button onClick={() => {
-              download(runtimeDefinition, 'runtime-composite.json')
-            }}>
+            <div className="result-text">{runtimeDefinition}</div>
+            <button
+              onClick={() => {
+                download(
+                  `// This is an auto-generated file, do not edit manually
+export const definition = ${runtimeDefinition}`,
+                  "runtime-composite.js"
+                );
+              }}
+            >
               download runtime definition
             </button>
           </div>
-        }
+        )}
       </div>
-    </PageBox >
+    </PageBox>
   );
 }
 
+const EditorBox = styled.div`
+  height: calc(100vh - 80px);
+`;
 
 const PageBox = styled.div`
-  margin-bottom: 50px;
   > .err {
     display: flex;
     height: 100vh;
@@ -129,35 +118,62 @@ const PageBox = styled.div`
     }
   }
 
-  .title-box{
+  .title-box {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 20px 0px ;
+    padding: 20px 0px;
+    box-sizing: border-box;
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
   }
-  .node-input{
+  .node-input {
     width: 50%;
   }
-  .model-code{
+  .model-code {
     width: 100%;
     height: 300px;
     font-size: 14px;
     line-height: 24px;
   }
 
-  .result-box{
+  .result-box {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     gap: 20px;
     width: 100%;
-    div{
+    div {
       width: 50%;
-      margin: 20px 0px ;
+      margin: 20px 0px;
     }
-    .result-text{
+    .result-text {
       width: 100%;
-      word-wrap:break-word;
+      word-wrap: break-word;
     }
   }
-`;
 
+  button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    /* width: 100px; */
+    padding: 0 15px;
+    height: 36px;
+
+    border-radius: 100px;
+    background: #14171a;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: 400;
+    color: #a0aec0;
+    text-transform: capitalize;
+    background: #718096;
+    font-weight: 500;
+    color: #14171a;
+  }
+`;
