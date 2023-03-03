@@ -69,21 +69,27 @@ export default function ModelCreate() {
         }}
         schema={mySchema}
       /> */}
+      <h3>ceramic node</h3>
       <input
         title="ceramic node"
+        className='node-input'
+        placeholder="input your ceramic node url here."
         type="text"
         value={ceramicNode}
         onChange={(e) => {
           setCeramicNode(e.target.value);
         }} />
+      <h3>your model's graphql</h3>
       <textarea
         className='model-code'
+        placeholder="input your graphql code here."
         onChange={(e) => {
           setGraphql(e.target.value);
         }} />
       <div className="result-box">
         {composite &&
           <div>
+            <h3>your model's composite</h3>
             <div className='result-text'>{composite}</div>
             <button onClick={() => {
               download(composite, "my-composite.json")
@@ -94,6 +100,7 @@ export default function ModelCreate() {
         }
         {runtimeDefinition &&
           <div>
+            <h3>your model's runtime definition</h3>
             <div className='result-text'>{runtimeDefinition}</div>
             <button onClick={() => {
               download(runtimeDefinition, 'runtime-composite.json')
@@ -128,7 +135,9 @@ const PageBox = styled.div`
     justify-content: space-between;
     margin: 20px 0px ;
   }
-
+  .node-input{
+    width: 50%;
+  }
   .model-code{
     width: 100%;
     height: 300px;
