@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getModelStreamList, PageSize } from "../api";
 import { ModelStream } from "../types";
 import { sortPubKey } from "../utils/sortPubkey";
@@ -11,7 +11,7 @@ import Search from "../components/Search";
 
 export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
-  // const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
   const searchText = useRef("");
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
@@ -45,7 +45,7 @@ export default function ModelPage() {
     <PageBox>
       <div className="title-box">
         <div className="title">ComposeDB Models</div>
-        <div>
+        <div className="tools">
           <Search
             searchAction={(text) => {
               searchText.current = text;
@@ -54,8 +54,15 @@ export default function ModelPage() {
             }}
             placeholder={"Search by model name"}
           />
+
+          <button
+            onClick={() => {
+              navigate("/model/create");
+            }}
+          >
+            New Model
+          </button>
         </div>
-        <Link to={"/model/create"}>[ + ]</Link>
       </div>
       <InfiniteScroll
         dataLength={models.length}
@@ -127,6 +134,32 @@ const PageBox = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      > button {
+        border-radius: 100px;
+        background: #14171a;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        font-weight: 400;
+        color: #a0aec0;
+        text-transform: capitalize;
+        background: #718096;
+        font-weight: 500;
+        color: #14171a;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        /* width: 100px; */
+        padding: 0 15px;
+        height: 36px;
+      }
+    }
   }
 
   .title {

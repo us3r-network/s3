@@ -60,3 +60,8 @@ export type ModelStreamInfo = {
   content: any;
   state: any;
 };
+
+export type ModeCreateResult = {
+  composite: any;
+  runtimeDefinition: any;
+};

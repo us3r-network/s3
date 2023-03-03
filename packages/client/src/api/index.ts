@@ -1,6 +1,12 @@
 import axios, { AxiosPromise } from "axios";
 import { API_BASE_URL } from "../constants";
-import { ModelStream, ModelStreamInfo, Network, Stream } from "../types";
+import {
+  ModeCreateResult,
+  ModelStream,
+  ModelStreamInfo,
+  Network,
+  Stream,
+} from "../types";
 
 enum ApiRespCode {
   SUCCESS = 0,
@@ -77,5 +83,13 @@ export function getModelStreamInfo(
 ): AxiosPromise<ApiResp<ModelStreamInfo>> {
   return axios.get(`${API_BASE_URL}/TESTNET/streams/${streamId}/info`, {
     params: {},
+  });
+}
+
+export function createModel(
+  graphql: string
+): AxiosPromise<ApiResp<ModeCreateResult>> {
+  return axios.post(`${API_BASE_URL}/models`, {
+    graphql: graphql,
   });
 }
