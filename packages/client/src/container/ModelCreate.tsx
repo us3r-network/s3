@@ -7,6 +7,7 @@ import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
 import { schemas } from "../utils/composedb-types/schemas";
 import { createModel } from "../api";
+import { AxiosError } from "axios";
 
 export default function ModelCreate() {
   const navigate = useNavigate();
@@ -17,16 +18,37 @@ export default function ModelCreate() {
     libraries: schemas.library,
   });
 
+  const [submitting, setSubmitting] = useState(false);
+  const [createNew, setCreateNew] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+
+  const resetState = () => {
+    setErrMsg("");
+    setCreateNew(false);
+    setRuntimeDefinition("");
+    setComposite("");
+    setGqlSchema({
+      code: schemas.code,
+      libraries: schemas.library,
+    });
+  };
+
   const submit = useCallback(async () => {
+    setErrMsg("");
     if (!gqlSchema.code) return;
     try {
+      setSubmitting(true);
       const resp = await createModel(gqlSchema.code);
       const { composite, runtimeDefinition } = resp.data.data;
 
       setComposite(JSON.stringify(composite));
       setRuntimeDefinition(JSON.stringify(runtimeDefinition));
+      setCreateNew(true);
     } catch (error) {
-      console.error(error);
+      const err = error as AxiosError;
+      setErrMsg((err.response?.data as any).message || err.message);
+    } finally {
+      setSubmitting(false);
     }
   }, [gqlSchema.code]);
 
@@ -39,6 +61,31 @@ export default function ModelCreate() {
     FileSaver.saveAs(blob, filename);
   };
 
+  let status = (
+    <button
+      onClick={() => {
+        submit();
+      }}
+    >
+      submit
+    </button>
+  );
+  if (submitting) {
+    status = <span>submitting</span>;
+  }
+
+  if (createNew) {
+    status = (
+      <button
+        onClick={() => {
+          resetState();
+        }}
+      >
+        New Model
+      </button>
+    );
+  }
+
   return (
     <PageBox>
       <div className="title-box">
@@ -47,22 +94,17 @@ export default function ModelCreate() {
             navigate(-1);
           }}
         />
-        <div className="tools">
-          <button
-            onClick={() => {
-              submit();
-            }}
-          >
-            submit
-          </button>
-        </div>
+        <div className="tools">{status}</div>
       </div>
+      {errMsg && <div className="err-msg">{errMsg}</div>}
       <EditorBox>
         <GraphQLEditor
           setSchema={(props) => {
+            setErrMsg("");
             setGqlSchema(props);
           }}
           schema={gqlSchema}
+          readonly={createNew}
         />
       </EditorBox>
       <div className="result-box">
@@ -102,7 +144,7 @@ export const definition = ${runtimeDefinition}`,
 }
 
 const EditorBox = styled.div`
-  height: calc(100vh - 80px);
+  height: calc(100vh - 300px);
 `;
 
 const PageBox = styled.div`
@@ -154,6 +196,12 @@ const PageBox = styled.div`
       width: 100%;
       word-wrap: break-word;
     }
+  }
+
+  .err-msg {
+    padding: 15px 0 25px 0;
+    color: #ef1d1d;
+    font-weight: 700;
   }
 
   button {
