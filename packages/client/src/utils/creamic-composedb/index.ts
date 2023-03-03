@@ -38,8 +38,6 @@ export async function submitComposeDBModel(graphql: string, myCeramicNode: strin
             const authMethod = await EthereumWebAuth.getAuthMethod(ethProvider, accountId)
             const session = await DIDSession.authorize(authMethod, { resources: ["ceramic://*"] })
 
-            // Uses DIDs in ceramic, composedb & glaze libraries, ie
-            const ceramic = new CeramicClient()
             ceramic.did = session.did
         }
 
