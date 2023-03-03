@@ -110,32 +110,36 @@ export default function ModelCreate() {
       <div className="result-box">
         {composite && (
           <div>
-            <h3>your model's composite</h3>
+            <div className="title">
+              <h3>Model's composite</h3>
+              <button
+                onClick={() => {
+                  download(composite, "my-composite.json");
+                }}
+              >
+                Download
+              </button>
+            </div>
             <div className="result-text">{composite}</div>
-            <button
-              onClick={() => {
-                download(composite, "my-composite.json");
-              }}
-            >
-              download composite
-            </button>
           </div>
         )}
         {runtimeDefinition && (
           <div>
-            <h3>your model's runtime definition</h3>
-            <div className="result-text">{runtimeDefinition}</div>
-            <button
-              onClick={() => {
-                download(
-                  `// This is an auto-generated file, do not edit manually
+            <div className="title">
+              <h3>Model's runtime definition</h3>
+              <button
+                onClick={() => {
+                  download(
+                    `// This is an auto-generated file, do not edit manually
 export const definition = ${runtimeDefinition}`,
-                  "runtime-composite.js"
-                );
-              }}
-            >
-              download runtime definition
-            </button>
+                    "runtime-composite.js"
+                  );
+                }}
+              >
+                Download
+              </button>
+            </div>
+            <div className="result-text">{runtimeDefinition}</div>
           </div>
         )}
       </div>
@@ -164,7 +168,7 @@ const PageBox = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 0px;
+    padding: 10px 0px;
     box-sizing: border-box;
 
     .tools {
@@ -189,8 +193,24 @@ const PageBox = styled.div`
     gap: 20px;
     width: 100%;
     div {
-      width: 50%;
+      width: calc(50% - 10px);
       margin: 20px 0px;
+      border-radius: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #1a1a1c;
+      .title {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0;
+
+        h3 {
+          margin: 0;
+          padding: 0;
+        }
+      }
     }
     .result-text {
       width: 100%;
