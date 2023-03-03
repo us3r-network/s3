@@ -35,6 +35,7 @@ export default function ModelCreate() {
   const submit = async () => {
     const result = await submitComposeDBModel(graphql, ceramicNode)
     if (result) {
+      console.log(result, '\n', JSON.stringify(result.composite.toJSON()), '\n', JSON.stringify(result.runtimeDefinition))
       setComposite(JSON.stringify(result.composite.toJSON()))
       setRuntimeDefinition(JSON.stringify(result.runtimeDefinition))
     }
@@ -81,18 +82,26 @@ export default function ModelCreate() {
           setGraphql(e.target.value);
         }} />
       <div className="result-box">
-        <div>
-          <textarea>{composite}</textarea>
-          <button onClick={() => {
-            download(composite, "my-composite.json")
-          }}>download composite</button>
-        </div>
-        <div>
-          <textarea>{runtimeDefinition}</textarea>
-          <button onClick={() => {
-            download(runtimeDefinition, 'runtime-composite.json')
-          }}>download runtime definition</button>
-        </div>
+        {composite &&
+          <div>
+            <div className='result-text'>{composite}</div>
+            <button onClick={() => {
+              download(composite, "my-composite.json")
+            }}>
+              download composite
+            </button>
+          </div>
+        }
+        {runtimeDefinition &&
+          <div>
+            <div className='result-text'>{runtimeDefinition}</div>
+            <button onClick={() => {
+              download(runtimeDefinition, 'runtime-composite.json')
+            }}>
+              download runtime definition
+            </button>
+          </div>
+        }
       </div>
     </PageBox >
   );
@@ -136,9 +145,8 @@ const PageBox = styled.div`
       width: 50%;
       margin: 20px 0px ;
     }
-    textarea{
+    .result-text{
       width: 100%;
-      height: 300px;
       word-wrap:break-word;
     }
   }

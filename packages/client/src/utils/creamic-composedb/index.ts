@@ -17,12 +17,12 @@ export async function submitComposeDBModel(graphql: string, myCeramicNode: strin
     // 0 Login
     console.log('Connecting to the our ceramic node...')
     const ceramic = new CeramicClient(
-        myCeramicNode === '' ? myCeramicNode : CERAMIC_NODE
+        myCeramicNode !== '' ? myCeramicNode : CERAMIC_NODE
     );
     try {
         // Hexadecimal-encoded private key for a DID having admin access to the target Ceramic node
         // Replace the example key here by your admin private key
-        if (CERAMIC_NODE_ADMIN_PRIVATE_KEY) {
+        if (CERAMIC_NODE_ADMIN_PRIVATE_KEY && myCeramicNode===CERAMIC_NODE) {
             const privateKey = fromString(CERAMIC_NODE_ADMIN_PRIVATE_KEY, 'base16')
             const did = new DID({
                 resolver: getResolver(),
