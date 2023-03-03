@@ -71,7 +71,12 @@ export default function ModelCreate() {
     </button>
   );
   if (submitting) {
-    status = <span>submitting</span>;
+    status = (
+      <div className="loading">
+        <img src="/loading.gif" title="loading" alt="" />{" "}
+        <span>submitting</span>
+      </div>
+    );
   }
 
   if (createNew) {
@@ -243,5 +248,15 @@ const PageBox = styled.div`
     background: #718096;
     font-weight: 500;
     color: #14171a;
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    img {
+      width: 25px;
+      height: 25px;
+    }
   }
 `;
