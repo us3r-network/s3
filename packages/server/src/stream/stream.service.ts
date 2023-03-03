@@ -13,7 +13,9 @@ export default class StreamService {
   ) { }
 
   async findByStreamId(network: Network, streamId: string): Promise<Stream> {
-    return await this.streamRepository.findOne({ where: { network: network, stream_id: streamId } });
+    return await this.streamRepository.findOne({
+      where: { network: network, stream_id: streamId },
+    });
   }
 
   async findStreams(
@@ -21,8 +23,8 @@ export default class StreamService {
     familyOrApp: string,
     did: string,
     pageSize: number,
-    pageNumber: number): Promise<Stream[]> {
-
+    pageNumber: number,
+  ): Promise<Stream[]> {
     let whereSql = 'network=:network';
     if (familyOrApp?.trim().length > 0) {
       if (whereSql.length > 0) {
@@ -47,5 +49,27 @@ export default class StreamService {
       .offset(pageSize * (pageNumber - 1))
       .orderBy('created_at', 'DESC')
       .getMany();
+  }
+
+  async findModelUseCount(
+    network: Network,
+    models: string[],
+  ): Promise<Map<string, number>> {
+    const useCountMap = new Map<string, number>();
+
+    const useCountResult = await this.streamRepository
+      .createQueryBuilder('streams')
+      .select(['streams.model, count(streams.stream_id) as count'])
+      .where('network=:network', {
+        network: network,
+      })
+      .andWhere('streams.model IN (:...models)', { models: models })
+      .groupBy('streams.model')
+      .getRawMany();
+
+    useCountResult?.forEach((r) => {
+      useCountMap.set(r['model'], Number(r['count']));
+    });
+    return useCountMap;
   }
 }

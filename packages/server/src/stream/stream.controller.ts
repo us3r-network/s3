@@ -10,15 +10,17 @@ import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Network, Stream } from '../entities/stream/stream.entity';
 import StreamService from './stream.service';
 import { BasicMessageDto } from './dtos/common.dto';
-import { ConvertToStream, ConvertToStreamsReponseDto, StreamDto } from './dtos/stream.dto';
-
+import {
+  ConvertToStream,
+  ConvertToStreamsReponseDto,
+  StreamDto,
+} from './dtos/stream.dto';
+import { importDynamic } from 'src/common/utils';
 @ApiTags('/')
 @Controller('/')
 export class StreamController {
   private readonly logger = new Logger(StreamController.name);
-  constructor(
-    private readonly streamService: StreamService,
-  ) { }
+  constructor(private readonly streamService: StreamService) { }
 
   @Get('/streams')
   @ApiQuery({
@@ -48,8 +50,18 @@ export class StreamController {
     if (!pageSize || pageSize == 0) pageSize = 50;
     if (!pageNumber || pageNumber == 0) pageNumber = 1;
 
-    const streams = await this.streamService.findStreams(network, familyOrApp, did, pageSize, pageNumber);
-    return new BasicMessageDto('ok', 0, ConvertToStreamsReponseDto(streams, 0, 0));
+    const streams = await this.streamService.findStreams(
+      network,
+      familyOrApp,
+      did,
+      pageSize,
+      pageNumber,
+    );
+    return new BasicMessageDto(
+      'ok',
+      0,
+      ConvertToStreamsReponseDto(streams, 0, 0),
+    );
   }
 
   @Get('/:network/streams/:streamId')
@@ -65,5 +77,26 @@ export class StreamController {
       );
     }
     return new BasicMessageDto('ok', 0, ConvertToStream(stream));
+  }
+
+  @Get('/:network/streams/:streamId/info')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getStreamInfo(
+    @Param('streamId') streamId: string,
+    @Param('network') network: Network,
+  ): Promise<BasicMessageDto> {
+    // Currently only suport testnet
+    const Ceramic = await importDynamic('@ceramicnetwork/http-client');
+    if (network == Network.TESTNET) {
+      const ceramicClient = new Ceramic.CeramicClient(
+        'https://ceramic-clay.3boxlabs.com',
+      );
+      const stream = await ceramicClient.loadStream(streamId);
+      return new BasicMessageDto('ok', 0, {
+        state: stream?.state,
+        content: stream?.content,
+      });
+    }
+    return new BasicMessageDto('ok', 0, {});
   }
 }

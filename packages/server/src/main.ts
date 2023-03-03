@@ -5,7 +5,6 @@ import { AppModule } from './app.module';
 import { Network } from './entities/stream/stream.entity';
 import CeramicSubscriberService from './stream/ceramic.subscriber.service';
 
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = new DocumentBuilder()
@@ -19,7 +18,7 @@ async function bootstrap() {
 
   app.enableCors();
 
-  await app.listen(3002);
+  await app.listen(3000);
 
   const ceramicSubscriberService = app.get(CeramicSubscriberService);
   // Sub ceramic test network.
@@ -31,7 +30,7 @@ async function bootstrap() {
       '/dns4/go-ipfs-ceramic-private-clay-external.3boxlabs.com/tcp/4011/ws/p2p/QmQotCKxiMWt935TyCBFTN23jaivxwrZ3uD58wNxeg5npi',
       '/dns4/go-ipfs-ceramic-private-cas-clay-external.3boxlabs.com/tcp/4011/ws/p2p/QmbeBTzSccH8xYottaYeyVX8QsKyox1ExfRx7T1iBqRyCd',
     ],
-    ['/ip4/127.0.0.1/tcp/20001/ws'],
+    ['/ip4/127.0.0.1/tcp/20000/ws'],
     '/ceramic/testnet-clay',
     'https://ceramic-clay.3boxlabs.com',
   );
@@ -42,7 +41,7 @@ async function bootstrap() {
       '/dns4/go-ipfs-ceramic-private-mainnet-external.3boxlabs.com/tcp/4011/ws/p2p/QmXALVsXZwPWTUbsT8G6VVzzgTJaAWRUD7FWL5f7d5ubAL',
       '/dns4/go-ipfs-ceramic-private-cas-mainnet-external.3boxlabs.com/tcp/4011/ws/p2p/QmUvEKXuorR7YksrVgA7yKGbfjWHuCRisw2cH9iqRVM9P8',
     ],
-    ['/ip4/127.0.0.1/tcp/30001/ws'],
+    ['/ip4/127.0.0.1/tcp/30000/ws'],
     '/ceramic/mainnet',
     'https://ceramic.passport-iam.gitcoin.co/',
   );

@@ -9,10 +9,9 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
-      logging: false,
+      logging: true,
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
-      synchronize: true,
       extra: {
         ssl: {
           rejectUnauthorized: false,
