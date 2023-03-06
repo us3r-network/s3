@@ -109,7 +109,6 @@ export default function ModelCreate() {
             setGqlSchema(props);
           }}
           schema={gqlSchema}
-          readonly={createNew}
         />
       </EditorBox>
       <div className="result-box">
