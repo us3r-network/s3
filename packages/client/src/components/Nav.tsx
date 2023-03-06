@@ -6,7 +6,7 @@ import Logo from "./Logo";
 
 export default function Nav() {
   let location = useLocation();
-  console.log(location.pathname);
+
   const modelActive = location.pathname.startsWith("/model");
   return (
     <NavContainer>
@@ -19,19 +19,23 @@ export default function Nav() {
         </Link>
 
         <div className="nav">
-          <div className={`nav-item ${!modelActive ? "active" : ""}`}>
-            <Link to={"/"}>S</Link>
-            <div className="tint-c">
-              <div className="tint">Streams</div>
+          <Link to={"/"}>
+            <div className={`nav-item ${!modelActive ? "active" : ""}`}>
+              <span>S</span>
+              <div className="tint-c">
+                <div className="tint">Streams</div>
+              </div>
             </div>
-          </div>
+          </Link>
 
-          <div className={`nav-item ${modelActive ? "active" : ""}`}>
-            <Link to={"/model"}>M</Link>
-            <div className="tint-c">
-              <div className="tint">ComposeDB Models</div>
+          <Link to={"/model"}>
+            <div className={`nav-item ${modelActive ? "active" : ""}`}>
+              <span>M</span>
+              <div className="tint-c">
+                <div className="tint">ComposeDB Models</div>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         <div className="github-star">
@@ -75,6 +79,9 @@ const NavContainer = styled.nav`
       flex-direction: column;
       align-items: center;
       gap: 20px;
+      a {
+        color: #fff;
+      }
       .nav-item {
         position: relative;
         width: 48px;
@@ -85,9 +92,6 @@ const NavContainer = styled.nav`
         align-items: center;
         justify-content: center;
         font-size: 26px;
-        a {
-          color: #fff;
-        }
 
         .tint-c {
           position: absolute;
@@ -110,8 +114,11 @@ const NavContainer = styled.nav`
           }
         }
 
+        > span {
+          color: #fff;
+        }
         &.active {
-          a {
+          > span {
             color: #71aaff;
           }
         }
