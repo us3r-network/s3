@@ -74,6 +74,7 @@ export function getModelStreamList({
       name,
       pageSize,
       pageNumber,
+      useCounting: true,
     },
   });
 }
