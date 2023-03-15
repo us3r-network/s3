@@ -12,7 +12,7 @@ const LoginButton = () => {
   const { openLoginModal } = useUs3rAuthModal();
 
   return (
-    <Wrapper style={{}}>
+    <Wrapper>
       {!!sessId && <UserAvatar did={sessId} title={sessId} />}
       <button
         onClick={() => {
@@ -32,9 +32,11 @@ const LoginButton = () => {
 export default LoginButton;
 const Wrapper = styled.div`
   width: 100%;
+  height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: end;
   gap: 10px;
   > img {
     width: 32px;

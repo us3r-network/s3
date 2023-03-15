@@ -40,6 +40,7 @@ export default function Nav() {
         </div>
 
         <div className="nav-bottom">
+          <LoginButton />
           <div className="github-star">
             <GitHubButton
               href="https://github.com/us3r-network/userscan"
@@ -50,7 +51,6 @@ export default function Nav() {
               Star
             </GitHubButton>
           </div>
-          <LoginButton />
         </div>
       </div>
     </NavContainer>
@@ -132,10 +132,11 @@ const NavContainer = styled.nav`
     }
 
     .nav-bottom {
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       .github-star {
         width: 100%;
         display: flex;
