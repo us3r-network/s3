@@ -13,16 +13,8 @@ const LoginButton = () => {
 
   return (
     <Wrapper style={{}}>
-      {!!sessId && <UserAvatar did={sessId} />}
+      {!!sessId && <UserAvatar did={sessId} title={sessId} />}
       <button
-        style={{
-          width: "50px",
-          height: "32px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "12px",
-        }}
         onClick={() => {
           if (!sessId) {
             openLoginModal();
@@ -51,8 +43,8 @@ const Wrapper = styled.div`
   > button {
     overflow: hidden;
     cursor: pointer;
-    width: calc(100% - 4px);
-    height: 40px;
+    width: 54px;
+    height: 32px;
     border-radius: 10px;
     color: #fff;
     background: none;
