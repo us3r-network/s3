@@ -17,6 +17,7 @@ export type Stream = {
   commitIds: string[];
   content: Json;
   metadata: Json;
+  domain?: string;
 };
 
 export enum Network {

@@ -44,6 +44,12 @@ export default function StreamTable({
           <span>Indexing time:</span>
           <div>{dayjs(data.indexingTime).fromNow()}</div>
         </div>
+        {data.domain && (
+          <div>
+            <span>Domain:</span>
+            <div>{data.domain}</div>
+          </div>
+        )}
         <div>
           <span>Family or App:</span>
           {(data.familyOrApp && (
