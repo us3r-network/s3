@@ -1,6 +1,12 @@
-import axios, { AxiosPromise } from 'axios';
-import { API_BASE_URL } from '../constants';
-import { Network, Stream } from '../types';
+import axios, { AxiosPromise } from "axios";
+import { API_BASE_URL } from "../constants";
+import {
+  ModeCreateResult,
+  ModelStream,
+  ModelStreamInfo,
+  Network,
+  Stream,
+} from "../types";
 
 enum ApiRespCode {
   SUCCESS = 0,
@@ -52,4 +58,39 @@ export function getStreamInfo(
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}`
   );
+}
+
+export function getModelStreamList({
+  name,
+  pageSize = PageSize,
+  pageNumber = 1,
+}: {
+  name?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}): AxiosPromise<ApiResp<Array<ModelStream>>> {
+  return axios.get(`${API_BASE_URL}/models`, {
+    params: {
+      name,
+      pageSize,
+      pageNumber,
+      useCounting: true,
+    },
+  });
+}
+
+export function getModelStreamInfo(
+  streamId: string
+): AxiosPromise<ApiResp<ModelStreamInfo>> {
+  return axios.get(`${API_BASE_URL}/TESTNET/streams/${streamId}/info`, {
+    params: {},
+  });
+}
+
+export function createModel(
+  graphql: string
+): AxiosPromise<ApiResp<ModeCreateResult>> {
+  return axios.post(`${API_BASE_URL}/models`, {
+    graphql: graphql,
+  });
 }

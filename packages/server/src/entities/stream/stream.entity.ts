@@ -49,7 +49,8 @@ export class Stream extends BaseEntity {
     type: 'text',
     array: true,
     default: [],
-  }) private tags: string[];
+  })
+  private tags: string[];
 
   @Column({ nullable: true })
   private anchor_status: Status;
@@ -127,28 +128,28 @@ export class Stream extends BaseEntity {
   set setStreamId(streamId: string) {
     this.stream_id = streamId;
   }
-  
+
   get getDid(): string {
     return this.did;
   }
   set setDid(did: string) {
     this.did = did;
   }
-  
+
   get getAnchorStatus(): Status {
     return this.anchor_status;
   }
   set setAnchorStatus(anchorStatus: Status) {
     this.anchor_status = anchorStatus;
   }
-  
+
   get getAnchorHash(): string {
     return this.anchor_hash;
   }
   set setAnchorHash(anchorHash: string) {
     this.anchor_hash = anchorHash;
   }
-  
+
   get getApp(): string {
     return this.app;
   }
@@ -204,7 +205,7 @@ export class Stream extends BaseEntity {
   set setOriginData(originData: any) {
     this.origin_data = originData;
   }
-  
+
   get getCreatedAt(): Date {
     return this.created_at;
   }

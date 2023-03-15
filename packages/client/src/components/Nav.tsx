@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import GitHubButton from "react-github-btn";
 
@@ -6,6 +6,9 @@ import Logo from "./Logo";
 import LoginButton from "./LoginButton";
 
 export default function Nav() {
+  let location = useLocation();
+
+  const modelActive = location.pathname.startsWith("/model");
   return (
     <NavContainer>
       <div className="fixed">
@@ -15,6 +18,26 @@ export default function Nav() {
             <span>Alpha</span>
           </div>
         </Link>
+
+        <div className="nav">
+          <Link to={"/"}>
+            <div className={`nav-item ${!modelActive ? "active" : ""}`}>
+              <span>S</span>
+              <div className="tint-c">
+                <div className="tint">Streams</div>
+              </div>
+            </div>
+          </Link>
+
+          <Link to={"/model"}>
+            <div className={`nav-item ${modelActive ? "active" : ""}`}>
+              <span>M</span>
+              <div className="tint-c">
+                <div className="tint">ComposeDB Models</div>
+              </div>
+            </div>
+          </Link>
+        </div>
 
         <div className="nav-bottom">
           <div className="github-star">
@@ -27,7 +50,6 @@ export default function Nav() {
               Star
             </GitHubButton>
           </div>
-
           <LoginButton />
         </div>
       </div>
@@ -55,16 +77,76 @@ const NavContainer = styled.nav`
     justify-content: space-between;
     flex-direction: column;
 
-    .nav-bottom {
+    .nav {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 20px;
+      a {
+        color: #fff;
+      }
+      .nav-item {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border: 1px solid #39424c;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
 
+        .tint-c {
+          position: absolute;
+          left: 0;
+          top: -15px;
+        }
+
+        .tint {
+          position: fixed;
+          display: none;
+          font-size: 16px;
+          width: fit-content;
+          padding: 1px 3px;
+          border: 1px solid #39424c;
+        }
+
+        &:hover {
+          .tint {
+            display: block;
+          }
+        }
+
+        > span {
+          color: #fff;
+        }
+        &.active {
+          > span {
+            color: #71aaff;
+          }
+        }
+
+        /* font-weight: 700; */
+      }
+    }
+
+    .nav-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       .github-star {
         width: 100%;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        .github-star {
+          width: 100%;
+          text-align: center;
+        }
       }
     }
   }

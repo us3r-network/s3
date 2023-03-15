@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerBehindProxyGuard } from './middlewares/throttler-behind-proxy.guard';
 import { StreamModule } from './stream/stream.module';
+import { ModelModule } from './model/model.module';
 
 const env: string | undefined = process.env.NODE_ENV;
 
@@ -18,6 +19,7 @@ const env: string | undefined = process.env.NODE_ENV;
       limit: +process.env.THROTTLE_LIMIT,
     }),
     StreamModule,
+    ModelModule,
   ],
   controllers: [],
   providers: [

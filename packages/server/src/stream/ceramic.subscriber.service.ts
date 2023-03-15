@@ -12,15 +12,15 @@ export default class CeramicSubscriberService {
   constructor(
     @InjectRepository(Stream)
     private readonly streamRepository: StreamRepository,
-  ) { }
+  ) {}
   async SubCeramic(
     network: Network,
     bootstrapMultiaddrs: string[],
     listen: string[],
     topic: string,
-    ceramicNetworkUrl: string
+    ceramicNetworkUrl: string,
   ) {
-    const node = await this.createP2PNode(bootstrapMultiaddrs, listen)
+    const node = await this.createP2PNode(bootstrapMultiaddrs, listen);
     node.pubsub.subscribe(topic);
 
     const ceramic = await this.createCeramicClient(ceramicNetworkUrl);
@@ -35,18 +35,21 @@ export default class CeramicSubscriberService {
         } else if (parsed.typ == 2) {
           // MsgType: RESPONSE
           const streamIds = Object.keys(parsed.tips);
-          await Promise.all(streamIds?.map(async streamId => {
-            await this.store(ceramic, network, streamId);
-          }));
+          await Promise.all(
+            streamIds?.map(async (streamId) => {
+              await this.store(ceramic, network, streamId);
+            }),
+          );
         }
       } catch (error) {
-        this.logger.error(`ceramic sub err, messgage:${message} error:${error}`);
+        this.logger.error(
+          `ceramic sub err, messgage:${message} error:${error}`,
+        );
       }
     });
   }
 
-  async createP2PNode(bootstrapMultiaddrs: string[],
-    listen: string[]) {
+  async createP2PNode(bootstrapMultiaddrs: string[], listen: string[]) {
     const libp2p = await _importDynamic('libp2p');
     const webSockets = await _importDynamic('@libp2p/websockets');
     const mplex = await _importDynamic('@libp2p/mplex');
@@ -75,62 +78,107 @@ export default class CeramicSubscriberService {
     });
   }
 
-  async createCeramicClient(ceramicNetworkUrl: string){
+  async createCeramicClient(ceramicNetworkUrl: string) {
     const CeramicClient = await _importDynamic('@ceramicnetwork/http-client');
     return new CeramicClient.CeramicClient(ceramicNetworkUrl);
   }
 
   // Store all streams.
-  async store(ceramic: any, network: Network, streamId: string,) {
+  async store(ceramic: any, network: Network, streamId: string) {
     const stream = await ceramic.loadStream(streamId);
-    await this.storeStream(network, streamId, stream.allCommitIds, stream.state);
+    await this.storeStream(
+      network,
+      streamId,
+      stream.allCommitIds,
+      stream.state,
+    );
     // save schema stream
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
       const schemaStream = await ceramic.loadStream(schemaStreamId);
-      await this.storeStream(network, schemaStreamId, schemaStream.allCommitIds, schemaStream.state);
+      await this.storeStream(
+        network,
+        schemaStreamId,
+        schemaStream.allCommitIds,
+        schemaStream.state,
+      );
     }
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
       const modelStream = await ceramic.loadStream(modelStreamId);
-      await this.storeStream(network, modelStreamId, modelStream.allCommitIds, modelStream.state);
+      await this.storeStream(
+        network,
+        modelStreamId,
+        modelStream.allCommitIds,
+        modelStream.state,
+      );
     }
   }
 
-  async storeStream(network: Network, streamId: string, commitIds: string[], streamState: any) {
+  async storeStream(
+    network: Network,
+    streamId: string,
+    commitIds: string[],
+    streamState: any,
+  ) {
     try {
-      const stream = this.convertToStreamEntity(network, streamId, commitIds, streamState);
+      const stream = this.convertToStreamEntity(
+        network,
+        streamId,
+        commitIds,
+        streamState,
+      );
       if (!stream) return;
 
-      const savedStream = await this.streamRepository.upsert(stream, ['network', 'stream_id']);
+      const savedStream = await this.streamRepository.upsert(stream, [
+        'network',
+        'stream_id',
+      ]);
       this.logger.log(`Saved network(${network}) stream id(${streamId})`);
       return savedStream;
     } catch (error) {
-      this.logger.error(`To store network(${network}) stream(${streamId}) err:${JSON.stringify(error)}`);
+      this.logger.error(
+        `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
+          error,
+        )}`,
+      );
     }
   }
 
-  convertToStreamEntity(network: Network, streamId: string, commitIds: string[], streamState: any): Stream {
+  convertToStreamEntity(
+    network: Network,
+    streamId: string,
+    commitIds: string[],
+    streamState: any,
+  ): Stream {
     const stream = new Stream();
     stream.setStreamId = streamId;
     stream.setNetwork = network;
-    if (streamState?.metadata?.family) stream.setFamily = streamState.metadata.family;
+    if (streamState?.metadata?.family)
+      stream.setFamily = streamState.metadata.family;
     stream.setType = streamState.type;
     stream.setDid = streamState?.metadata?.controllers[0];
-    if (streamState.anchorStatus == 3) { stream.setAnchorStatus = Status.ANCHORED } else {
-      stream.setAnchorStatus = Status.NOT_ANCHORED
+    if (streamState.anchorStatus == 3) {
+      stream.setAnchorStatus = Status.ANCHORED;
+    } else {
+      stream.setAnchorStatus = Status.NOT_ANCHORED;
     }
     if (streamState?.anchorProof && streamState.anchorProof.blockTimestamp) {
-      stream.setAnchorDate = new Date(streamState.anchorProof.blockTimestamp * 1000);
+      stream.setAnchorDate = new Date(
+        streamState.anchorProof.blockTimestamp * 1000,
+      );
       stream.setAnchorHash = streamState.anchorProof.txHash.toString();
     }
-    if (streamState?.metadata?.schema) stream.setSchema = streamState.metadata.schema.replace('ceramic://', '');
+    if (streamState?.metadata?.schema)
+      stream.setSchema = streamState.metadata.schema.replace('ceramic://', '');
     if (streamState?.metadata?.model) {
       stream.setModel = streamState.metadata.model.toString();
     }
     if (streamState?.metadata?.tags) stream.setTags = streamState.metadata.tags;
-    stream.setCommitIds = commitIds?.map(id => id.toString().replace('CommitID(', '').replace(')', ''));
+    stream.setCommitIds = commitIds?.map((id) =>
+      id.toString().replace('CommitID(', '').replace(')', ''),
+    );
     stream.setContent = streamState.content;
     stream.setMetadata = streamState.metadata;
     stream.setOriginData = JSON.parse(JSON.stringify(streamState));
