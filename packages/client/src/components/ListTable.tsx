@@ -38,7 +38,7 @@ export default function ListTable({
             if (item.content.type) {
               tags.push(item.content.type);
             }
-            item.domain = "app.omniatech.io";
+
             return (
               <tr key={item.streamId + idx}>
                 <td>
