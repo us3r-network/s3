@@ -38,6 +38,7 @@ export default function ListTable({
             if (item.content.type) {
               tags.push(item.content.type);
             }
+
             return (
               <tr key={item.streamId + idx}>
                 <td>
@@ -67,21 +68,33 @@ export default function ListTable({
                   </td>
                 )}
                 <td>
-                  <div className="family-container">
-                    {(item.familyOrApp && (
-                      <Link to={`/${network}/family/${item.familyOrApp}`}>
-                        <div className="family">
-                          {FamilyOrAppMapReverse[item.familyOrApp] ||
-                          item.familyOrApp.length > 15
-                            ? sortPubKey(item.familyOrApp, {
-                                len: 8,
-                                split: "-",
-                              })
-                            : item.familyOrApp}
-                        </div>
+                  {(item.domain && (
+                    <div className="family-container">
+                      <Link
+                        to={`/${network}/family/${encodeURIComponent(
+                          item.domain
+                        )}`}
+                      >
+                        <div className="family">{item.domain}</div>
                       </Link>
-                    )) || <div className="xxxx">-</div>}
-                  </div>
+                    </div>
+                  )) || (
+                    <div className="family-container">
+                      {(item.familyOrApp && (
+                        <Link to={`/${network}/family/${item.familyOrApp}`}>
+                          <div className="family">
+                            {FamilyOrAppMapReverse[item.familyOrApp] ||
+                            item.familyOrApp.length > 15
+                              ? sortPubKey(item.familyOrApp, {
+                                  len: 8,
+                                  split: "-",
+                                })
+                              : item.familyOrApp}
+                          </div>
+                        </Link>
+                      )) || <div className="xxxx">-</div>}
+                    </div>
+                  )}
                 </td>
                 <td>
                   <div className="xxxx">
