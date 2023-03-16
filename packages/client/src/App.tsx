@@ -32,7 +32,7 @@ export default function App() {
       <Us3rThreadProvider ceramicHost={CERAMIC_HOST}>
         <Us3rAuthProvider
           authConfig={{ authToolTypes }}
-          themeConfig={{ themeType: "light" }}
+          themeConfig={{ themeType: "dark" }}
         >
           <Routes>
             <Route path="/" element={<Layout />}>
