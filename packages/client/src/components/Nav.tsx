@@ -3,6 +3,7 @@ import styled from "styled-components";
 import GitHubButton from "react-github-btn";
 
 import Logo from "./Logo";
+import LoginButton from "./LoginButton";
 
 export default function Nav() {
   let location = useLocation();
@@ -38,15 +39,18 @@ export default function Nav() {
           </Link>
         </div>
 
-        <div className="github-star">
-          <GitHubButton
-            href="https://github.com/us3r-network/userscan"
-            data-color-scheme="no-preference: light; light: light; dark: dark;"
-            data-icon="octicon-star"
-            aria-label="Star buttons/github-buttons on GitHub"
-          >
-            Star
-          </GitHubButton>
+        <div className="nav-bottom">
+          <LoginButton />
+          <div className="github-star">
+            <GitHubButton
+              href="https://github.com/us3r-network/userscan"
+              data-color-scheme="no-preference: light; light: light; dark: dark;"
+              data-icon="octicon-star"
+              aria-label="Star buttons/github-buttons on GitHub"
+            >
+              Star
+            </GitHubButton>
+          </div>
         </div>
       </div>
     </NavContainer>
@@ -127,9 +131,24 @@ const NavContainer = styled.nav`
       }
     }
 
-    .github-star {
+    .nav-bottom {
       width: 100%;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      .github-star {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        .github-star {
+          width: 100%;
+          text-align: center;
+        }
+      }
     }
   }
 
@@ -153,34 +172,6 @@ const NavContainer = styled.nav`
       font-size: 16px;
       color: rgb(255, 255, 255);
       padding-bottom: 5px;
-    }
-  }
-
-  .login-container {
-    width: 100%;
-    padding: 0 2px;
-
-    > button {
-      overflow: hidden;
-      cursor: pointer;
-      width: calc(100% - 4px);
-      height: 40px;
-      border-radius: 10px;
-      color: #fff;
-      background: none;
-      outline: none;
-      border: 1px solid gray;
-    }
-  }
-
-  .avatar-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    margin-bottom: 5px;
-    > span {
-      display: none;
     }
   }
 
