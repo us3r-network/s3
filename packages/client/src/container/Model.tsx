@@ -60,7 +60,7 @@ export default function ModelPage() {
               navigate("/model/create");
             }}
           >
-            New Model
+            + New Model
           </button>
         </div>
       </div>
@@ -91,18 +91,26 @@ export default function ModelPage() {
                   <tr key={item.stream_id}>
                     <td>{item.stream_content.name}</td>
                     <td>
-                      <div>{item.stream_content.description}</div>
+                      <div className="description">
+                        {item.stream_content.description}
+                      </div>
                     </td>
                     <td>
                       <Link to={`/model/${item.stream_id}`}>
                         {sortPubKey(item.stream_id, { len: 8, split: "-" })}
                       </Link>
                     </td>
-                    <td>{item.useCount}</td>
                     <td>
-                      {(item.last_anchored_at &&
-                        dayjs(item.created_at).format("YYYY-MM-DD HH:mm:ss")) ||
-                        "-"}
+                      <div className="usage-count">{item.useCount}</div>
+                    </td>
+                    <td>
+                      <div className="release-date">
+                        {(item.last_anchored_at &&
+                          dayjs(item.created_at).format(
+                            "YYYY-MM-DD HH:mm:ss"
+                          )) ||
+                          "-"}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -149,7 +157,7 @@ const PageBox = styled.div`
         font-weight: 400;
         color: #a0aec0;
         text-transform: capitalize;
-        background: #718096;
+        background: #ffffff;
         font-weight: 500;
         color: #14171a;
         cursor: pointer;
@@ -178,6 +186,12 @@ const PageBox = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
+
+    color: #ffffff;
   }
 `;
 
@@ -219,7 +233,7 @@ const TableContainer = styled.table`
     font-size: 16px;
     line-height: 19px;
     overflow: hidden;
-    color: #71aaff;
+    color: #ffffff;
 
     &:first-child {
       padding-left: 20px;
@@ -244,6 +258,15 @@ const TableContainer = styled.table`
 
   tbody td {
     height: 88px;
+  }
+
+  .release-date,
+  .usage-count,
+  .description {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: #718096;
   }
 
   .did-container {

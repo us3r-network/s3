@@ -44,7 +44,7 @@ export default function App() {
               <Route path="model" element={<Model />} />
               <Route path="model/:streamId" element={<ModelStream />} />
               <Route path="model/create" element={<ModelCreate />} />
-      
+
               <Route path="*" element={<NoMatch />} />
             </Route>
           </Routes>

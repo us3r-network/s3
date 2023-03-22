@@ -109,4 +109,6 @@ const TableContainer = styled.div`
     text-align: center;
     padding: 50px;
   }
+
+  color: #718096;
 `;

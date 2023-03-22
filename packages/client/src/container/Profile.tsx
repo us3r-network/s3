@@ -1,14 +1,14 @@
-import { useEffect, useMemo } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import multiavatar from '@multiavatar/multiavatar';
+import { useEffect, useMemo } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
+import multiavatar from "@multiavatar/multiavatar";
 
-import { Network } from '../types';
-import ListTable from '../components/ListTable';
-import useListData from '../hooks/useListData';
-import { sortPubKey } from '../utils/sortPubkey';
-import BackBtn from '../components/BackBtn';
+import { Network } from "../types";
+import ListTable from "../components/ListTable";
+import useListData from "../hooks/useListData";
+import { sortPubKey } from "../utils/sortPubkey";
+import BackBtn from "../components/BackBtn";
 
 export default function Profile() {
   const { network, did } = useParams();
@@ -25,8 +25,8 @@ export default function Profile() {
   }, [network, did]);
 
   const pubkey = useMemo(() => {
-    if (!did) return '';
-    return did.split(':').pop() || '';
+    if (!did) return "";
+    return did;
   }, [did]);
 
   return (

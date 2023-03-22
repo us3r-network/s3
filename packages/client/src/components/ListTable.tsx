@@ -112,9 +112,9 @@ export default function ListTable({
                   )) || <div className="xxxx">-</div>}
                 </td>
                 <td>
-                  <span>
+                  <div className="index-time">
                     <time>{dayjs(item.indexingTime).fromNow()}</time>
-                  </span>
+                  </div>
                 </td>
               </tr>
             );
@@ -166,7 +166,6 @@ const TableContainer = styled.table`
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
-    color: #71aaff;
     overflow: hidden;
     &:first-child {
       padding-left: 20px;
@@ -203,15 +202,21 @@ const TableContainer = styled.table`
     .badge {
       background-color: #718096;
       border-radius: 20px;
-      padding: 4px 10px;
+      padding: 0px 10px;
       font-size: 13px;
       font-weight: 500;
       align-items: center;
       flex-direction: row;
       display: flex;
+      /* width: 101px; */
+      height: 23px;
     }
     .grey {
-      color: #14171a;
+      background: #14171a;
+      font-size: 16px;
+      line-height: 19px;
+
+      color: #718096;
     }
   }
 
@@ -223,12 +228,12 @@ const TableContainer = styled.table`
       font-size: 12px;
       line-height: 14px;
 
-      color: #6c8fc1;
+      color: #ffffff;
 
       padding: 2px 4px;
       width: fit-content;
 
-      border: 1px solid #6c8fc1;
+      border: 1px solid #ffffff;
       border-radius: 4px;
     }
   }
@@ -238,7 +243,7 @@ const TableContainer = styled.table`
     font-size: 16px;
     line-height: 19px;
 
-    color: #ffffff;
+    color: #718096;
   }
 
   & time {
@@ -246,6 +251,6 @@ const TableContainer = styled.table`
     font-size: 16px;
     line-height: 19px;
 
-    color: #ffffff;
+    color: #718096;
   }
 `;
