@@ -19,6 +19,7 @@ import { CERAMIC_HOST } from "./constants";
 import Model from "./container/Model";
 import ModelStream from "./container/ModelStream";
 import ModelCreate from "./container/ModelCreate";
+import UserModels from "./container/UserModels";
 
 dayjs.extend(relativeTime);
 
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="model" element={<Model />} />
               <Route path="model/:streamId" element={<ModelStream />} />
               <Route path="model/create" element={<ModelCreate />} />
+              <Route path="models/:did" element={<UserModels />} />
 
               <Route path="*" element={<NoMatch />} />
             </Route>
