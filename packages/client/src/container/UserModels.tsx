@@ -1,44 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import { Link, useParams } from "react-router-dom";
+import { ModelStream, ModelStreamInfo } from "../types";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { TableBox } from "../components/TableBox";
-import { Link, useNavigate } from "react-router-dom";
 import { getModelStreamList, PageSize } from "../api";
-import { ModelStream } from "../types";
+import styled from "styled-components";
+import { TableBox } from "../components/TableBox";
 import { sortPubKey } from "../utils/sortPubkey";
 import dayjs from "dayjs";
-import Search from "../components/Search";
-import { useUs3rProfileContext } from "@us3r-network/profile";
-import { useUs3rAuthModal } from "@us3r-network/authkit";
+import { UserAvatar } from "@us3r-network/authkit";
 
-export default function ModelPage() {
+export default function UserModels() {
+  const { did } = useParams();
   const [models, setModels] = useState<Array<ModelStream>>([]);
-  const navigate = useNavigate();
-  const searchText = useRef("");
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
-  const { sessId } = useUs3rProfileContext()!;
-  const { openLoginModal } = useUs3rAuthModal();
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText.current });
+    if (!did) return;
+    const resp = await getModelStreamList({ did: did });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
     pageNum.current = 1;
-  }, []);
+  }, [did]);
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
         pageNumber,
-        name: searchText.current,
+        did,
       });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setModels([...models, ...list]);
     },
-    [models]
+    [did, models]
   );
 
   useEffect(() => {
@@ -48,36 +44,9 @@ export default function ModelPage() {
   return (
     <PageBox>
       <div className="title-box">
-        <div className="title">ComposeDB Models</div>
-        <div className="tools">
-          <Search
-            searchAction={(text) => {
-              searchText.current = text;
-              setModels([]);
-              fetchModel();
-            }}
-            placeholder={"Search by model name"}
-          />
-
-          <button
-            onClick={() => {
-              navigate("/model/create");
-            }}
-          >
-            + New Model
-          </button>
-
-          <button
-            onClick={() => {
-              if (sessId) {
-                navigate(`/models/${sessId}`);
-              } else {
-                openLoginModal();
-              }
-            }}
-          >
-            My Models
-          </button>
+        <div className="title">
+          <UserAvatar did={did} title={did} />
+          <span>Models</span>
         </div>
       </div>
       <InfiniteScroll
@@ -139,77 +108,6 @@ export default function ModelPage() {
     </PageBox>
   );
 }
-
-const Loading = styled.div`
-  padding: 20px;
-  text-align: center;
-  color: gray;
-`;
-
-const PageBox = styled.div`
-  margin-bottom: 20px;
-  .no-more {
-    padding: 20px;
-    text-align: center;
-    color: gray;
-  }
-
-  .title-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .tools {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-
-      > button {
-        border-radius: 100px;
-        background: #14171a;
-        font-size: 14px;
-        line-height: 20px;
-        text-align: center;
-        font-weight: 400;
-        color: #a0aec0;
-        text-transform: capitalize;
-        background: #ffffff;
-        font-weight: 500;
-        color: #14171a;
-        cursor: pointer;
-        border: none;
-        outline: none;
-        /* width: 100px; */
-        padding: 0 15px;
-        height: 36px;
-      }
-    }
-  }
-
-  .title {
-    > span {
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 40px;
-    }
-
-    padding: 20px 0;
-    position: sticky;
-    background-color: #14171a;
-    top: 0;
-    z-index: 100;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 28px;
-    font-style: italic;
-
-    color: #ffffff;
-  }
-`;
 
 const TableContainer = styled.table`
   width: 100%;
@@ -338,6 +236,72 @@ const TableContainer = styled.table`
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
+
+    color: #ffffff;
+  }
+`;
+
+const Loading = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: gray;
+`;
+
+const PageBox = styled.div`
+  margin-bottom: 20px;
+  .no-more {
+    padding: 20px;
+    text-align: center;
+    color: gray;
+  }
+
+  .title-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      > button {
+        border-radius: 100px;
+        background: #14171a;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        font-weight: 400;
+        color: #a0aec0;
+        text-transform: capitalize;
+        background: #ffffff;
+        font-weight: 500;
+        color: #14171a;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        /* width: 100px; */
+        padding: 0 15px;
+        height: 36px;
+      }
+    }
+  }
+
+  .title {
+    gap: 10px;
+    padding: 20px 0;
+    position: sticky;
+    background-color: #14171a;
+    top: 0;
+    z-index: 100;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
 
     color: #ffffff;
   }

@@ -62,16 +62,19 @@ export function getStreamInfo(
 
 export function getModelStreamList({
   name,
+  did,
   pageSize = PageSize,
   pageNumber = 1,
 }: {
   name?: string;
+  did?: string;
   pageSize?: number;
   pageNumber?: number;
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
   return axios.get(`${API_BASE_URL}/models`, {
     params: {
       name,
+      did,
       pageSize,
       pageNumber,
       useCounting: true,

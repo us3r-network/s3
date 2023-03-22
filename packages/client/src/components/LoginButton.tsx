@@ -7,7 +7,6 @@ import { useUs3rProfileContext } from "@us3r-network/profile";
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Network } from "../types";
 
 const LoginButton = () => {
