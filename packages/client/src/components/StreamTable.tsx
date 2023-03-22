@@ -31,27 +31,27 @@ export default function StreamTable({
     <TableBox>
       <TableContainer>
         <div>
-          <span>Stream ID:</span>
+          <span className="name">Stream ID:</span>
           <div>
             <Link to={`/${net}/stream/${data.streamId}`}>{data.streamId}</Link>
           </div>
         </div>
         <div className="network">
-          <span>Network:</span>
-          <div>{network}</div>
+          <span className="name">Network:</span>
+          <div className="name">{network}</div>
         </div>
         <div>
-          <span>Indexing time:</span>
-          <div>{dayjs(data.indexingTime).fromNow()}</div>
+          <span className="name">Indexing time:</span>
+          <div className="name">{dayjs(data.indexingTime).fromNow()}</div>
         </div>
         {data.domain && (
           <div>
-            <span>Domain:</span>
+            <span className="name">Domain:</span>
             <div>{data.domain}</div>
           </div>
         )}
         <div>
-          <span>Family or App:</span>
+          <span className="name">Family or App:</span>
           {(data.familyOrApp && (
             <div>
               <Link to={`/${net}/family/${data.familyOrApp}`}>
@@ -63,11 +63,11 @@ export default function StreamTable({
           )) || <div>-</div>}
         </div>
         <div>
-          <span>Type:</span>
-          <div>{Types[data.type] || "-"}</div>
+          <span className="name">Type:</span>
+          <div className="name">{Types[data.type] || "-"}</div>
         </div>
         <div className="from">
-          <span>From:</span>
+          <span className="name">From:</span>
           <div>
             <Link to={`/${net}/profile/${data.did}`}>
               <div
@@ -80,12 +80,12 @@ export default function StreamTable({
           </div>
         </div>
         <div>
-          <span>Tags:</span>
-          <div>{tags.join(" ").trim() || "-"}</div>
+          <span className="name">Tags:</span>
+          <div className="name">{tags.join(" ").trim() || "-"}</div>
         </div>
         <div>
-          <span>Status:</span>
-          <div>{data.anchorStatus}</div>
+          <span className="name">Status:</span>
+          <div className="name">{data.anchorStatus}</div>
         </div>
         {/* <div>
           <span>Hash:</span>
@@ -97,7 +97,7 @@ export default function StreamTable({
         </div> */}
         {(data.model && (
           <div className="model">
-            <span>Modal:</span>
+            <span className="name">Modal:</span>
             <div>
               <a href={`/${net}/stream/${data.model}`}>{data.model}</a>
               <div>
@@ -108,7 +108,7 @@ export default function StreamTable({
           </div>
         )) || (
           <div>
-            <span>Schema:</span>
+            <span className="name">Schema:</span>
             {(data.schema && (
               <div>
                 <a href={`/${net}/stream/${data.schema}`}>{data.schema}</a>
@@ -118,20 +118,20 @@ export default function StreamTable({
           </div>
         )}
         <div>
-          <span>Commit IDs:</span>
-          <div>{data.commitIds.join("\n")}</div>
+          <span className="name">Commit IDs:</span>
+          <div className="name">{data.commitIds.join("\n")}</div>
         </div>
         <div className="content">
-          <span>Content:</span>
-          <div>
+          <span className="name">Content:</span>
+          <div className="name">
             <pre>
               <code>{JSON.stringify(data.content, null, 2)}</code>
             </pre>
           </div>
         </div>
         <div className="metadata">
-          <span>Metadata:</span>
-          <div>
+          <span className="name">Metadata:</span>
+          <div className="name">
             <pre>
               <code>{JSON.stringify(data.metadata, null, 2)}</code>
             </pre>
@@ -169,6 +169,14 @@ const TableContainer = styled.div`
     & div {
       overflow: scroll;
     }
+  }
+
+  .name {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+
+    color: #718096;
   }
 
   & .from {

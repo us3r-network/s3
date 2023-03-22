@@ -106,7 +106,10 @@ const FilterBox = styled.div`
   }
 
   .title {
-    font-size: 22px;
     font-weight: 700;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
   }
 `;

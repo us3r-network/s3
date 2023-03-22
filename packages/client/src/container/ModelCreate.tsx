@@ -124,7 +124,11 @@ export default function ModelCreate() {
                 Download
               </button>
             </div>
-            <div className="result-text">{composite}</div>
+            <div className="result-text">
+              <pre>
+                <code>{JSON.stringify(JSON.parse(composite), null, 2)}</code>
+              </pre>
+            </div>
           </div>
         )}
         {runtimeDefinition && (
@@ -143,7 +147,13 @@ export const definition = ${runtimeDefinition}`,
                 Download
               </button>
             </div>
-            <div className="result-text">{runtimeDefinition}</div>
+            <div className="result-text">
+              <pre>
+                <code>
+                  {JSON.stringify(JSON.parse(runtimeDefinition), null, 2)}
+                </code>
+              </pre>
+            </div>
           </div>
         )}
       </div>
@@ -153,6 +163,10 @@ export const definition = ${runtimeDefinition}`,
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
+  background: #14171a;
+  border: 1px solid #39424c;
+  border-radius: 20px;
+  overflow: hidden;
 `;
 
 const PageBox = styled.div`
@@ -179,6 +193,10 @@ const PageBox = styled.div`
       display: flex;
       align-items: center;
       gap: 15px;
+
+      > button {
+        background: #ffffff;
+      }
     }
   }
   .node-input {
@@ -196,10 +214,14 @@ const PageBox = styled.div`
     flex-direction: row;
     gap: 20px;
     width: 100%;
+    > div {
+      background: #1b1e23;
+      border: 1px solid #39424c;
+      border-radius: 20px;
+    }
     div {
       width: calc(50% - 10px);
       margin: 20px 0px;
-      border-radius: 10px;
       padding: 10px;
       box-sizing: border-box;
       background-color: #1a1a1c;
@@ -209,6 +231,15 @@ const PageBox = styled.div`
         align-items: center;
         justify-content: space-between;
         margin: 0;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 28px;
+        font-style: italic;
+        color: #ffffff;
+
+        button {
+          background: #ffffff;
+        }
 
         h3 {
           margin: 0;
@@ -219,6 +250,8 @@ const PageBox = styled.div`
     .result-text {
       width: 100%;
       word-wrap: break-word;
+      color: #718096;
+      overflow: scroll;
     }
   }
 
