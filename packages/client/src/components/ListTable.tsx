@@ -231,10 +231,11 @@ const TableContainer = styled.table`
       color: #ffffff;
 
       padding: 2px 4px;
-      width: fit-content;
-
+      max-width: fit-content;
       border: 1px solid #ffffff;
       border-radius: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
