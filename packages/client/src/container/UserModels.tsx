@@ -5,7 +5,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { getModelStreamList, PageSize } from "../api";
 import styled from "styled-components";
 import { TableBox } from "../components/TableBox";
-import { sortPubKey } from "../utils/sortPubkey";
+import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import { UserAvatar } from "@us3r-network/authkit";
 
@@ -82,7 +82,7 @@ export default function UserModels() {
                     </td>
                     <td>
                       <Link to={`/model/${item.stream_id}`}>
-                        {sortPubKey(item.stream_id, { len: 8, split: "-" })}
+                        {shortPubKey(item.stream_id, { len: 8, split: "-" })}
                       </Link>
                     </td>
                     <td>

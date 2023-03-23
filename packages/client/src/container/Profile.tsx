@@ -7,7 +7,7 @@ import multiavatar from "@multiavatar/multiavatar";
 import { Network } from "../types";
 import ListTable from "../components/ListTable";
 import useListData from "../hooks/useListData";
-import { sortPubKey } from "../utils/sortPubkey";
+import { shortPubKey, shortPubKeyHash } from "../utils/shortPubKey";
 import BackBtn from "../components/BackBtn";
 
 export default function Profile() {
@@ -46,7 +46,7 @@ export default function Profile() {
           }}
         />
         <div>
-          <h3>{sortPubKey(pubkey)}</h3>
+          <h3>{shortPubKeyHash(pubkey)}</h3>
         </div>
       </Title>
       <InfiniteScroll

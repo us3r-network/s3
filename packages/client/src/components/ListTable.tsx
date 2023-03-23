@@ -4,7 +4,7 @@ import multiavatar from "@multiavatar/multiavatar";
 import dayjs from "dayjs";
 
 import { Stream } from "../types";
-import { sortPubKey } from "../utils/sortPubkey";
+import { shortPubKey } from "../utils/shortPubKey";
 import { TableBox } from "./TableBox";
 import { FamilyOrAppMapReverse, Types } from "../constants";
 
@@ -43,7 +43,7 @@ export default function ListTable({
               <tr key={item.streamId + idx}>
                 <td>
                   <Link to={`/${network}/stream/${item.streamId}`}>
-                    {sortPubKey(item.streamId, { len: 8, split: "-" })}
+                    {shortPubKey(item.streamId, { len: 8, split: "-" })}
                   </Link>
                 </td>
                 {showDid && (
@@ -59,10 +59,10 @@ export default function ListTable({
                       <div className="user-details-container">
                         <div className="name">
                           <a href={`/${network}/profile/${item.did}`}>
-                            {sortPubKey(pubkey)}
+                            {shortPubKey(pubkey)}
                           </a>
                         </div>
-                        <div className="badge grey">{sortPubKey(pubkey)}</div>
+                        <div className="badge grey">{shortPubKey(pubkey)}</div>
                       </div>
                     </div>
                   </td>
@@ -85,7 +85,7 @@ export default function ListTable({
                           <div className="family">
                             {FamilyOrAppMapReverse[item.familyOrApp] ||
                             item.familyOrApp.length > 15
-                              ? sortPubKey(item.familyOrApp, {
+                              ? shortPubKey(item.familyOrApp, {
                                   len: 8,
                                   split: "-",
                                 })
@@ -107,7 +107,7 @@ export default function ListTable({
                 <td>
                   {(item.schema && (
                     <Link to={`/${network}/stream/${item.schema}`}>
-                      {sortPubKey(item.schema, { len: 8, split: "-" })}
+                      {shortPubKey(item.schema, { len: 8, split: "-" })}
                     </Link>
                   )) || <div className="xxxx">-</div>}
                 </td>

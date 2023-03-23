@@ -5,7 +5,7 @@ import { TableBox } from "../components/TableBox";
 import { Link, useNavigate } from "react-router-dom";
 import { getModelStreamList, PageSize } from "../api";
 import { ModelStream } from "../types";
-import { sortPubKey } from "../utils/sortPubkey";
+import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import Search from "../components/Search";
 import { useUs3rProfileContext } from "@us3r-network/profile";
@@ -113,7 +113,7 @@ export default function ModelPage() {
                     </td>
                     <td>
                       <Link to={`/model/${item.stream_id}`}>
-                        {sortPubKey(item.stream_id, { len: 8, split: "-" })}
+                        {shortPubKey(item.stream_id, { len: 8, split: "-" })}
                       </Link>
                     </td>
                     <td>
