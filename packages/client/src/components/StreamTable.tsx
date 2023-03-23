@@ -6,7 +6,7 @@ import { Network, Stream } from "../types";
 import { FamilyOrAppMapReverse, Types } from "../constants";
 import { TableBox } from "./TableBox";
 import { useMemo } from "react";
-import { sortPubKey } from "../utils/sortPubkey";
+import { shortPubKey } from "../utils/shortPubKey";
 import { Link } from "react-router-dom";
 import Check from "./icons/Check";
 
@@ -75,7 +75,7 @@ export default function StreamTable({
                   __html: multiavatar(pubkey),
                 }}
               />
-              {sortPubKey(pubkey)}
+              {shortPubKey(pubkey)}
             </Link>
           </div>
         </div>

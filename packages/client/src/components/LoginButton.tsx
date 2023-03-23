@@ -73,4 +73,7 @@ const Wrapper = styled.div`
     outline: none;
     border: 1px solid gray;
   }
+  > div {
+    cursor: pointer;
+  }
 `;
