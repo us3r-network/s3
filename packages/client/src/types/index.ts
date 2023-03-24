@@ -66,3 +66,9 @@ export type ModeCreateResult = {
   composite: any;
   runtimeDefinition: any;
 };
+
+export type ModeQueryResult = {
+  composite: any;
+  runtimeDefinition: any;
+  graphqlSchema: string;
+};

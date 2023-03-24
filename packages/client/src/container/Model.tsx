@@ -4,12 +4,10 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
 import { Link, useNavigate } from "react-router-dom";
 import { getModelStreamList, PageSize } from "../api";
-import { ModelStream } from "../types";
+import { ModelStream, Network } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import Search from "../components/Search";
-import { useUs3rProfileContext } from "@us3r-network/profile";
-import { useUs3rAuthModal } from "@us3r-network/authkit";
 
 export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
@@ -17,8 +15,6 @@ export default function ModelPage() {
   const searchText = useRef("");
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
-  const { sessId } = useUs3rProfileContext()!;
-  const { openLoginModal } = useUs3rAuthModal();
 
   const fetchModel = useCallback(async () => {
     const resp = await getModelStreamList({ name: searchText.current });
@@ -39,6 +35,21 @@ export default function ModelPage() {
       setModels([...models, ...list]);
     },
     [models]
+  );
+
+  const navToStream = useCallback(
+    (streamId: string) => {
+      let network = Network.MAINNET;
+      try {
+        const localNetwork =
+          localStorage.getItem("network-select") || '"MAINNET"';
+        network = JSON.parse(localNetwork);
+      } catch (error) {
+        console.error(error);
+      }
+      navigate(`/${network.toLowerCase()}/stream/${streamId}`);
+    },
+    [navigate]
   );
 
   useEffect(() => {
@@ -67,7 +78,7 @@ export default function ModelPage() {
             + New Model
           </button>
 
-          <button
+          {/* <button
             onClick={() => {
               if (sessId) {
                 navigate(`/models/${sessId}`);
@@ -77,7 +88,7 @@ export default function ModelPage() {
             }}
           >
             My Models
-          </button>
+          </button> */}
         </div>
       </div>
       <InfiniteScroll
@@ -105,16 +116,25 @@ export default function ModelPage() {
               {models.map((item, idx) => {
                 return (
                   <tr key={item.stream_id}>
-                    <td>{item.stream_content.name}</td>
+                    <td>
+                      <Link to={`/modelview/${item.stream_id}`}>
+                        {item.stream_content.name}
+                      </Link>
+                    </td>
                     <td>
                       <div className="description">
                         {item.stream_content.description}
                       </div>
                     </td>
                     <td>
-                      <Link to={`/model/${item.stream_id}`}>
+                      <div
+                        className="nav-stream"
+                        onClick={() => {
+                          navToStream(item.stream_id);
+                        }}
+                      >
                         {shortPubKey(item.stream_id, { len: 8, split: "-" })}
-                      </Link>
+                      </div>
                     </td>
                     <td>
                       <div className="usage-count">{item.useCount}</div>
@@ -340,5 +360,9 @@ const TableContainer = styled.table`
     line-height: 19px;
 
     color: #ffffff;
+  }
+
+  .nav-stream {
+    cursor: pointer;
   }
 `;

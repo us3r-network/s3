@@ -20,6 +20,7 @@ import Model from "./container/Model";
 import ModelStream from "./container/ModelStream";
 import ModelCreate from "./container/ModelCreate";
 import UserModels from "./container/UserModels";
+import ModelView from "./container/ModelView";
 
 dayjs.extend(relativeTime);
 
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="model/:streamId" element={<ModelStream />} />
               <Route path="model/create" element={<ModelCreate />} />
               <Route path="models/:did" element={<UserModels />} />
+              <Route path="modelview/:streamId" element={<ModelView />} />
 
               <Route path="*" element={<NoMatch />} />
             </Route>
