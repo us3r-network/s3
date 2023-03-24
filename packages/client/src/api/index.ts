@@ -4,6 +4,7 @@ import {
   ModeCreateResult,
   ModelStream,
   ModelStreamInfo,
+  ModeQueryResult,
   Network,
   Stream,
 } from "../types";
@@ -95,5 +96,13 @@ export function createModel(
 ): AxiosPromise<ApiResp<ModeCreateResult>> {
   return axios.post(`${API_BASE_URL}/models`, {
     graphql: graphql,
+  });
+}
+
+export function queryModelGraphql(
+  streamId: string
+): AxiosPromise<ApiResp<ModeQueryResult>> {
+  return axios.post(`${API_BASE_URL}/models/graphql`, {
+    models: [streamId],
   });
 }
