@@ -19,7 +19,7 @@
     "@types/react-dom": "^18.0.0",
     "@types/styled-components": "^5.1.26",
     "@us3r-network/authkit": "^0.4.0",
-    "@us3r-network/profile": "^0.1.6",
+    "@us3r-network/profile": "^0.1.7",
     "@us3r-network/thread": "^0.1.2",
     "axios": "^1.2.6",
     "dayjs": "^1.11.7",
