@@ -27,7 +27,7 @@ export default function ListTable({
             <th>Family or app</th>
             <th>Tags</th>
             <th>Type</th>
-            <th>Schema</th>
+            <th>Schema/Model</th>
             <th>Indexing time</th>
           </tr>
         </thead>
@@ -37,6 +37,21 @@ export default function ListTable({
             const tags: string[] = [...item.tags];
             if (item.content.type) {
               tags.push(item.content.type);
+            }
+
+            let schemaOrModel = <div className="xxxx">-</div>;
+            if (item.schema) {
+              schemaOrModel = (
+                <Link to={`/${network}/stream/${item.schema}`}>
+                  {shortPubKey(item.schema, { len: 8, split: "-" })}
+                </Link>
+              );
+            } else if (item.model && (item.type === "0" || item.type === "3")) {
+              schemaOrModel = (
+                <Link to={`/${network}/stream/${item.model}`}>
+                  {shortPubKey(item.model, { len: 8, split: "-" })}
+                </Link>
+              );
             }
 
             return (
@@ -104,13 +119,7 @@ export default function ListTable({
                 <td>
                   <div className="xxxx">{Types[item.type] || "-"}</div>
                 </td>
-                <td>
-                  {(item.schema && (
-                    <Link to={`/${network}/stream/${item.schema}`}>
-                      {shortPubKey(item.schema, { len: 8, split: "-" })}
-                    </Link>
-                  )) || <div className="xxxx">-</div>}
-                </td>
+                <td>{schemaOrModel}</td>
                 <td>
                   <div className="index-time">
                     <time>{dayjs(item.indexingTime).fromNow()}</time>
