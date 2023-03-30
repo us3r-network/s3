@@ -85,8 +85,14 @@ export default function ModelView() {
         <div className="tools">
           <button
             onClick={() => {
-              const network =
-                localStorage.getItem("network-select") || "TESTNET";
+              let network = "TESTNET";
+              try {
+                const localNetwork =
+                  localStorage.getItem("network-select") || '"MAINNET"';
+                network = JSON.parse(localNetwork);
+              } catch (error) {
+                console.error(error);
+              }
               window.open(
                 `https://cscan.onrender.com/${network}/${streamId}/graphql`,
                 "_blank"
