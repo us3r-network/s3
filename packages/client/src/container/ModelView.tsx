@@ -82,6 +82,20 @@ export default function ModelView() {
             navigate(-1);
           }}
         />
+        <div className="tools">
+          <button
+            onClick={() => {
+              const network =
+                localStorage.getItem("network-select") || "TESTNET";
+              window.open(
+                `https://cscan.onrender.com/${network}/${streamId}/graphql`,
+                "_blank"
+              );
+            }}
+          >
+            Playground
+          </button>
+        </div>
       </div>
 
       <EditorBox>
