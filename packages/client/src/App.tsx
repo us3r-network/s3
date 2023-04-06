@@ -21,6 +21,7 @@ import ModelStream from "./container/ModelStream";
 import ModelCreate from "./container/ModelCreate";
 import UserModels from "./container/UserModels";
 import ModelView from "./container/ModelView";
+import { PlaygroundGraphiQL } from "./container/Playground";
 
 dayjs.extend(relativeTime);
 
@@ -51,6 +52,10 @@ export default function App() {
 
               <Route path="*" element={<NoMatch />} />
             </Route>
+            <Route
+              path="playground/:streamId"
+              element={<PlaygroundGraphiQL />}
+            />
           </Routes>
         </Us3rAuthProvider>
       </Us3rThreadProvider>
