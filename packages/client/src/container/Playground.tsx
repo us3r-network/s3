@@ -23,6 +23,7 @@ import { Link, useParams } from "react-router-dom";
 import { queryModelGraphql } from "../api";
 import { AxiosError } from "axios";
 import styled from "styled-components";
+import { createGraphqlDefaultQuery } from "../utils/createDefaultQuery";
 
 const type = {
   query: String,
@@ -47,37 +48,34 @@ export type YogaGraphiQLProps = Omit<
     additionalHeaders?: LoadFromUrlOptions["headers"];
   };
 
+const initialQuery = /* GraphQL */ `
+  #
+  # Welcome to S3 GraphiQL
+  #
+
+  # An example GraphQL query might look like:
+  #
+  #     {
+  #       field(arg: "value") {
+  #         subField
+  #       }
+  #     }
+  #
+  # Keyboard shortcuts:
+  #
+  #  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
+  #
+  #     Merge Query:  Shift-Ctrl-M (or press the merge button above)
+  #
+  #       Run Query:  Ctrl-Enter (or press the play button above)
+  #
+  #   Auto Complete:  Ctrl-Space (or just start typing)
+  #
+`;
+
 export function PlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
-  const initialQuery = /* GraphQL */ `#
-# Welcome to ${props.title || "S3 GraphiQL"}
-#
-# ${
-    props.title || "Yoga GraphiQL"
-  } is an in-browser tool for writing, validating, and
-# testing GraphQL queries.
-
-# An example GraphQL query might look like:
-#
-#     {
-#       field(arg: "value") {
-#         subField
-#       }
-#     }
-#
-# Keyboard shortcuts:
-#
-#  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
-#
-#     Merge Query:  Shift-Ctrl-M (or press the merge button above)
-#
-#       Run Query:  Ctrl-Enter (or press the play button above)
-#
-#   Auto Complete:  Ctrl-Space (or just start typing)
-#
-`;
-
   const { streamId } = useParams();
   //   const [modelData, setModelData] = useState<ModeQueryResult>();
 
@@ -135,6 +133,15 @@ export function PlaygroundGraphiQL(
       const resp = await queryModelGraphql(streamId);
       const { data } = resp.data;
       setDefinition(data.runtimeDefinition);
+      const definition = data.runtimeDefinition;
+      const modelName = Object.keys(definition.models)[0];
+      const objValues: any[] = Object.values(definition.objects);
+      const modelProperties = Object.entries(objValues[0]);
+      const defaultQuery = createGraphqlDefaultQuery(
+        modelName,
+        modelProperties
+      );
+      setQuery(initialQuery + defaultQuery);
     } catch (error) {
       const err = error as AxiosError;
       setErrMsg((err.response?.data as any).message || err.message);
