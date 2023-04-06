@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import BackBtn from "../components/BackBtn";
 import FileSaver from "file-saver";
@@ -83,24 +83,9 @@ export default function ModelView() {
           }}
         />
         <div className="tools">
-          <button
-            onClick={() => {
-              let network = "TESTNET";
-              try {
-                const localNetwork =
-                  localStorage.getItem("network-select") || '"MAINNET"';
-                network = JSON.parse(localNetwork);
-              } catch (error) {
-                console.error(error);
-              }
-              window.open(
-                `https://cscan.onrender.com/${network}/${streamId}/graphql`,
-                "_blank"
-              );
-            }}
-          >
-            Playground
-          </button>
+          <Link to={`/playground/${streamId}`} target="_blank">
+            <button>Playground</button>
+          </Link>
         </div>
       </div>
 
