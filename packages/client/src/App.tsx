@@ -1,34 +1,36 @@
-import { Routes, Route, Outlet } from "react-router-dom";
-import styled from "styled-components";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import { Routes, Route, Outlet } from "react-router-dom"
+import styled from "styled-components"
+import dayjs from "dayjs"
+import { isMobile } from "react-device-detect"
+import relativeTime from "dayjs/plugin/relativeTime"
 
-import { Us3rProfileProvider } from "@us3r-network/profile";
-import { Us3rThreadProvider } from "@us3r-network/thread";
-import { Us3rAuthProvider, AuthToolType } from "@us3r-network/authkit";
+import { Us3rProfileProvider } from "@us3r-network/profile"
+import { Us3rThreadProvider } from "@us3r-network/thread"
+import { Us3rAuthProvider, AuthToolType } from "@us3r-network/authkit"
 
-import Stream from "./container/Stream";
-import Profile from "./container/Profile";
-import Family from "./container/Family";
+import Stream from "./container/Stream"
+import Profile from "./container/Profile"
+import Family from "./container/Family"
 
-import Home from "./container/Home";
-import Nav from "./components/Nav";
-import NoMatch from "./components/NoMatch";
-import { useGAPageView } from "./hooks/useGoogleAnalytics";
-import { CERAMIC_HOST } from "./constants";
-import Model from "./container/Model";
-import ModelStream from "./container/ModelStream";
-import ModelCreate from "./container/ModelCreate";
-import UserModels from "./container/UserModels";
-import ModelView from "./container/ModelView";
-import { PlaygroundGraphiQL } from "./container/Playground";
+import Home from "./container/Home"
+import Nav from "./components/Nav"
+import MobileNav from "./components/MobileNav"
+import NoMatch from "./components/NoMatch"
+import { useGAPageView } from "./hooks/useGoogleAnalytics"
+import { CERAMIC_HOST } from "./constants"
+import Model from "./container/Model"
+import ModelStream from "./container/ModelStream"
+import ModelCreate from "./container/ModelCreate"
+import UserModels from "./container/UserModels"
+import ModelView from "./container/ModelView"
+import { PlaygroundGraphiQL } from "./container/Playground"
 
-dayjs.extend(relativeTime);
+dayjs.extend(relativeTime)
 
 const authToolTypes = [
   AuthToolType.metamask_wallet,
   AuthToolType.phantom_wallet,
-];
+]
 export default function App() {
   return (
     <Us3rProfileProvider ceramicHost={CERAMIC_HOST}>
@@ -40,9 +42,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path=":network/stream/:streamId" element={<Stream />} />
-              <Route path=":network/profile/:did" element={<Profile />} />
-              <Route path=":network/family/:familyOrApp" element={<Family />} />
+              <Route path="/:network/stream/:streamId" element={<Stream />} />
+              <Route path="/:network/profile/:did" element={<Profile />} />
+              <Route path="/:network/family/:familyOrApp" element={<Family />} />
 
               <Route path="model" element={<Model />} />
               <Route path="model/:streamId" element={<ModelStream />} />
@@ -60,23 +62,23 @@ export default function App() {
         </Us3rAuthProvider>
       </Us3rThreadProvider>
     </Us3rProfileProvider>
-  );
+  )
 }
 
 function Layout() {
-  useGAPageView();
+  useGAPageView()
   return (
-    <AppContainer>
-      <Nav />
+    <AppContainer isMobile={isMobile}>
+      {isMobile ?<MobileNav/> : <Nav />}
 
       <main>
         <Outlet />
       </main>
     </AppContainer>
-  );
+  )
 }
 
-const AppContainer = styled.div`
+const AppContainer = styled.div<{isMobile: boolean}>`
   display: flex;
 
   > main {
@@ -84,5 +86,7 @@ const AppContainer = styled.div`
     margin: 0 auto;
     width: calc(100vw - 300px);
     max-width: 1300px;
+    margin-top: ${props => props?.isMobile ? '60px' : '0'};
+    z-index: 0;
   }
-`;
+`

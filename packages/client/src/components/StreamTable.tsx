@@ -148,6 +148,7 @@ const TableContainer = styled.div`
     display: flex;
     padding: 20px 0;
     border-bottom: 1px solid #39424c;
+    word-break: break-all;
     &:first-child {
       padding-top: 15px;
     }
@@ -177,6 +178,10 @@ const TableContainer = styled.div`
     line-height: 19px;
 
     color: #718096;
+
+    pre{
+      white-space: pre-wrap;
+    }
   }
 
   & .from {

@@ -140,7 +140,7 @@ const Avatar = styled.div`
 `;
 
 const TableContainer = styled.table`
-  width: 100%;
+  /* width: 100%; */
   table-layout: fixed;
   border-collapse: collapse;
 

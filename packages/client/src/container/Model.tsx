@@ -1,60 +1,61 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { TableBox } from "../components/TableBox";
-import { Link, useNavigate } from "react-router-dom";
-import { getModelStreamList, PageSize } from "../api";
-import { ModelStream, Network } from "../types";
-import { shortPubKey } from "../utils/shortPubKey";
-import dayjs from "dayjs";
-import Search from "../components/Search";
+import { useCallback, useEffect, useRef, useState } from "react"
+import styled from "styled-components"
+import InfiniteScroll from "react-infinite-scroll-component"
+import { TableBox } from "../components/TableBox"
+import { Link, useNavigate } from "react-router-dom"
+import { getModelStreamList, PageSize } from "../api"
+import { ModelStream, Network } from "../types"
+import { shortPubKey } from "../utils/shortPubKey"
+import dayjs from "dayjs"
+import { isMobile } from "react-device-detect"
+import Search from "../components/Search"
 
 export default function ModelPage() {
-  const [models, setModels] = useState<Array<ModelStream>>([]);
-  const navigate = useNavigate();
-  const searchText = useRef("");
-  const [hasMore, setHasMore] = useState(true);
-  const pageNum = useRef(1);
+  const [models, setModels] = useState<Array<ModelStream>>([])
+  const navigate = useNavigate()
+  const searchText = useRef("")
+  const [hasMore, setHasMore] = useState(true)
+  const pageNum = useRef(1)
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText.current });
-    const list = resp.data.data;
-    setModels(list);
-    setHasMore(list.length >= PageSize);
-    pageNum.current = 1;
-  }, []);
+    const resp = await getModelStreamList({ name: searchText.current })
+    const list = resp.data.data
+    setModels(list)
+    setHasMore(list.length >= PageSize)
+    pageNum.current = 1
+  }, [])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
         pageNumber,
         name: searchText.current,
-      });
-      const list = resp.data.data;
-      setHasMore(list.length >= PageSize);
-      setModels([...models, ...list]);
+      })
+      const list = resp.data.data
+      setHasMore(list.length >= PageSize)
+      setModels([...models, ...list])
     },
     [models]
-  );
+  )
 
   const navToStream = useCallback(
     (streamId: string) => {
-      let network = Network.MAINNET;
+      let network = Network.MAINNET
       try {
         const localNetwork =
-          localStorage.getItem("network-select") || '"MAINNET"';
-        network = JSON.parse(localNetwork);
+          localStorage.getItem("network-select") || '"MAINNET"'
+        network = JSON.parse(localNetwork)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
-      navigate(`/${network.toLowerCase()}/stream/${streamId}`);
+      navigate(`/${network.toLowerCase()}/stream/${streamId}`)
     },
     [navigate]
-  );
+  )
 
   useEffect(() => {
-    fetchModel();
-  }, [fetchModel]);
+    fetchModel()
+  }, [fetchModel])
 
   return (
     <PageBox>
@@ -63,21 +64,22 @@ export default function ModelPage() {
         <div className="tools">
           <Search
             searchAction={(text) => {
-              searchText.current = text;
-              setModels([]);
-              fetchModel();
+              searchText.current = text
+              setModels([])
+              fetchModel()
             }}
             placeholder={"Search by model name"}
           />
 
-          <button
-            onClick={() => {
-              navigate("/model/create");
-            }}
-          >
-            + New Model
-          </button>
-
+          {!isMobile && (
+            <button
+              onClick={() => {
+                navigate("/model/create")
+              }}
+            >
+              + New Model
+            </button>
+          )}
           {/* <button
             onClick={() => {
               if (sessId) {
@@ -94,9 +96,9 @@ export default function ModelPage() {
       <InfiniteScroll
         dataLength={models.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreModel(pageNum.current);
-          console.log("fetch more");
+          pageNum.current += 1
+          fetchMoreModel(pageNum.current)
+          console.log("fetch more")
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -117,9 +119,13 @@ export default function ModelPage() {
                 return (
                   <tr key={item.stream_id}>
                     <td>
-                      <Link to={`/modelview/${item.stream_id}`}>
-                        {item.stream_content.name}
-                      </Link>
+                      {!isMobile ? (
+                        <Link to={`/modelview/${item.stream_id}`}>
+                          {item.stream_content.name}
+                        </Link>
+                      ) : (
+                        item.stream_content.name
+                      )}
                     </td>
                     <td>
                       <div className="description">
@@ -130,7 +136,7 @@ export default function ModelPage() {
                       <div
                         className="nav-stream"
                         onClick={() => {
-                          navToStream(item.stream_id);
+                          navToStream(item.stream_id)
                         }}
                       >
                         {shortPubKey(item.stream_id, { len: 8, split: "-" })}
@@ -149,7 +155,7 @@ export default function ModelPage() {
                       </div>
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </TableContainer>
@@ -157,14 +163,14 @@ export default function ModelPage() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
 const PageBox = styled.div`
   margin-bottom: 20px;
@@ -229,7 +235,7 @@ const PageBox = styled.div`
 
     color: #ffffff;
   }
-`;
+`
 
 const TableContainer = styled.table`
   width: 100%;
@@ -365,4 +371,4 @@ const TableContainer = styled.table`
   .nav-stream {
     cursor: pointer;
   }
-`;
+`
