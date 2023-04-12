@@ -8,7 +8,6 @@ import { getModelStreamList, PageSize } from "../api"
 import { ModelStream, Network } from "../types"
 import { shortPubKey } from "../utils/shortPubKey"
 import dayjs from "dayjs"
-import { isMobile } from "react-device-detect"
 import Search from "../components/Search"
 
 export default function ModelPage() {
