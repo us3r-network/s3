@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
+import { isMobile } from 'react-device-detect'
 import InfiniteScroll from "react-infinite-scroll-component"
 import { TableBox } from "../components/TableBox"
 import { Link, useNavigate } from "react-router-dom"
@@ -60,7 +61,9 @@ export default function ModelPage() {
   return (
     <PageBox>
       <div className="title-box">
-        <div className="title">ComposeDB Models</div>
+        {}
+        {!isMobile && <div className="title">ComposeDB Models</div>}
+
         <div className="tools">
           <Search
             searchAction={(text) => {

@@ -1,25 +1,28 @@
-import { ReactNode, useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import styled from "styled-components"
-import IconFilterFunnel from "./icons/FilterFunnel"
-import GitHubButton from "react-github-btn"
+import { ReactNode, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import styled from 'styled-components'
+import IconFilterFunnel from './icons/FilterFunnel'
+import GitHubButton from 'react-github-btn'
 
-import Logo from "./Logo"
-import LoginButton from "./LoginButton"
+import Logo from './Logo'
+import LoginButton from './LoginButton'
 
 export default function Nav() {
   let location = useLocation()
   const [openFilter, setOpenFilter] = useState(false)
-  const modelActive = location.pathname.startsWith("/model")
+  const modelActive = location.pathname.startsWith('/model')
+
   return (
     <NavContainer>
       {/* <div className="fixed"> */}
-      <Link to={"/"}>
+      <Link to={'/'}>
         <div className="logo-container">
           <Logo className="App-logo" alt="logo" />
           <span>Alpha</span>
         </div>
       </Link>
+      <span className="title">{modelActive ? 'ComposeDB Models' : 'Streams'}</span>
+
       <div
         onClick={() => {
           setOpenFilter(!openFilter)
@@ -33,18 +36,18 @@ export default function Nav() {
           <FilterSelectWrapper>
             <FilterSelectInner>
               <div className="nav">
-                <Link to={"/"} onClick={() => setOpenFilter(!openFilter)}>
-                  <div className={`nav-item ${!modelActive ? "active" : ""}`}>
-                    <StreamIcon stroke={!modelActive ? "white" : "#718096"} />
+                <Link to={'/'} onClick={() => setOpenFilter(!openFilter)}>
+                  <div className={`nav-item ${!modelActive ? 'active' : ''}`}>
+                    <StreamIcon stroke={!modelActive ? 'white' : '#718096'} />
                     <div className="tint-c">
                       <div className="tint">Streams</div>
                     </div>
                   </div>
                 </Link>
 
-                <Link to={"/model"} onClick={() => setOpenFilter(!openFilter)}>
-                  <div className={`nav-item ${modelActive ? "active" : ""}`}>
-                    <ModelIcon stroke={modelActive ? "white" : "#718096"} />
+                <Link to={'/model'} onClick={() => setOpenFilter(!openFilter)}>
+                  <div className={`nav-item ${modelActive ? 'active' : ''}`}>
+                    <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
                     <div className="tint-c">
                       <div className="tint">ComposeDB Models</div>
                     </div>
@@ -74,7 +77,7 @@ export default function Nav() {
   )
 }
 
-function StreamIcon({ stroke = "white" }) {
+function StreamIcon({ stroke = 'white' }) {
   return (
     <svg
       width="17"
@@ -93,7 +96,7 @@ function StreamIcon({ stroke = "white" }) {
   )
 }
 
-function ModelIcon({ stroke = "#718096" }) {
+function ModelIcon({ stroke = '#718096' }) {
   return (
     <svg
       width="17"
@@ -162,6 +165,15 @@ const NavContainer = styled.nav`
     }
   }
 
+  .title{
+    font-weight: 700;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
+    color: white;
+  }
+
   .App-logo {
     width: 30px;
     height: 30px;
@@ -185,7 +197,7 @@ const NavContainer = styled.nav`
 `
 const FilterSelectModal = styled.div<{ isOpen: boolean }>`
   width: 100vw;
-  height: ${({ isOpen }) => (isOpen ? "calc(100vh - 56px)" : "0px")};
+  height: ${({ isOpen }) => (isOpen ? 'calc(100vh - 56px)' : '0px')};
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 56px;
