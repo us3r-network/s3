@@ -33,21 +33,23 @@ export default function Home() {
   }, [network])
 
   return (
-    <PageBox>
+    <PageBox isMobile={isMobile}>
       <FilterBox>
         {!isMobile && <div className="title">Streams</div>}
-        <div>
-          <Search
-            searchAction={(text) => {
-              if (text.startsWith('did')) {
-                navigate(`/${network.toLowerCase()}/profile/${text}`)
-              } else if (text.length < 62) {
-                navigate(`/${network.toLowerCase()}/family/${text}`)
-              } else {
-                navigate(`/${network.toLowerCase()}/stream/${text}`)
-              }
-            }}
-          />
+        <div className={isMobile ? 'mobileBox' : ''}>
+          {!isMobile && (
+            <Search
+              searchAction={(text) => {
+                if (text.startsWith('did')) {
+                  navigate(`/${network.toLowerCase()}/profile/${text}`)
+                } else if (text.length < 62) {
+                  navigate(`/${network.toLowerCase()}/family/${text}`)
+                } else {
+                  navigate(`/${network.toLowerCase()}/stream/${text}`)
+                }
+              }}
+            />
+          )}
           <NetworkSwitch
             network={network}
             networks={Object.values(Network)}
@@ -82,13 +84,14 @@ const Loading = styled.div`
   color: gray;
 `
 
-const PageBox = styled.div`
+const PageBox = styled.div<{ isMobile: boolean }>`
   margin-bottom: 20px;
   .no-more {
     padding: 20px;
     text-align: center;
     color: gray;
   }
+  padding: ${({isMobile}) => isMobile ? '0 10px' : '0'};
 `
 
 const FilterBox = styled.div`
@@ -112,5 +115,16 @@ const FilterBox = styled.div`
     font-size: 24px;
     line-height: 28px;
     font-style: italic;
+  }
+
+  .mobileBox {
+    /* flex-direction: column; */
+    flex-grow: 1;
+    button {
+      flex-grow: 1;
+    }
+    > div {
+      flex-grow: 1;
+    }
   }
 `

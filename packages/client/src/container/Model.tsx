@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react"
-import styled from "styled-components"
+import { useCallback, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
-import InfiniteScroll from "react-infinite-scroll-component"
-import { TableBox } from "../components/TableBox"
-import { Link, useNavigate } from "react-router-dom"
-import { getModelStreamList, PageSize } from "../api"
-import { ModelStream, Network } from "../types"
-import { shortPubKey } from "../utils/shortPubKey"
-import dayjs from "dayjs"
-import Search from "../components/Search"
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { TableBox } from '../components/TableBox'
+import { Link, useNavigate } from 'react-router-dom'
+import { getModelStreamList, PageSize } from '../api'
+import { ModelStream, Network } from '../types'
+import { shortPubKey } from '../utils/shortPubKey'
+import dayjs from 'dayjs'
+import Search from '../components/Search'
 
 export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([])
   const navigate = useNavigate()
-  const searchText = useRef("")
+  const searchText = useRef('')
   const [hasMore, setHasMore] = useState(true)
   const pageNum = useRef(1)
 
@@ -43,7 +43,7 @@ export default function ModelPage() {
       let network = Network.MAINNET
       try {
         const localNetwork =
-          localStorage.getItem("network-select") || '"MAINNET"'
+          localStorage.getItem('network-select') || '"MAINNET"'
         network = JSON.parse(localNetwork)
       } catch (error) {
         console.error(error)
@@ -58,29 +58,29 @@ export default function ModelPage() {
   }, [fetchModel])
 
   return (
-    <PageBox>
-      <div className="title-box">
-        {}
+    <PageBox isMobile={isMobile}>
+      <div className={isMobile ? 'title-box mobile-models-box' : 'title-box'}>
         {!isMobile && <div className="title">ComposeDB Models</div>}
 
         <div className="tools">
-          <Search
-            searchAction={(text) => {
-              searchText.current = text
-              setModels([])
-              fetchModel()
-            }}
-            placeholder={"Search by model name"}
-          />
-
           {!isMobile && (
-            <button
-              onClick={() => {
-                navigate("/model/create")
-              }}
-            >
-              + New Model
-            </button>
+            <>
+              <Search
+                searchAction={(text) => {
+                  searchText.current = text
+                  setModels([])
+                  fetchModel()
+                }}
+                placeholder={'Search by model name'}
+              />
+              <button
+                onClick={() => {
+                  navigate('/model/create')
+                }}
+              >
+                + New Model
+              </button>
+            </>
           )}
           {/* <button
             onClick={() => {
@@ -100,13 +100,13 @@ export default function ModelPage() {
         next={() => {
           pageNum.current += 1
           fetchMoreModel(pageNum.current)
-          console.log("fetch more")
+          console.log('fetch more')
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
         <TableBox>
-          <TableContainer>
+          <TableContainer isMobile={isMobile}>
             <thead>
               <tr>
                 <th>Model Name</th>
@@ -141,7 +141,7 @@ export default function ModelPage() {
                           navToStream(item.stream_id)
                         }}
                       >
-                        {shortPubKey(item.stream_id, { len: 8, split: "-" })}
+                        {shortPubKey(item.stream_id, { len: 8, split: '-' })}
                       </div>
                     </td>
                     <td>
@@ -151,9 +151,9 @@ export default function ModelPage() {
                       <div className="release-date">
                         {(item.last_anchored_at &&
                           dayjs(item.created_at).format(
-                            "YYYY-MM-DD HH:mm:ss"
+                            'YYYY-MM-DD HH:mm:ss'
                           )) ||
-                          "-"}
+                          '-'}
                       </div>
                     </td>
                   </tr>
@@ -174,12 +174,18 @@ const Loading = styled.div`
   color: gray;
 `
 
-const PageBox = styled.div`
+const PageBox = styled.div<{isMobile: boolean}>`
   margin-bottom: 20px;
+  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : '')};
+
   .no-more {
     padding: 20px;
     text-align: center;
     color: gray;
+  }
+
+  .mobile-models-box{
+    margin-bottom: 20px;
   }
 
   .title-box {
@@ -239,10 +245,11 @@ const PageBox = styled.div`
   }
 `
 
-const TableContainer = styled.table`
-  width: 100%;
+const TableContainer = styled.table<{ isMobile: boolean }>`
+  /* width: 100%; */
   table-layout: fixed;
   border-collapse: collapse;
+
 
   tbody tr,
   thead tr {
@@ -261,6 +268,7 @@ const TableContainer = styled.table`
 
     width: calc(100% / 7) !important;
     overflow: hidden;
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
 
     &:first-child {
       padding-left: 20px;
@@ -270,6 +278,7 @@ const TableContainer = styled.table`
       padding-left: 20px;
       padding-right: 0px;
     }
+
   }
 
   tbody tr td {
@@ -278,6 +287,7 @@ const TableContainer = styled.table`
     line-height: 19px;
     overflow: hidden;
     color: #ffffff;
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
 
     &:first-child {
       padding-left: 20px;

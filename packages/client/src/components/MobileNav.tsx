@@ -1,7 +1,9 @@
 import { ReactNode, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
 import styled from 'styled-components'
 import IconFilterFunnel from './icons/FilterFunnel'
+import BackCircle from './icons/BackCircle'
 import GitHubButton from 'react-github-btn'
 
 import Logo from './Logo'
@@ -9,19 +11,29 @@ import LoginButton from './LoginButton'
 
 export default function Nav() {
   let location = useLocation()
+  const navigate = useNavigate()
   const [openFilter, setOpenFilter] = useState(false)
   const modelActive = location.pathname.startsWith('/model')
+  const isSubPage = !(location.pathname === '/model' || location.pathname === '/')
 
   return (
     <NavContainer>
       {/* <div className="fixed"> */}
-      <Link to={'/'}>
-        <div className="logo-container">
-          <Logo className="App-logo" alt="logo" />
-          <span>Alpha</span>
-        </div>
-      </Link>
-      <span className="title">{modelActive ? 'ComposeDB Models' : 'Streams'}</span>
+      {isSubPage ? (
+        <span onClick={() => navigate(-1)}>
+          <BackCircle />
+        </span>
+      ) : (
+        <Link to={'/'}>
+          <div className="logo-container">
+            <Logo className="App-logo" alt="logo" />
+            {/* <span>Alpha</span> */}
+          </div>
+        </Link>
+      )}
+      <span className="title">
+        {modelActive ? 'ComposeDB Models' : 'Streams'}
+      </span>
 
       <div
         onClick={() => {
@@ -165,10 +177,10 @@ const NavContainer = styled.nav`
     }
   }
 
-  .title{
+  .title {
     font-weight: 700;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 28px;
     font-style: italic;
     color: white;
@@ -275,16 +287,6 @@ const FilterSelectInner = styled.div`
         > span {
         }
       }
-
-      /* font-weight: 700; */
     }
   }
-`
-const FilterSelectButtons = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 20px;
-  border-top: solid 1px #39424c;
-  gap: 20px;
 `
