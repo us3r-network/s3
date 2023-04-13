@@ -141,7 +141,7 @@ const Avatar = styled.div`
 `
 
 const TableContainer = styled.table<{ isMobile: boolean }>`
-  /* width: 100%; */
+  ${({ isMobile }) => (isMobile ? `` : 'width: 100%;')}
   table-layout: fixed;
   border-collapse: collapse;
 
