@@ -97,7 +97,7 @@ export default function ModelPage() {
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        <TableBox>
+        <TableBox isMobile={isMobile}>
           <TableContainer isMobile={isMobile}>
             <thead>
               <tr>

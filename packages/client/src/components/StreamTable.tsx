@@ -29,7 +29,7 @@ export default function StreamTable({
   }
 
   return (
-    <TableBox>
+    <TableBox isMobile={isMobile}>
       <TableContainer isMobile={isMobile}>
         <div>
           <span className="name">Stream ID:</span>
