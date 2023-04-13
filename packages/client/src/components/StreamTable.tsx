@@ -29,7 +29,7 @@ export default function StreamTable({
   }
 
   return (
-    <TableBox>
+    <TableBox isMobile={isMobile}>
       <TableContainer isMobile={isMobile}>
         <div>
           <span className="name">Stream ID:</span>
@@ -145,7 +145,6 @@ export default function StreamTable({
 
 const TableContainer = styled.div<{ isMobile?: boolean }>`
   margin: 10px;
-  ${({ isMobile }) => (isMobile ? `` : 'width: 100%;')}
   > div {
     display: flex;
 

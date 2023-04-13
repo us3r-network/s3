@@ -19,7 +19,7 @@ export default function ListTable({
   showDid?: boolean
 }) {
   return (
-    <TableBox>
+    <TableBox isMobile={isMobile}>
       <TableContainer isMobile={isMobile}>
         <thead>
           <tr>
