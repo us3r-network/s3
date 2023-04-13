@@ -1,44 +1,47 @@
-import { useEffect, useMemo } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
-import multiavatar from "@multiavatar/multiavatar";
+import { useEffect, useMemo } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useNavigate, useParams } from 'react-router-dom'
+import styled from 'styled-components'
+import multiavatar from '@multiavatar/multiavatar'
+import { isMobile } from 'react-device-detect'
 
-import { Network } from "../types";
-import ListTable from "../components/ListTable";
-import useListData from "../hooks/useListData";
-import { shortPubKey, shortPubKeyHash } from "../utils/shortPubKey";
-import BackBtn from "../components/BackBtn";
+import { Network } from '../types'
+import ListTable from '../components/ListTable'
+import useListData from '../hooks/useListData'
+import { shortPubKey, shortPubKeyHash } from '../utils/shortPubKey'
+import BackBtn from '../components/BackBtn'
 
 export default function Profile() {
-  const { network, did } = useParams();
-  const navigate = useNavigate();
+  const { network, did } = useParams()
+  const navigate = useNavigate()
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network: network as Network,
     did,
-  });
+  })
 
   useEffect(() => {
-    if (!network || !did) return;
-    loadData({ network: network as Network, did });
+    if (!network || !did) return
+    loadData({ network: network as Network, did })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network, did]);
+  }, [network, did])
 
   const pubkey = useMemo(() => {
-    if (!did) return "";
-    return did;
-  }, [did]);
+    if (!did) return ''
+    return did
+  }, [did])
 
   return (
     <div>
       <Title>
-        <div>
-          <BackBtn
-            backAction={() => {
-              navigate(-1);
-            }}
-          />
-        </div>
+        {!isMobile && (
+          <div>
+            <BackBtn
+              backAction={() => {
+                navigate(-1)
+              }}
+            />
+          </div>
+        )}
         <div
           className="avatar"
           dangerouslySetInnerHTML={{
@@ -52,8 +55,8 @@ export default function Profile() {
       <InfiniteScroll
         dataLength={data.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreData(pageNum.current);
+          pageNum.current += 1
+          fetchMoreData(pageNum.current)
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -62,7 +65,7 @@ export default function Profile() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </div>
-  );
+  )
 }
 
 const Title = styled.div`
@@ -83,10 +86,10 @@ const Title = styled.div`
   > h2 {
     margin: 0;
   }
-`;
+`
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`

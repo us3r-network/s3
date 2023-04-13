@@ -41,6 +41,8 @@ export function getList({
     streams: Array<Stream>;
   }>
 > {
+  console.log(network,'streamId')
+
   return axios.get(`${API_BASE_URL}/streams`, {
     params: {
       network: network.toUpperCase(),
@@ -56,6 +58,7 @@ export function getStreamInfo(
   network: Network,
   streamId: string
 ): AxiosPromise<ApiResp<Stream>> {
+  console.log(network,streamId)
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}`
   );

@@ -1,21 +1,22 @@
-import { useEffect } from "react";
-import styled from "styled-components";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react'
+import styled from 'styled-components'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useNavigate } from 'react-router-dom'
+import { isMobile } from 'react-device-detect'
 
-import { Network } from "../types";
-import ListTable from "../components/ListTable";
-import Search from "../components/Search";
-import NetworkSwitch from "../components/NetworkSwitch";
-import useListData from "../hooks/useListData";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { Network } from '../types'
+import ListTable from '../components/ListTable'
+import Search from '../components/Search'
+import NetworkSwitch from '../components/NetworkSwitch'
+import useListData from '../hooks/useListData'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 
 export default function Home() {
   const [network, setNetwork] = useLocalStorage(
-    "network-select",
+    'network-select',
     Network.MAINNET
-  );
-  const navigate = useNavigate();
+  )
+  const navigate = useNavigate()
   const {
     pageNum,
     data,
@@ -24,37 +25,39 @@ export default function Home() {
     setHasMore,
     loadData,
     fetchMoreData,
-  } = useListData({ network });
+  } = useListData({ network })
 
   useEffect(() => {
-    loadData({ network });
+    loadData({ network })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
+  }, [network])
 
   return (
-    <PageBox>
+    <PageBox isMobile={isMobile}>
       <FilterBox>
-        <div className="title">Streams</div>
-        <div>
-          <Search
-            searchAction={(text) => {
-              if (text.startsWith("did")) {
-                navigate(`/${network.toLowerCase()}/profile/${text}`);
-              } else if (text.length < 62) {
-                navigate(`/${network.toLowerCase()}/family/${text}`);
-              } else {
-                navigate(`/${network.toLowerCase()}/stream/${text}`);
-              }
-            }}
-          />
+        {!isMobile && <div className="title">Streams</div>}
+        <div className={isMobile ? 'mobileBox' : ''}>
+          {!isMobile && (
+            <Search
+              searchAction={(text) => {
+                if (text.startsWith('did')) {
+                  navigate(`/${network.toLowerCase()}/profile/${text}`)
+                } else if (text.length < 62) {
+                  navigate(`/${network.toLowerCase()}/family/${text}`)
+                } else {
+                  navigate(`/${network.toLowerCase()}/stream/${text}`)
+                }
+              }}
+            />
+          )}
           <NetworkSwitch
             network={network}
             networks={Object.values(Network)}
             networkChangeAction={(n) => {
-              window.scrollTo({ top: 0 });
-              setHasMore(true);
-              setData([]);
-              setNetwork(n as Network);
+              window.scrollTo({ top: 0 })
+              setHasMore(true)
+              setData([])
+              setNetwork(n as Network)
             }}
           />
         </div>
@@ -62,8 +65,8 @@ export default function Home() {
       <InfiniteScroll
         dataLength={data.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreData(pageNum.current);
+          pageNum.current += 1
+          fetchMoreData(pageNum.current)
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -72,23 +75,24 @@ export default function Home() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
-const PageBox = styled.div`
+const PageBox = styled.div<{ isMobile: boolean }>`
   margin-bottom: 20px;
   .no-more {
     padding: 20px;
     text-align: center;
     color: gray;
   }
-`;
+  padding: ${({isMobile}) => isMobile ? '0 10px' : '0'};
+`
 
 const FilterBox = styled.div`
   display: flex;
@@ -112,4 +116,15 @@ const FilterBox = styled.div`
     line-height: 28px;
     font-style: italic;
   }
-`;
+
+  .mobileBox {
+    /* flex-direction: column; */
+    flex-grow: 1;
+    button {
+      flex-grow: 1;
+    }
+    > div {
+      flex-grow: 1;
+    }
+  }
+`
