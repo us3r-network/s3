@@ -40,15 +40,7 @@ export default function ModelPage() {
 
   const navToStream = useCallback(
     (streamId: string) => {
-      let network = Network.MAINNET
-      try {
-        const localNetwork =
-          localStorage.getItem('network-select') || '"MAINNET"'
-        network = JSON.parse(localNetwork)
-      } catch (error) {
-        console.error(error)
-      }
-      navigate(`/${network.toLowerCase()}/stream/${streamId}`)
+      navigate(`/testnet/stream/${streamId}`)
     },
     [navigate]
   )
