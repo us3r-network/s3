@@ -145,6 +145,7 @@ export default function StreamTable({
 
 const TableContainer = styled.div<{ isMobile?: boolean }>`
   margin: 10px;
+  ${({ isMobile }) => (isMobile ? `` : 'width: 100%;')}
   > div {
     display: flex;
 
