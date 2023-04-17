@@ -148,6 +148,8 @@ const NavContainer = styled.nav`
           width: fit-content;
           padding: 1px 3px;
           border: 1px solid #39424c;
+          background: #718096;
+          border-radius: 5px;
         }
 
         &:hover {
