@@ -21,6 +21,7 @@ async function bootstrap() {
   await app.listen(3000);
 
   const ceramicSubscriberService = app.get(CeramicSubscriberService);
+
   // Sub ceramic test network.
   await ceramicSubscriberService.SubCeramic(
     Network.TESTNET,
@@ -32,8 +33,9 @@ async function bootstrap() {
     ],
     ['/ip4/127.0.0.1/tcp/20000/ws'],
     '/ceramic/testnet-clay',
-    'https://ceramic-clay.3boxlabs.com',
+    'https://gateway.ceramic.network/',
   );
+
   // Sub ceramic main network.
   await ceramicSubscriberService.SubCeramic(
     Network.MAINNET,
@@ -43,7 +45,7 @@ async function bootstrap() {
     ],
     ['/ip4/127.0.0.1/tcp/30000/ws'],
     '/ceramic/mainnet',
-    'https://ceramic.passport-iam.gitcoin.co/',
+    'https://gateway.ceramic.network/',
   );
 }
 bootstrap();

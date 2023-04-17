@@ -12,6 +12,12 @@ Userscan is completely open source.
     > DATABASE_PASSWORD=123456
     >
     > DATABASE_HOST=127.0.0.1
+    >
+    > CERAMIC_NODE_ADMIN_PRIVATE_KEY=<Your Admin Private Key>
+    >
+    > CERAMIC_NODE=<Your Ceramic Node Url>
+    >
+    > REDIS_URL=<Your Redis Url>
 3. run the sevice by development mod: `yarn start:dev` 
 4. run the sevice by docker: 
     >`docker build -t userscan . `

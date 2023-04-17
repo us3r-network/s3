@@ -6,7 +6,7 @@ import StreamService from './stream.service';
 import CeramicSubscriberService from './ceramic.subscriber.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Stream])],
+  imports: [TypeOrmModule.forFeature([Stream], 'testnet')],
   controllers: [StreamController],
   providers: [StreamService, CeramicSubscriberService],
   exports: [StreamService, CeramicSubscriberService],

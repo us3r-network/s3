@@ -42,6 +42,7 @@ export function ConvertToStream(stream: Stream): StreamDto {
   streamDto.content = stream.getContent;
   streamDto.model = stream.getModel;
   streamDto.metadata = stream.getMetadata;
+  streamDto.domain = stream.getDomain;
   return streamDto;
 }
 
@@ -76,4 +77,6 @@ export class StreamDto {
   content: string;
   @ApiProperty()
   metadata: string;
+  @ApiProperty()
+  domain: string;
 }
