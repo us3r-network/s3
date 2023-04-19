@@ -4412,10 +4412,10 @@
     "@typescript-eslint/types" "5.56.0"
     eslint-visitor-keys "^3.3.0"
 
-"@us3r-network/auth-with-rainbowkit@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.1.2.tgz#a9c371a3ee6eca72c509e7e96c4d7ba7b6eecb60"
-  integrity sha512-HUoOYBaP+UMkax3b41w2/9yGDeDzqrjIR6qej/OM1imr9iKUGZiIkScsl5l4cAky2scsQIE/CJQtb3B6QmjQ2w==
+"@us3r-network/auth-with-rainbowkit@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.1.3.tgz#2a6622ff625868e4378e9dee3796789213b9ac48"
+  integrity sha512-YcqfSiS9ks43oNI4Fzr9y1U9BCsVfsQeEiSaVw8N3I25FUpA3eo6i82e8QkE6gd62D26bRZufHHxKxhCxu7vYQ==
   dependencies:
     "@rainbow-me/rainbowkit" "^0.12.7"
     "@us3r-network/auth" "^0.2.2"
@@ -4445,10 +4445,10 @@
     react "^18.2.0"
     react-dom "^18.2.0"
 
-"@us3r-network/profile@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.npmjs.org/@us3r-network/profile/-/profile-0.3.0.tgz#73a5e646da0017abf678f8678ded94a618e38b1c"
-  integrity sha512-8TWTyXuQndO6sUfsYYf1xDSXELFCSm9xAGRJd3OyzxqeZ0l6P7S+tEJTm06hkpFLyTB7BnlG0Zgj5cXPBNUw8g==
+"@us3r-network/profile@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/@us3r-network/profile/-/profile-0.3.1.tgz#8f214d8bc8032a4941022bb7cc8326fed4161280"
+  integrity sha512-n7MZq6aVlidjWmnyWpLROIYwxgoRbyjb3oNnnZ2vdbd7QnGraenntLuRO8LTxntuiB0pFojEncya4EATWiQTIQ==
   dependencies:
     "@composedb/devtools" "^0.4.3"
     "@composedb/types" "^0.4.3"
