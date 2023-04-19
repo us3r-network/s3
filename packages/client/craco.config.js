@@ -28,6 +28,9 @@ module.exports = {
       ],
       ignoreWarnings: [/Failed to parse source map/],
     },
+    alias: {
+      "rebass/styled-components": "rebass/styled-components/index.js",
+    },
     // externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
     // externals: [nodeExternals()],
   },

@@ -12,7 +12,6 @@ import {
 import { useUrlSearchParams } from "use-url-search-params";
 
 import "@graphiql/plugin-explorer/dist/style.css";
-import { useUs3rProfileContext } from "@us3r-network/profile";
 import { shortPubKey } from "../utils/shortPubKey";
 import { ComposeClient } from "@composedb/client";
 import { RuntimeCompositeDefinition } from "@composedb/types";
@@ -24,6 +23,12 @@ import { queryModelGraphql } from "../api";
 import { AxiosError } from "axios";
 import styled from "styled-components";
 import { createGraphqlDefaultQuery } from "../utils/createDefaultQuery";
+import {
+  useAuthentication,
+  useSession,
+} from "@us3r-network/auth-with-rainbowkit";
+import { useProfileState } from "@us3r-network/profile";
+import { DID } from "dids";
 
 const type = {
   query: String,
@@ -80,47 +85,47 @@ export function PlaygroundGraphiQL(
   //   const [modelData, setModelData] = useState<ModeQueryResult>();
 
   const [definition, setDefinition] = useState({
-    "models": {
-      "Profile": {
-        "id": "kjzl6hvfrbw6cah5z1j58emxetv28ky4hpmmmdbspnb7a2yycpi1o03e2webxrn",
-        "accountRelation": { "type": "single" },
+    models: {
+      Profile: {
+        id: "kjzl6hvfrbw6cah5z1j58emxetv28ky4hpmmmdbspnb7a2yycpi1o03e2webxrn",
+        accountRelation: { type: "single" },
       },
     },
-    "objects": {
-      "Wallet": {
-        "chain": {
-          "type": "reference",
-          "refType": "enum",
-          "refName": "ChainType",
-          "required": false,
+    objects: {
+      Wallet: {
+        chain: {
+          type: "reference",
+          refType: "enum",
+          refName: "ChainType",
+          required: false,
         },
-        "address": { "type": "string", "required": true },
-        "primary": { "type": "boolean", "required": true },
+        address: { type: "string", required: true },
+        primary: { type: "boolean", required: true },
       },
-      "Profile": {
-        "bio": { "type": "string", "required": false },
-        "name": { "type": "string", "required": true },
-        "tags": {
-          "type": "list",
-          "required": false,
-          "item": { "type": "string", "required": false },
+      Profile: {
+        bio: { type: "string", required: false },
+        name: { type: "string", required: true },
+        tags: {
+          type: "list",
+          required: false,
+          item: { type: "string", required: false },
         },
-        "avatar": { "type": "string", "required": false },
-        "wallets": {
-          "type": "list",
-          "required": false,
-          "item": {
-            "type": "reference",
-            "refType": "object",
-            "refName": "Wallet",
-            "required": false,
+        avatar: { type: "string", required: false },
+        wallets: {
+          type: "list",
+          required: false,
+          item: {
+            type: "reference",
+            refType: "object",
+            refName: "Wallet",
+            required: false,
           },
         },
-        "version": { "type": "view", "viewType": "documentVersion" },
+        version: { type: "view", viewType: "documentVersion" },
       },
     },
-    "enums": { "ChainType": ["EVM", "SOLANA"] },
-    "accountData": { "profile": { "type": "node", "name": "Profile" } },
+    enums: { ChainType: ["EVM", "SOLANA"] },
+    accountData: { profile: { type: "node", name: "Profile" } },
   });
 
   const [errMsg, setErrMsg] = useState("");
@@ -150,8 +155,10 @@ export function PlaygroundGraphiQL(
     }
   }, [streamId]);
 
-  const { sessId, profile, connectUs3r, us3rAuth, us3rAuthValid } =
-    useUs3rProfileContext()!;
+  const { signIn } = useAuthentication();
+  const session = useSession();
+  const sessId = session?.id;
+  const { profile } = useProfileState();
 
   const composeClient = useMemo(
     () =>
@@ -165,11 +172,15 @@ export function PlaygroundGraphiQL(
     useState(false);
 
   const authComposeClients = useCallback(() => {
-    if (us3rAuthValid && us3rAuth.valid) {
-      us3rAuth.authComposeClients([composeClient]);
+    if (session) {
+      composeClient.setDID(session.did);
       setComposeClientAuthenticated(true);
+    } else {
+      const did = new DID();
+      composeClient.setDID(did);
+      setComposeClientAuthenticated(false);
     }
-  }, [composeClient, setComposeClientAuthenticated, us3rAuth, us3rAuthValid]);
+  }, [session, composeClient, setComposeClientAuthenticated]);
 
   useEffect(() => {
     authComposeClients();
@@ -246,7 +257,7 @@ export function PlaygroundGraphiQL(
               )) || (
                 <div
                   onClick={async () => {
-                    await connectUs3r();
+                    await signIn();
                     authComposeClients();
                   }}
                 >

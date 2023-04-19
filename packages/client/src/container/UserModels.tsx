@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { TableBox } from "../components/TableBox";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
-import { UserAvatar } from "@us3r-network/authkit";
+import { UserAvatar } from "@us3r-network/profile";
 
 export default function UserModels() {
   const { did } = useParams();

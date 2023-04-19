@@ -1,18 +1,17 @@
-import {
-  useUs3rAuthModal,
-  useUs3rAuth,
-  UserAvatar,
-} from "@us3r-network/authkit";
-import { useUs3rProfileContext } from "@us3r-network/profile";
+import { UserAvatar } from "@us3r-network/profile";
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Network } from "../types";
+import {
+  useAuthentication,
+  useSession,
+} from "@us3r-network/auth-with-rainbowkit";
 
 const LoginButton = () => {
-  const { sessId } = useUs3rProfileContext()!;
-  const { logout } = useUs3rAuth();
-  const { openLoginModal } = useUs3rAuthModal();
+  const { signIn, signOut } = useAuthentication();
+  const session = useSession();
+  const sessId = session?.id;
   const navigate = useNavigate();
 
   const navToProfile = useCallback(() => {
@@ -31,15 +30,15 @@ const LoginButton = () => {
     <Wrapper>
       {!!sessId && (
         <div onClick={navToProfile}>
-          <UserAvatar did={sessId} title={sessId} />
+          <UserAvatar title={sessId} />
         </div>
       )}
       <button
         onClick={() => {
           if (!sessId) {
-            openLoginModal();
+            signIn();
           } else {
-            logout();
+            signOut();
           }
         }}
       >
