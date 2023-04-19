@@ -1,84 +1,74 @@
-import { Routes, Route, Outlet } from "react-router-dom"
-import styled from "styled-components"
-import dayjs from "dayjs"
-import { isMobile } from "react-device-detect"
-import relativeTime from "dayjs/plugin/relativeTime"
+import { Routes, Route, Outlet } from "react-router-dom";
+import styled from "styled-components";
+import dayjs from "dayjs";
+import { isMobile } from "react-device-detect";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-import { Us3rProfileProvider } from "@us3r-network/profile"
-import { Us3rThreadProvider } from "@us3r-network/thread"
-import { Us3rAuthProvider, AuthToolType } from "@us3r-network/authkit"
+import { Us3rAuthWithRainbowkitProvider } from "@us3r-network/auth-with-rainbowkit";
+import { ProfileStateProvider } from "@us3r-network/profile";
 
-import Stream from "./container/Stream"
-import Profile from "./container/Profile"
-import Family from "./container/Family"
+import Stream from "./container/Stream";
+import Profile from "./container/Profile";
+import Family from "./container/Family";
 
-import Home from "./container/Home"
-import Nav from "./components/Nav"
-import MobileNav from "./components/MobileNav"
-import NoMatch from "./components/NoMatch"
-import { useGAPageView } from "./hooks/useGoogleAnalytics"
-import { CERAMIC_HOST } from "./constants"
-import Model from "./container/Model"
-import ModelStream from "./container/ModelStream"
-import ModelCreate from "./container/ModelCreate"
-import UserModels from "./container/UserModels"
-import ModelView from "./container/ModelView"
-import { PlaygroundGraphiQL } from "./container/Playground"
+import Home from "./container/Home";
+import Nav from "./components/Nav";
+import MobileNav from "./components/MobileNav";
+import NoMatch from "./components/NoMatch";
+import { useGAPageView } from "./hooks/useGoogleAnalytics";
+import { CERAMIC_HOST } from "./constants";
+import Model from "./container/Model";
+import ModelStream from "./container/ModelStream";
+import ModelCreate from "./container/ModelCreate";
+import UserModels from "./container/UserModels";
+import ModelView from "./container/ModelView";
+import { PlaygroundGraphiQL } from "./container/Playground";
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
-const authToolTypes = [
-  AuthToolType.metamask_wallet,
-  AuthToolType.phantom_wallet,
-]
 export default function App() {
   return (
-    <Us3rProfileProvider ceramicHost={CERAMIC_HOST}>
-      <Us3rThreadProvider ceramicHost={CERAMIC_HOST}>
-        <Us3rAuthProvider
-          authConfig={{ authToolTypes }}
-          themeConfig={{ themeType: "dark" }}
-        >
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="/:network/stream/:streamId" element={<Stream />} />
-              <Route path="/:network/profile/:did" element={<Profile />} />
-              <Route path="/:network/family/:familyOrApp" element={<Family />} />
+    <Us3rAuthWithRainbowkitProvider>
+      <ProfileStateProvider
+        ceramicHost={CERAMIC_HOST}
+        themeConfig={{ mode: "dark" }}
+      >
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="/:network/stream/:streamId" element={<Stream />} />
+            <Route path="/:network/profile/:did" element={<Profile />} />
+            <Route path="/:network/family/:familyOrApp" element={<Family />} />
 
-              <Route path="model" element={<Model />} />
-              <Route path="model/:streamId" element={<ModelStream />} />
-              <Route path="model/create" element={<ModelCreate />} />
-              <Route path="models/:did" element={<UserModels />} />
-              <Route path="modelview/:streamId" element={<ModelView />} />
+            <Route path="model" element={<Model />} />
+            <Route path="model/:streamId" element={<ModelStream />} />
+            <Route path="model/create" element={<ModelCreate />} />
+            <Route path="models/:did" element={<UserModels />} />
+            <Route path="modelview/:streamId" element={<ModelView />} />
 
-              <Route path="*" element={<NoMatch />} />
-            </Route>
-            <Route
-              path="playground/:streamId"
-              element={<PlaygroundGraphiQL />}
-            />
-          </Routes>
-        </Us3rAuthProvider>
-      </Us3rThreadProvider>
-    </Us3rProfileProvider>
-  )
+            <Route path="*" element={<NoMatch />} />
+          </Route>
+          <Route path="playground/:streamId" element={<PlaygroundGraphiQL />} />
+        </Routes>
+      </ProfileStateProvider>
+    </Us3rAuthWithRainbowkitProvider>
+  );
 }
 
 function Layout() {
-  useGAPageView()
+  useGAPageView();
   return (
     <AppContainer isMobile={isMobile}>
-      {isMobile ?<MobileNav/> : <Nav />}
+      {isMobile ? <MobileNav /> : <Nav />}
 
       <main>
         <Outlet />
       </main>
     </AppContainer>
-  )
+  );
 }
 
-const AppContainer = styled.div<{isMobile: boolean}>`
+const AppContainer = styled.div<{ isMobile: boolean }>`
   display: flex;
 
   > main {
@@ -86,7 +76,7 @@ const AppContainer = styled.div<{isMobile: boolean}>`
     margin: 0 auto;
     width: calc(100vw - 300px);
     max-width: 1300px;
-    margin-top: ${props => props?.isMobile ? '60px' : '0'};
+    margin-top: ${(props) => (props?.isMobile ? "60px" : "0")};
     z-index: 0;
   }
-`
+`;
