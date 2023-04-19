@@ -9,6 +9,7 @@ import { ModelStream, Network } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import Search from '../components/Search'
+import Star from '../components/icons/Star'
 
 export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([])
@@ -106,6 +107,7 @@ export default function ModelPage() {
                 <th>ID</th>
                 <th>Usage Count</th>
                 <th>Release Date</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -146,6 +148,11 @@ export default function ModelPage() {
                             'YYYY-MM-DD HH:mm:ss'
                           )) ||
                           '-'}
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <Star />
                       </div>
                     </td>
                   </tr>
@@ -242,7 +249,6 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
   table-layout: fixed;
   border-collapse: collapse;
 
-
   tbody tr,
   thead tr {
     font-size: 15px;
@@ -258,7 +264,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     opacity: 0.8;
     text-align: start;
 
-    width: calc(100% / 7) !important;
+    width: calc((100% - 70px) / 7) !important;
     overflow: hidden;
     ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
 
@@ -269,6 +275,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     &:last-child {
       padding-left: 20px;
       padding-right: 0px;
+      width: 70px  !important;
     }
 
   }
