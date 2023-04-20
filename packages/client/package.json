@@ -21,6 +21,7 @@
     "@types/react-dom": "^18.0.0",
     "@types/styled-components": "^5.1.26",
     "@us3r-network/auth-with-rainbowkit": "^0.1.2",
+    "@us3r-network/model-collection": "^0.1.1",
     "@us3r-network/profile": "^0.3.0",
     "axios": "^1.2.6",
     "dayjs": "^1.11.7",

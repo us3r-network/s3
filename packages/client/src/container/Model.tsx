@@ -1,22 +1,71 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { TableBox } from '../components/TableBox'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  useAuthentication,
+  useSession,
+} from "@us3r-network/auth-with-rainbowkit";
 import { getModelStreamList, PageSize } from '../api'
 import { ModelStream, Network } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import Search from '../components/Search'
 import Star from '../components/icons/Star'
+import {s3ModelCollection} from '../api/ceramic'
+import StarEmpty from '../components/icons/StarEmpty'
 
 export default function ModelPage() {
+  const { signIn } = useAuthentication();
+  const session = useSession();
+  const sessId = session?.id;
   const [models, setModels] = useState<Array<ModelStream>>([])
   const navigate = useNavigate()
   const searchText = useRef('')
   const [hasMore, setHasMore] = useState(true)
   const pageNum = useRef(1)
+  const [filterStar, setFilterStar] = useState(false);
+  const [personalCollections, setPersonalCollections] = useState<{modelId: string, id: string, revoke: boolean}[]>([])
+
+  const fetchPersonal = useCallback(async () => {
+    if (!session) return
+    s3ModelCollection.authComposeClient(session)
+    const personal = await s3ModelCollection.queryPersonalCollections({first: 500})
+    const collected = personal.data?.viewer.modelCollectionList
+
+    console.log(collected)
+
+    if (collected) {
+      setPersonalCollections(collected?.edges.map(item => {
+        return {
+          modelId: item.node.modelID,
+          id: item.node.id!,
+          revoke: !!item.node.revoke
+        }
+      }))
+    }
+  }, [session])
+
+
+  const starModelAction = useCallback(async (modelId: string, id?: string, revoke?: boolean) => {
+    if (!session) return
+    s3ModelCollection.authComposeClient(session)
+
+    if (id) {
+      await s3ModelCollection.updateCollection(id,{
+        revoke: !revoke
+      })
+    } else {
+      await s3ModelCollection.createCollection({
+        modelID: modelId,
+        revoke: false
+      })
+    }
+    
+    await fetchPersonal()
+  }, [session, fetchPersonal])
 
   const fetchModel = useCallback(async () => {
     const resp = await getModelStreamList({ name: searchText.current })
@@ -47,8 +96,26 @@ export default function ModelPage() {
   )
 
   useEffect(() => {
+    if (!session) {
+      setPersonalCollections([])
+    }
+  }, [session])
+
+
+  useEffect(() => {
     fetchModel()
-  }, [fetchModel])
+    fetchPersonal()
+  }, [fetchModel, fetchPersonal])
+
+  const lists = useMemo(() => {
+    if (!filterStar) return models
+    const data = models.filter(item => {
+      const hasStarItem = personalCollections.find(starItem=>starItem.modelId === item.stream_id && starItem.revoke === false)
+      return !!hasStarItem
+    })
+    console.log(data)
+    return data
+  }, [models, personalCollections, filterStar])
 
   return (
     <PageBox isMobile={isMobile}>
@@ -66,6 +133,12 @@ export default function ModelPage() {
                 }}
                 placeholder={'Search by model name'}
               />
+              <button className='star-btn' onClick={() => {
+                setFilterStar(!filterStar)
+                setHasMore(filterStar)
+              }}>
+                {filterStar ? <Star /> : <StarEmpty/>}
+              </button>
               <button
                 onClick={() => {
                   navigate('/model/create')
@@ -89,7 +162,7 @@ export default function ModelPage() {
         </div>
       </div>
       <InfiniteScroll
-        dataLength={models.length}
+        dataLength={lists.length}
         next={() => {
           pageNum.current += 1
           fetchMoreModel(pageNum.current)
@@ -111,7 +184,8 @@ export default function ModelPage() {
               </tr>
             </thead>
             <tbody>
-              {models.map((item, idx) => {
+              {lists.map((item, idx) => {
+                const hasStarItem = personalCollections.find(starItem=>starItem.modelId === item.stream_id)
                 return (
                   <tr key={item.stream_id}>
                     <td>
@@ -151,8 +225,16 @@ export default function ModelPage() {
                       </div>
                     </td>
                     <td>
-                      <div>
-                        <Star />
+                      <div className='star' onClick={() => {
+                        if (!sessId) {
+                          signIn()
+                          return
+                        }
+                        
+                        starModelAction(item.stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
+                      }}>
+                        
+                      {hasStarItem?.revoke === false ? <Star /> : <StarEmpty />}
                       </div>
                     </td>
                   </tr>
@@ -215,6 +297,18 @@ const PageBox = styled.div<{isMobile: boolean}>`
         /* width: 100px; */
         padding: 0 15px;
         height: 36px;
+
+        &.star-btn {
+          width: 52px;
+          height: 40px;
+
+          background: #1A1E23;
+          border: 1px solid #39424C;
+          border-radius: 100px;
+          display: inline-flex;
+          align-items: center;
+          justify-items: center
+        }
       }
     }
   }
@@ -380,6 +474,10 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
   }
 
   .nav-stream {
+    cursor: pointer;
+  }
+
+  .star {
     cursor: pointer;
   }
 `
