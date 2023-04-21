@@ -12,6 +12,7 @@ import Profile from "./container/Profile";
 import Family from "./container/Family";
 
 import Home from "./container/Home";
+import Streams from "./container/Streams";
 import Nav from "./components/Nav";
 import MobileNav from "./components/MobileNav";
 import NoMatch from "./components/NoMatch";
@@ -23,6 +24,7 @@ import ModelCreate from "./container/ModelCreate";
 import UserModels from "./container/UserModels";
 import ModelView from "./container/ModelView";
 import { PlaygroundGraphiQL } from "./container/Playground";
+
 
 dayjs.extend(relativeTime);
 
@@ -36,6 +38,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="streams" element={<Streams />} />
             <Route path="/:network/stream/:streamId" element={<Stream />} />
             <Route path="/:network/profile/:did" element={<Profile />} />
             <Route path="/:network/family/:familyOrApp" element={<Family />} />
