@@ -54,8 +54,8 @@ function ListCard({
         />
         {shortPubKey(did, { len: 10, split: "-" })}
       </div>
-      <div>
-        <time>{dayjs(indexingTime).fromNow()}</time>
+      <div className="time">
+        {dayjs(indexingTime).fromNow()}
       </div>
     </CardBox>
   );
@@ -68,7 +68,7 @@ const Avatar = styled.div`
 
 const CardBox = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1.5fr 100px;
+  grid-template-columns: 1fr 1.5fr 110px;
   justify-content: space-between;
   align-items: center;
   padding: 24px 0;
@@ -84,11 +84,11 @@ const CardBox = styled.div`
     gap: 10px;
   }
 
-  time {
+  .time {
     font-weight: 400;
     font-size: 14px;
     line-height: 17px;
-
+    text-align: end;
     color: #718096;
   }
 `;

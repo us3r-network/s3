@@ -1,10 +1,47 @@
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { Network } from "../../types";
 
+type Ops = "model" | "stream";
 export default function SearchFilter() {
+  const [ops, setOps] = useState<Ops>("model");
+  const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        if (ops === "model") {
+          navigate(`/modelview/${searchText}`);
+        } else {
+          let network = Network.MAINNET;
+          try {
+            const localNetwork =
+              localStorage.getItem("network-select") || '"MAINNET"';
+            network = JSON.parse(localNetwork);
+          } catch (error) {
+            console.error(error);
+          }
+          navigate(`/${network.toLowerCase()}/stream/${searchText}`);
+        }
+        console.log(searchText);
+      }
+    },
+    [ops, searchText, navigate]
+  );
+
   return (
     <Box className="search-area">
       <div className="select-box">
-        <select name="" id="">
+        <select
+          name=""
+          id=""
+          value={ops}
+          onChange={(e) => {
+            setOps(e.target.value as Ops);
+          }}
+        >
           <option value="model">Model</option>
           <option value="stream">Stream</option>
         </select>
@@ -12,6 +49,11 @@ export default function SearchFilter() {
       <input
         type="text"
         placeholder="Search by Model / Steam ID / DID / Family"
+        value={searchText}
+        onChange={(e) => {
+          setSearchText(e.target.value);
+        }}
+        onKeyDown={handleKeyDown}
       />
     </Box>
   );
