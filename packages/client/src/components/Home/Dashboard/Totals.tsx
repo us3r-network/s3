@@ -51,5 +51,4 @@ export default function NumbersContainer() {
   const NumbersBox = styled.div`
     display: grid;
     grid-template-columns: auto auto;
-    grid-row-gap: 20px;
   `;

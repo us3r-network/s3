@@ -1,11 +1,13 @@
 import styled from "styled-components";
+import Streams from "./Streams";
+import Models from "./Models";
 
 export default function Lists() {
   return (
     <Box>
-      <div>Models</div>
+      <Models />
 
-      <div>Streams</div>
+      <Streams />
     </Box>
   );
 }
