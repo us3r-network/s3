@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,8 @@ import useListData from '../hooks/useListData'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import SelectIcon from '../components/icons/Select'
 import FeedsFilterBox from '../components/FeedsFilterBox'
+import { getStreamTopics } from '../api'
+import Filter from '../components/Filter'
 
 export default function Streams() {
   const [network, setNetwork] = useLocalStorage(
@@ -29,9 +31,18 @@ export default function Streams() {
     fetchMoreData,
   } = useListData({ network })
   const [showSelect, setShowSelect] = useState(false)
+  const [domains, setDomains] = useState<Array<{name: string, num: number}>>([])
+  const [families, setFamilies] = useState<Array<{name: string, num: number}>>([])
+
+  const loadTopics = useCallback(async () => {
+    const resp = await getStreamTopics(network)
+    setDomains(resp.data.data.domains)
+    setFamilies(resp.data.data.familys)
+  }, [network])
 
   useEffect(() => {
     loadData({ network })
+    loadTopics()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network])
 
@@ -73,7 +84,10 @@ export default function Streams() {
         </div>
       </FilterBox>
       <FeedsFilterBox open={showSelect} >
-        select
+        <Filter domains={domains} families={families} filterAction={(data) => {
+          // console.log('filter', data);
+          loadData({ network, familyOrApp: data.families[0] })
+        }}/>
       </FeedsFilterBox>
       <InfiniteScroll
         dataLength={data.length}

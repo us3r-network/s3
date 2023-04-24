@@ -54,6 +54,11 @@ export function getList({
   });
 }
 
+export function getStreamTopics(network: Network) {
+  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/streams/topics`, {
+  });
+}
+
 export function getStreamInfo(
   network: Network,
   streamId: string

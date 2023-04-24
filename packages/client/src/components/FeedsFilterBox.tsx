@@ -14,15 +14,15 @@ export default function FeedsFilterBox({
   const bottomInnerRef = useRef<HTMLDivElement>();
   const setOpenStyle = useCallback(() => {
     if (bottomInnerRef.current) {
-      // bottomInnerRef.current.parentElement!.style.height = `${bottomInnerRef.current.offsetHeight}px`;
-      bottomInnerRef.current.parentElement!.style.paddingTop = '20px';
+      bottomInnerRef.current.parentElement!.style.height = `${bottomInnerRef.current.offsetHeight}px`;
+      // bottomInnerRef.current.parentElement!.style.paddingTop = '20px';
       bottomInnerRef.current.parentElement!.style.opacity = '1';
     }
   }, []);
   const setCloseStyle = useCallback(() => {
     if (bottomInnerRef.current) {
-      // bottomInnerRef.current.parentElement!.style.height = '0px';
-      bottomInnerRef.current.parentElement!.style.paddingTop = '0px';
+      bottomInnerRef.current.parentElement!.style.height = '0px';
+      // bottomInnerRef.current.parentElement!.style.paddingTop = '0px';
       bottomInnerRef.current.parentElement!.style.opacity = '0';
     }
   }, []);
@@ -56,7 +56,6 @@ const FeedsFilterBoxWrapper = styled.div<{open: boolean}>`
   margin-bottom: ${({open}) => open ? '20px' : '0'};
   position: sticky;
   top: 80px;
-  padding: ${({open}) => open ? '20px' : '0 20px'};
   box-sizing: border-box;
   background: #1b1e23;
   border-radius: 20px;
@@ -67,6 +66,5 @@ const FeedsFilterBoxWrapper = styled.div<{open: boolean}>`
 `;
 const FeedsFilterBoxInner = styled.div`
   width: 100%;
-  max-height: 50vh;
   overflow-y: auto;
 `;

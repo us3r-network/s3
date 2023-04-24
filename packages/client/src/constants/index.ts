@@ -29,3 +29,7 @@ export const Types: { [key: string]: string } = {
   "2": "Model",
   "3": "ModelInstanceDocument",
 };
+
+export const TypesReverse = Object.fromEntries(
+  Object.entries(Types).map(([key, value]) => [value, key])
+);
