@@ -23,6 +23,7 @@ export default function useListData({
   }: {
     network: Network;
     familyOrApp?: string;
+    type?: string[]
     did?: string;
   }) => {
     const resp = await getList({ network, familyOrApp, did });

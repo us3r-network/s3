@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { TypesReverse } from "../constants";
 import { useCallback, useEffect, useState } from "react";
 import RadioIcon from "./icons/Radio";
+import { shortPubKey } from "../utils/shortPubKey";
 
 export default function Filter({
   domains,
@@ -88,7 +89,7 @@ export default function Filter({
                   domainsHandler(item.name);
                 }}
               >
-                {item.name}
+                {item.name.length > 30 ? shortPubKey(item.name) : item.name}
                 {hasSelect && <RadioIcon />}
               </button>
             );
@@ -108,7 +109,7 @@ export default function Filter({
                   familiesHandler(item.name);
                 }}
               >
-                {item.name}
+                {item.name.length > 30 ? shortPubKey(item.name) : item.name}
                 {hasSelect && <RadioIcon />}
               </button>
             );
