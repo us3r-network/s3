@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useNavigate } from 'react-router-dom'
@@ -33,6 +33,15 @@ export default function Streams() {
   const [showSelect, setShowSelect] = useState(false)
   const [domains, setDomains] = useState<Array<{name: string, num: number}>>([])
   const [families, setFamilies] = useState<Array<{name: string, num: number}>>([])
+  const filterRef = useRef<{
+    domains: string[],
+    families: string[],
+    types: string[],
+  }>({
+      domains: [],
+      families: [],
+      types: [],
+  })
 
   const loadTopics = useCallback(async () => {
     const resp = await getStreamTopics(network)
@@ -85,15 +94,23 @@ export default function Streams() {
       </FilterBox>
       <FeedsFilterBox open={showSelect} >
         <Filter domains={domains} families={families} filterAction={(data) => {
-          // console.log('filter', data);
-          loadData({ network, familyOrApp: data.families[0] })
+          filterRef.current = data;
+          loadData({
+            network,
+            familyOrApp: [...data.families, ...data.domains],
+            types: data.types
+          })
         }}/>
       </FeedsFilterBox>
       <InfiniteScroll
         dataLength={data.length}
         next={() => {
-          pageNum.current += 1
-          fetchMoreData(pageNum.current)
+          pageNum.current += 1;
+          fetchMoreData(
+            pageNum.current, 
+            filterRef.current.types,
+            [...filterRef.current.domains, ...filterRef.current.families]
+          )
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}

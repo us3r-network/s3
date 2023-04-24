@@ -28,12 +28,14 @@ export function getList({
   pageNumber = 1,
   did,
   familyOrApp,
+  types
 }: {
   network: Network;
   pageSize?: number;
   pageNumber?: number;
   did?: string;
-  familyOrApp?: string;
+  familyOrApp?: string[];
+  types?: string[]
 }): AxiosPromise<
   ApiResp<{
     didCount: number;
@@ -50,6 +52,7 @@ export function getList({
       pageNumber,
       did,
       familyOrApp,
+      types,
     },
   });
 }

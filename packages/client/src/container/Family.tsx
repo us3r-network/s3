@@ -14,12 +14,11 @@ export default function Family() {
   const navigate = useNavigate()
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network: network as Network,
-    familyOrApp,
   })
 
   useEffect(() => {
     if (!network || !familyOrApp) return
-    loadData({ network: network as Network, familyOrApp })
+    loadData({ network: network as Network, familyOrApp: [familyOrApp || ''] })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network, familyOrApp])
 

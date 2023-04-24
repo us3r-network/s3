@@ -24,55 +24,78 @@ export default function Filter({
   const domainsHandler = useCallback(
     (item: string) => {
       const itemIdx = selectDomains.indexOf(item);
+      let data = []
       if (itemIdx === -1) {
-        setSelectDomains([...selectDomains, item]);
+        data = ([...selectDomains, item]);
       } else {
-        setSelectDomains([
+        data = ([
           ...selectDomains.slice(0, itemIdx),
           ...selectDomains.slice(itemIdx + 1),
         ]);
       }
+      setSelectDomains(data)
+      filterAction({
+        domains: data,
+        families: selectFamilies,
+        types: selectTypes.map(item => TypesReverse[item]),
+      });
     },
-    [selectDomains]
+    [filterAction, selectDomains, selectFamilies, selectTypes]
   );
 
   const familiesHandler = useCallback(
     (item: string) => {
       const itemIdx = selectFamilies.indexOf(item);
+      let data = []
       if (itemIdx === -1) {
-        setSelectFamilies([...selectFamilies, item]);
+        data = ([...selectFamilies, item]);
       } else {
-        setSelectFamilies([
+        data = ([
           ...selectFamilies.slice(0, itemIdx),
           ...selectFamilies.slice(itemIdx + 1),
         ]);
       }
+      setSelectFamilies(data)
+      filterAction({
+        domains: selectDomains,
+        families: data,
+        types: selectTypes.map(item => TypesReverse[item]),
+      });
     },
-    [selectFamilies]
+    [filterAction, selectFamilies, selectTypes, selectDomains]
   );
 
   const typesHandler = useCallback(
     (item: string) => {
       const itemIdx = selectTypes.indexOf(item);
+      let data = []
       if (itemIdx === -1) {
-        setSelectTypes([...selectTypes, item]);
+        data = ([...selectTypes, item]);
       } else {
-        setSelectTypes([
+        data =([
           ...selectTypes.slice(0, itemIdx),
           ...selectTypes.slice(itemIdx + 1),
         ]);
       }
+      setSelectTypes(data)
+      filterAction({
+        domains: selectDomains,
+        families: selectFamilies,
+        types: data.map(item => TypesReverse[item]),
+      });
     },
-    [selectTypes]
+    [filterAction, selectDomains, selectTypes, selectFamilies]
   );
 
-  useEffect(() => {
-    filterAction({
-      domains: selectDomains,
-      families: selectFamilies,
-      types: selectTypes.map(item => TypesReverse[item]),
-    });
-  }, [filterAction, selectDomains, selectFamilies, selectTypes]);
+
+
+  // useEffect(() => {
+  //   filterAction({
+  //     domains: selectDomains,
+  //     families: selectFamilies,
+  //     types: selectTypes.map(item => TypesReverse[item]),
+  //   });
+  // }, [mounted, filterAction, selectDomains, selectFamilies, selectTypes]);
 
   return (
     <FilterWrapper>
