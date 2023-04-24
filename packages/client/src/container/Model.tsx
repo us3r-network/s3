@@ -133,6 +133,10 @@ export default function ModelPage() {
                 placeholder={'Search by model name'}
               />
               <button className='star-btn' onClick={() => {
+                if (!sessId) {
+                  signIn()
+                  return
+                }
                 setFilterStar(!filterStar)
                 setHasMore(filterStar)
               }}>
