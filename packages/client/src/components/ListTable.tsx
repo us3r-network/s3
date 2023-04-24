@@ -1,22 +1,22 @@
-import styled from 'styled-components'
-import { Link } from 'react-router-dom'
-import multiavatar from '@multiavatar/multiavatar'
-import dayjs from 'dayjs'
-import { isMobile } from 'react-device-detect'
+import styled from "styled-components";
+import { Link } from "react-router-dom";
+import multiavatar from "@multiavatar/multiavatar";
+import dayjs from "dayjs";
+import { isMobile } from "react-device-detect";
 
-import { Stream } from '../types'
-import { shortPubKey } from '../utils/shortPubKey'
-import { TableBox } from './TableBox'
-import { FamilyOrAppMapReverse, Types } from '../constants'
+import { Stream } from "../types";
+import { shortPubKey } from "../utils/shortPubKey";
+import { TableBox } from "./TableBox";
+import { FamilyOrAppMapReverse, Types } from "../constants";
 
 export default function ListTable({
   network,
   data,
   showDid,
 }: {
-  network: string | undefined
-  data: Array<Stream>
-  showDid?: boolean
+  network: string | undefined;
+  data: Array<Stream>;
+  showDid?: boolean;
 }) {
   return (
     <TableBox isMobile={isMobile}>
@@ -34,32 +34,32 @@ export default function ListTable({
         </thead>
         <tbody>
           {data.map((item, idx) => {
-            const pubkey = item.did.split(':').pop() || ''
-            const tags: string[] = [...item.tags]
+            const pubkey = item.did.split(":").pop() || "";
+            const tags: string[] = [...item.tags];
             if (item.content.type) {
-              tags.push(item.content.type)
+              tags.push(item.content.type);
             }
 
-            let schemaOrModel = <div className="xxxx">-</div>
+            let schemaOrModel = <div className="xxxx">-</div>;
             if (item.schema) {
               schemaOrModel = (
                 <Link to={`/${network}/stream/${item.schema}`}>
-                  {shortPubKey(item.schema, { len: 8, split: '-' })}
+                  {shortPubKey(item.schema, { len: 8, split: "-" })}
                 </Link>
-              )
-            } else if (item.model && (item.type === '0' || item.type === '3')) {
+              );
+            } else if (item.model && (item.type === "0" || item.type === "3")) {
               schemaOrModel = (
                 <Link to={`/${network}/stream/${item.model}`}>
-                  {shortPubKey(item.model, { len: 8, split: '-' })}
+                  {shortPubKey(item.model, { len: 8, split: "-" })}
                 </Link>
-              )
+              );
             }
 
             return (
               <tr key={item.streamId + idx}>
                 <td>
                   <Link to={`/${network}/stream/${item.streamId}`}>
-                    {shortPubKey(item.streamId, { len: 8, split: '-' })}
+                    {shortPubKey(item.streamId, { len: 8, split: "-" })}
                   </Link>
                 </td>
                 {showDid && (
@@ -91,7 +91,11 @@ export default function ListTable({
                           item.domain
                         )}`}
                       >
-                        <div className="family">{item.domain}</div>
+                        <div className="family">
+                          {item.domain.length > 15
+                            ? shortPubKey(item.domain, { len: 8, split: "-" })
+                            : item.domain}
+                        </div>
                       </Link>
                     </div>
                   )) || (
@@ -103,7 +107,7 @@ export default function ListTable({
                             item.familyOrApp.length > 15
                               ? shortPubKey(item.familyOrApp, {
                                   len: 8,
-                                  split: '-',
+                                  split: "-",
                                 })
                               : item.familyOrApp}
                           </div>
@@ -114,11 +118,11 @@ export default function ListTable({
                 </td>
                 <td>
                   <div className="xxxx">
-                    {tags.length > 0 ? tags.join(',') : '-'}
+                    {tags.length > 0 ? tags.join(",") : "-"}
                   </div>
                 </td>
                 <td>
-                  <div className="xxxx">{Types[item.type] || '-'}</div>
+                  <div className="xxxx">{Types[item.type] || "-"}</div>
                 </td>
                 <td>{schemaOrModel}</td>
                 <td>
@@ -127,21 +131,21 @@ export default function ListTable({
                   </div>
                 </td>
               </tr>
-            )
+            );
           })}
         </tbody>
       </TableContainer>
     </TableBox>
-  )
+  );
 }
 
 const Avatar = styled.div`
   width: 40px;
   height: 40px;
-`
+`;
 
 const TableContainer = styled.table<{ isMobile: boolean }>`
-  ${({ isMobile }) => (isMobile ? `` : 'width: 100%;')}
+  ${({ isMobile }) => (isMobile ? `` : "width: 100%;")}
   table-layout: fixed;
   border-collapse: collapse;
 
@@ -170,7 +174,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
       padding-left: 0px;
       padding-right: 20px;
     }
-    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : "")};
   }
 
   tbody tr td {
@@ -186,7 +190,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
       padding-left: 0px;
       padding-right: 20px;
     }
-    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : "")};
 
     > div {
       text-overflow: ellipsis;
@@ -266,4 +270,4 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
 
     color: #718096;
   }
-`
+`;

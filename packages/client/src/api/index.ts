@@ -52,7 +52,7 @@ export function getList({
       pageNumber,
       did,
       familyOrApp,
-      types,
+      type: types,
     },
   });
 }

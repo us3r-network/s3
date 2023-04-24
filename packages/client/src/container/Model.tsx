@@ -35,7 +35,6 @@ export default function ModelPage() {
     const personal = await s3ModelCollection.queryPersonalCollections({first: 500})
     const collected = personal.data?.viewer.modelCollectionList
 
-    console.log(collected)
 
     if (collected) {
       setPersonalCollections(collected?.edges.map(item => {

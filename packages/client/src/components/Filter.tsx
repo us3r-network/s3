@@ -112,7 +112,7 @@ export default function Filter({
                   domainsHandler(item.name);
                 }}
               >
-                {item.name.length > 30 ? shortPubKey(item.name) : item.name}
+                {item.name.length > 30 ? shortPubKey(item.name, {len: 8, split: '-'}) : item.name}
                 {hasSelect && <RadioIcon />}
               </button>
             );
@@ -132,7 +132,7 @@ export default function Filter({
                   familiesHandler(item.name);
                 }}
               >
-                {item.name.length > 30 ? shortPubKey(item.name) : item.name}
+                {item.name.length > 30 ? shortPubKey(item.name, {len: 8, split: '-'}) : item.name}
                 {hasSelect && <RadioIcon />}
               </button>
             );
