@@ -55,6 +55,7 @@ export type ModelStream = {
   "created_at": string;
   "updated_at": string;
   "useCount": number;
+  "isIndexed"?: boolean;
 };
 
 export type ModelStreamInfo = {
