@@ -6,6 +6,7 @@ import {
   ModelStreamInfo,
   ModeQueryResult,
   Network,
+  Stats,
   Stream,
 } from "../types";
 
@@ -116,4 +117,8 @@ export function queryModelGraphql(
   return axios.post(`${API_BASE_URL}/models/graphql`, {
     models: [streamId],
   });
+}
+
+export function getHomeStats({network}: {network: Network}): AxiosPromise<ApiResp<Stats>> {
+  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/stats`);
 }

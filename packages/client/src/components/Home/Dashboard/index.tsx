@@ -1,17 +1,21 @@
 import styled from "styled-components";
 import NumbersContainer from "./Totals";
 import { ChartContainer } from "./Charts";
+import { Stats } from "../../../types";
 
-export default function Dashboard() {
-    return (
-      <Box>
-        <NumbersContainer />
-        <div className="split-line"></div>
-        <ChartContainer />
-      </Box>
-    );
+export default function Dashboard({ data }: { data: Stats | undefined }) {
+  if (!data) {
+    return null;
   }
-  const Box = styled.div`
+  return (
+    <Box>
+      <NumbersContainer data={data}/>
+      <div className="split-line"></div>
+      <ChartContainer data={data.streamsLastWeek}/>
+    </Box>
+  );
+}
+const Box = styled.div`
   display: grid;
   grid-template-columns: 1fr 1px 1fr;
   padding: 20px;
