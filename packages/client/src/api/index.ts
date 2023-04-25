@@ -28,14 +28,14 @@ export function getList({
   pageNumber = 1,
   did,
   familyOrApp,
-  types
+  types,
 }: {
   network: Network;
   pageSize?: number;
   pageNumber?: number;
   did?: string;
   familyOrApp?: string[];
-  types?: string[]
+  types?: string[];
 }): AxiosPromise<
   ApiResp<{
     didCount: number;
@@ -43,8 +43,6 @@ export function getList({
     streams: Array<Stream>;
   }>
 > {
-  console.log(network,'streamId')
-
   return axios.get(`${API_BASE_URL}/streams`, {
     params: {
       network: network.toUpperCase(),
@@ -58,15 +56,17 @@ export function getList({
 }
 
 export function getStreamTopics(network: Network) {
-  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/streams/topics`, {
-  });
+  return axios.get(
+    `${API_BASE_URL}/${network.toUpperCase()}/streams/topics`,
+    {}
+  );
 }
 
 export function getStreamInfo(
   network: Network,
   streamId: string
 ): AxiosPromise<ApiResp<Stream>> {
-  console.log(network,streamId)
+  console.log(network, streamId);
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}`
   );
@@ -115,5 +115,31 @@ export function queryModelGraphql(
 ): AxiosPromise<ApiResp<ModeQueryResult>> {
   return axios.post(`${API_BASE_URL}/models/graphql`, {
     models: [streamId],
+  });
+}
+
+export function getHomeStats({
+  network,
+}: {
+  network: Network;
+}): AxiosPromise<ApiResp<Stats>> {
+  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/stats`);
+}
+
+export function getModelMid({
+  network,
+  pageSize = 50,
+  pageNumber = 1,
+}: {
+  network: Network;
+  pageSize?: number;
+  pageNumber?: number;
+}) {
+  return axios.get(`${API_BASE_URL}/streams`, {
+    params: {
+      network: network.toUpperCase(),
+      pageSize,
+      pageNumber,
+    },
   });
 }
