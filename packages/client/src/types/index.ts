@@ -73,3 +73,11 @@ export type ModeQueryResult = {
   runtimeDefinition: any;
   graphqlSchema: string;
 };
+
+export type Stats = {
+  streamsLastWeek: number[];
+  streamsPerHour: number;
+  todayModels: number;
+  totalModels: number;
+  totalStreams: number;
+};

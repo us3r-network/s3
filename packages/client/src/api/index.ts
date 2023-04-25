@@ -6,6 +6,7 @@ import {
   ModelStreamInfo,
   ModeQueryResult,
   Network,
+  Stats,
   Stream,
 } from "../types";
 

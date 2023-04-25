@@ -2,8 +2,29 @@ import styled from "styled-components";
 import SearchFilter from "../components/Home/HomeFilter";
 import Dashboard from "../components/Home/Dashboard";
 import Lists from "../components/Home/Lists";
+import { useCallback, useEffect, useState } from "react";
+import { Network, Stats } from "../types";
+import { getHomeStats } from "../api";
 
 export default function Home() {
+  const [stats, setStats] = useState<Stats>()
+  const fetchHomeStats = useCallback( async () => {
+    let network = Network.MAINNET;
+    try {
+      const localNetwork =
+        localStorage.getItem("network-select") || '"MAINNET"';
+      network = JSON.parse(localNetwork);
+    } catch (error) {
+      console.error(error);
+    }
+    const resp = await getHomeStats({ network })
+    setStats(resp.data.data)
+  }, [])
+
+  useEffect(() => {
+    fetchHomeStats()
+  }, [fetchHomeStats])
+
   return (
     <Box>
       <SloganBox>
@@ -16,7 +37,7 @@ export default function Home() {
           <img src="homebn.png" alt="" />
         </ImgBox>
       </SloganBox>
-      <Dashboard />
+      <Dashboard data={stats}/>
       <Lists/>
     </Box>
   );
