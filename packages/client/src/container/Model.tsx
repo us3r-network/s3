@@ -233,7 +233,7 @@ export default function ModelPage() {
                         <div className="usage-count">{item.useCount}</div>
                       )) || (
                         <div>
-                          <Link to={`/model/${item.stream_id}/streams`}>
+                          <Link to={`/model/${item.stream_id}/mids`}>
                             {item.useCount}
                           </Link>
                         </div>

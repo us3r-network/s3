@@ -83,6 +83,9 @@ export default function ModelView() {
           }}
         />
         <div className="tools">
+          <Link to={`/model/${streamId}/streams`}>
+            <button>Streams</button>
+          </Link>
           <Link to={`/playground/${streamId}`} target="_blank">
             <button>Playground</button>
           </Link>

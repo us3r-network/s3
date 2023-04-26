@@ -147,3 +147,19 @@ export function getModelMid({
     },
   });
 }
+
+export function getModelMidItem({
+  network,
+  modelId,
+  midId,
+}: {
+  network: Network;
+  modelId: string;
+  midId: string;
+}) {
+  return axios.get(`${API_BASE_URL}/models/${modelId}/mids/${midId}`, {
+    params: {
+      network: network.toUpperCase(),
+    },
+  });
+}

@@ -60,7 +60,7 @@ export default function ModelStreams() {
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        <ModelStreamList data={streams} />
+        {modelId && <ModelStreamList data={streams} modelId={modelId} />}
       </InfiniteScroll>
     </PageBox>
   );

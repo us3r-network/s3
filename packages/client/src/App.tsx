@@ -25,6 +25,7 @@ import UserModels from "./container/UserModels";
 import ModelView from "./container/ModelView";
 import { PlaygroundGraphiQL } from "./container/Playground";
 import ModelStreams from "./container/ModelStreams";
+import ModelMidInfo from "./container/ModelMidInfo";
 
 
 dayjs.extend(relativeTime);
@@ -46,7 +47,8 @@ export default function App() {
 
             <Route path="model" element={<Model />} />
             <Route path="model/:streamId" element={<ModelStream />} />
-            <Route path="model/:modelId/streams" element={<ModelStreams />} />
+            <Route path="model/:modelId/mids" element={<ModelStreams />} />
+            <Route path="model/:modelId/mids/:mid" element={<ModelMidInfo />} />
             <Route path="model/create" element={<ModelCreate />} />
             <Route path="models/:did" element={<UserModels />} />
             <Route path="modelview/:streamId" element={<ModelView />} />

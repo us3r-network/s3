@@ -3,8 +3,9 @@ import { TableBox } from "./TableBox";
 import { ModelMid } from "../types";
 import dayjs from "dayjs";
 import { shortPubKey } from "../utils/shortPubKey";
+import { Link } from "react-router-dom";
 
-export default function ModelStreamList({ data }: { data: ModelMid[] }) {
+export default function ModelStreamList({ modelId,data }: { modelId: string,data: ModelMid[] }) {
   return (
     <TableBox>
       <TableContainer>
@@ -20,10 +21,16 @@ export default function ModelStreamList({ data }: { data: ModelMid[] }) {
             return (
               <tr key={item.streamId}>
                 <td>
-                  {shortPubKey(item.streamId, {
-                    len: 8,
-                    split: "-",
-                  })}
+                  <div className="stream-id">
+                  <Link to={`/model/${modelId}/mids/${item.streamId}`}>
+
+                          
+                    {shortPubKey(item.streamId, {
+                      len: 8,
+                      split: "-",
+                    })}
+                    </Link>
+                  </div>
                 </td>
                 <td>
                   {shortPubKey(item.controllerDid, {
@@ -32,7 +39,7 @@ export default function ModelStreamList({ data }: { data: ModelMid[] }) {
                   })}
                 </td>
                 <td className="index-time">
-                  <div >
+                  <div>
                     <time>{dayjs(item.createdAt).fromNow()}</time>
                   </div>
                 </td>
@@ -49,6 +56,7 @@ const TableContainer = styled.table`
   /* table-layout: fixed; */
   width: 100%;
   border-collapse: collapse;
+  color: #718096;
 
   tbody tr,
   thead tr {
@@ -107,5 +115,17 @@ const TableContainer = styled.table`
       overflow: hidden;
       padding-right: 5px;
     }
+  }
+
+  & .stream-id {
+    color: #fff;
+  }
+
+  & time {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+
+    color: #718096;
   }
 `;
