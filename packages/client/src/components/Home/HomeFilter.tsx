@@ -23,7 +23,13 @@ export default function SearchFilter() {
           } catch (error) {
             console.error(error);
           }
-          navigate(`/${network.toLowerCase()}/stream/${searchText}`);
+          if (searchText.startsWith('did')) {
+            navigate(`/${network.toLowerCase()}/profile/${searchText}`)
+          } else if (searchText.length < 62) {
+            navigate(`/${network.toLowerCase()}/family/${searchText}`)
+          } else {
+            navigate(`/${network.toLowerCase()}/stream/${searchText}`)
+          }
         }
         console.log(searchText);
       }
@@ -48,7 +54,7 @@ export default function SearchFilter() {
       </div>
       <input
         type="text"
-        placeholder="Search by Model / Steam ID / DID / Family"
+        placeholder={ops === 'stream' ? 'Search by stream id, did or family...' : "Search by model name"}
         value={searchText}
         onChange={(e) => {
           setSearchText(e.target.value);

@@ -29,8 +29,8 @@ export default function Home() {
     <Box>
       <SloganBox>
         <div className="left">
-          <h1>Slogan Slogan</h1>
-          <h3>Slogan Hub For Your Fragmented Self Sovereign Data</h3>
+          <h1>S3.xyz</h1>
+          <h3>Hub For Your Fragmented Self Sovereign Data</h3>
           <SearchFilter />
         </div>
         <ImgBox>
