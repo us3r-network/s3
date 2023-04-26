@@ -1,14 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getModelMidItem } from "../api";
 import getCurrNetwork from "../utils/getCurrNetwork";
 import styled from "styled-components";
 import BackBtn from "../components/BackBtn";
+import dayjs from "dayjs";
 
 export default function ModelMidInfo() {
   const { modelId, mid } = useParams();
   const navigate = useNavigate();
   const [info, setInfo] = useState<any>();
+
+  const navToStream = useCallback(
+    (stream?: string) => {
+      if (!stream) return;
+      const network = getCurrNetwork();
+      navigate(`/${network.toLowerCase()}/stream/${stream}`);
+    },
+    [navigate]
+  );
 
   const fetchMidInfo = useCallback(async () => {
     if (!modelId || !mid) return;
@@ -38,7 +48,12 @@ export default function ModelMidInfo() {
       <Table>
         <div>
           <span>StreamID:</span>
-          <div>{info?.streamId}</div>
+          <div
+            className="stream-id"
+            onClick={() => navToStream(info?.streamId)}
+          >
+            {info?.streamId}
+          </div>
         </div>
         <div>
           <span>controllerDID:</span>
@@ -54,7 +69,10 @@ export default function ModelMidInfo() {
         </div>
         <div>
           <span>createdAt:</span>
-          <div>{info?.createdAt}</div>
+          <div>
+            {info?.createdAt &&
+              dayjs(info?.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+          </div>
         </div>
       </Table>
     </PageBox>
@@ -93,6 +111,10 @@ const Table = styled.div`
 
     & div {
       overflow: scroll;
+    }
+
+    & .stream-id {
+      cursor: pointer;
     }
   }
 `;
