@@ -55,6 +55,7 @@ export type ModelStream = {
   "created_at": string;
   "updated_at": string;
   "useCount": number;
+  "isIndexed"?: boolean;
 };
 
 export type ModelStreamInfo = {
@@ -80,3 +81,10 @@ export type Stats = {
   totalModels: number;
   totalStreams: number;
 };
+
+export type ModelMid = {
+  streamId: string;
+  controllerDid: string;
+  createdAt: number;
+  updatedAt: number;
+}

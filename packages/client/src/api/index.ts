@@ -2,6 +2,7 @@ import axios, { AxiosPromise } from "axios";
 import { API_BASE_URL } from "../constants";
 import {
   ModeCreateResult,
+  ModelMid,
   ModelStream,
   ModelStreamInfo,
   ModeQueryResult,
@@ -29,14 +30,14 @@ export function getList({
   pageNumber = 1,
   did,
   familyOrApp,
-  types
+  types,
 }: {
   network: Network;
   pageSize?: number;
   pageNumber?: number;
   did?: string;
   familyOrApp?: string[];
-  types?: string[]
+  types?: string[];
 }): AxiosPromise<
   ApiResp<{
     didCount: number;
@@ -44,8 +45,6 @@ export function getList({
     streams: Array<Stream>;
   }>
 > {
-  console.log(network,'streamId')
-
   return axios.get(`${API_BASE_URL}/streams`, {
     params: {
       network: network.toUpperCase(),
@@ -59,15 +58,17 @@ export function getList({
 }
 
 export function getStreamTopics(network: Network) {
-  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/streams/topics`, {
-  });
+  return axios.get(
+    `${API_BASE_URL}/${network.toUpperCase()}/streams/topics`,
+    {}
+  );
 }
 
 export function getStreamInfo(
   network: Network,
   streamId: string
 ): AxiosPromise<ApiResp<Stream>> {
-  console.log(network,streamId)
+  console.log(network, streamId);
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}`
   );
@@ -119,6 +120,46 @@ export function queryModelGraphql(
   });
 }
 
-export function getHomeStats({network}: {network: Network}): AxiosPromise<ApiResp<Stats>> {
+export function getHomeStats({
+  network,
+}: {
+  network: Network;
+}): AxiosPromise<ApiResp<Stats>> {
   return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/stats`);
+}
+
+export function getModelMid({
+  network,
+  modelId,
+  pageSize = 50,
+  pageNumber = 1,
+}: {
+  network: Network;
+  modelId: string;
+  pageSize?: number;
+  pageNumber?: number;
+}): AxiosPromise<ApiResp<ModelMid[]>> {
+  return axios.get(`${API_BASE_URL}/models/${modelId}/mids`, {
+    params: {
+      network: network.toUpperCase(),
+      pageSize,
+      pageNumber,
+    },
+  });
+}
+
+export function getModelMidItem({
+  network,
+  modelId,
+  midId,
+}: {
+  network: Network;
+  modelId: string;
+  midId: string;
+}) {
+  return axios.get(`${API_BASE_URL}/models/${modelId}/mids/${midId}`, {
+    params: {
+      network: network.toUpperCase(),
+    },
+  });
 }
