@@ -72,6 +72,7 @@ export type ModeQueryResult = {
   composite: any;
   runtimeDefinition: any;
   graphqlSchema: string;
+  isIndexed?: boolean
 };
 
 export type Stats = {
