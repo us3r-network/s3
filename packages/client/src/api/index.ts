@@ -2,6 +2,7 @@ import axios, { AxiosPromise } from "axios";
 import { API_BASE_URL } from "../constants";
 import {
   ModeCreateResult,
+  ModelMid,
   ModelStream,
   ModelStreamInfo,
   ModeQueryResult,
@@ -129,14 +130,16 @@ export function getHomeStats({
 
 export function getModelMid({
   network,
+  modelId,
   pageSize = 50,
   pageNumber = 1,
 }: {
   network: Network;
+  modelId: string;
   pageSize?: number;
   pageNumber?: number;
-}) {
-  return axios.get(`${API_BASE_URL}/streams`, {
+}): AxiosPromise<ApiResp<ModelMid[]>> {
+  return axios.get(`${API_BASE_URL}/models/${modelId}/mids`, {
     params: {
       network: network.toUpperCase(),
       pageSize,

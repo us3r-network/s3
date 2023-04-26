@@ -81,3 +81,10 @@ export type Stats = {
   totalModels: number;
   totalStreams: number;
 };
+
+export type ModelMid = {
+  streamId: string;
+  controllerDid: string;
+  createdAt: number;
+  updatedAt: number;
+}

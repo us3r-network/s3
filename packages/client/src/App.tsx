@@ -46,7 +46,7 @@ export default function App() {
 
             <Route path="model" element={<Model />} />
             <Route path="model/:streamId" element={<ModelStream />} />
-            <Route path="model/:streamId/streams" element={<ModelStreams />} />
+            <Route path="model/:modelId/streams" element={<ModelStreams />} />
             <Route path="model/create" element={<ModelCreate />} />
             <Route path="models/:did" element={<UserModels />} />
             <Route path="modelview/:streamId" element={<ModelView />} />
