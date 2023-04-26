@@ -7,10 +7,10 @@ export function ChartContainer({ data }: { data: number[] }) {
   const today = dayjs();
   const chartData = data.map((item, idx) => {
     return {
-      name: today.subtract(idx, 'day').format("DD/MM"),
+      name: today.subtract(data.length - idx, 'day').format("DD/MM"),
       stream: item,
     };
-  }).reverse();
+  });
   return (
     <Box>
       <div className="title">Stream history in 7 days</div>
