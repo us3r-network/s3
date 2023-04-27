@@ -29,6 +29,9 @@ export type ModelStream = {
   "stream_id": string;
   "controller_did": string;
   "tip": string;
+  streamContent: {
+    name: string
+  },
   "stream_content": {
     "name": string;
     "description": string | null;

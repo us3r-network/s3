@@ -102,7 +102,7 @@ export default function Filter({
       <div>
         <div className="title">domains:</div>
         <div className="tags">
-          {domains.map((item) => {
+          {domains.slice(0,20).map((item) => {
             const hasSelect = selectDomains.includes(item.name);
             return (
               <button
@@ -122,7 +122,7 @@ export default function Filter({
       <div>
         <div className="title"> family:</div>
         <div className="tags">
-          {families.map((item) => {
+          {families.slice(0,20).map((item) => {
             const hasSelect = selectFamilies.includes(item.name);
             return (
               <button

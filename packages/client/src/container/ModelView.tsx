@@ -5,10 +5,11 @@ import styled from "styled-components";
 import BackBtn from "../components/BackBtn";
 import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
-import { queryModelGraphql } from "../api";
-import { ModeQueryResult } from "../types";
+import { getModelInfo, queryModelGraphql } from "../api";
+import { ModeQueryResult, ModelStream } from "../types";
 import { schemas } from "../utils/composedb-types/schemas";
 import { AxiosError } from "axios";
+import getCurrNetwork from "../utils/getCurrNetwork";
 
 export default function ModelView() {
   const { streamId } = useParams();
@@ -18,8 +19,16 @@ export default function ModelView() {
     code: schemas.code,
   });
   const [errMsg, setErrMsg] = useState("");
+  const [modelStream, setModelStream] = useState<ModelStream>();
 
   const [loading, setLoading] = useState(false);
+
+  const fetchModelInfo = useCallback(async (streamId: string) => {
+    const network = getCurrNetwork();
+    const resp = await getModelInfo({ network, id: streamId });
+    setModelStream(resp.data.data);
+  }, []);
+
   const fetchModelGraphql = useCallback(async (streamId: string) => {
     try {
       setLoading(true);
@@ -48,7 +57,8 @@ export default function ModelView() {
   useEffect(() => {
     if (!streamId) return;
     fetchModelGraphql(streamId);
-  }, [fetchModelGraphql, streamId]);
+    fetchModelInfo(streamId);
+  }, [fetchModelGraphql, streamId, fetchModelInfo]);
 
   if (loading) {
     return (
@@ -76,15 +86,19 @@ export default function ModelView() {
   return (
     <PageBox>
       <div className="title-box">
-        <BackBtn
-          backAction={() => {
-            navigate(-1);
-          }}
-        />
+        <div className="title">
+          <BackBtn
+            backAction={() => {
+              navigate(-1);
+            }}
+          />
+
+          <span>{modelStream?.streamContent?.name}</span>
+        </div>
         <div className="tools">
-          {modelData?.isIndexed && (
+          {modelStream?.isIndexed && (
             <Link to={`/model/${streamId}/mids`}>
-              <button>Streams</button>
+              <button>Model Instance Document</button>
             </Link>
           )}
           <Link to={`/playground/${streamId}`} target="_blank">
@@ -181,6 +195,20 @@ const PageBox = styled.div`
     justify-content: space-between;
     padding: 10px 0px;
     box-sizing: border-box;
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      > span {
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 28px;
+        font-style: italic;
+        color: #ffffff;
+      }
+    }
 
     .tools {
       display: flex;
