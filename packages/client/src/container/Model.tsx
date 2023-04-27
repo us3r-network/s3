@@ -8,7 +8,7 @@ import {
   useAuthentication,
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
-import { getModelStreamList, PageSize } from "../api";
+import { getModelStreamList, getStarModels, PageSize } from "../api";
 import { ModelStream, Network } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
@@ -16,12 +16,14 @@ import Search from "../components/Search";
 import Star from "../components/icons/Star";
 import { s3ModelCollection } from "../api/ceramic";
 import StarEmpty from "../components/icons/StarEmpty";
+import getCurrNetwork from "../utils/getCurrNetwork";
 
 export default function ModelPage() {
   const { signIn } = useAuthentication();
   const session = useSession();
   const sessId = session?.id;
   const [models, setModels] = useState<Array<ModelStream>>([]);
+  const [starModels, setStarModels] = useState<Array<ModelStream>>([]);
   const navigate = useNavigate();
   const searchText = useRef("");
   const [hasMore, setHasMore] = useState(true);
@@ -30,6 +32,20 @@ export default function ModelPage() {
   const [personalCollections, setPersonalCollections] = useState<
     { modelId: string; id: string; revoke: boolean }[]
   >([]);
+
+  const fetchStarModels = useCallback(async () => {
+    const ids = personalCollections
+      .map((item) => {
+        return item.modelId;
+      });
+
+    const network = getCurrNetwork();
+    const resp = await getStarModels({ network, ids });
+
+    const list = resp.data.data;
+    setHasMore(false);
+    setStarModels([...list]);
+  }, [personalCollections]);
 
   const fetchPersonal = useCallback(async () => {
     if (!session) return;
@@ -41,7 +57,7 @@ export default function ModelPage() {
 
     if (collected) {
       setPersonalCollections(
-        collected?.edges.map((item) => {
+        collected?.edges.filter(item => item.node.revoke !== true).map((item) => {
           return {
             modelId: item.node.modelID,
             id: item.node.id!,
@@ -114,15 +130,9 @@ export default function ModelPage() {
 
   const lists = useMemo(() => {
     if (!filterStar) return models;
-    const data = models.filter((item) => {
-      const hasStarItem = personalCollections.find(
-        (starItem) =>
-          starItem.modelId === item.stream_id && starItem.revoke === false
-      );
-      return !!hasStarItem;
-    });
-    return data;
-  }, [models, personalCollections, filterStar]);
+    return starModels;
+  }, [filterStar, models, starModels]);
+
 
   return (
     <PageBox isMobile={isMobile}>
@@ -149,6 +159,9 @@ export default function ModelPage() {
                   }
                   setFilterStar(!filterStar);
                   setHasMore(filterStar);
+                  if (!filterStar) {
+                    fetchStarModels();
+                  }
                 }}
               >
                 {filterStar ? <Star /> : <StarEmpty />}
@@ -162,17 +175,6 @@ export default function ModelPage() {
               </button>
             </>
           )}
-          {/* <button
-            onClick={() => {
-              if (sessId) {
-                navigate(`/models/${sessId}`);
-              } else {
-                openLoginModal();
-              }
-            }}
-          >
-            My Models
-          </button> */}
         </div>
       </div>
       <InfiniteScroll
@@ -264,11 +266,7 @@ export default function ModelPage() {
                           );
                         }}
                       >
-                        {hasStarItem?.revoke === false ? (
-                          <Star />
-                        ) : (
-                          <StarEmpty />
-                        )}
+                        {hasStarItem ? <Star /> : <StarEmpty />}
                       </div>
                     </td>
                   </tr>
