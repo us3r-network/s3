@@ -49,7 +49,6 @@ export default function ModelView() {
     if (!streamId) return;
     fetchModelGraphql(streamId);
   }, [fetchModelGraphql, streamId]);
-  // return <div>{streamId}</div>;
 
   if (loading) {
     return (

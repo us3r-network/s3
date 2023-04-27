@@ -163,3 +163,16 @@ export function getModelMidItem({
     },
   });
 }
+
+export function getStarModels({
+  network,
+  ids,
+}: {
+  network: Network;
+  ids: string[];
+}): AxiosPromise<ApiResp<Array<ModelStream>>> {
+  return axios.post(`${API_BASE_URL}/models/ids`, {
+    network: network.toUpperCase(),
+    ids,
+  });
+}
