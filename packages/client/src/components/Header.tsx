@@ -1,4 +1,4 @@
-import { LoginButton, UserAvatar } from "@us3r-network/profile";
+
 import styled from "styled-components";
 import { useCeramicCtx } from "../context/CeramicCtx";
 import ChevronDown from "./icons/ChevronDown";
@@ -9,7 +9,6 @@ export default function Header() {
     <Box>
       <div>
         <NetworkSwitch />
-        <UserAvatar />
       </div>
     </Box>
   );
