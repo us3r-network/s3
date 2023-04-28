@@ -130,6 +130,7 @@ const NavContainer = styled.nav`
 
   transition: all 0.15s ease-out;
   height: 100vh;
+  z-index: 500;
 
   > div.fixed {
     position: fixed;
