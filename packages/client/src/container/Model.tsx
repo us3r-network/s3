@@ -14,9 +14,9 @@ import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import Search from "../components/Search";
 import Star from "../components/icons/Star";
-import { s3ModelCollection } from "../api/ceramic";
 import StarEmpty from "../components/icons/StarEmpty";
 import getCurrNetwork from "../utils/getCurrNetwork";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelPage() {
   const { signIn } = useAuthentication();
@@ -32,6 +32,7 @@ export default function ModelPage() {
   const [personalCollections, setPersonalCollections] = useState<
     { modelId: string; id: string; revoke: boolean }[]
   >([]);
+  const {s3ModelCollection} = useCeramicCtx()
 
   const fetchStarModels = useCallback(async () => {
     const ids = personalCollections
@@ -66,7 +67,7 @@ export default function ModelPage() {
         })
       );
     }
-  }, [session]);
+  }, [s3ModelCollection, session]);
 
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
@@ -86,7 +87,7 @@ export default function ModelPage() {
 
       await fetchPersonal();
     },
-    [session, fetchPersonal]
+    [session, s3ModelCollection, fetchPersonal]
   );
 
   const fetchModel = useCallback(async () => {
@@ -305,7 +306,6 @@ const PageBox = styled.div<{ isMobile: boolean }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     .tools {
       display: flex;
       align-items: center;
