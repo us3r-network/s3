@@ -80,10 +80,10 @@ export type ModeQueryResult = {
 
 export type Stats = {
   streamsLastWeek: number[];
-  streamsPerHour: number;
-  todayModels: number;
-  totalModels: number;
-  totalStreams: number;
+  streamsPerHour: number | null;
+  todayModels: number | null;
+  totalModels: number | null;
+  totalStreams: number | null;
 };
 
 export type ModelMid = {
