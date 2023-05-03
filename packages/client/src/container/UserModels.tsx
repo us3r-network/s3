@@ -8,33 +8,36 @@ import { TableBox } from "../components/TableBox";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import { UserAvatar } from "@us3r-network/profile";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function UserModels() {
   const { did } = useParams();
+  const { network } = useCeramicCtx();
   const [models, setModels] = useState<Array<ModelStream>>([]);
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
 
   const fetchModel = useCallback(async () => {
     if (!did) return;
-    const resp = await getModelStreamList({ did: did });
+    const resp = await getModelStreamList({ did: did, network });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
     pageNum.current = 1;
-  }, [did]);
+  }, [did, network]);
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
         pageNumber,
         did,
+        network,
       });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setModels([...models, ...list]);
     },
-    [did, models]
+    [did, models, network]
   );
 
   useEffect(() => {

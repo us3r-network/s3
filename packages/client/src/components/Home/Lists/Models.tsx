@@ -4,15 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { getModelStreamList } from "../../../api";
 import { ModelStream } from "../../../types";
 import { shortPubKey } from "../../../utils/shortPubKey";
+import { useCeramicCtx } from "../../../context/CeramicCtx";
 
 export default function Models() {
   const [list, setList] = useState<Array<ModelStream>>([]);
-
+  const { network } = useCeramicCtx();
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({});
+    const resp = await getModelStreamList({network});
     const list = resp.data.data;
     setList(list);
-  }, []);
+  }, [network]);
+
   useEffect(() => {
     fetchModel();
   }, [fetchModel]);

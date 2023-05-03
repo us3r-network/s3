@@ -79,11 +79,13 @@ export function getModelStreamList({
   did,
   pageSize = PageSize,
   pageNumber = 1,
+  network
 }: {
   name?: string;
   did?: string;
   pageSize?: number;
   pageNumber?: number;
+  network: Network
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
   return axios.get(`${API_BASE_URL}/models`, {
     params: {
@@ -92,31 +94,37 @@ export function getModelStreamList({
       pageSize,
       pageNumber,
       useCounting: true,
+      network: network.toUpperCase()
     },
   });
 }
 
 export function getModelStreamInfo(
-  streamId: string
+  streamId: string,
+  network: Network
 ): AxiosPromise<ApiResp<ModelStreamInfo>> {
-  return axios.get(`${API_BASE_URL}/TESTNET/streams/${streamId}/info`, {
+  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}/info`, {
     params: {},
   });
 }
 
 export function createModel(
-  graphql: string
+  graphql: string,
+  network: Network
 ): AxiosPromise<ApiResp<ModeCreateResult>> {
   return axios.post(`${API_BASE_URL}/models`, {
     graphql: graphql,
+    network: network.toUpperCase(),
   });
 }
 
 export function queryModelGraphql(
-  streamId: string
+  streamId: string,
+  network: Network,
 ): AxiosPromise<ApiResp<ModeQueryResult>> {
   return axios.post(`${API_BASE_URL}/models/graphql`, {
     models: [streamId],
+    network: network.toUpperCase()
   });
 }
 

@@ -20,6 +20,7 @@ import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelPage() {
   const { signIn } = useAuthentication();
+  const { network } = useCeramicCtx();
   const session = useSession();
   const sessId = session?.id;
   const [models, setModels] = useState<Array<ModelStream>>([]);
@@ -91,24 +92,25 @@ export default function ModelPage() {
   );
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText.current });
+    const resp = await getModelStreamList({ name: searchText.current, network });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
     pageNum.current = 1;
-  }, []);
+  }, [network]);
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
         pageNumber,
         name: searchText.current,
+        network,
       });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setModels([...models, ...list]);
     },
-    [models]
+    [models, network]
   );
 
   const navToStream = useCallback(

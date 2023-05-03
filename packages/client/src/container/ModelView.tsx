@@ -10,9 +10,11 @@ import { ModeQueryResult, ModelStream } from "../types";
 import { schemas } from "../utils/composedb-types/schemas";
 import { AxiosError } from "axios";
 import getCurrNetwork from "../utils/getCurrNetwork";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelView() {
   const { streamId } = useParams();
+  const { network } = useCeramicCtx();
   const navigate = useNavigate();
   const [modelData, setModelData] = useState<ModeQueryResult>();
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
@@ -32,7 +34,7 @@ export default function ModelView() {
   const fetchModelGraphql = useCallback(async (streamId: string) => {
     try {
       setLoading(true);
-      const resp = await queryModelGraphql(streamId);
+      const resp = await queryModelGraphql(streamId, network);
       const { data } = resp.data;
       setModelData(data);
       setGqlSchema({
@@ -44,7 +46,7 @@ export default function ModelView() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [network]);
 
   const download = (text: string, filename: string) => {
     const blob = new Blob([text], {

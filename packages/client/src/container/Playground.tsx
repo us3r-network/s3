@@ -29,6 +29,7 @@ import {
 } from "@us3r-network/auth-with-rainbowkit";
 import { useProfileState } from "@us3r-network/profile";
 import { DID } from "dids";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 const type = {
   query: String,
@@ -82,6 +83,7 @@ export function PlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
   const { streamId } = useParams();
+  const { network } = useCeramicCtx();
   //   const [modelData, setModelData] = useState<ModeQueryResult>();
 
   const [definition, setDefinition] = useState({
@@ -135,7 +137,7 @@ export function PlaygroundGraphiQL(
     if (!streamId) return;
     try {
       setLoading(true);
-      const resp = await queryModelGraphql(streamId);
+      const resp = await queryModelGraphql(streamId, network);
       const { data } = resp.data;
       setDefinition(data.runtimeDefinition);
       const definition = data.runtimeDefinition;
@@ -153,7 +155,7 @@ export function PlaygroundGraphiQL(
     } finally {
       setLoading(false);
     }
-  }, [streamId]);
+  }, [streamId, network]);
 
   const { signIn } = useAuthentication();
   const session = useSession();

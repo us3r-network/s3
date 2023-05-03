@@ -8,9 +8,11 @@ import { GraphQLEditor, PassedSchema } from "graphql-editor";
 import { schemas } from "../utils/composedb-types/schemas";
 import { createModel } from "../api";
 import { AxiosError } from "axios";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelCreate() {
   const navigate = useNavigate();
+  const { network } = useCeramicCtx();
   const [composite, setComposite] = useState("");
   const [runtimeDefinition, setRuntimeDefinition] = useState("");
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
@@ -38,7 +40,7 @@ export default function ModelCreate() {
     if (!gqlSchema.code) return;
     try {
       setSubmitting(true);
-      const resp = await createModel(gqlSchema.code);
+      const resp = await createModel(gqlSchema.code, network);
       const { composite, runtimeDefinition } = resp.data.data;
 
       setComposite(JSON.stringify(composite));
@@ -50,7 +52,7 @@ export default function ModelCreate() {
     } finally {
       setSubmitting(false);
     }
-  }, [gqlSchema.code]);
+  }, [gqlSchema.code, network]);
 
   const download = (text: string, filename: string) => {
     console.log(text);
