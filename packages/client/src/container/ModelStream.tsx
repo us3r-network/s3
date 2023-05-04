@@ -6,23 +6,25 @@ import { getModelStreamInfo } from "../api";
 import BackBtn from "../components/BackBtn";
 import { TableBox } from "../components/TableBox";
 import { ModelStreamInfo } from "../types";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelStream() {
   const { streamId } = useParams();
+  const { network } = useCeramicCtx();
   const [stream, setStream] = useState<ModelStreamInfo>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!streamId) return;
     setLoading(true);
-    getModelStreamInfo(streamId)
+    getModelStreamInfo(streamId, network)
       .then((resp) => {
         setStream(resp.data.data);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [streamId]);
+  }, [streamId, network]);
 
   return (
     <PageBox>
