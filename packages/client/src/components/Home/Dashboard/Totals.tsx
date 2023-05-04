@@ -5,10 +5,10 @@ import { Stats } from "../../../types";
 export default function NumbersContainer({data}: {data: Stats}) {
     return (
       <NumbersBox>
-        <NumberCard title="Total Models" data={data.totalModels}/>
-        <NumberCard title="Total Streams" data={data.totalStreams}/>
-        <NumberCard title="Release Today" data={data.todayModels}/>
-        <NumberCard title="Streams per Hour" data={data.streamsPerHour}/>
+        <NumberCard title="Total Models" data={data.totalModels || 0}/>
+        <NumberCard title="Total Streams" data={data.totalStreams || 0}/>
+        <NumberCard title="Release Today" data={data.todayModels || 0}/>
+        <NumberCard title="Streams per Hour" data={data.streamsPerHour || 0}/>
       </NumbersBox>
     );
   }
