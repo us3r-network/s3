@@ -5,10 +5,18 @@ import { BrowserRouter } from "react-router-dom";
 import "./styles/index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { Network } from "./types";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+const params = new URLSearchParams(window.location.search);
+const network = params.get("network");
+if (network?.toUpperCase() === Network.MAINNET || network?.toUpperCase() === Network.TESTNET ) {
+  localStorage.setItem('network-select', JSON.stringify(network.toUpperCase()))
+}
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>

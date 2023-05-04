@@ -66,11 +66,11 @@ export default function Streams() {
               <Search
                 searchAction={(text) => {
                   if (text.startsWith("did")) {
-                    navigate(`/${network.toLowerCase()}/profile/${text}`);
+                    navigate(`/streams/profile/${text}`);
                   } else if (text.length < 62) {
-                    navigate(`/${network.toLowerCase()}/family/${text}`);
+                    navigate(`/streams/family/${text}`);
                   } else {
-                    navigate(`/${network.toLowerCase()}/stream/${text}`);
+                    navigate(`/streams/stream/${text}`);
                   }
                 }}
               />
@@ -104,7 +104,7 @@ export default function Streams() {
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        <ListTable data={data} network={network.toLowerCase()} showDid />
+        <ListTable data={data} showDid />
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
@@ -146,16 +146,6 @@ const SelectBox = styled.div<{ isActive?: boolean }>`
   }
 `;
 
-const SelectArea = styled.div`
-  border-radius: 20px;
-  border: 1px solid #39424c;
-  background: #1b1e23;
-  margin: 0 0 15px 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
 
 const PageBox = styled.div<{ isMobile: boolean }>`
   margin-bottom: 20px;

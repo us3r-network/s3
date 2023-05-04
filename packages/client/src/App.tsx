@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { isMobile } from "react-device-detect";
@@ -18,7 +18,7 @@ import MobileNav from "./components/MobileNav";
 import NoMatch from "./components/NoMatch";
 import { useGAPageView } from "./hooks/useGoogleAnalytics";
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from "./constants";
-import Model from "./container/Model";
+import Models from "./container/Models";
 import ModelStream from "./container/ModelStream";
 import ModelCreate from "./container/ModelCreate";
 import UserModels from "./container/UserModels";
@@ -30,14 +30,23 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import { Network } from "./types";
 import CeramicProvider from "./context/CeramicCtx";
 import Header from "./components/Header";
+import { useEffect } from "react";
 
 dayjs.extend(relativeTime);
 
 export default function App() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [network, setNetwork] = useLocalStorage(
     "network-select",
     Network.MAINNET
   );
+
+  useEffect(() => {
+    const currNetwork = searchParams.get("network");
+    if (currNetwork === network) return;
+    searchParams.set("network", network);
+    setSearchParams(searchParams);
+  }, [network, searchParams, setSearchParams]);
 
   return (
     <Us3rAuthWithRainbowkitProvider>
@@ -52,25 +61,25 @@ export default function App() {
         <CeramicProvider network={network} setNetwork={setNetwork}>
           <Routes>
             <Route path="/" element={<Layout />}>
+              
               <Route index element={<Home />} />
-              <Route path="streams" element={<Streams />} />
-              <Route path="/:network/stream/:streamId" element={<Stream />} />
-              <Route path="/:network/profile/:did" element={<Profile />} />
-              <Route
-                path="/:network/family/:familyOrApp"
-                element={<Family />}
-              />
 
-              <Route path="model" element={<Model />} />
-              <Route path="model/:streamId" element={<ModelStream />} />
-              <Route path="model/:modelId/mids" element={<ModelStreams />} />
-              <Route
-                path="model/:modelId/mids/:mid"
-                element={<ModelMidInfo />}
-              />
-              <Route path="model/create" element={<ModelCreate />} />
-              <Route path="models/:did" element={<UserModels />} />
-              <Route path="modelview/:streamId" element={<ModelView />} />
+              <Route path="streams">
+                <Route index element={<Streams />} />
+                <Route path="stream/:streamId" element={<Stream />} />
+                <Route path="profile/:did" element={<Profile />} />
+                <Route path="family/:familyOrApp" element={<Family />} />
+              </Route>
+
+              <Route path="models">
+                <Route index element={<Models />} />
+                <Route path="model/:streamId" element={<ModelStream />} />
+                <Route path="model/:modelId/mids" element={<ModelStreams />} />
+                <Route path="model/:modelId/mids/:mid" element={<ModelMidInfo />} />
+                <Route path="model/create" element={<ModelCreate />} />
+                <Route path="did/:did" element={<UserModels />} />
+                <Route path="modelview/:streamId" element={<ModelView />} />
+              </Route>
 
               <Route path="*" element={<NoMatch />} />
             </Route>

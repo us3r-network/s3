@@ -9,7 +9,7 @@ import {
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
 import { getModelStreamList, getStarModels, PageSize } from "../api";
-import { ModelStream, Network } from "../types";
+import { ModelStream } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import Search from "../components/Search";
@@ -18,7 +18,7 @@ import StarEmpty from "../components/icons/StarEmpty";
 import getCurrNetwork from "../utils/getCurrNetwork";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
-export default function ModelPage() {
+export default function ModelsPage() {
   const { signIn } = useAuthentication();
   const { network } = useCeramicCtx();
   const session = useSession();
@@ -115,7 +115,7 @@ export default function ModelPage() {
 
   const navToStream = useCallback(
     (streamId: string) => {
-      navigate(`/testnet/stream/${streamId}`);
+      navigate(`/streams/stream/${streamId}`);
     },
     [navigate]
   );
@@ -171,7 +171,7 @@ export default function ModelPage() {
               </button>
               <button
                 onClick={() => {
-                  navigate("/model/create");
+                  navigate("/models/model/create");
                 }}
               >
                 + New Model
@@ -211,7 +211,7 @@ export default function ModelPage() {
                   <tr key={item.stream_id}>
                     <td>
                       {!isMobile ? (
-                        <Link to={`/modelview/${item.stream_id}`}>
+                        <Link to={`/models/modelview/${item.stream_id}`}>
                           {item.stream_content.name}
                         </Link>
                       ) : (
@@ -238,7 +238,7 @@ export default function ModelPage() {
                         <div className="usage-count">{item.useCount}</div>
                       )) || (
                         <div>
-                          <Link to={`/model/${item.stream_id}/mids`}>
+                          <Link to={`/models/model/${item.stream_id}/mids`}>
                             {item.useCount}
                           </Link>
                         </div>

@@ -13,7 +13,7 @@ export default function Nav() {
   let location = useLocation()
   const navigate = useNavigate()
   const [openFilter, setOpenFilter] = useState(false)
-  const modelActive = location.pathname.startsWith('/model')
+  const modelActive = location.pathname.startsWith('/models')
   const isSubPage = !(location.pathname === '/model' || location.pathname === '/')
 
   return (
@@ -57,7 +57,7 @@ export default function Nav() {
                   </div>
                 </Link>
 
-                <Link to={'/model'} onClick={() => setOpenFilter(!openFilter)}>
+                <Link to={'/models'} onClick={() => setOpenFilter(!openFilter)}>
                   <div className={`nav-item ${modelActive ? 'active' : ''}`}>
                     <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
                     <div className="tint-c">

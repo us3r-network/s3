@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Network } from "../../types";
 
 type Ops = "model" | "stream";
 export default function SearchFilter() {
@@ -15,20 +14,12 @@ export default function SearchFilter() {
         if (ops === "model") {
           navigate(`/modelview/${searchText}`);
         } else {
-          let network = Network.MAINNET;
-          try {
-            const localNetwork =
-              localStorage.getItem("network-select") || '"MAINNET"';
-            network = JSON.parse(localNetwork);
-          } catch (error) {
-            console.error(error);
-          }
           if (searchText.startsWith('did')) {
-            navigate(`/${network.toLowerCase()}/profile/${searchText}`)
+            navigate(`/streams/profile/${searchText}`)
           } else if (searchText.length < 62) {
-            navigate(`/${network.toLowerCase()}/family/${searchText}`)
+            navigate(`/streams/family/${searchText}`)
           } else {
-            navigate(`/${network.toLowerCase()}/stream/${searchText}`)
+            navigate(`/streams/stream/${searchText}`)
           }
         }
         console.log(searchText);

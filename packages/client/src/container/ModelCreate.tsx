@@ -98,7 +98,7 @@ export default function ModelCreate() {
       <div className="title-box">
         <BackBtn
           backAction={() => {
-            navigate(-1);
+            navigate('/models');
           }}
         />
         <div className="tools">{status}</div>

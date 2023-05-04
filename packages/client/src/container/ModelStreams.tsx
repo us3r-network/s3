@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ModelMid, Network } from "../types";
+import { ModelMid } from "../types";
 import { PageSize, getModelMid } from "../api";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ModelStreamList from "../components/ModelStreamList";
-import getCurrNetwork from "../utils/getCurrNetwork";
 import { useNavigate, useParams } from "react-router-dom";
 import BackBtn from "../components/BackBtn";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelStreams() {
   const pageNum = useRef(1);
+  const { network } = useCeramicCtx();
   const [hasMore, setHasMore] = useState(true);
   const [streams, setStreams] = useState<Array<ModelMid>>([]);
   const { modelId } = useParams();
@@ -19,7 +20,7 @@ export default function ModelStreams() {
     async (pageNumber: number) => {
       if (!modelId) return;
       const resp = await getModelMid({
-        network: getCurrNetwork(),
+        network,
         modelId,
         pageNumber,
       });
@@ -27,13 +28,13 @@ export default function ModelStreams() {
       setHasMore(list.length >= PageSize);
       setStreams([...streams, ...list]);
     },
-    [streams, modelId]
+    [streams, modelId, network]
   );
   const fetchModelMid = useCallback(async () => {
     if (!modelId) return;
-    const resp = await getModelMid({ network: getCurrNetwork(), modelId });
+    const resp = await getModelMid({ network, modelId });
     setStreams(resp.data.data);
-  }, [modelId]);
+  }, [modelId, network]);
 
   useEffect(() => {
     fetchModelMid();
@@ -44,7 +45,7 @@ export default function ModelStreams() {
       <div className="title-box">
         <BackBtn
           backAction={() => {
-            navigate(-1);
+            navigate('/models');
           }}
         />
         <div className="title">

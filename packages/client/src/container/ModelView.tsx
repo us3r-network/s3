@@ -9,7 +9,6 @@ import { getModelInfo, queryModelGraphql } from "../api";
 import { ModeQueryResult, ModelStream } from "../types";
 import { schemas } from "../utils/composedb-types/schemas";
 import { AxiosError } from "axios";
-import getCurrNetwork from "../utils/getCurrNetwork";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelView() {
@@ -26,14 +25,14 @@ export default function ModelView() {
   const [loading, setLoading] = useState(false);
 
   const fetchModelInfo = useCallback(async (streamId: string) => {
-    const network = getCurrNetwork();
     const resp = await getModelInfo({ network, id: streamId });
     setModelStream(resp.data.data);
-  }, []);
+  }, [network]);
 
   const fetchModelGraphql = useCallback(async (streamId: string) => {
     try {
       setLoading(true);
+      setErrMsg('')
       const resp = await queryModelGraphql(streamId, network);
       const { data } = resp.data;
       setModelData(data);
@@ -76,7 +75,7 @@ export default function ModelView() {
         <div className="title-box">
           <BackBtn
             backAction={() => {
-              navigate(-1);
+              navigate('/models');
             }}
           />
         </div>
@@ -91,7 +90,7 @@ export default function ModelView() {
         <div className="title">
           <BackBtn
             backAction={() => {
-              navigate(-1);
+              navigate('/models');
             }}
           />
 

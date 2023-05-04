@@ -9,7 +9,7 @@ export default function Nav() {
   let location = useLocation();
 
   const homeActive = location.pathname === "/";
-  const modelActive = location.pathname.startsWith("/model");
+  const modelActive = location.pathname.startsWith("/models");
   const streamActive = location.pathname.startsWith('/streams')
   return (
     <NavContainer>
@@ -40,7 +40,7 @@ export default function Nav() {
             </div>
           </Link>
 
-          <Link to={"/model"}>
+          <Link to={"/models"}>
             <div className={`nav-item ${modelActive ? "active" : ""}`}>
               <ModelIcon stroke={modelActive ? "white" : "#718096"} />
               <div className="tint-c">
