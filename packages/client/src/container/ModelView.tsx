@@ -87,7 +87,7 @@ export default function ModelView() {
               <button>Model Instance Document</button>
             </Link>
           )}
-          <Link to={`/models/playground/${streamId}`} target="_blank">
+          <Link to={`/models/playground/${streamId}`} >
             <button>Playground</button>
           </Link>
         </div>
