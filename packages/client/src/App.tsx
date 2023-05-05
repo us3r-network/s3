@@ -42,11 +42,7 @@ export default function App() {
   return (
     <Us3rAuthWithRainbowkitProvider>
       <ProfileStateProvider
-        ceramicHost={
-          network === Network.MAINNET
-            ? CERAMIC_MAINNET_HOST
-            : CERAMIC_TESTNET_HOST
-        }
+        ceramicHost={CERAMIC_TESTNET_HOST}
         themeConfig={{ mode: "dark" }}
       >
         <CeramicProvider network={network} setNetwork={setNetwork}>

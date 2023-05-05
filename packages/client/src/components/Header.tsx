@@ -37,7 +37,7 @@ export default function Header() {
             }}
           />
         )) || <div></div>}
-        <NetworkSwitch />
+        {(showBack && <div></div>) || <NetworkSwitch />}
       </div>
     </Box>
   );
@@ -47,9 +47,12 @@ function NetworkSwitch() {
   const { network, setNetwork } = useCeramicCtx();
 
   return (
-    <Select selectedKey={network} onSelectionChange={(k) => {
-      setNetwork(k as Network)
-    }}>
+    <Select
+      selectedKey={network}
+      onSelectionChange={(k) => {
+        setNetwork(k as Network);
+      }}
+    >
       <Label></Label>
       <Button>
         <SelectValue />
