@@ -1,8 +1,7 @@
 import { UserAvatar } from "@us3r-network/profile";
 import { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Network } from "../types";
 import {
   useAuthentication,
   useSession,
@@ -15,15 +14,7 @@ const LoginButton = () => {
   const navigate = useNavigate();
 
   const navToProfile = useCallback(() => {
-    let network = Network.MAINNET;
-    try {
-      const localNetwork =
-        localStorage.getItem("network-select") || '"MAINNET"';
-      network = JSON.parse(localNetwork);
-    } catch (error) {
-      console.error(error);
-    }
-    navigate(`/${network.toLowerCase()}/profile/${sessId}`);
+    navigate(`/streams/profile/${sessId}`);
   }, [navigate, sessId]);
 
   return (

@@ -3,13 +3,13 @@ import styled from "styled-components";
 import { isMobile } from "react-device-detect";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useAuthentication,
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
 import { getModelStreamList, getStarModels, PageSize } from "../api";
-import { ModelStream, Network } from "../types";
+import { ModelStream } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
 import Search from "../components/Search";
@@ -18,7 +18,8 @@ import StarEmpty from "../components/icons/StarEmpty";
 import getCurrNetwork from "../utils/getCurrNetwork";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
-export default function ModelPage() {
+export default function ModelsPage() {
+  const [searchParams] = useSearchParams();
   const { signIn } = useAuthentication();
   const { network } = useCeramicCtx();
   const session = useSession();
@@ -26,20 +27,20 @@ export default function ModelPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
   const [starModels, setStarModels] = useState<Array<ModelStream>>([]);
   const navigate = useNavigate();
-  const searchText = useRef("");
+  const searchText = useRef(searchParams.get('searchText') || '');
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
   const [filterStar, setFilterStar] = useState(false);
   const [personalCollections, setPersonalCollections] = useState<
     { modelId: string; id: string; revoke: boolean }[]
   >([]);
-  const {s3ModelCollection} = useCeramicCtx()
+  const { s3ModelCollection } = useCeramicCtx();
+  
 
   const fetchStarModels = useCallback(async () => {
-    const ids = personalCollections
-      .map((item) => {
-        return item.modelId;
-      });
+    const ids = personalCollections.map((item) => {
+      return item.modelId;
+    });
 
     const network = getCurrNetwork();
     const resp = await getStarModels({ network, ids });
@@ -59,13 +60,15 @@ export default function ModelPage() {
 
     if (collected) {
       setPersonalCollections(
-        collected?.edges.filter(item => item.node.revoke !== true).map((item) => {
-          return {
-            modelId: item.node.modelID,
-            id: item.node.id!,
-            revoke: !!item.node.revoke,
-          };
-        })
+        collected?.edges
+          .filter((item) => item.node.revoke !== true)
+          .map((item) => {
+            return {
+              modelId: item.node.modelID,
+              id: item.node.id!,
+              revoke: !!item.node.revoke,
+            };
+          })
       );
     }
   }, [s3ModelCollection, session]);
@@ -92,7 +95,12 @@ export default function ModelPage() {
   );
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText.current, network });
+    setModels([])
+    setHasMore(true)
+    const resp = await getModelStreamList({
+      name: searchText.current,
+      network,
+    });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
@@ -115,7 +123,7 @@ export default function ModelPage() {
 
   const navToStream = useCallback(
     (streamId: string) => {
-      navigate(`/testnet/stream/${streamId}`);
+      navigate(`/streams/stream/${streamId}`);
     },
     [navigate]
   );
@@ -136,7 +144,6 @@ export default function ModelPage() {
     return starModels;
   }, [filterStar, models, starModels]);
 
-
   return (
     <PageBox isMobile={isMobile}>
       <div className={isMobile ? "title-box mobile-models-box" : "title-box"}>
@@ -146,6 +153,7 @@ export default function ModelPage() {
           {!isMobile && (
             <>
               <Search
+                text={searchText.current}
                 searchAction={(text) => {
                   searchText.current = text;
                   setModels([]);
@@ -171,7 +179,7 @@ export default function ModelPage() {
               </button>
               <button
                 onClick={() => {
-                  navigate("/model/create");
+                  navigate("/models/model/create");
                 }}
               >
                 + New Model
@@ -211,9 +219,17 @@ export default function ModelPage() {
                   <tr key={item.stream_id}>
                     <td>
                       {!isMobile ? (
-                        <Link to={`/modelview/${item.stream_id}`}>
-                          {item.stream_content.name}
-                        </Link>
+                        <>
+                          {(item.isIndexed && (
+                            <Link to={`/models/modelview/${item.stream_id}`}>
+                              {item.stream_content.name}
+                            </Link>
+                          )) || (
+                            <div className="usage-count">
+                              {item.stream_content.name}
+                            </div>
+                          )}
+                        </>
                       ) : (
                         item.stream_content.name
                       )}
@@ -238,7 +254,7 @@ export default function ModelPage() {
                         <div className="usage-count">{item.useCount}</div>
                       )) || (
                         <div>
-                          <Link to={`/model/${item.stream_id}/mids`}>
+                          <Link to={`/models/model/${item.stream_id}/mids`}>
                             {item.useCount}
                           </Link>
                         </div>

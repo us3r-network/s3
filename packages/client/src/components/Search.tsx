@@ -3,13 +3,15 @@ import { useState } from "react";
 import styled from "styled-components";
 
 export default function Search({
+  text,
   searchAction,
   placeholder = "Search by stream id, did or family...",
 }: {
+  text: string,
   searchAction: (text: string) => void;
   placeholder?: string;
 }) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(text || "");
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {

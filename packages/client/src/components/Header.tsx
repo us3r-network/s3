@@ -1,13 +1,42 @@
-
 import styled from "styled-components";
 import { useCeramicCtx } from "../context/CeramicCtx";
 import ChevronDown from "./icons/ChevronDown";
 import { Network } from "../types";
+import BackBtn from "./BackBtn";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import {
+  Button,
+  Item,
+  Label,
+  ListBox,
+  Popover,
+  Select,
+  SelectValue,
+} from "react-aria-components";
 
 export default function Header() {
+  const navigate = useNavigate();
+  let location = useLocation();
+
+  const showBack = useMemo(() => {
+    const show =
+      location.pathname === "/" ||
+      location.pathname === "/models" ||
+      location.pathname === "/streams";
+    return !show;
+  }, [location]);
+
   return (
     <Box>
       <div>
+        {(showBack && (
+          <BackBtn
+            backAction={() => {
+              navigate(-1);
+            }}
+          />
+        )) || <div></div>}
         <NetworkSwitch />
       </div>
     </Box>
@@ -18,86 +47,34 @@ function NetworkSwitch() {
   const { network, setNetwork } = useCeramicCtx();
 
   return (
-    <SwitchBox>
-      <div className="title">
-        <div>{network.toLowerCase()}</div>
-        <ChevronDown />
-      </div>
-      <div className="list">
-        <div
-          onClick={() => {
-            setNetwork(Network.MAINNET);
-          }}
-        >
-          Mainnet
-        </div>
-        <div
-          onClick={() => {
-            setNetwork(Network.TESTNET);
-          }}
-        >
-          Testnet
-        </div>
-      </div>
-    </SwitchBox>
+    <Select selectedKey={network} onSelectionChange={(k) => {
+      setNetwork(k as Network)
+    }}>
+      <Label></Label>
+      <Button>
+        <SelectValue />
+        <span aria-hidden="true">
+          <ChevronDown />
+        </span>
+      </Button>
+      <Popover>
+        <ListBox>
+          <Item id={Network.MAINNET}>{Network.MAINNET}</Item>
+          <Item id={Network.TESTNET}>{Network.TESTNET}</Item>
+        </ListBox>
+      </Popover>
+    </Select>
   );
 }
-
-const SwitchBox = styled.div`
-  width: 125px;
-  height: 40px;
-  cursor: pointer;
-  background: #1a1e23;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #39424c;
-  border-radius: 100px;
-  position: relative;
-
-  > .title {
-    display: flex;
-    align-items: center;
-    text-transform: capitalize;
-    padding: 8px 20px 8px 16px;
-    gap: 8px;
-  }
-  > .list {
-    position: absolute;
-    top: 40px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #39424c;
-    width: 100%;
-    padding: 10px 20px;
-    box-sizing: border-box;
-    /* gap: 20px; */
-    background: #1a1e23;
-    border-radius: 10px;
-    visibility: hidden;
-    > div {
-      padding: 10px 0;
-      &:first-child {
-        border-bottom: 1px solid #39424c;
-      }
-      
-    }
-  }
-
-  &:hover {
-    > .list {
-      visibility: visible;
-    }
-  }
-`;
 
 const Box = styled.div`
   position: sticky;
   top: 0;
   background-color: #1b1e23;
   z-index: 100;
+  align-items: center;
   > div {
-    justify-content: end;
+    justify-content: space-between;
     display: flex;
     height: 60px;
     gap: 20px;

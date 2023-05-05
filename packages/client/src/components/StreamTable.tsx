@@ -22,7 +22,6 @@ export default function StreamTable({
     return data.did.split(':').pop() || ''
   }, [data.did])
 
-  const net = network.toLowerCase()
   const tags = [...data.tags]
   if (data.content.type) {
     tags.push(data.content.type)
@@ -34,7 +33,7 @@ export default function StreamTable({
         <div>
           <span className="name">Stream ID:</span>
           <div>
-            <Link to={`/${net}/stream/${data.streamId}`}>{data.streamId}</Link>
+            <Link to={`/streams/stream/${data.streamId}`}>{data.streamId}</Link>
           </div>
         </div>
         <div className="network">
@@ -55,7 +54,7 @@ export default function StreamTable({
           <span className="name">Family or App:</span>
           {(data.familyOrApp && (
             <div>
-              <Link to={`/${net}/family/${data.familyOrApp}`}>
+              <Link to={`/streams/family/${data.familyOrApp}`}>
                 <div className="family">
                   {FamilyOrAppMapReverse[data.familyOrApp] || data.familyOrApp}
                 </div>
@@ -70,7 +69,7 @@ export default function StreamTable({
         <div className="from">
           <span className="name">From:</span>
           <div>
-            <Link to={`/${net}/profile/${data.did}`}>
+            <Link to={`/streams/profile/${data.did}`}>
               <div
                 dangerouslySetInnerHTML={{
                   __html: multiavatar(pubkey),
@@ -88,19 +87,11 @@ export default function StreamTable({
           <span className="name">Status:</span>
           <div className="name">{data.anchorStatus}</div>
         </div>
-        {/* <div>
-          <span>Hash:</span>
-          <div>...</div>
-        </div> */}
-        {/* <div>
-          <span>Date:</span>
-          <div>...</div>
-        </div> */}
         {(data.model && (
           <div className="model">
             <span className="name">Modal:</span>
             <div>
-              <a href={`/${net}/stream/${data.model}`}>{data.model}</a>
+              <Link to={`/streams/stream/${data.model}`}>{data.model}</Link>
               <div>
                 <Check />
                 <span>ComposeDB</span>
@@ -112,7 +103,7 @@ export default function StreamTable({
             <span className="name">Schema:</span>
             {(data.schema && (
               <div>
-                <a href={`/${net}/stream/${data.schema}`}>{data.schema}</a>
+                <Link to={`/streams/stream/${data.schema}`}>{data.schema}</Link>
               </div>
             )) ||
               '-'}

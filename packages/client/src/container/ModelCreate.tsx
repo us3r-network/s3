@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import BackBtn from "../components/BackBtn";
 import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
 import { schemas } from "../utils/composedb-types/schemas";
@@ -96,11 +95,6 @@ export default function ModelCreate() {
   return (
     <PageBox>
       <div className="title-box">
-        <BackBtn
-          backAction={() => {
-            navigate(-1);
-          }}
-        />
         <div className="tools">{status}</div>
       </div>
       {errMsg && <div className="err-msg">{errMsg}</div>}

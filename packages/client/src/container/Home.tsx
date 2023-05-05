@@ -3,27 +3,22 @@ import SearchFilter from "../components/Home/HomeFilter";
 import Dashboard from "../components/Home/Dashboard";
 import Lists from "../components/Home/Lists";
 import { useCallback, useEffect, useState } from "react";
-import { Network, Stats } from "../types";
+import {  Network, Stats } from "../types";
 import { getHomeStats } from "../api";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function Home() {
   const [stats, setStats] = useState<Stats>()
-  const fetchHomeStats = useCallback( async () => {
-    let network = Network.MAINNET;
-    try {
-      const localNetwork =
-        localStorage.getItem("network-select") || '"MAINNET"';
-      network = JSON.parse(localNetwork);
-    } catch (error) {
-      console.error(error);
-    }
+  const { network } = useCeramicCtx();
+  
+  const fetchHomeStats = useCallback( async (network: Network) => {
     const resp = await getHomeStats({ network })
     setStats(resp.data.data)
   }, [])
 
   useEffect(() => {
-    fetchHomeStats()
-  }, [fetchHomeStats])
+    fetchHomeStats(network)
+  }, [fetchHomeStats, network])
 
   return (
     <Box>

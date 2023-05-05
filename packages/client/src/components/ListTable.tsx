@@ -4,17 +4,15 @@ import multiavatar from "@multiavatar/multiavatar";
 import dayjs from "dayjs";
 import { isMobile } from "react-device-detect";
 
-import { Stream } from "../types";
+import {  Stream } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import { TableBox } from "./TableBox";
 import { FamilyOrAppMapReverse, Types } from "../constants";
 
 export default function ListTable({
-  network,
   data,
   showDid,
 }: {
-  network: string | undefined;
   data: Array<Stream>;
   showDid?: boolean;
 }) {
@@ -43,13 +41,13 @@ export default function ListTable({
             let schemaOrModel = <div className="xxxx">-</div>;
             if (item.schema) {
               schemaOrModel = (
-                <Link to={`/${network}/stream/${item.schema}`}>
+                <Link to={`/streams/stream/${item.schema}`}>
                   {shortPubKey(item.schema, { len: 8, split: "-" })}
                 </Link>
               );
             } else if (item.model && (item.type === "0" || item.type === "3")) {
               schemaOrModel = (
-                <Link to={`/${network}/stream/${item.model}`}>
+                <Link to={`/streams/stream/${item.model}`}>
                   {shortPubKey(item.model, { len: 8, split: "-" })}
                 </Link>
               );
@@ -58,7 +56,7 @@ export default function ListTable({
             return (
               <tr key={item.streamId + idx}>
                 <td>
-                  <Link to={`/${network}/stream/${item.streamId}`}>
+                  <Link to={`/streams/stream/${item.streamId}`}>
                     {shortPubKey(item.streamId, { len: 8, split: "-" })}
                   </Link>
                 </td>
@@ -74,9 +72,9 @@ export default function ListTable({
                       </div>
                       <div className="user-details-container">
                         <div className="name">
-                          <a href={`/${network}/profile/${item.did}`}>
+                          <Link to={`/streams/profile/${item.did}`}>
                             {shortPubKey(pubkey)}
-                          </a>
+                          </Link>
                         </div>
                         <div className="badge grey">{shortPubKey(pubkey)}</div>
                       </div>
@@ -87,7 +85,7 @@ export default function ListTable({
                   {(item.domain && (
                     <div className="family-container">
                       <Link
-                        to={`/${network}/family/${encodeURIComponent(
+                        to={`/streams/family/${encodeURIComponent(
                           item.domain
                         )}`}
                       >
@@ -101,7 +99,7 @@ export default function ListTable({
                   )) || (
                     <div className="family-container">
                       {(item.familyOrApp && (
-                        <Link to={`/${network}/family/${item.familyOrApp}`}>
+                        <Link to={`/streams/family/${item.familyOrApp}`}>
                           <div className="family">
                             {FamilyOrAppMapReverse[item.familyOrApp] ||
                             item.familyOrApp.length > 15
