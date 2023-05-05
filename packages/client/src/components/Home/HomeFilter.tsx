@@ -12,7 +12,7 @@ export default function SearchFilter() {
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
         if (ops === "model") {
-          navigate(`/modelview/${searchText}`);
+          navigate(`/models?searchText=${searchText}`);
         } else {
           if (searchText.startsWith('did')) {
             navigate(`/streams/profile/${searchText}`)
@@ -22,7 +22,6 @@ export default function SearchFilter() {
             navigate(`/streams/stream/${searchText}`)
           }
         }
-        console.log(searchText);
       }
     },
     [ops, searchText, navigate]

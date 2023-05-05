@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, useSearchParams } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import styled from "styled-components";
 import dayjs from "dayjs";
 import { isMobile } from "react-device-detect";
@@ -30,23 +30,14 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import { Network } from "./types";
 import CeramicProvider from "./context/CeramicCtx";
 import Header from "./components/Header";
-import { useEffect } from "react";
 
 dayjs.extend(relativeTime);
 
 export default function App() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [network, setNetwork] = useLocalStorage(
     "network-select",
     Network.MAINNET
   );
-
-  useEffect(() => {
-    const currNetwork = searchParams.get("network");
-    if (currNetwork === network) return;
-    searchParams.set("network", network);
-    setSearchParams(searchParams);
-  }, [network, searchParams, setSearchParams]);
 
   return (
     <Us3rAuthWithRainbowkitProvider>
@@ -61,7 +52,6 @@ export default function App() {
         <CeramicProvider network={network} setNetwork={setNetwork}>
           <Routes>
             <Route path="/" element={<Layout />}>
-              
               <Route index element={<Home />} />
 
               <Route path="streams">
@@ -75,18 +65,20 @@ export default function App() {
                 <Route index element={<Models />} />
                 <Route path="model/:streamId" element={<ModelStream />} />
                 <Route path="model/:modelId/mids" element={<ModelStreams />} />
-                <Route path="model/:modelId/mids/:mid" element={<ModelMidInfo />} />
+                <Route
+                  path="model/:modelId/mids/:mid"
+                  element={<ModelMidInfo />}
+                />
                 <Route path="model/create" element={<ModelCreate />} />
                 <Route path="did/:did" element={<UserModels />} />
                 <Route path="modelview/:streamId" element={<ModelView />} />
+                <Route
+                  path="playground/:streamId"
+                  element={<PlaygroundGraphiQL />}
+                />
               </Route>
-
-              <Route path="*" element={<NoMatch />} />
             </Route>
-            <Route
-              path="playground/:streamId"
-              element={<PlaygroundGraphiQL />}
-            />
+            <Route path="*" element={<NoMatch />} />
           </Routes>
         </CeramicProvider>
       </ProfileStateProvider>

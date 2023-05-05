@@ -64,6 +64,7 @@ export default function Streams() {
                 <SelectIcon />
               </SelectBox>
               <Search
+                text=""
                 searchAction={(text) => {
                   if (text.startsWith("did")) {
                     navigate(`/streams/profile/${text}`);

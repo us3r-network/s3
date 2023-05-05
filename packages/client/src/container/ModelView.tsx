@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
-import BackBtn from "../components/BackBtn";
 import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
 import { getModelInfo, queryModelGraphql } from "../api";
@@ -14,7 +12,6 @@ import { useCeramicCtx } from "../context/CeramicCtx";
 export default function ModelView() {
   const { streamId } = useParams();
   const { network } = useCeramicCtx();
-  const navigate = useNavigate();
   const [modelData, setModelData] = useState<ModeQueryResult>();
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
@@ -72,13 +69,7 @@ export default function ModelView() {
   if (errMsg) {
     return (
       <PageBox>
-        <div className="title-box">
-          <BackBtn
-            backAction={() => {
-              navigate('/models');
-            }}
-          />
-        </div>
+        <div className="title-box" />
         <Loading>{errMsg}</Loading>
       </PageBox>
     );
@@ -88,21 +79,15 @@ export default function ModelView() {
     <PageBox>
       <div className="title-box">
         <div className="title">
-          <BackBtn
-            backAction={() => {
-              navigate('/models');
-            }}
-          />
-
           <span>{modelStream?.streamContent?.name}</span>
         </div>
         <div className="tools">
           {modelStream?.isIndexed && (
-            <Link to={`/model/${streamId}/mids`}>
+            <Link to={`/models/model/${streamId}/mids`}>
               <button>Model Instance Document</button>
             </Link>
           )}
-          <Link to={`/playground/${streamId}`} target="_blank">
+          <Link to={`/models/playground/${streamId}`} target="_blank">
             <button>Playground</button>
           </Link>
         </div>
@@ -171,6 +156,7 @@ export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
+  max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
@@ -216,7 +202,7 @@ const PageBox = styled.div`
       align-items: center;
       gap: 15px;
 
-      > button {
+      button {
         background: #ffffff;
       }
     }

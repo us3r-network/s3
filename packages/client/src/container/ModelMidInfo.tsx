@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getModelMidItem } from "../api";
 import getCurrNetwork from "../utils/getCurrNetwork";
 import styled from "styled-components";
-import BackBtn from "../components/BackBtn";
 import dayjs from "dayjs";
 
 export default function ModelMidInfo() {
@@ -38,13 +37,7 @@ export default function ModelMidInfo() {
 
   return (
     <PageBox>
-      <div className="title-box">
-        <BackBtn
-          backAction={() => {
-            navigate(-1);
-          }}
-        />
-      </div>
+      <div className="title-box" />
       <Table>
         <div>
           <span>StreamID:</span>

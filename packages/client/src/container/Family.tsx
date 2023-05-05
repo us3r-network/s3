@@ -1,19 +1,16 @@
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { isMobile } from "react-device-detect";
 
 import { Network } from "../types";
 import ListTable from "../components/ListTable";
 import useListData from "../hooks/useListData";
-import BackBtn from "../components/BackBtn";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function Family() {
   const { familyOrApp } = useParams();
   const { network } = useCeramicCtx();
-  const navigate = useNavigate();
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network: network as Network,
   });
@@ -27,15 +24,6 @@ export default function Family() {
   return (
     <div>
       <Title>
-        {!isMobile && (
-          <div>
-            <BackBtn
-              backAction={() => {
-                navigate("/streams");
-              }}
-            />
-          </div>
-        )}
         <h3>
           Activity for the family: <span>{familyOrApp}</span> on{" "}
           <span>{network}</span>

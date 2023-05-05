@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { isMobile } from "react-device-detect";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { TableBox } from "../components/TableBox";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useAuthentication,
   useSession,
@@ -19,6 +19,7 @@ import getCurrNetwork from "../utils/getCurrNetwork";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelsPage() {
+  const [searchParams] = useSearchParams();
   const { signIn } = useAuthentication();
   const { network } = useCeramicCtx();
   const session = useSession();
@@ -26,20 +27,20 @@ export default function ModelsPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
   const [starModels, setStarModels] = useState<Array<ModelStream>>([]);
   const navigate = useNavigate();
-  const searchText = useRef("");
+  const searchText = useRef(searchParams.get('searchText') || '');
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
   const [filterStar, setFilterStar] = useState(false);
   const [personalCollections, setPersonalCollections] = useState<
     { modelId: string; id: string; revoke: boolean }[]
   >([]);
-  const {s3ModelCollection} = useCeramicCtx()
+  const { s3ModelCollection } = useCeramicCtx();
+  
 
   const fetchStarModels = useCallback(async () => {
-    const ids = personalCollections
-      .map((item) => {
-        return item.modelId;
-      });
+    const ids = personalCollections.map((item) => {
+      return item.modelId;
+    });
 
     const network = getCurrNetwork();
     const resp = await getStarModels({ network, ids });
@@ -59,13 +60,15 @@ export default function ModelsPage() {
 
     if (collected) {
       setPersonalCollections(
-        collected?.edges.filter(item => item.node.revoke !== true).map((item) => {
-          return {
-            modelId: item.node.modelID,
-            id: item.node.id!,
-            revoke: !!item.node.revoke,
-          };
-        })
+        collected?.edges
+          .filter((item) => item.node.revoke !== true)
+          .map((item) => {
+            return {
+              modelId: item.node.modelID,
+              id: item.node.id!,
+              revoke: !!item.node.revoke,
+            };
+          })
       );
     }
   }, [s3ModelCollection, session]);
@@ -92,7 +95,12 @@ export default function ModelsPage() {
   );
 
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ name: searchText.current, network });
+    setModels([])
+    setHasMore(true)
+    const resp = await getModelStreamList({
+      name: searchText.current,
+      network,
+    });
     const list = resp.data.data;
     setModels(list);
     setHasMore(list.length >= PageSize);
@@ -136,7 +144,6 @@ export default function ModelsPage() {
     return starModels;
   }, [filterStar, models, starModels]);
 
-
   return (
     <PageBox isMobile={isMobile}>
       <div className={isMobile ? "title-box mobile-models-box" : "title-box"}>
@@ -146,6 +153,7 @@ export default function ModelsPage() {
           {!isMobile && (
             <>
               <Search
+                text={searchText.current}
                 searchAction={(text) => {
                   searchText.current = text;
                   setModels([]);
@@ -211,9 +219,17 @@ export default function ModelsPage() {
                   <tr key={item.stream_id}>
                     <td>
                       {!isMobile ? (
-                        <Link to={`/models/modelview/${item.stream_id}`}>
-                          {item.stream_content.name}
-                        </Link>
+                        <>
+                          {(item.isIndexed && (
+                            <Link to={`/models/modelview/${item.stream_id}`}>
+                              {item.stream_content.name}
+                            </Link>
+                          )) || (
+                            <div className="usage-count">
+                              {item.stream_content.name}
+                            </div>
+                          )}
+                        </>
                       ) : (
                         item.stream_content.name
                       )}

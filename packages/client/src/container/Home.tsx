@@ -7,8 +7,6 @@ import {  Network, Stats } from "../types";
 import { getHomeStats } from "../api";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
-
-
 export default function Home() {
   const [stats, setStats] = useState<Stats>()
   const { network } = useCeramicCtx();

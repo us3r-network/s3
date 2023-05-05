@@ -4,9 +4,9 @@ import { PageSize, getModelMid } from "../api";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ModelStreamList from "../components/ModelStreamList";
-import { useNavigate, useParams } from "react-router-dom";
-import BackBtn from "../components/BackBtn";
+import { useParams } from "react-router-dom";
 import { useCeramicCtx } from "../context/CeramicCtx";
+import { AxiosError } from "axios";
 
 export default function ModelStreams() {
   const pageNum = useRef(1);
@@ -14,7 +14,8 @@ export default function ModelStreams() {
   const [hasMore, setHasMore] = useState(true);
   const [streams, setStreams] = useState<Array<ModelMid>>([]);
   const { modelId } = useParams();
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
@@ -32,22 +33,45 @@ export default function ModelStreams() {
   );
   const fetchModelMid = useCallback(async () => {
     if (!modelId) return;
-    const resp = await getModelMid({ network, modelId });
-    setStreams(resp.data.data);
+    try {
+      setLoading(true);
+      setErrMsg('')
+      const resp = await getModelMid({ network, modelId });
+      const list = resp.data.data;
+      setHasMore(list.length >= PageSize);
+      setStreams(list);
+    } catch (error) {
+      const err = error as AxiosError;
+      setErrMsg((err.response?.data as any).message || err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [modelId, network]);
 
   useEffect(() => {
     fetchModelMid();
   }, [fetchModelMid]);
 
+  if (loading) {
+    return (
+      <PageBox>
+        <Loading>Loading...</Loading>
+      </PageBox>
+    );
+  }
+
+  if (errMsg) {
+    return (
+      <PageBox>
+        <div className="title-box" />
+        <Loading>{errMsg}</Loading>
+      </PageBox>
+    );
+  }
+
   return (
     <PageBox>
       <div className="title-box">
-        <BackBtn
-          backAction={() => {
-            navigate('/models');
-          }}
-        />
         <div className="title">
           <span>Model Streams</span>
         </div>
@@ -63,6 +87,7 @@ export default function ModelStreams() {
       >
         {modelId && <ModelStreamList data={streams} modelId={modelId} />}
       </InfiniteScroll>
+      {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
   );
 }

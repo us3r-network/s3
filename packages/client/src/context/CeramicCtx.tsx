@@ -22,9 +22,9 @@ export default function CeramicProvider({
 }) {
   const s3ModelCollection = useMemo(() => {
     if (network === Network.MAINNET) {
-      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST);
+      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet');
     }
-    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST);
+    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet');
   }, [network]);
   return (
     <CeramicContext.Provider

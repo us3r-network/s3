@@ -1,21 +1,18 @@
 import { useEffect, useMemo } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import multiavatar from "@multiavatar/multiavatar";
-import { isMobile } from "react-device-detect";
 
 import { Network } from "../types";
 import ListTable from "../components/ListTable";
 import useListData from "../hooks/useListData";
 import { shortPubKeyHash } from "../utils/shortPubKey";
-import BackBtn from "../components/BackBtn";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function Profile() {
   const { did } = useParams();
   const { network } = useCeramicCtx();
-  const navigate = useNavigate();
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network: network as Network,
     did,
@@ -35,15 +32,6 @@ export default function Profile() {
   return (
     <div>
       <Title>
-        {!isMobile && (
-          <div>
-            <BackBtn
-              backAction={() => {
-                navigate("/streams");
-              }}
-            />
-          </div>
-        )}
         <div
           className="avatar"
           dangerouslySetInnerHTML={{
@@ -71,7 +59,6 @@ export default function Profile() {
 }
 
 const Title = styled.div`
-  position: sticky;
   z-index: 100;
   background-color: #14171a;
   padding: 20px 0;

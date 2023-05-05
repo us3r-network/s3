@@ -1,11 +1,10 @@
 import { AxiosError, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { isMobile } from "react-device-detect";
 
 import { getStreamInfo } from "../api";
-import BackBtn from "../components/BackBtn";
 import StreamTable from "../components/StreamTable";
 import { Network, Stream } from "../types";
 import { useCeramicCtx } from "../context/CeramicCtx";
@@ -13,7 +12,6 @@ import { useCeramicCtx } from "../context/CeramicCtx";
 export default function StreamPage() {
   const { streamId } = useParams();
   const { network } = useCeramicCtx();
-  const navigate = useNavigate();
   const [stream, setStream] = useState<Stream>();
   const [serverErrMsg, setServerErrMsg] = useState<{
     status: number;
@@ -75,15 +73,7 @@ export default function StreamPage() {
 
   return (
     <PageBox isMobile={isMobile}>
-      <BackContainer>
-        {!isMobile && (
-          <BackBtn
-            backAction={() => {
-              navigate('/streams');
-            }}
-          />
-        )}
-      </BackContainer>
+      <BackContainer />
       {stream && <StreamTable data={stream} network={network as Network} />}
     </PageBox>
   );
