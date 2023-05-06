@@ -33,7 +33,11 @@ export default function Header() {
         {(showBack && (
           <BackBtn
             backAction={() => {
-              navigate(-1);
+              if (location.pathname.startsWith('/models/modelview')) {
+                navigate('/models')
+              } else {
+                navigate(-1);
+              }
             }}
           />
         )) || <div></div>}
