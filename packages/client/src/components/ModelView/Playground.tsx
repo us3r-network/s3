@@ -27,13 +27,13 @@ import {
 } from "@us3r-network/auth-with-rainbowkit";
 import { DID } from "dids";
 import { useCeramicCtx } from "../../context/CeramicCtx";
+import { CERAMIC_TESTNET_HOST, CERAMIC_MAINNET_HOST } from "../../constants";
+import { Network } from "../../types";
 
 const type = {
   query: String,
 };
 
-const ceramicHost =
-  process.env.REACT_APP_CERAMIC_HOST || "http://13.215.254.225:7007";
 
 export type YogaGraphiQLProps = Omit<
   GraphiQLProps,
@@ -159,10 +159,10 @@ export default function PlaygroundGraphiQL(
   const composeClient = useMemo(
     () =>
       new ComposeClient({
-        ceramic: ceramicHost,
+        ceramic: network === Network.MAINNET ? CERAMIC_MAINNET_HOST : CERAMIC_TESTNET_HOST,
         definition: definition as RuntimeCompositeDefinition,
       }),
-    [definition]
+    [definition, network]
   );
   const [composeClientAuthenticated, setComposeClientAuthenticated] =
     useState(false);
