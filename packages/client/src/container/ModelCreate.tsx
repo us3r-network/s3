@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
@@ -10,7 +9,6 @@ import { AxiosError } from "axios";
 import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelCreate() {
-  const navigate = useNavigate();
   const { network } = useCeramicCtx();
   const [composite, setComposite] = useState("");
   const [runtimeDefinition, setRuntimeDefinition] = useState("");
@@ -159,6 +157,7 @@ export const definition = ${runtimeDefinition}`,
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
+  max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
@@ -181,13 +180,14 @@ const PageBox = styled.div`
   .title-box {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: end;
     padding: 10px 0px;
     box-sizing: border-box;
 
     .tools {
       display: flex;
       align-items: center;
+      
       gap: 15px;
 
       > button {

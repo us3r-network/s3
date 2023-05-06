@@ -12,24 +12,21 @@ import {
 import { useUrlSearchParams } from "use-url-search-params";
 
 import "@graphiql/plugin-explorer/dist/style.css";
-import { shortPubKey } from "../utils/shortPubKey";
 import { ComposeClient } from "@composedb/client";
 import { RuntimeCompositeDefinition } from "@composedb/types";
 
 import "graphiql/graphiql.css";
-import "../styles/playground.css";
-import { Link, useParams } from "react-router-dom";
-import { queryModelGraphql } from "../api";
+import "../../styles/playground.css";
+import {  useParams } from "react-router-dom";
+import { queryModelGraphql } from "../../api";
 import { AxiosError } from "axios";
 import styled from "styled-components";
-import { createGraphqlDefaultQuery } from "../utils/createDefaultQuery";
+import { createGraphqlDefaultQuery } from "../../utils/createDefaultQuery";
 import {
-  useAuthentication,
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
-import { useProfileState } from "@us3r-network/profile";
 import { DID } from "dids";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import { useCeramicCtx } from "../../context/CeramicCtx";
 
 const type = {
   query: String,
@@ -79,7 +76,7 @@ const initialQuery = /* GraphQL */ `
   #
 `;
 
-export function PlaygroundGraphiQL(
+export default function PlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
   const { streamId } = useParams();
@@ -157,10 +154,7 @@ export function PlaygroundGraphiQL(
     }
   }, [streamId, network]);
 
-  const { signIn } = useAuthentication();
   const session = useSession();
-  const sessId = session?.id;
-  const { profile } = useProfileState();
 
   const composeClient = useMemo(
     () =>
@@ -254,28 +248,6 @@ export function PlaygroundGraphiQL(
           <GraphiQL.Logo>
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               {composeClientAuthenticated && <div>Writable</div>}
-              {(sessId && (
-                <div>{profile?.name || shortPubKey(sessId)}</div>
-              )) || (
-                <div
-                  onClick={async () => {
-                    await signIn();
-                    authComposeClients();
-                  }}
-                >
-                  ConnectWallet
-                </div>
-              )}
-              <div style={{ display: "flex" }}>
-                <Link to={"/"}>
-                  <img src="/logo.png" alt="" style={{ width: "30px" }} />
-                </Link>
-              </div>
-              <span>
-                S3 Graph
-                <em>i</em>
-                QL
-              </span>
             </div>
           </GraphiQL.Logo>
         </GraphiQLInterface>

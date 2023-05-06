@@ -17,14 +17,12 @@ import Nav from "./components/Nav";
 import MobileNav from "./components/MobileNav";
 import NoMatch from "./components/NoMatch";
 import { useGAPageView } from "./hooks/useGoogleAnalytics";
-import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from "./constants";
+import { CERAMIC_TESTNET_HOST } from "./constants";
 import Models from "./container/Models";
 import ModelStream from "./container/ModelStream";
 import ModelCreate from "./container/ModelCreate";
 import UserModels from "./container/UserModels";
 import ModelView from "./container/ModelView";
-import { PlaygroundGraphiQL } from "./container/Playground";
-import ModelStreams from "./container/ModelStreams";
 import ModelMidInfo from "./container/ModelMidInfo";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { Network } from "./types";
@@ -60,7 +58,6 @@ export default function App() {
               <Route path="models">
                 <Route index element={<Models />} />
                 <Route path="model/:streamId" element={<ModelStream />} />
-                <Route path="model/:modelId/mids" element={<ModelStreams />} />
                 <Route
                   path="model/:modelId/mids/:mid"
                   element={<ModelMidInfo />}
@@ -68,10 +65,6 @@ export default function App() {
                 <Route path="model/create" element={<ModelCreate />} />
                 <Route path="did/:did" element={<UserModels />} />
                 <Route path="modelview/:streamId" element={<ModelView />} />
-                <Route
-                  path="playground/:streamId"
-                  element={<PlaygroundGraphiQL />}
-                />
               </Route>
             </Route>
             <Route path="*" element={<NoMatch />} />
