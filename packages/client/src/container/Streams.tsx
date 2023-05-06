@@ -159,6 +159,8 @@ const PageBox = styled.div<{ isMobile: boolean }>`
 `;
 
 const FilterBox = styled.div`
+  position: sticky;
+  top: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
