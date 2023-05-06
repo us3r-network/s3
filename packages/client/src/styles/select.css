@@ -92,13 +92,12 @@
     .react-aria-Header {
       font-size: 1.143rem;
       font-weight: bold;
-      padding: 0 0.571rem 0 1.571rem;
     }
   
     .react-aria-Item {
       margin: 2px;
-      padding: 0.286rem 0.571rem 0.286rem 1.571rem;
       border-radius: 6px;
+      padding: 10px 15px;
       outline: none;
       cursor: default;
       color: var(--text-color);
@@ -111,9 +110,7 @@
         font-weight: 600;
   
         &::before {
-          content: '✓';
-          content: '✓' / '';
-          alt: ' ';
+          content: '';
           position: absolute;
           top: 4px;
           left: 4px;

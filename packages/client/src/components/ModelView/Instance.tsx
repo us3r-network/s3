@@ -1,42 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ModelMid } from "../types";
-import { PageSize, getModelMid } from "../api";
+import { ModelMid } from "../../types";
+import { PageSize, getModelMid } from "../../api";
 import styled from "styled-components";
 import InfiniteScroll from "react-infinite-scroll-component";
-import ModelStreamList from "../components/ModelStreamList";
+import ModelStreamList from "../../components/ModelStreamList";
 import { useParams } from "react-router-dom";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import { useCeramicCtx } from "../../context/CeramicCtx";
 import { AxiosError } from "axios";
 
-export default function ModelStreams() {
+export default function Instance() {
   const pageNum = useRef(1);
   const { network } = useCeramicCtx();
   const [hasMore, setHasMore] = useState(true);
   const [streams, setStreams] = useState<Array<ModelMid>>([]);
-  const { modelId } = useParams();
+  const { streamId  } = useParams();
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
-      if (!modelId) return;
+      if (!streamId) return;
       const resp = await getModelMid({
         network,
-        modelId,
+        modelId: streamId,
         pageNumber,
       });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setStreams([...streams, ...list]);
     },
-    [streams, modelId, network]
+    [streams, streamId, network]
   );
   const fetchModelMid = useCallback(async () => {
-    if (!modelId) return;
+    if (!streamId) return;
     try {
       setLoading(true);
-      setErrMsg('')
-      const resp = await getModelMid({ network, modelId });
+      setErrMsg("");
+      const resp = await getModelMid({ network, modelId: streamId });
       const list = resp.data.data;
       setHasMore(list.length >= PageSize);
       setStreams(list);
@@ -46,7 +46,7 @@ export default function ModelStreams() {
     } finally {
       setLoading(false);
     }
-  }, [modelId, network]);
+  }, [streamId, network]);
 
   useEffect(() => {
     fetchModelMid();
@@ -71,11 +71,6 @@ export default function ModelStreams() {
 
   return (
     <PageBox>
-      <div className="title-box">
-        <div className="title">
-          <span>Model Streams</span>
-        </div>
-      </div>
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
@@ -85,7 +80,7 @@ export default function ModelStreams() {
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        {modelId && <ModelStreamList data={streams} modelId={modelId} />}
+        {streamId && <ModelStreamList data={streams} modelId={streamId} />}
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>

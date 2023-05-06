@@ -216,7 +216,7 @@ export default function ModelsPage() {
                   (starItem) => starItem.modelId === item.stream_id
                 );
                 return (
-                  <tr key={item.stream_id}>
+                  <tr key={item.stream_id + idx}>
                     <td>
                       {!isMobile ? (
                         <>
