@@ -14,6 +14,7 @@ import {
   Select,
   SelectValue,
 } from "react-aria-components";
+import { isMobile } from "react-device-detect";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -26,6 +27,10 @@ export default function Header() {
       location.pathname === "/streams";
     return !show;
   }, [location]);
+
+  if (isMobile) {
+    return null
+  }
 
   return (
     <Box>

@@ -103,7 +103,7 @@ const AppContainer = styled.div<{ isMobile: boolean }>`
   main {
     flex-grow: 1;
     margin: 0 auto;
-    width: calc(100vw - 300px);
+    width: ${(props) => (props?.isMobile ? "100%" : "calc(100vw - 300px)")};
     max-width: 1300px;
     margin-top: ${(props) => (props?.isMobile ? "60px" : "0")};
     z-index: 0;
