@@ -55,7 +55,7 @@ const FeedsFilterBoxWrapper = styled.div<{open: boolean}>`
   transition: all 0.3s ease-out;
   margin-bottom: ${({open}) => open ? '20px' : '0'};
   position: sticky;
-  top: 80px;
+  top: 140px;
   box-sizing: border-box;
   background: #1b1e23;
   border-radius: 20px;

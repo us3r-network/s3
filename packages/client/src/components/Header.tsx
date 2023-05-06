@@ -92,7 +92,6 @@ const Box = styled.div`
     gap: 20px;
     align-items: center;
     padding: 10px 0;
-    width: calc(100vw - 300px);
     max-width: 1300px;
     margin: 0 auto;
     box-sizing: border-box;

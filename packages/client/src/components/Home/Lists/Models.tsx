@@ -20,7 +20,7 @@ export default function Models() {
   }, [fetchModel]);
   return (
     <Box>
-      <Title title="Total Models" viewAll="/model" />
+      <Title title="Total Models" viewAll="/models" />
       <div>
         {list.slice(0, 10).map((item) => {
           return (
