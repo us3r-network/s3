@@ -9,6 +9,8 @@ import ListTable from "../components/ListTable";
 import useListData from "../hooks/useListData";
 import { shortPubKeyHash } from "../utils/shortPubKey";
 import { useCeramicCtx } from "../context/CeramicCtx";
+import UserAvatarStyled from "../components/common/UserAvatarStyled";
+import { UserName } from "@us3r-network/profile";
 
 export default function Profile() {
   const { did } = useParams();
@@ -32,14 +34,12 @@ export default function Profile() {
   return (
     <div>
       <Title>
-        <div
-          className="avatar"
-          dangerouslySetInnerHTML={{
-            __html: multiavatar(pubkey),
-          }}
-        />
-        <div>
-          <h3>{shortPubKeyHash(pubkey)}</h3>
+        <UserAvatarStyled className="avatar" did={did} />
+        <div className="names">
+          <h3>
+            <UserName did={did} />
+          </h3>
+          <span>{shortPubKeyHash(pubkey)}</span>
         </div>
       </Title>
       <InfiniteScroll
@@ -66,6 +66,14 @@ const Title = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  .names {
+    > h3 {
+      margin: 0;
+    }
+    > span {
+      color: #718096;
+    }
+  }
 
   & .avatar {
     width: 60px;

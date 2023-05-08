@@ -8,6 +8,8 @@ import useListData from "../../../hooks/useListData";
 import { shortPubKey } from "../../../utils/shortPubKey";
 import { useCeramicCtx } from "../../../context/CeramicCtx";
 import { Link } from "react-router-dom";
+import UserAvatarStyled from "../../common/UserAvatarStyled";
+import { UserName } from "@us3r-network/profile";
 
 export default function Streams() {
   const { network } = useCeramicCtx();
@@ -51,13 +53,9 @@ function ListCard({
         </Link>{" "}
       </div>
       <div className="avatar">
-        <Avatar
-          dangerouslySetInnerHTML={{
-            __html: multiavatar(did),
-          }}
-        />
+        <Avatar did={did} />
         <Link to={`/streams/profile/${did}`}>
-          {shortPubKey(did, { len: 10, split: "-" })}
+          <UserName did={did} />
         </Link>
       </div>
       <div className="time">{dayjs(indexingTime).fromNow()}</div>
@@ -65,7 +63,7 @@ function ListCard({
   );
 }
 
-const Avatar = styled.div`
+const Avatar = styled(UserAvatarStyled)`
   width: 40px;
   height: 40px;
 `;

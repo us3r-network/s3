@@ -3,7 +3,7 @@ import { useCeramicCtx } from "../context/CeramicCtx";
 import ChevronDown from "./icons/ChevronDown";
 import { Network } from "../types";
 import BackBtn from "./BackBtn";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMemo } from "react";
 import {
   Button,
@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "react-aria-components";
 import { isMobile } from "react-device-detect";
+import { useSession } from "@us3r-network/auth-with-rainbowkit";
+import { LogoutButton } from "@us3r-network/profile";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -28,8 +30,19 @@ export default function Header() {
     return !show;
   }, [location]);
 
+  const params = useParams();
+  const session = useSession();
+  const showLogoutButton = useMemo(() => {
+    return (
+      location.pathname.startsWith("/streams/profile") &&
+      session &&
+      session.id &&
+      session.id === params?.did
+    );
+  }, [location, session, params?.did]);
+
   if (isMobile) {
-    return null
+    return null;
   }
 
   return (
@@ -38,8 +51,8 @@ export default function Header() {
         {(showBack && (
           <BackBtn
             backAction={() => {
-              if (location.pathname.startsWith('/models/modelview')) {
-                navigate('/models')
+              if (location.pathname.startsWith("/models/modelview")) {
+                navigate("/models");
               } else {
                 navigate(-1);
               }
@@ -47,6 +60,7 @@ export default function Header() {
           />
         )) || <div></div>}
         {(showBack && <div></div>) || <NetworkSwitch />}
+        {showLogoutButton && <LogoutButton />}
       </div>
     </Box>
   );
@@ -95,5 +109,16 @@ const Box = styled.div`
     max-width: 1300px;
     margin: 0 auto;
     box-sizing: border-box;
+  }
+  button[data-us3r-logoutbutton] {
+    overflow: hidden;
+    cursor: pointer;
+    width: 54px;
+    height: 32px;
+    border-radius: 10px;
+    color: #fff;
+    background: none;
+    outline: none;
+    border: 1px solid gray;
   }
 `;
