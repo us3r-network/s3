@@ -27,7 +27,7 @@ export default function ModelsPage() {
   const [models, setModels] = useState<Array<ModelStream>>([]);
   const [starModels, setStarModels] = useState<Array<ModelStream>>([]);
   const navigate = useNavigate();
-  const searchText = useRef(searchParams.get('searchText') || '');
+  const searchText = useRef(searchParams.get("searchText") || "");
   const [hasMore, setHasMore] = useState(true);
   const pageNum = useRef(1);
   const [filterStar, setFilterStar] = useState(false);
@@ -35,7 +35,6 @@ export default function ModelsPage() {
     { modelId: string; id: string; revoke: boolean }[]
   >([]);
   const { s3ModelCollection } = useCeramicCtx();
-  
 
   const fetchStarModels = useCallback(async () => {
     const ids = personalCollections.map((item) => {
@@ -95,8 +94,8 @@ export default function ModelsPage() {
   );
 
   const fetchModel = useCallback(async () => {
-    setModels([])
-    setHasMore(true)
+    setModels([]);
+    setHasMore(true);
     const resp = await getModelStreamList({
       name: searchText.current,
       network,
@@ -143,6 +142,8 @@ export default function ModelsPage() {
     if (!filterStar) return models;
     return starModels;
   }, [filterStar, models, starModels]);
+
+
 
   return (
     <PageBox isMobile={isMobile}>
@@ -195,7 +196,7 @@ export default function ModelsPage() {
           fetchMoreModel(pageNum.current);
           console.log("fetch more");
         }}
-        hasMore={hasMore}
+        hasMore={filterStar ? false : hasMore}
         loader={<Loading>Loading...</Loading>}
       >
         <TableBox isMobile={isMobile}>
@@ -295,7 +296,7 @@ export default function ModelsPage() {
           </TableContainer>
         </TableBox>
       </InfiniteScroll>
-      {!hasMore && <Loading>no more data</Loading>}
+      {(!filterStar && !hasMore) && <Loading>no more data</Loading>}
     </PageBox>
   );
 }
