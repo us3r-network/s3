@@ -34,7 +34,6 @@ export default function ListTable({
         </thead>
         <tbody>
           {data.map((item, idx) => {
-            const pubkey = item.did.split(":").pop() || "";
             const tags: string[] = [...item.tags];
             if (item.content.type) {
               tags.push(item.content.type);
@@ -65,19 +64,10 @@ export default function ListTable({
                 {showDid && (
                   <td>
                     <div className="did-container">
-                      <div>
-                        <Avatar did={item.did} />
-                      </div>
-                      <div className="user-details-container">
-                        <div className="name">
-                          <Link to={`/streams/profile/${item.did}`}>
-                            <UserName did={item.did} />
-                          </Link>
-                        </div>
-                        <div className="badge grey">
-                          <UserName did={item.did} />
-                        </div>
-                      </div>
+                      <Avatar did={item.did} />
+                      <Link to={`/streams/profile/${item.did}`}>
+                        <UserName did={item.did} />
+                      </Link>
                     </div>
                   </td>
                 )}
@@ -207,11 +197,8 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
 
   .did-container {
     display: flex;
+    align-items: center;
     gap: 10px;
-
-    & div {
-      text-align: start;
-    }
 
     .badge {
       background-color: #718096;
