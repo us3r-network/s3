@@ -10,6 +10,8 @@ import { useMemo } from "react";
 import { shortPubKey } from "../utils/shortPubKey";
 import { Link } from "react-router-dom";
 import Check from "./icons/Check";
+import UserAvatarStyled from "./common/UserAvatarStyled";
+import { UserName } from "@us3r-network/profile";
 
 export default function StreamTable({
   data,
@@ -70,12 +72,8 @@ export default function StreamTable({
           <span className="name">From:</span>
           <div>
             <Link to={`/streams/profile/${data.did}`}>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: multiavatar(pubkey),
-                }}
-              />
-              {shortPubKey(pubkey)}
+              <UserAvatarStyled did={data.did} className="avatar" />
+              <UserName did={data.did} />
             </Link>
           </div>
         </div>
@@ -188,8 +186,9 @@ const TableContainer = styled.div<{ isMobile?: boolean }>`
       align-items: center;
       gap: 10px;
       width: fit-content;
-      > div {
+      > .avatar {
         width: 50px;
+        height: 50px;
       }
     }
   }

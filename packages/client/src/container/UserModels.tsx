@@ -7,8 +7,8 @@ import styled from "styled-components";
 import { TableBox } from "../components/TableBox";
 import { shortPubKey } from "../utils/shortPubKey";
 import dayjs from "dayjs";
-import { UserAvatar } from "@us3r-network/profile";
 import { useCeramicCtx } from "../context/CeramicCtx";
+import UserAvatarStyled from "../components/common/UserAvatarStyled";
 
 export default function UserModels() {
   const { did } = useParams();
@@ -48,7 +48,7 @@ export default function UserModels() {
     <PageBox>
       <div className="title-box">
         <div className="title">
-          <UserAvatar did={did} title={did} />
+          <UserAvatarStyled did={did} title={did} />
           <span>Models</span>
         </div>
       </div>

@@ -4,8 +4,16 @@ import { ModelMid } from "../types";
 import dayjs from "dayjs";
 import { shortPubKey } from "../utils/shortPubKey";
 import { Link } from "react-router-dom";
+import UserAvatarStyled from "./common/UserAvatarStyled";
+import { UserName } from "@us3r-network/profile";
 
-export default function ModelStreamList({ modelId,data }: { modelId: string,data: ModelMid[] }) {
+export default function ModelStreamList({
+  modelId,
+  data,
+}: {
+  modelId: string;
+  data: ModelMid[];
+}) {
   return (
     <TableBox>
       <TableContainer>
@@ -22,19 +30,17 @@ export default function ModelStreamList({ modelId,data }: { modelId: string,data
               <tr key={item.streamId}>
                 <td>
                   <div className="stream-id">
-                  <Link to={`/models/model/${modelId}/mids/${item.streamId}`}>
-                    {shortPubKey(item.streamId, {
-                      len: 8,
-                      split: "-",
-                    })}
+                    <Link to={`/models/model/${modelId}/mids/${item.streamId}`}>
+                      {shortPubKey(item.streamId, {
+                        len: 8,
+                        split: "-",
+                      })}
                     </Link>
                   </div>
                 </td>
-                <td>
-                  {shortPubKey(item.controllerDid, {
-                    len: 8,
-                    split: "-",
-                  })}
+                <td className="td-did">
+                  <UserAvatarStyled did={item.controllerDid} />
+                  <UserName did={item.controllerDid} />
                 </td>
                 <td className="index-time">
                   <div>
@@ -72,6 +78,12 @@ const TableContainer = styled.table`
     &.index-time {
       width: 200px;
     }
+  }
+
+  tbody tr .td-did {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   thead tr th {

@@ -4,10 +4,12 @@ import multiavatar from "@multiavatar/multiavatar";
 import dayjs from "dayjs";
 import { isMobile } from "react-device-detect";
 
-import {  Stream } from "../types";
+import { Stream } from "../types";
 import { shortPubKey } from "../utils/shortPubKey";
 import { TableBox } from "./TableBox";
 import { FamilyOrAppMapReverse, Types } from "../constants";
+import UserAvatarStyled from "./common/UserAvatarStyled";
+import { UserName } from "@us3r-network/profile";
 
 export default function ListTable({
   data,
@@ -64,19 +66,17 @@ export default function ListTable({
                   <td>
                     <div className="did-container">
                       <div>
-                        <Avatar
-                          dangerouslySetInnerHTML={{
-                            __html: multiavatar(pubkey),
-                          }}
-                        />
+                        <Avatar did={item.did} />
                       </div>
                       <div className="user-details-container">
                         <div className="name">
                           <Link to={`/streams/profile/${item.did}`}>
-                            {shortPubKey(pubkey)}
+                            <UserName did={item.did} />
                           </Link>
                         </div>
-                        <div className="badge grey">{shortPubKey(pubkey)}</div>
+                        <div className="badge grey">
+                          <UserName did={item.did} />
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -137,12 +137,12 @@ export default function ListTable({
   );
 }
 
-const Avatar = styled.div`
+const Avatar = styled(UserAvatarStyled)`
   width: 40px;
   height: 40px;
 `;
 
- const TableContainer = styled.table<{ isMobile: boolean }>`
+const TableContainer = styled.table<{ isMobile: boolean }>`
   ${({ isMobile }) => (isMobile ? `` : "width: 100%;")}
   table-layout: fixed;
   border-collapse: collapse;
