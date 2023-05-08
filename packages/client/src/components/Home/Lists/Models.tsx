@@ -5,12 +5,13 @@ import { getModelStreamList } from "../../../api";
 import { ModelStream } from "../../../types";
 import { shortPubKey } from "../../../utils/shortPubKey";
 import { useCeramicCtx } from "../../../context/CeramicCtx";
+import { Link } from "react-router-dom";
 
 export default function Models() {
   const [list, setList] = useState<Array<ModelStream>>([]);
   const { network } = useCeramicCtx();
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({network});
+    const resp = await getModelStreamList({ network });
     const list = resp.data.data;
     setList(list);
   }, [network]);
@@ -28,6 +29,7 @@ export default function Models() {
               key={item.stream_id}
               stream_id={item.stream_id}
               count={item.useCount}
+              isIndexed={item.isIndexed}
               description={item.stream_content.description || ""}
               name={item.stream_content.name}
             />
@@ -43,20 +45,36 @@ function ListCard({
   name,
   description,
   count,
+  isIndexed,
 }: {
   stream_id: string;
   name: string;
   description: string;
   count: number;
+  isIndexed?: boolean;
 }) {
   return (
     <CardBox>
       <div className="name">
-        <h4>{name}</h4>
-        <span>{shortPubKey(stream_id, {len: 8, split: '-'})}</span>
+        {(isIndexed && (
+          <Link to={`/models/modelview/${stream_id}`}>
+            <h4>{name}</h4>
+            <span>{shortPubKey(stream_id, { len: 8, split: "-" })}</span>
+          </Link>
+        )) || (
+          <>
+            <h4>{name}</h4>
+            <span>{shortPubKey(stream_id, { len: 8, split: "-" })}</span>
+          </>
+        )}
       </div>
       <div className="desc">{description}</div>
-      <div className="count">{count}</div>
+      <div className="count">
+        {(isIndexed && (
+          <Link to={`/models/model/${stream_id}/mids`}>{count}</Link>
+        )) ||
+          count}
+      </div>
     </CardBox>
   );
 }
@@ -73,12 +91,15 @@ const CardBox = styled.div`
     border-bottom: none;
   }
   .name {
+    color: #718096;
+    > a {
+      color: #ffffff;
+    }
     h4 {
       margin: 5px 0;
       font-weight: 500;
       font-size: 16px;
       line-height: 19px;
-      color: #ffffff;
     }
     span {
       font-weight: 400;
@@ -100,8 +121,11 @@ const CardBox = styled.div`
     font-weight: 500;
     font-size: 16px;
     line-height: 19px;
-    color: #ffffff;
+    color: #718096;
     text-align: end;
+    > a {
+      color: #ffffff;
+    }
   }
 `;
 

@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import multiavatar from "@multiavatar/multiavatar";
 
 import Title from "./Title";
-import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import { Network } from "../../../types";
 import useListData from "../../../hooks/useListData";
 import { shortPubKey } from "../../../utils/shortPubKey";
+import { useCeramicCtx } from "../../../context/CeramicCtx";
+import { Link } from "react-router-dom";
 
 export default function Streams() {
-  const [network] = useLocalStorage("network-select", Network.MAINNET);
+  const { network } = useCeramicCtx();
   const { data, loadData } = useListData({ network });
   useEffect(() => {
     loadData({ network });
@@ -45,18 +45,22 @@ function ListCard({
 }) {
   return (
     <CardBox>
-      <div>{shortPubKey(streamId, { len: 8, split: "-" })}</div>
+      <div>
+        <Link to={`/streams/stream/${streamId}`}>
+          {shortPubKey(streamId, { len: 8, split: "-" })}
+        </Link>{" "}
+      </div>
       <div className="avatar">
         <Avatar
           dangerouslySetInnerHTML={{
             __html: multiavatar(did),
           }}
         />
-        {shortPubKey(did, { len: 10, split: "-" })}
+        <Link to={`/streams/profile/${did}`}>
+          {shortPubKey(did, { len: 10, split: "-" })}
+        </Link>
       </div>
-      <div className="time">
-        {dayjs(indexingTime).fromNow()}
-      </div>
+      <div className="time">{dayjs(indexingTime).fromNow()}</div>
     </CardBox>
   );
 }
