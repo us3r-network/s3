@@ -143,8 +143,6 @@ export default function ModelsPage() {
     return starModels;
   }, [filterStar, models, starModels]);
 
-
-
   return (
     <PageBox isMobile={isMobile}>
       <div className={isMobile ? "title-box mobile-models-box" : "title-box"}>
@@ -271,23 +269,12 @@ export default function ModelsPage() {
                       </div>
                     </td>
                     <td>
-                      <div
-                        className="star"
-                        onClick={() => {
-                          if (!sessId) {
-                            signIn();
-                            return;
-                          }
-
-                          starModelAction(
-                            item.stream_id,
-                            hasStarItem?.id,
-                            !!hasStarItem?.revoke
-                          );
-                        }}
-                      >
-                        {hasStarItem ? <Star /> : <StarEmpty />}
-                      </div>
+                      <ModelStarItem
+                        stream_id={item.stream_id}
+                        hasStarItem={hasStarItem}
+                        fetchPersonal={fetchPersonal}
+                        signIn={signIn}
+                      />
                     </td>
                   </tr>
                 );
@@ -296,8 +283,81 @@ export default function ModelsPage() {
           </TableContainer>
         </TableBox>
       </InfiniteScroll>
-      {(!filterStar && !hasMore) && <Loading>no more data</Loading>}
+      {!filterStar && !hasMore && <Loading>no more data</Loading>}
     </PageBox>
+  );
+}
+
+function ModelStarItem({
+  signIn,
+  hasStarItem,
+  fetchPersonal,
+  stream_id,
+}: {
+  stream_id: string;
+  signIn: () => void;
+  hasStarItem:
+    | {
+        modelId: string;
+        id: string;
+        revoke: boolean;
+      }
+    | undefined;
+  fetchPersonal: () => void;
+}) {
+  const session = useSession();
+  const { s3ModelCollection } = useCeramicCtx();
+  const [staring, setStaring] = useState(false);
+
+  const sessId = session?.id;
+
+  const starModelAction = useCallback(
+    async (modelId: string, id?: string, revoke?: boolean) => {
+      try {
+        
+      
+      if (!session) return;
+      s3ModelCollection.authComposeClient(session);
+      setStaring(true)
+      if (id) {
+        await s3ModelCollection.updateCollection(id, {
+          revoke: !revoke,
+        });
+      } else {
+        await s3ModelCollection.createCollection({
+          modelID: modelId,
+          revoke: false,
+        });
+      }
+    } catch (error) {
+        
+    } finally {
+      setStaring(false)
+    }
+
+      await fetchPersonal();
+    },
+    [session, s3ModelCollection, fetchPersonal]
+  );
+  if (staring) {
+    return <div className="star">
+      <img src="/loading.gif" title="loading" alt="" />{" "}
+    </div>
+  }
+  return (
+    <div
+      className="star"
+      onClick={() => {
+        if (!sessId) {
+          signIn();
+          return;
+        }
+
+        starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke);
+      }}
+    >
+      {hasStarItem ? <Star /> : <StarEmpty />}
+    </div>
   );
 }
 
@@ -529,5 +589,9 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
 
   .star {
     cursor: pointer;
+
+    > img {
+      width: 23px
+    }
   }
 `;
