@@ -28,6 +28,7 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import { Network } from "./types";
 import CeramicProvider from "./context/CeramicCtx";
 import Header from "./components/Header";
+import ModelStreams from "./container/ModelStreams";
 
 dayjs.extend(relativeTime);
 
@@ -57,6 +58,7 @@ export default function App() {
               <Route path="models">
                 <Route index element={<Models />} />
                 <Route path="model/:streamId" element={<ModelStream />} />
+                <Route path="model/:modelId/mids" element={<ModelStreams />} />
                 <Route
                   path="model/:modelId/mids/:mid"
                   element={<ModelMidInfo />}

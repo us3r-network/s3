@@ -13,8 +13,7 @@ export default function ModelMidInfo() {
   const navToStream = useCallback(
     (stream?: string) => {
       if (!stream) return;
-      const network = getCurrNetwork();
-      navigate(`/${network.toLowerCase()}/stream/${stream}`);
+      navigate(`/streams/stream/${stream}`);
     },
     [navigate]
   );
