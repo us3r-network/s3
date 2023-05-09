@@ -1,13 +1,11 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import styled from "styled-components";
 import IconFilterFunnel from "./icons/FilterFunnel";
 import BackCircle from "./icons/BackCircle";
-import GitHubButton from "react-github-btn";
 
 import Logo from "./Logo";
-import LoginButton from "./LoginButton";
 import LoginSvg from "./icons/login.svg";
 import LogoutSvg from "./icons/logout.svg";
 import {
