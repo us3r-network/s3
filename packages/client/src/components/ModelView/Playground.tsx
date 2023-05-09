@@ -12,30 +12,28 @@ import {
 import { useUrlSearchParams } from "use-url-search-params";
 
 import "@graphiql/plugin-explorer/dist/style.css";
-import { shortPubKey } from "../utils/shortPubKey";
 import { ComposeClient } from "@composedb/client";
 import { RuntimeCompositeDefinition } from "@composedb/types";
 
 import "graphiql/graphiql.css";
-import "../styles/playground.css";
-import { Link, useParams } from "react-router-dom";
-import { queryModelGraphql } from "../api";
+import "../../styles/playground.css";
+import {  useParams } from "react-router-dom";
+import { queryModelGraphql } from "../../api";
 import { AxiosError } from "axios";
 import styled from "styled-components";
-import { createGraphqlDefaultQuery } from "../utils/createDefaultQuery";
+import { createGraphqlDefaultQuery } from "../../utils/createDefaultQuery";
 import {
-  useAuthentication,
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
-import { useProfileState } from "@us3r-network/profile";
 import { DID } from "dids";
+import { useCeramicCtx } from "../../context/CeramicCtx";
+import { CERAMIC_TESTNET_HOST, CERAMIC_MAINNET_HOST } from "../../constants";
+import { Network } from "../../types";
 
 const type = {
   query: String,
 };
 
-const ceramicHost =
-  process.env.REACT_APP_CERAMIC_HOST || "http://13.215.254.225:7007";
 
 export type YogaGraphiQLProps = Omit<
   GraphiQLProps,
@@ -78,10 +76,11 @@ const initialQuery = /* GraphQL */ `
   #
 `;
 
-export function PlaygroundGraphiQL(
+export default function PlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
   const { streamId } = useParams();
+  const { network } = useCeramicCtx();
   //   const [modelData, setModelData] = useState<ModeQueryResult>();
 
   const [definition, setDefinition] = useState({
@@ -135,7 +134,7 @@ export function PlaygroundGraphiQL(
     if (!streamId) return;
     try {
       setLoading(true);
-      const resp = await queryModelGraphql(streamId);
+      const resp = await queryModelGraphql(streamId, network);
       const { data } = resp.data;
       setDefinition(data.runtimeDefinition);
       const definition = data.runtimeDefinition;
@@ -153,20 +152,17 @@ export function PlaygroundGraphiQL(
     } finally {
       setLoading(false);
     }
-  }, [streamId]);
+  }, [streamId, network]);
 
-  const { signIn } = useAuthentication();
   const session = useSession();
-  const sessId = session?.id;
-  const { profile } = useProfileState();
 
   const composeClient = useMemo(
     () =>
       new ComposeClient({
-        ceramic: ceramicHost,
+        ceramic: network === Network.MAINNET ? CERAMIC_MAINNET_HOST : CERAMIC_TESTNET_HOST,
         definition: definition as RuntimeCompositeDefinition,
       }),
-    [definition]
+    [definition, network]
   );
   const [composeClientAuthenticated, setComposeClientAuthenticated] =
     useState(false);
@@ -252,28 +248,6 @@ export function PlaygroundGraphiQL(
           <GraphiQL.Logo>
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               {composeClientAuthenticated && <div>Writable</div>}
-              {(sessId && (
-                <div>{profile?.name || shortPubKey(sessId)}</div>
-              )) || (
-                <div
-                  onClick={async () => {
-                    await signIn();
-                    authComposeClients();
-                  }}
-                >
-                  ConnectWallet
-                </div>
-              )}
-              <div style={{ display: "flex" }}>
-                <Link to={"/"}>
-                  <img src="/logo.png" alt="" style={{ width: "30px" }} />
-                </Link>
-              </div>
-              <span>
-                S3 Graph
-                <em>i</em>
-                QL
-              </span>
             </div>
           </GraphiQL.Logo>
         </GraphiQLInterface>

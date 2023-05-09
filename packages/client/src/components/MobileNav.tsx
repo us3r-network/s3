@@ -14,7 +14,7 @@ import {
   useAuthentication,
   useSession,
 } from "@us3r-network/auth-with-rainbowkit";
-import { UserAvatar } from "@us3r-network/profile";
+import UserAvatarStyled from "./common/UserAvatarStyled";
 
 export default function Nav() {
   const { signIn, signOut } = useAuthentication();
@@ -48,7 +48,7 @@ export default function Nav() {
 
       <div className="right">
         {session ? (
-          <UserAvatar width={30} height={30} />
+          <UserAvatarStyled />
         ) : (
           <div
             onClick={() => {
@@ -82,9 +82,10 @@ export default function Nav() {
                   </div>
                 </Link>
 
-                <Link to={"/model"} onClick={() => setOpenFilter(!openFilter)}>
+                <Link to={"/models"} onClick={() => setOpenFilter(!openFilter)}>
                   <div className={`nav-item ${modelActive ? "active" : ""}`}>
                     <ModelIcon stroke={modelActive ? "white" : "#718096"} />
+
                     <div className="tint-c">
                       <div className="tint">ComposeDB Models</div>
                     </div>

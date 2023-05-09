@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import BackBtn from "../components/BackBtn";
 import FileSaver from "file-saver";
 import { GraphQLEditor, PassedSchema } from "graphql-editor";
 import { schemas } from "../utils/composedb-types/schemas";
 import { createModel } from "../api";
 import { AxiosError } from "axios";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelCreate() {
-  const navigate = useNavigate();
+  const { network } = useCeramicCtx();
   const [composite, setComposite] = useState("");
   const [runtimeDefinition, setRuntimeDefinition] = useState("");
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
@@ -38,7 +37,7 @@ export default function ModelCreate() {
     if (!gqlSchema.code) return;
     try {
       setSubmitting(true);
-      const resp = await createModel(gqlSchema.code);
+      const resp = await createModel(gqlSchema.code, network);
       const { composite, runtimeDefinition } = resp.data.data;
 
       setComposite(JSON.stringify(composite));
@@ -50,7 +49,7 @@ export default function ModelCreate() {
     } finally {
       setSubmitting(false);
     }
-  }, [gqlSchema.code]);
+  }, [gqlSchema.code, network]);
 
   const download = (text: string, filename: string) => {
     console.log(text);
@@ -94,11 +93,6 @@ export default function ModelCreate() {
   return (
     <PageBox>
       <div className="title-box">
-        <BackBtn
-          backAction={() => {
-            navigate(-1);
-          }}
-        />
         <div className="tools">{status}</div>
       </div>
       {errMsg && <div className="err-msg">{errMsg}</div>}
@@ -163,6 +157,7 @@ export const definition = ${runtimeDefinition}`,
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
+  max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
@@ -185,13 +180,14 @@ const PageBox = styled.div`
   .title-box {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: end;
     padding: 10px 0px;
     box-sizing: border-box;
 
     .tools {
       display: flex;
       align-items: center;
+      
       gap: 15px;
 
       > button {

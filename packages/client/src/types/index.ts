@@ -29,6 +29,9 @@ export type ModelStream = {
   "stream_id": string;
   "controller_did": string;
   "tip": string;
+  streamContent: {
+    name: string
+  },
   "stream_content": {
     "name": string;
     "description": string | null;
@@ -55,6 +58,7 @@ export type ModelStream = {
   "created_at": string;
   "updated_at": string;
   "useCount": number;
+  "isIndexed"?: boolean;
 };
 
 export type ModelStreamInfo = {
@@ -71,4 +75,20 @@ export type ModeQueryResult = {
   composite: any;
   runtimeDefinition: any;
   graphqlSchema: string;
+  isIndexed?: boolean
 };
+
+export type Stats = {
+  streamsLastWeek: number[];
+  streamsPerHour: number | null;
+  todayModels: number | null;
+  totalModels: number | null;
+  totalStreams: number | null;
+};
+
+export type ModelMid = {
+  streamId: string;
+  controllerDid: string;
+  createdAt: number;
+  updatedAt: number;
+}

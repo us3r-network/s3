@@ -5,11 +5,9 @@ import { Network, Stream } from '../types';
 
 export default function useListData({
   network,
-  familyOrApp,
   did,
 }: {
   network: Network;
-  familyOrApp?: string;
   did?: string;
 }) {
   const pageNum = useRef(1);
@@ -20,12 +18,14 @@ export default function useListData({
     network,
     familyOrApp,
     did,
+    types
   }: {
     network: Network;
-    familyOrApp?: string;
+    familyOrApp?: string[];
+    types?: string[]
     did?: string;
   }) => {
-    const resp = await getList({ network, familyOrApp, did });
+    const resp = await getList({ network, familyOrApp, did, types });
     const { streams } = resp.data.data;
     setHasMore(streams.length >= PageSize);
     setData(streams);
@@ -33,13 +33,13 @@ export default function useListData({
   };
 
   const fetchMoreData = useCallback(
-    async (pageNumber: number) => {
-      const resp = await getList({ network, pageNumber, familyOrApp, did });
+    async (pageNumber: number, types?: string[], familyOrApp?: string[]) => {
+      const resp = await getList({ network, pageNumber, familyOrApp, did, types, });
       const { streams } = resp.data.data;
       setHasMore(streams.length >= PageSize);
       setData([...data, ...streams]);
     },
-    [data, network, familyOrApp, did]
+    [data, network, did]
   );
 
   return {

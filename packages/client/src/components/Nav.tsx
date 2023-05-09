@@ -8,7 +8,9 @@ import LoginButton from "./LoginButton";
 export default function Nav() {
   let location = useLocation();
 
-  const modelActive = location.pathname.startsWith("/model");
+  const homeActive = location.pathname === "/";
+  const modelActive = location.pathname.startsWith("/models");
+  const streamActive = location.pathname.startsWith('/streams')
   return (
     <NavContainer>
       <div className="fixed">
@@ -21,15 +23,24 @@ export default function Nav() {
 
         <div className="nav">
           <Link to={"/"}>
-            <div className={`nav-item ${!modelActive ? "active" : ""}`}>
-              <StreamIcon stroke={!modelActive ? "white" : "#718096"} />
+            <div className={`nav-item ${homeActive ? "active" : ""}`}>
+              <HomeIcon stroke={homeActive ? "white" : "#718096"} />
+              <div className="tint-c">
+                <div className="tint">Home</div>
+              </div>
+            </div>
+          </Link>
+
+          <Link to={"/streams"}>
+            <div className={`nav-item ${streamActive ? "active" : ""}`}>
+              <StreamIcon stroke={streamActive ? "white" : "#718096"} />
               <div className="tint-c">
                 <div className="tint">Streams</div>
               </div>
             </div>
           </Link>
 
-          <Link to={"/model"}>
+          <Link to={"/models"}>
             <div className={`nav-item ${modelActive ? "active" : ""}`}>
               <ModelIcon stroke={modelActive ? "white" : "#718096"} />
               <div className="tint-c">
@@ -54,6 +65,25 @@ export default function Nav() {
         </div>
       </div>
     </NavContainer>
+  );
+}
+
+function HomeIcon({ stroke = "white" }) {
+  return (
+    <svg
+      width="17"
+      height="16"
+      viewBox="0 0 17 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.5 14.0005V9.06714C6.5 8.69378 6.5 8.50709 6.57266 8.36448C6.63658 8.23904 6.73857 8.13706 6.86401 8.07314C7.00661 8.00048 7.1933 8.00048 7.56667 8.00048H9.43333C9.8067 8.00048 9.99339 8.00048 10.136 8.07314C10.2614 8.13706 10.3634 8.23904 10.4273 8.36448C10.5 8.50709 10.5 8.69378 10.5 9.06714V14.0005M7.84513 1.84315L3.32359 5.3599C3.02135 5.59498 2.87022 5.71252 2.76135 5.85973C2.66491 5.99012 2.59307 6.13701 2.54935 6.29319C2.5 6.4695 2.5 6.66095 2.5 7.04386V11.8671C2.5 12.6139 2.5 12.9872 2.64532 13.2725C2.77316 13.5233 2.97713 13.7273 3.22801 13.8552C3.51323 14.0005 3.8866 14.0005 4.63333 14.0005H12.3667C13.1134 14.0005 13.4868 14.0005 13.772 13.8552C14.0229 13.7273 14.2268 13.5233 14.3547 13.2725C14.5 12.9872 14.5 12.6139 14.5 11.8671V7.04386C14.5 6.66095 14.5 6.4695 14.4506 6.29319C14.4069 6.13701 14.3351 5.99012 14.2386 5.85973C14.1298 5.71252 13.9787 5.59499 13.6764 5.35991L9.15487 1.84315C8.92065 1.66099 8.80354 1.5699 8.67423 1.53489C8.56013 1.504 8.43987 1.504 8.32577 1.53489C8.19646 1.5699 8.07935 1.66099 7.84513 1.84315Z"
+        stroke={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
@@ -100,6 +130,7 @@ const NavContainer = styled.nav`
 
   transition: all 0.15s ease-out;
   height: 100vh;
+  z-index: 500;
 
   > div.fixed {
     position: fixed;

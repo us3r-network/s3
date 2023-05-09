@@ -1,49 +1,28 @@
-import { UserAvatar } from "@us3r-network/profile";
 import { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Network } from "../types";
-import {
-  useAuthentication,
-  useSession,
-} from "@us3r-network/auth-with-rainbowkit";
+import { useSession } from "@us3r-network/auth-with-rainbowkit";
+import UserAvatarStyled from "./common/UserAvatarStyled";
+import { LoginButton as LoginButtonStyled } from "@us3r-network/profile";
 
 const LoginButton = () => {
-  const { signIn, signOut } = useAuthentication();
   const session = useSession();
   const sessId = session?.id;
   const navigate = useNavigate();
 
   const navToProfile = useCallback(() => {
-    let network = Network.MAINNET;
-    try {
-      const localNetwork =
-        localStorage.getItem("network-select") || '"MAINNET"';
-      network = JSON.parse(localNetwork);
-    } catch (error) {
-      console.error(error);
-    }
-    navigate(`/${network.toLowerCase()}/profile/${sessId}`);
+    navigate(`/streams/profile/${sessId}`);
   }, [navigate, sessId]);
 
   return (
     <Wrapper>
-      {!!sessId && (
+      {!!sessId ? (
         <div onClick={navToProfile}>
-          <UserAvatar title={sessId} />
+          <UserAvatarStyled title={sessId} />
         </div>
+      ) : (
+        <LoginButtonStyled>Login</LoginButtonStyled>
       )}
-      <button
-        onClick={() => {
-          if (!sessId) {
-            signIn();
-          } else {
-            signOut();
-          }
-        }}
-      >
-        <span>{sessId ? "Logout" : "Login"}</span>
-      </button>
     </Wrapper>
   );
 };
@@ -57,11 +36,7 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: end;
   gap: 10px;
-  > img {
-    width: 32px;
-    height: 32px;
-  }
-  > button {
+  button[data-us3r-loginbutton] {
     overflow: hidden;
     cursor: pointer;
     width: 54px;
