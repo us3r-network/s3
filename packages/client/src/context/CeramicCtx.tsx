@@ -2,8 +2,10 @@ import React, { createContext, useContext, useMemo } from "react";
 import { Network } from "../types";
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from "../constants";
 import { S3ModelCollectionModel } from "@us3r-network/model-collection";
+import { CeramicClient } from '@ceramicnetwork/http-client'
 
 export interface CeramicContextData {
+  ceramic: CeramicClient,
   network: Network;
   setNetwork: (arg0: Network) => void;
   s3ModelCollection: S3ModelCollectionModel
@@ -26,9 +28,18 @@ export default function CeramicProvider({
     }
     return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet');
   }, [network]);
+
+  const ceramic = useMemo(() => {
+    if (network === Network.MAINNET) {
+      return new CeramicClient(CERAMIC_MAINNET_HOST)
+    }
+    return new CeramicClient(CERAMIC_TESTNET_HOST)
+  }, [network])
+
   return (
     <CeramicContext.Provider
       value={{
+        ceramic,
         network,
         setNetwork,
         s3ModelCollection

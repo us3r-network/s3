@@ -3,12 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getModelMidItem } from "../api";
 import getCurrNetwork from "../utils/getCurrNetwork";
 import styled from "styled-components";
-import dayjs from "dayjs";
+import { useCeramicCtx } from "../context/CeramicCtx";
 
 export default function ModelMidInfo() {
   const { modelId, mid } = useParams();
   const navigate = useNavigate();
   const [info, setInfo] = useState<any>();
+  const { ceramic } = useCeramicCtx();
 
   const navToStream = useCallback(
     (stream?: string) => {
@@ -30,9 +31,24 @@ export default function ModelMidInfo() {
     setInfo(resp.data.data);
   }, [modelId, mid]);
 
+  const fetchStreamFromCeramic = useCallback(async () => {
+    if (!modelId) return;
+    try {
+      const data = await ceramic.loadStream(modelId);
+      console.log(data);
+      setInfo({
+        streamId: modelId,
+        streamContent: data.content,
+        controllerDid: data.metadata.controller,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [ceramic, modelId]);
+
   useEffect(() => {
-    fetchMidInfo();
-  }, [fetchMidInfo]);
+    fetchStreamFromCeramic();
+  }, [fetchStreamFromCeramic]);
 
   return (
     <PageBox>
@@ -59,13 +75,13 @@ export default function ModelMidInfo() {
             </pre>
           </div>
         </div>
-        <div>
+        {/* <div>
           <span>createdAt:</span>
           <div>
             {info?.createdAt &&
               dayjs(info?.createdAt).format("YYYY-MM-DD HH:mm:ss")}
           </div>
-        </div>
+        </div> */}
       </Table>
     </PageBox>
   );
