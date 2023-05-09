@@ -1,20 +1,32 @@
-import { ReactNode, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ReactNode, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import styled from 'styled-components'
-import IconFilterFunnel from './icons/FilterFunnel'
-import BackCircle from './icons/BackCircle'
-import GitHubButton from 'react-github-btn'
+import styled from "styled-components";
+import IconFilterFunnel from "./icons/FilterFunnel";
+import BackCircle from "./icons/BackCircle";
+import GitHubButton from "react-github-btn";
 
-import Logo from './Logo'
-import LoginButton from './LoginButton'
+import Logo from "./Logo";
+import LoginButton from "./LoginButton";
+import LoginSvg from "./icons/login.svg";
+import LogoutSvg from "./icons/logout.svg";
+import {
+  useAuthentication,
+  useSession,
+} from "@us3r-network/auth-with-rainbowkit";
+import { UserAvatar } from "@us3r-network/profile";
 
 export default function Nav() {
-  let location = useLocation()
-  const navigate = useNavigate()
-  const [openFilter, setOpenFilter] = useState(false)
-  const modelActive = location.pathname.startsWith('/models')
-  const isSubPage = !(location.pathname === '/model' || location.pathname === '/')
+
+  const { signIn, signOut } = useAuthentication();
+  const session = useSession();
+  let location = useLocation();
+  const navigate = useNavigate();
+  const [openFilter, setOpenFilter] = useState(false);
+  const modelActive = location.pathname.startsWith("/model");
+  const isSubPage = !(
+    location.pathname === "/model" || location.pathname === "/"
+  );
 
   return (
     <NavContainer>
@@ -24,7 +36,7 @@ export default function Nav() {
           <BackCircle />
         </span>
       ) : (
-        <Link to={'/'}>
+        <Link to={"/"}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             {/* <span>Alpha</span> */}
@@ -32,15 +44,29 @@ export default function Nav() {
         </Link>
       )}
       <span className="title">
-        {modelActive ? 'ComposeDB Models' : 'Streams'}
+        {modelActive ? "ComposeDB Models" : "Streams"}
       </span>
 
-      <div
-        onClick={() => {
-          setOpenFilter(!openFilter)
-        }}
-      >
-        <IconFilterFunnel />
+      <div className="right">
+        {session ? (
+          <UserAvatar width={30} height={30} />
+        ) : (
+          <div
+            onClick={() => {
+              signIn();
+            }}
+          >
+            <LoginIcon />
+          </div>
+        )}
+
+        <div
+          onClick={() => {
+            setOpenFilter(!openFilter);
+          }}
+        >
+          <IconFilterFunnel />
+        </div>
       </div>
 
       <FilterSelectModal isOpen={openFilter}>
@@ -48,9 +74,9 @@ export default function Nav() {
           <FilterSelectWrapper>
             <FilterSelectInner>
               <div className="nav">
-                <Link to={'/'} onClick={() => setOpenFilter(!openFilter)}>
-                  <div className={`nav-item ${!modelActive ? 'active' : ''}`}>
-                    <StreamIcon stroke={!modelActive ? 'white' : '#718096'} />
+                <Link to={"/"} onClick={() => setOpenFilter(!openFilter)}>
+                  <div className={`nav-item ${!modelActive ? "active" : ""}`}>
+                    <StreamIcon stroke={!modelActive ? "white" : "#718096"} />
                     <div className="tint-c">
                       <div className="tint">Streams</div>
                     </div>
@@ -60,11 +86,28 @@ export default function Nav() {
                 <Link to={'/models'} onClick={() => setOpenFilter(!openFilter)}>
                   <div className={`nav-item ${modelActive ? 'active' : ''}`}>
                     <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
+
                     <div className="tint-c">
                       <div className="tint">ComposeDB Models</div>
                     </div>
                   </div>
                 </Link>
+
+                {!!session && (
+                  <div
+                    onClick={() => {
+                      signOut();
+                      setOpenFilter(!openFilter);
+                    }}
+                  >
+                    <div className={`nav-item ${modelActive ? "active" : ""}`}>
+                      <LogoutIcon />
+                      <div className="tint-c">
+                        <div className="tint">Logout</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </FilterSelectInner>
           </FilterSelectWrapper>
@@ -86,10 +129,21 @@ export default function Nav() {
         </div> */}
       {/* </div> */}
     </NavContainer>
-  )
+  );
 }
-
-function StreamIcon({ stroke = 'white' }) {
+const LoginIcon = styled.img.attrs({
+  src: LoginSvg,
+})`
+  width: 20px;
+  height: 20px;
+`;
+const LogoutIcon = styled.img.attrs({
+  src: LogoutSvg,
+})`
+  width: 20px;
+  height: 20px;
+`;
+function StreamIcon({ stroke = "white" }) {
   return (
     <svg
       width="17"
@@ -105,10 +159,10 @@ function StreamIcon({ stroke = 'white' }) {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
 
-function ModelIcon({ stroke = '#718096' }) {
+function ModelIcon({ stroke = "#718096" }) {
   return (
     <svg
       width="17"
@@ -124,7 +178,7 @@ function ModelIcon({ stroke = '#718096' }) {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
 
 const NavContainer = styled.nav`
@@ -191,7 +245,11 @@ const NavContainer = styled.nav`
     height: 30px;
     pointer-events: none;
   }
-
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
   /* @media (prefers-reduced-motion: no-preference) {
     .App-logo {
       animation: App-logo-spin infinite 20s linear;
@@ -206,20 +264,20 @@ const NavContainer = styled.nav`
       transform: rotate(360deg);
     }
   }
-`
+`;
 const FilterSelectModal = styled.div<{ isOpen: boolean }>`
   width: 100vw;
-  height: ${({ isOpen }) => (isOpen ? 'calc(100vh - 56px)' : '0px')};
+  height: ${({ isOpen }) => (isOpen ? "calc(100vh - 56px)" : "0px")};
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 56px;
   left: 0;
   overflow: hidden;
   transition: all 0.3s;
-`
+`;
 const FilterSelectModalInner = styled.div`
   width: 100%;
-`
+`;
 const FilterSelectWrapper = styled.div`
   width: 100%;
   max-height: calc(100vh - 56px);
@@ -228,7 +286,7 @@ const FilterSelectWrapper = styled.div`
   padding: 10px;
   box-sizing: border-box;
   background: #1b1e23;
-`
+`;
 const FilterSelectInner = styled.div`
   height: 0;
   flex: 1;
@@ -289,4 +347,4 @@ const FilterSelectInner = styled.div`
       }
     }
   }
-`
+`;
