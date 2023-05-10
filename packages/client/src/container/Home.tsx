@@ -1,17 +1,19 @@
-import styled from "styled-components";
-import SearchFilter from "../components/Home/HomeFilter";
-import Dashboard from "../components/Home/Dashboard";
-import Lists from "../components/Home/Lists";
-import { useCallback, useEffect, useState } from "react";
-import {  Network, Stats } from "../types";
-import { getHomeStats } from "../api";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
+
+import SearchFilter from '../components/Home/HomeFilter'
+import Dashboard, { DashboardMobile } from '../components/Home/Dashboard'
+import Lists, { ListsMobile } from '../components/Home/Lists'
+import { useCallback, useEffect, useState } from 'react'
+import { Network, Stats } from '../types'
+import { getHomeStats } from '../api'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function Home() {
   const [stats, setStats] = useState<Stats>()
-  const { network } = useCeramicCtx();
-  
-  const fetchHomeStats = useCallback( async (network: Network) => {
+  const { network } = useCeramicCtx()
+
+  const fetchHomeStats = useCallback(async (network: Network) => {
     const resp = await getHomeStats({ network })
     setStats(resp.data.data)
   }, [])
@@ -21,32 +23,35 @@ export default function Home() {
   }, [fetchHomeStats, network])
 
   return (
-    <Box>
-      <SloganBox>
-        <div className="left">
-          <h1>S3.xyz</h1>
-          <h3>Hub For Your Fragmented Self Sovereign Data</h3>
-          <SearchFilter />
-        </div>
-        <ImgBox>
-          <img src="homebn.png" alt="" />
-        </ImgBox>
-      </SloganBox>
-      <Dashboard data={stats}/>
-      <Lists/>
+    <Box isMobile={isMobile}>
+      {isMobile ? null : (
+        <SloganBox>
+          <div className="left">
+            <h1>S3.xyz</h1>
+            <h3>Hub For Your Fragmented Self Sovereign Data</h3>
+            <SearchFilter />
+          </div>
+          <ImgBox>
+            <img src="homebn.png" alt="" />
+          </ImgBox>
+        </SloganBox>
+      )}
+      {isMobile ? <DashboardMobile data={stats} /> : <Dashboard data={stats} />}
+      {isMobile ? <ListsMobile /> : <Lists />}
     </Box>
-  );
+  )
 }
 
-const Box = styled.div`
+const Box = styled.div<{ isMobile?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`;
+  ${({ isMobile }) => (isMobile ? 'padding: 20px 10px;' : ``)};
+`
 
 const ImgBox = styled.div`
   text-align: center;
-`;
+`
 
 const SloganBox = styled.div`
   background: linear-gradient(90deg, #21213a 0%, #2b3569 100.92%);
@@ -71,7 +76,7 @@ const SloganBox = styled.div`
   }
 
   h3 {
-    font-family: "Rubik";
+    font-family: 'Rubik';
     font-style: normal;
     font-weight: 500;
     font-size: 24px;
@@ -80,4 +85,4 @@ const SloganBox = styled.div`
     color: #ffffff;
     margin: 0;
   }
-`;
+`

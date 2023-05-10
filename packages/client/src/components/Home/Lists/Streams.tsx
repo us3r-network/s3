@@ -46,8 +46,8 @@ function ListCard({
   indexingTime: number;
 }) {
   return (
-    <CardBox>
-      <div>
+    <CardBox className="streams-box">
+      <div className="short-key">
         <Link to={`/streams/stream/${streamId}`}>
           {shortPubKey(streamId, { len: 8, split: "-" })}
         </Link>{" "}

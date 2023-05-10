@@ -54,7 +54,7 @@ function ListCard({
   isIndexed?: boolean;
 }) {
   return (
-    <CardBox>
+    <CardBox className="models-box">
       <div className="name">
         {(isIndexed && (
           <Link to={`/models/modelview/${stream_id}`}>

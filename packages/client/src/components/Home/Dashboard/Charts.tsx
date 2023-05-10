@@ -13,7 +13,7 @@ export function ChartContainer({ data }: { data: number[] }) {
   });
   return (
     <Box>
-      <div className="title">Stream history in 7 days</div>
+      <div className="title chat-title">Stream history in 7 days</div>
       <div className="chart">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
