@@ -73,47 +73,14 @@ export default function StreamPage() {
 
   return (
     <PageBox isMobile={isMobile}>
-      <BackContainer />
       {stream && <StreamTable data={stream} network={network as Network} />}
     </PageBox>
   )
 }
 
-const BackContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 0;
-  position: sticky;
-  background-color: #14171a;
-  top: 0;
-  z-index: 100;
-
-  > div {
-    cursor: pointer;
-    padding: 10px;
-    gap: 8px;
-    box-sizing: border-box;
-    width: 81px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-
-    background: #1a1e23;
-    border: 1px solid #39424c;
-    border-radius: 100px;
-
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
-
-    color: #718096;
-  }
-`
-
 const PageBox = styled.div<{ isMobile?: boolean }>`
   margin-bottom: 50px;
-  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : '')};
+  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : 'padding: 20px 0')};
 
   > .err {
     display: flex;

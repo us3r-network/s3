@@ -7,7 +7,7 @@ export function ChartContainer({ data }: { data: number[] }) {
   const today = dayjs()
   const chartData = data.map((item, idx) => {
     return {
-      name: today.subtract(data.length - idx, 'day').format('DD/MM'),
+      name: today.subtract(data.length - (idx + 1), 'day').format('DD/MM'),
       stream: item,
     }
   })
