@@ -52,7 +52,6 @@ export default function ModelMidInfo() {
 
   return (
     <PageBox>
-      <div className="title-box" />
       <Table>
         <div>
           <span>StreamID:</span>
@@ -91,7 +90,7 @@ const Table = styled.div`
   border-radius: 20px;
   border: 1px solid #39424c;
   background: #1b1e23;
-
+  
   padding: 10px 20px;
   > div {
     display: flex;
@@ -128,6 +127,7 @@ const Table = styled.div`
 `
 
 const PageBox = styled.div`
+  padding: 24px 0;
   .title-box {
     display: flex;
     align-items: center;
