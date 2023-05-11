@@ -1,42 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ModelMid } from '../../types'
-import { PageSize, getModelMid } from '../../api'
+import { ModelMid } from '../types'
+import { PageSize, getModelMid } from '../api'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import ModelStreamList from '../../components/ModelStreamList'
+import ModelStreamList from '../components/ModelStreamList'
 import { useParams } from 'react-router-dom'
-import { useCeramicCtx } from '../../context/CeramicCtx'
+import { useCeramicCtx } from '../context/CeramicCtx'
 import { AxiosError } from 'axios'
 
-export default function Instance() {
+export default function ModelStreams() {
   const pageNum = useRef(1)
   const { network } = useCeramicCtx()
   const [hasMore, setHasMore] = useState(true)
   const [streams, setStreams] = useState<Array<ModelMid>>([])
-  const { streamId } = useParams()
+  const { modelId } = useParams()
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState('')
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
-      if (!streamId) return
+      if (!modelId) return
       const resp = await getModelMid({
         network,
-        modelId: streamId,
+        modelId,
         pageNumber,
       })
       const list = resp.data.data
       setHasMore(list.length >= PageSize)
       setStreams([...streams, ...list])
     },
-    [streams, streamId, network]
+    [streams, modelId, network]
   )
   const fetchModelMid = useCallback(async () => {
-    if (!streamId) return
+    if (!modelId) return
     try {
       setLoading(true)
       setErrMsg('')
-      const resp = await getModelMid({ network, modelId: streamId })
+      const resp = await getModelMid({ network, modelId })
       const list = resp.data.data
       setHasMore(list.length >= PageSize)
       setStreams(list)
@@ -46,7 +46,7 @@ export default function Instance() {
     } finally {
       setLoading(false)
     }
-  }, [streamId, network])
+  }, [modelId, network])
 
   useEffect(() => {
     fetchModelMid()
@@ -71,6 +71,11 @@ export default function Instance() {
 
   return (
     <PageBox>
+      <div className="title-box">
+        <div className="title">
+          <span>Model Streams</span>
+        </div>
+      </div>
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
@@ -80,7 +85,7 @@ export default function Instance() {
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        {streamId && <ModelStreamList data={streams} modelId={streamId} />}
+        {modelId && <ModelStreamList data={streams} modelId={modelId} />}
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>

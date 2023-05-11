@@ -1,17 +1,17 @@
-import styled from 'styled-components';
-import Back from './icons/Back';
+import styled from 'styled-components'
+import Back from './icons/Back'
 
 export default function BackBtn({ backAction }: { backAction: () => void }) {
   return (
     <BackBox
       onClick={() => {
-        backAction();
+        backAction()
       }}
     >
       <Back />
       <span>Back</span>
     </BackBox>
-  );
+  )
 }
 
 const BackBox = styled.div`
@@ -33,4 +33,4 @@ const BackBox = styled.div`
   line-height: 17px;
 
   color: #718096;
-`;
+`

@@ -1,31 +1,29 @@
-import { ReactNode, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-import styled from "styled-components";
-import IconFilterFunnel from "./icons/FilterFunnel";
-import BackCircle from "./icons/BackCircle";
-import GitHubButton from "react-github-btn";
+import styled from 'styled-components'
+import IconFilterFunnel from './icons/FilterFunnel'
+import BackCircle from './icons/BackCircle'
 
-import Logo from "./Logo";
-import LoginButton from "./LoginButton";
-import LoginSvg from "./icons/login.svg";
-import LogoutSvg from "./icons/logout.svg";
+import Logo from './Logo'
+import LoginSvg from './icons/login.svg'
+import LogoutSvg from './icons/logout.svg'
 import {
   useAuthentication,
   useSession,
-} from "@us3r-network/auth-with-rainbowkit";
-import UserAvatarStyled from "./common/UserAvatarStyled";
+} from '@us3r-network/auth-with-rainbowkit'
+import UserAvatarStyled from './common/UserAvatarStyled'
 
 export default function Nav() {
-  const { signIn, signOut } = useAuthentication();
-  const session = useSession();
-  let location = useLocation();
-  const navigate = useNavigate();
-  const [openFilter, setOpenFilter] = useState(false);
-  const modelActive = location.pathname.startsWith("/model");
+  const { signIn, signOut } = useAuthentication()
+  const session = useSession()
+  let location = useLocation()
+  const navigate = useNavigate()
+  const [openFilter, setOpenFilter] = useState(false)
+  const modelActive = location.pathname.startsWith('/model')
   const isSubPage = !(
-    location.pathname === "/model" || location.pathname === "/"
-  );
+    location.pathname === '/model' || location.pathname === '/'
+  )
 
   return (
     <NavContainer>
@@ -35,7 +33,7 @@ export default function Nav() {
           <BackCircle />
         </span>
       ) : (
-        <Link to={"/"}>
+        <Link to={'/'}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             {/* <span>Alpha</span> */}
@@ -43,7 +41,12 @@ export default function Nav() {
         </Link>
       )}
       <span className="title">
-        {modelActive ? "ComposeDB Models" : "Streams"}
+        {{
+          '/': 'S3.XYZ',
+          '/streams': 'Streams',
+          '/models': 'ComposeDB Models',
+        }?.[location.pathname] || 'S3.XYZ'}
+        {/* {modelActive ? 'ComposeDB Models' : 'Streams'} */}
       </span>
 
       <div className="right">
@@ -52,7 +55,7 @@ export default function Nav() {
         ) : (
           <div
             onClick={() => {
-              signIn();
+              signIn()
             }}
           >
             <LoginIcon />
@@ -61,7 +64,7 @@ export default function Nav() {
 
         <div
           onClick={() => {
-            setOpenFilter(!openFilter);
+            setOpenFilter(!openFilter)
           }}
         >
           <IconFilterFunnel />
@@ -73,18 +76,41 @@ export default function Nav() {
           <FilterSelectWrapper>
             <FilterSelectInner>
               <div className="nav">
-                <Link to={"/"} onClick={() => setOpenFilter(!openFilter)}>
-                  <div className={`nav-item ${!modelActive ? "active" : ""}`}>
-                    <StreamIcon stroke={!modelActive ? "white" : "#718096"} />
+                <Link to={'/'} onClick={() => setOpenFilter(!openFilter)}>
+                  <div
+                    className={`nav-item ${
+                      location.pathname === '/' ? 'active' : ''
+                    }`}
+                  >
+                    <HomeIcon fill={!modelActive ? 'white' : '#718096'} />
+                    <div className="tint-c">
+                      <div className="tint">Home</div>
+                    </div>
+                  </div>
+                </Link>
+                <Link
+                  to={'/streams'}
+                  onClick={() => setOpenFilter(!openFilter)}
+                >
+                  <div
+                    className={`nav-item ${
+                      location.pathname === '/streams' ? 'active' : ''
+                    }`}
+                  >
+                    <StreamIcon stroke={!modelActive ? 'white' : '#718096'} />
                     <div className="tint-c">
                       <div className="tint">Streams</div>
                     </div>
                   </div>
                 </Link>
 
-                <Link to={"/models"} onClick={() => setOpenFilter(!openFilter)}>
-                  <div className={`nav-item ${modelActive ? "active" : ""}`}>
-                    <ModelIcon stroke={modelActive ? "white" : "#718096"} />
+                <Link to={'/models'} onClick={() => setOpenFilter(!openFilter)}>
+                  <div
+                    className={`nav-item ${
+                      location.pathname === '/models' ? 'active' : ''
+                    }`}
+                  >
+                    <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
 
                     <div className="tint-c">
                       <div className="tint">ComposeDB Models</div>
@@ -95,11 +121,11 @@ export default function Nav() {
                 {!!session && (
                   <div
                     onClick={() => {
-                      signOut();
-                      setOpenFilter(!openFilter);
+                      signOut()
+                      setOpenFilter(!openFilter)
                     }}
                   >
-                    <div className={`nav-item ${modelActive ? "active" : ""}`}>
+                    <div className={`nav-item ${modelActive ? 'active' : ''}`}>
                       <LogoutIcon />
                       <div className="tint-c">
                         <div className="tint">Logout</div>
@@ -128,21 +154,37 @@ export default function Nav() {
         </div> */}
       {/* </div> */}
     </NavContainer>
-  );
+  )
 }
 const LoginIcon = styled.img.attrs({
   src: LoginSvg,
 })`
   width: 20px;
   height: 20px;
-`;
+`
 const LogoutIcon = styled.img.attrs({
   src: LogoutSvg,
 })`
   width: 20px;
   height: 20px;
-`;
-function StreamIcon({ stroke = "white" }) {
+`
+function HomeIcon({ fill = 'white' }) {
+  return (
+    <svg
+      viewBox="0 0 1024 1024"
+      xmlns="http://www.w3.org/2000/svg"
+      width="17"
+      height="17"
+    >
+      <path
+        d="M681.319 966.181c-29.171 0-45.189-12.014-53.771-22.308-16.589-20.021-21.165-29.744-21.165-62.349v-237.387c0-19.449-1.716-24.595-2.86-25.741 0 0-3.434-1.716-13.155-1.716h-148.724c-24.595 0-28.603 1.716-28.603 30.89v233.382c0 32.605-4.003 41.757-21.165 62.349-8.579 10.297-24.595 22.308-53.771 22.308h-88.662c-23.453-0.571-39.47-6.293-53.197-18.876-9.726-8.579-25.169-28.028-25.169-58.917 0-55.484 0-111.542 0.571-167.029 0-46.333 0.571-93.237 0.571-140.144-16.589 0-33.75 0-50.91-0.571h-2.288c-42.33-1.716-50.91-25.169-50.91-65.78 0-40.039 10.868-53.771 24.595-67.498 76.651-76.077 155.59-151.011 232.812-224.231 37.754-35.465 76.077-72.646 114.403-108.683 4.003-4.003 7.438-7.438 10.868-10.297 21.165-20.592 35.465-34.319 56.058-37.182 2.288 0 4.576 0 6.863 0 20.592 2.288 34.319 16.016 56.058 37.182 3.434 3.434 6.863 6.863 10.868 10.297 37.754 36.607 76.651 73.219 114.403 108.683 76.651 72.646 156.159 148.154 232.812 224.231 14.299 13.728 24.595 28.028 24.595 67.498 0 40.039-8.579 64.066-50.91 65.78h-2.288c-17.163 0.571-34.319 0.571-50.91 0.571 0 46.906 0 93.237 0.571 140.144 0 56.058 0.571 111.542 0.571 167.029 0 30.89-16.016 50.335-25.169 58.917-13.728 13.155-29.744 18.876-52.627 18.876l-90.379 0.571zM189.956 524.014c4.003 0 7.438 0 11.439 0 15.443 0 28.028 12.585 28.028 28.603 0 56.058 0 112.689-0.571 168.743 0 56.058-0.571 111.542-0.571 167.029 0 6.863 2.288 13.155 7.438 17.731 2.288 1.716 4.003 3.434 14.873 4.003h88.089c6.863 0 9.726-1.716 10.297-1.716 8.011-9.151 8.011-9.151 8.011-25.741v-233.382c0-58.917 28.028-88.089 85.232-88.089h148.724c72.646 0 72.646 58.917 72.646 84.086v237.387c0 16.589 0 16.589 8.011 25.741 0.571 0.571 2.86 1.716 10.297 1.716h88.662c10.297 0 12.585-1.716 14.299-4.003 5.149-4.576 7.438-10.297 7.438-17.731 0-55.484 0-110.973-0.571-167.029 0-56.058-0.571-112.115-0.571-168.743 0-15.443 12.585-28.028 28.028-28.603 8.579 0 17.731 0 26.313 0 17.163 0 33.179 0 49.193-0.571 0-2.288 0-5.721 0-9.151 0-19.449-1.716-21.165-8.011-27.457-76.077-75.506-155.015-150.441-231.666-223.088-37.754-35.465-76.651-72.646-114.403-109.255-4.003-4.003-7.438-7.438-10.868-10.868-6.863-6.863-14.299-14.299-19.449-18.307-5.149 4.003-12.585 11.439-19.449 18.307-3.434 3.434-6.863 6.863-10.868 10.868-37.754 36.607-76.651 73.219-114.403 109.255-76.651 72.646-155.59 147.58-231.666 223.088-6.293 6.293-8.011 8.011-8.011 27.457 0 4.003 0 6.863 0 9.151 16.016 0.571 32.034 0.571 49.193 0.571 5.149 0 10.297 0 14.873 0z"
+        fill={fill}
+      ></path>
+    </svg>
+  )
+}
+
+function StreamIcon({ stroke = 'white' }) {
   return (
     <svg
       width="17"
@@ -158,10 +200,10 @@ function StreamIcon({ stroke = "white" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }
 
-function ModelIcon({ stroke = "#718096" }) {
+function ModelIcon({ stroke = '#718096' }) {
   return (
     <svg
       width="17"
@@ -177,7 +219,7 @@ function ModelIcon({ stroke = "#718096" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }
 
 const NavContainer = styled.nav`
@@ -263,20 +305,20 @@ const NavContainer = styled.nav`
       transform: rotate(360deg);
     }
   }
-`;
+`
 const FilterSelectModal = styled.div<{ isOpen: boolean }>`
   width: 100vw;
-  height: ${({ isOpen }) => (isOpen ? "calc(100vh - 56px)" : "0px")};
+  height: ${({ isOpen }) => (isOpen ? 'calc(100vh - 56px)' : '0px')};
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 56px;
   left: 0;
   overflow: hidden;
   transition: all 0.3s;
-`;
+`
 const FilterSelectModalInner = styled.div`
   width: 100%;
-`;
+`
 const FilterSelectWrapper = styled.div`
   width: 100%;
   max-height: calc(100vh - 56px);
@@ -285,7 +327,7 @@ const FilterSelectWrapper = styled.div`
   padding: 10px;
   box-sizing: border-box;
   background: #1b1e23;
-`;
+`
 const FilterSelectInner = styled.div`
   height: 0;
   flex: 1;
@@ -346,4 +388,4 @@ const FilterSelectInner = styled.div`
       }
     }
   }
-`;
+`

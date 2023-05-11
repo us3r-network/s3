@@ -15,5 +15,5 @@ export default function Logo(props: any) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

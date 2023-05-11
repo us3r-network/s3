@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { Link } from 'react-router-dom'
+import styled from 'styled-components'
 
 export default function NoMatch() {
   return (
@@ -9,7 +9,7 @@ export default function NoMatch() {
         <Link to="/">Go to the home page</Link>
       </p>
     </Container>
-  );
+  )
 }
 
 const Container = styled.div`
@@ -18,4 +18,4 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`;
+`

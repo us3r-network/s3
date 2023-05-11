@@ -15,5 +15,5 @@ export default function ComposeDB() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

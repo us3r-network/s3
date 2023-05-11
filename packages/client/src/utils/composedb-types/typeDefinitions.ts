@@ -1,8 +1,8 @@
-import { extraScalars } from "./scalars";
+import { extraScalars } from './scalars'
 
 const scarlarDefinitions = Object.keys(extraScalars)
   .map((name) => `scalar ${name}`)
-  .join("\n");
+  .join('\n')
 
 export const typeDefinitions = `
 # Added scalars
@@ -49,4 +49,4 @@ directive @createModel(
 ) on OBJECT
 
 directive @loadModel(id: StreamID!) on OBJECT
-`;
+`

@@ -1,32 +1,32 @@
-import styled from "styled-components";
-import multiavatar from "@multiavatar/multiavatar";
-import dayjs from "dayjs";
-import { isMobile } from "react-device-detect";
+import styled from 'styled-components'
+import multiavatar from '@multiavatar/multiavatar'
+import dayjs from 'dayjs'
+import { isMobile } from 'react-device-detect'
 
-import { Network, Stream } from "../types";
-import { FamilyOrAppMapReverse, Types } from "../constants";
-import { TableBox } from "./TableBox";
-import { useMemo } from "react";
-import { shortPubKey } from "../utils/shortPubKey";
-import { Link } from "react-router-dom";
-import Check from "./icons/Check";
-import UserAvatarStyled from "./common/UserAvatarStyled";
-import { UserName } from "@us3r-network/profile";
+import { Network, Stream } from '../types'
+import { FamilyOrAppMapReverse, Types } from '../constants'
+import { TableBox } from './TableBox'
+import { useMemo } from 'react'
+import { shortPubKey } from '../utils/shortPubKey'
+import { Link } from 'react-router-dom'
+import Check from './icons/Check'
+import UserAvatarStyled from './common/UserAvatarStyled'
+import { UserName } from '@us3r-network/profile'
 
 export default function StreamTable({
   data,
   network,
 }: {
-  data: Stream;
-  network: Network;
+  data: Stream
+  network: Network
 }) {
   const pubkey = useMemo(() => {
-    return data.did.split(":").pop() || "";
-  }, [data.did]);
+    return data.did.split(':').pop() || ''
+  }, [data.did])
 
-  const tags = [...data.tags];
+  const tags = [...data.tags]
   if (data.content.type) {
-    tags.push(data.content.type);
+    tags.push(data.content.type)
   }
 
   return (
@@ -66,7 +66,7 @@ export default function StreamTable({
         </div>
         <div>
           <span className="name">Type:</span>
-          <div className="name">{Types[data.type] || "-"}</div>
+          <div className="name">{Types[data.type] || '-'}</div>
         </div>
         <div className="from">
           <span className="name">From:</span>
@@ -79,7 +79,7 @@ export default function StreamTable({
         </div>
         <div>
           <span className="name">Tags:</span>
-          <div className="name">{tags.join(" ").trim() || "-"}</div>
+          <div className="name">{tags.join(' ').trim() || '-'}</div>
         </div>
         <div>
           <span className="name">Status:</span>
@@ -88,7 +88,7 @@ export default function StreamTable({
         {(data.model && (
           <div className="model">
             <span className="name">Model:</span>
-            {(data.model !== "kh4q0ozorrgaq2mezktnrmdwleo1d" && (
+            {(data.model !== 'kh4q0ozorrgaq2mezktnrmdwleo1d' && (
               <div>
                 <Link to={`/streams/stream/${data.model}`}>{data.model}</Link>
                 <div>
@@ -106,12 +106,12 @@ export default function StreamTable({
                 <Link to={`/streams/stream/${data.schema}`}>{data.schema}</Link>
               </div>
             )) ||
-              "-"}
+              '-'}
           </div>
         )}
         <div>
           <span className="name">Commit IDs:</span>
-          <div className="name">{data.commitIds.join("\n")}</div>
+          <div className="name">{data.commitIds.join('\n')}</div>
         </div>
         <div className="content">
           <span className="name">Content:</span>
@@ -131,7 +131,7 @@ export default function StreamTable({
         </div>
       </TableContainer>
     </TableBox>
-  );
+  )
 }
 
 const TableContainer = styled.div<{ isMobile?: boolean }>`
@@ -140,7 +140,7 @@ const TableContainer = styled.div<{ isMobile?: boolean }>`
     display: flex;
 
     ${({ isMobile }) =>
-      isMobile ? `flex-direction: column;row-gap: 8px;` : ""};
+      isMobile ? `flex-direction: column;row-gap: 8px;` : ''};
 
     padding: 20px 0;
     border-bottom: 1px solid #39424c;
@@ -214,4 +214,4 @@ const TableContainer = styled.div<{ isMobile?: boolean }>`
       }
     }
   }
-`;
+`

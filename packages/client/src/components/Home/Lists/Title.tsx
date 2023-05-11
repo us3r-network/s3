@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import ComposeDB from "../../icons/ComposeDB";
-import { Link } from "react-router-dom";
+import styled from 'styled-components'
+import ComposeDB from '../../icons/ComposeDB'
+import { Link } from 'react-router-dom'
 
 export default function Title({
   title,
   viewAll,
 }: {
-  title: string;
-  viewAll: string;
+  title: string
+  viewAll: string
 }) {
   return (
     <Box>
@@ -19,7 +19,7 @@ export default function Title({
         <Link to={viewAll}>View All</Link>
       </div>
     </Box>
-  );
+  )
 }
 
 const Box = styled.div`
@@ -52,4 +52,4 @@ const Box = styled.div`
     color: #ffffff;
     margin: 0;
   }
-`;
+`
