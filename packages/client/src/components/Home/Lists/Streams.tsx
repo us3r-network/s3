@@ -1,23 +1,23 @@
-import styled from "styled-components";
-import dayjs from "dayjs";
-import { useEffect } from "react";
-import multiavatar from "@multiavatar/multiavatar";
+import styled from 'styled-components'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import multiavatar from '@multiavatar/multiavatar'
 
-import Title from "./Title";
-import useListData from "../../../hooks/useListData";
-import { shortPubKey } from "../../../utils/shortPubKey";
-import { useCeramicCtx } from "../../../context/CeramicCtx";
-import { Link } from "react-router-dom";
-import UserAvatarStyled from "../../common/UserAvatarStyled";
-import { UserName } from "@us3r-network/profile";
+import Title from './Title'
+import useListData from '../../../hooks/useListData'
+import { shortPubKey } from '../../../utils/shortPubKey'
+import { useCeramicCtx } from '../../../context/CeramicCtx'
+import { Link } from 'react-router-dom'
+import UserAvatarStyled from '../../common/UserAvatarStyled'
+import { UserName } from '@us3r-network/profile'
 
 export default function Streams() {
-  const { network } = useCeramicCtx();
-  const { data, loadData } = useListData({ network });
+  const { network } = useCeramicCtx()
+  const { data, loadData } = useListData({ network })
   useEffect(() => {
-    loadData({ network });
+    loadData({ network })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
+  }, [network])
 
   return (
     <Box>
@@ -30,10 +30,10 @@ export default function Streams() {
             did={item.did}
             indexingTime={item.indexingTime}
           />
-        );
+        )
       })}
     </Box>
-  );
+  )
 }
 
 function ListCard({
@@ -41,16 +41,16 @@ function ListCard({
   did,
   indexingTime,
 }: {
-  streamId: string;
-  did: string;
-  indexingTime: number;
+  streamId: string
+  did: string
+  indexingTime: number
 }) {
   return (
     <CardBox className="streams-box">
       <div className="short-key">
         <Link to={`/streams/stream/${streamId}`}>
-          {shortPubKey(streamId, { len: 8, split: "-" })}
-        </Link>{" "}
+          {shortPubKey(streamId, { len: 8, split: '-' })}
+        </Link>{' '}
       </div>
       <div className="avatar">
         <Avatar did={did} />
@@ -60,13 +60,13 @@ function ListCard({
       </div>
       <div className="time">{dayjs(indexingTime).fromNow()}</div>
     </CardBox>
-  );
+  )
 }
 
 const Avatar = styled(UserAvatarStyled)`
   width: 40px;
   height: 40px;
-`;
+`
 
 const CardBox = styled.div`
   display: grid;
@@ -93,6 +93,6 @@ const CardBox = styled.div`
     text-align: end;
     color: #718096;
   }
-`;
+`
 
-const Box = styled.div``;
+const Box = styled.div``

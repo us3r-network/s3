@@ -1,63 +1,63 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ModelMid } from "../types";
-import { PageSize, getModelMid } from "../api";
-import styled from "styled-components";
-import InfiniteScroll from "react-infinite-scroll-component";
-import ModelStreamList from "../components/ModelStreamList";
-import { useParams } from "react-router-dom";
-import { useCeramicCtx } from "../context/CeramicCtx";
-import { AxiosError } from "axios";
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ModelMid } from '../types'
+import { PageSize, getModelMid } from '../api'
+import styled from 'styled-components'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import ModelStreamList from '../components/ModelStreamList'
+import { useParams } from 'react-router-dom'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import { AxiosError } from 'axios'
 
 export default function ModelStreams() {
-  const pageNum = useRef(1);
-  const { network } = useCeramicCtx();
-  const [hasMore, setHasMore] = useState(true);
-  const [streams, setStreams] = useState<Array<ModelMid>>([]);
-  const { modelId } = useParams();
-  const [loading, setLoading] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const pageNum = useRef(1)
+  const { network } = useCeramicCtx()
+  const [hasMore, setHasMore] = useState(true)
+  const [streams, setStreams] = useState<Array<ModelMid>>([])
+  const { modelId } = useParams()
+  const [loading, setLoading] = useState(false)
+  const [errMsg, setErrMsg] = useState('')
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
-      if (!modelId) return;
+      if (!modelId) return
       const resp = await getModelMid({
         network,
         modelId,
         pageNumber,
-      });
-      const list = resp.data.data;
-      setHasMore(list.length >= PageSize);
-      setStreams([...streams, ...list]);
+      })
+      const list = resp.data.data
+      setHasMore(list.length >= PageSize)
+      setStreams([...streams, ...list])
     },
     [streams, modelId, network]
-  );
+  )
   const fetchModelMid = useCallback(async () => {
-    if (!modelId) return;
+    if (!modelId) return
     try {
-      setLoading(true);
+      setLoading(true)
       setErrMsg('')
-      const resp = await getModelMid({ network, modelId });
-      const list = resp.data.data;
-      setHasMore(list.length >= PageSize);
-      setStreams(list);
+      const resp = await getModelMid({ network, modelId })
+      const list = resp.data.data
+      setHasMore(list.length >= PageSize)
+      setStreams(list)
     } catch (error) {
-      const err = error as AxiosError;
-      setErrMsg((err.response?.data as any).message || err.message);
+      const err = error as AxiosError
+      setErrMsg((err.response?.data as any).message || err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [modelId, network]);
+  }, [modelId, network])
 
   useEffect(() => {
-    fetchModelMid();
-  }, [fetchModelMid]);
+    fetchModelMid()
+  }, [fetchModelMid])
 
   if (loading) {
     return (
       <PageBox>
         <Loading>Loading...</Loading>
       </PageBox>
-    );
+    )
   }
 
   if (errMsg) {
@@ -66,7 +66,7 @@ export default function ModelStreams() {
         <div className="title-box" />
         <Loading>{errMsg}</Loading>
       </PageBox>
-    );
+    )
   }
 
   return (
@@ -79,8 +79,8 @@ export default function ModelStreams() {
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreStreams(pageNum.current);
+          pageNum.current += 1
+          fetchMoreStreams(pageNum.current)
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -89,14 +89,14 @@ export default function ModelStreams() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
 const PageBox = styled.div`
   .title-box {
@@ -129,4 +129,4 @@ const PageBox = styled.div`
       }
     }
   }
-`;
+`

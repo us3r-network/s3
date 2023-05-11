@@ -1,13 +1,13 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export default function NetworkSwitch({
   network,
   networks,
   networkChangeAction,
 }: {
-  network: string;
-  networks: string[];
-  networkChangeAction: (n: string) => void;
+  network: string
+  networks: string[]
+  networkChangeAction: (n: string) => void
 }) {
   return (
     <NetworkBox>
@@ -18,16 +18,16 @@ export default function NetworkSwitch({
             className={network === item ? 'active' : ''}
             onClick={() => {
               if (network !== item) {
-                networkChangeAction(item);
+                networkChangeAction(item)
               }
             }}
           >
             {item.toLowerCase()}
           </button>
-        );
+        )
       })}
     </NetworkBox>
-  );
+  )
 }
 
 const NetworkBox = styled.div`
@@ -64,4 +64,4 @@ const NetworkBox = styled.div`
       color: #14171a;
     }
   }
-`;
+`

@@ -12,5 +12,5 @@ export default function Star() {
         fill="#FFB762"
       />
     </svg>
-  );
+  )
 }

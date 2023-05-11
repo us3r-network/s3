@@ -1,5 +1,5 @@
-import axios, { AxiosPromise } from "axios";
-import { API_BASE_URL } from "../constants";
+import axios, { AxiosPromise } from 'axios'
+import { API_BASE_URL } from '../constants'
 import {
   ModeCreateResult,
   ModelMid,
@@ -9,7 +9,7 @@ import {
   Network,
   Stats,
   Stream,
-} from "../types";
+} from '../types'
 
 enum ApiRespCode {
   SUCCESS = 0,
@@ -17,12 +17,12 @@ enum ApiRespCode {
 }
 
 type ApiResp<T> = {
-  code: ApiRespCode;
-  msg: string;
-  data: T;
-};
+  code: ApiRespCode
+  msg: string
+  data: T
+}
 
-export const PageSize = 50;
+export const PageSize = 50
 
 export function getList({
   network,
@@ -32,17 +32,17 @@ export function getList({
   familyOrApp,
   types,
 }: {
-  network: Network;
-  pageSize?: number;
-  pageNumber?: number;
-  did?: string;
-  familyOrApp?: string[];
-  types?: string[];
+  network: Network
+  pageSize?: number
+  pageNumber?: number
+  did?: string
+  familyOrApp?: string[]
+  types?: string[]
 }): AxiosPromise<
   ApiResp<{
-    didCount: number;
-    streamCount: number;
-    streams: Array<Stream>;
+    didCount: number
+    streamCount: number
+    streams: Array<Stream>
   }>
 > {
   return axios.get(`${API_BASE_URL}/streams`, {
@@ -54,24 +54,24 @@ export function getList({
       familyOrApp,
       type: types,
     },
-  });
+  })
 }
 
 export function getStreamTopics(network: Network) {
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/topics`,
     {}
-  );
+  )
 }
 
 export function getStreamInfo(
   network: Network,
   streamId: string
 ): AxiosPromise<ApiResp<Stream>> {
-  console.log(network, streamId);
+  console.log(network, streamId)
   return axios.get(
     `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}`
-  );
+  )
 }
 
 export function getModelStreamList({
@@ -79,12 +79,12 @@ export function getModelStreamList({
   did,
   pageSize = PageSize,
   pageNumber = 1,
-  network
+  network,
 }: {
-  name?: string;
-  did?: string;
-  pageSize?: number;
-  pageNumber?: number;
+  name?: string
+  did?: string
+  pageSize?: number
+  pageNumber?: number
   network: Network
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
   return axios.get(`${API_BASE_URL}/models`, {
@@ -94,18 +94,21 @@ export function getModelStreamList({
       pageSize,
       pageNumber,
       useCounting: true,
-      network: network.toUpperCase()
+      network: network.toUpperCase(),
     },
-  });
+  })
 }
 
 export function getModelStreamInfo(
   streamId: string,
   network: Network
 ): AxiosPromise<ApiResp<ModelStreamInfo>> {
-  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}/info`, {
-    params: {},
-  });
+  return axios.get(
+    `${API_BASE_URL}/${network.toUpperCase()}/streams/${streamId}/info`,
+    {
+      params: {},
+    }
+  )
 }
 
 export function createModel(
@@ -115,25 +118,25 @@ export function createModel(
   return axios.post(`${API_BASE_URL}/models`, {
     graphql: graphql,
     network: network.toUpperCase(),
-  });
+  })
 }
 
 export function queryModelGraphql(
   streamId: string,
-  network: Network,
+  network: Network
 ): AxiosPromise<ApiResp<ModeQueryResult>> {
   return axios.post(`${API_BASE_URL}/models/graphql`, {
     models: [streamId],
-    network: network.toUpperCase()
-  });
+    network: network.toUpperCase(),
+  })
 }
 
 export function getHomeStats({
   network,
 }: {
-  network: Network;
+  network: Network
 }): AxiosPromise<ApiResp<Stats>> {
-  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/stats`);
+  return axios.get(`${API_BASE_URL}/${network.toUpperCase()}/stats`)
 }
 
 export function getModelMid({
@@ -142,10 +145,10 @@ export function getModelMid({
   pageSize = 50,
   pageNumber = 1,
 }: {
-  network: Network;
-  modelId: string;
-  pageSize?: number;
-  pageNumber?: number;
+  network: Network
+  modelId: string
+  pageSize?: number
+  pageNumber?: number
 }): AxiosPromise<ApiResp<ModelMid[]>> {
   return axios.get(`${API_BASE_URL}/models/${modelId}/mids`, {
     params: {
@@ -153,7 +156,7 @@ export function getModelMid({
       pageSize,
       pageNumber,
     },
-  });
+  })
 }
 
 export function getModelMidItem({
@@ -161,37 +164,40 @@ export function getModelMidItem({
   modelId,
   midId,
 }: {
-  network: Network;
-  modelId: string;
-  midId: string;
+  network: Network
+  modelId: string
+  midId: string
 }) {
   return axios.get(`${API_BASE_URL}/models/${modelId}/mids/${midId}`, {
     params: {
       network: network.toUpperCase(),
     },
-  });
+  })
 }
 
 export function getStarModels({
   network,
   ids,
 }: {
-  network: Network;
-  ids: string[];
+  network: Network
+  ids: string[]
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
   return axios.post(`${API_BASE_URL}/models/ids`, {
     network: network.toUpperCase(),
     ids,
-  });
+  })
 }
 
-export function getModelInfo({network, id}: {
-  network: Network;
-  id: string;
+export function getModelInfo({
+  network,
+  id,
+}: {
+  network: Network
+  id: string
 }): AxiosPromise<ApiResp<ModelStream>> {
   return axios.get(`${API_BASE_URL}/models/${id}`, {
     params: {
       network: network.toUpperCase(),
-    }
-  });
+    },
+  })
 }

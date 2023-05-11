@@ -14,5 +14,5 @@ export default function Back(props: any) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

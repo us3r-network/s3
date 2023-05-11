@@ -15,7 +15,7 @@ export default function NumbersContainer({ data }: { data: Stats }) {
 
 function NumberCard({ title, data }: { title: string; data: number }) {
   return (
-    <NumberCardBox className='numberCardBox'>
+    <NumberCardBox className="numberCardBox">
       <div className="title">
         <ComposeDB /> <span>{title}</span>
       </div>

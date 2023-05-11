@@ -1,28 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
-import { useParams } from "react-router-dom";
-import styled from "styled-components";
-import { getModelStreamInfo } from "../api";
-import { TableBox } from "../components/TableBox";
-import { ModelStreamInfo } from "../types";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import { useParams } from 'react-router-dom'
+import styled from 'styled-components'
+import { getModelStreamInfo } from '../api'
+import { TableBox } from '../components/TableBox'
+import { ModelStreamInfo } from '../types'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ModelStream() {
-  const { streamId } = useParams();
-  const { network } = useCeramicCtx();
-  const [stream, setStream] = useState<ModelStreamInfo>();
-  const [loading, setLoading] = useState(false);
+  const { streamId } = useParams()
+  const { network } = useCeramicCtx()
+  const [stream, setStream] = useState<ModelStreamInfo>()
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
-    if (!streamId) return;
-    setLoading(true);
+    if (!streamId) return
+    setLoading(true)
     getModelStreamInfo(streamId, network)
       .then((resp) => {
-        setStream(resp.data.data);
+        setStream(resp.data.data)
       })
       .finally(() => {
-        setLoading(false);
-      });
-  }, [streamId, network]);
+        setLoading(false)
+      })
+  }, [streamId, network])
 
   return (
     <PageBox>
@@ -44,7 +44,7 @@ export default function ModelStream() {
         </TableContainer>
       </TableBox>
     </PageBox>
-  );
+  )
 }
 
 const BackContainer = styled.div`
@@ -77,7 +77,7 @@ const BackContainer = styled.div`
 
     color: #718096;
   }
-`;
+`
 
 const PageBox = styled.div`
   margin-bottom: 50px;
@@ -92,7 +92,7 @@ const PageBox = styled.div`
       color: darkgray;
     }
   }
-`;
+`
 
 const TableContainer = styled.div`
   padding: 10px;
@@ -106,4 +106,4 @@ const TableContainer = styled.div`
   }
 
   color: #718096;
-`;
+`

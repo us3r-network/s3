@@ -1,18 +1,18 @@
-import styled from "styled-components";
-import { TableBox } from "./TableBox";
-import { ModelMid } from "../types";
-import dayjs from "dayjs";
-import { shortPubKey } from "../utils/shortPubKey";
-import { Link } from "react-router-dom";
-import UserAvatarStyled from "./common/UserAvatarStyled";
-import { UserName } from "@us3r-network/profile";
+import styled from 'styled-components'
+import { TableBox } from './TableBox'
+import { ModelMid } from '../types'
+import dayjs from 'dayjs'
+import { shortPubKey } from '../utils/shortPubKey'
+import { Link } from 'react-router-dom'
+import UserAvatarStyled from './common/UserAvatarStyled'
+import { UserName } from '@us3r-network/profile'
 
 export default function ModelStreamList({
   modelId,
   data,
 }: {
-  modelId: string;
-  data: ModelMid[];
+  modelId: string
+  data: ModelMid[]
 }) {
   return (
     <TableBox>
@@ -33,7 +33,7 @@ export default function ModelStreamList({
                     <Link to={`/models/model/${modelId}/mids/${item.streamId}`}>
                       {shortPubKey(item.streamId, {
                         len: 8,
-                        split: "-",
+                        split: '-',
                       })}
                     </Link>
                   </div>
@@ -48,12 +48,12 @@ export default function ModelStreamList({
                   </div>
                 </td>
               </tr>
-            );
+            )
           })}
         </tbody>
       </TableContainer>
     </TableBox>
-  );
+  )
 }
 
 const TableContainer = styled.table`
@@ -138,4 +138,4 @@ const TableContainer = styled.table`
 
     color: #718096;
   }
-`;
+`

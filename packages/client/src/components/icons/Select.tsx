@@ -14,5 +14,5 @@ export default function SelectIcon() {
         strokeLinejoin="round"
       ></path>
     </svg>
-  );
+  )
 }

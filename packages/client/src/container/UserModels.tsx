@@ -1,30 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { ModelStream, ModelStreamInfo } from "../types";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { getModelStreamList, PageSize } from "../api";
-import styled from "styled-components";
-import { TableBox } from "../components/TableBox";
-import { shortPubKey } from "../utils/shortPubKey";
-import dayjs from "dayjs";
-import { useCeramicCtx } from "../context/CeramicCtx";
-import UserAvatarStyled from "../components/common/UserAvatarStyled";
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { ModelStream, ModelStreamInfo } from '../types'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { getModelStreamList, PageSize } from '../api'
+import styled from 'styled-components'
+import { TableBox } from '../components/TableBox'
+import { shortPubKey } from '../utils/shortPubKey'
+import dayjs from 'dayjs'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import UserAvatarStyled from '../components/common/UserAvatarStyled'
 
 export default function UserModels() {
-  const { did } = useParams();
-  const { network } = useCeramicCtx();
-  const [models, setModels] = useState<Array<ModelStream>>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const pageNum = useRef(1);
+  const { did } = useParams()
+  const { network } = useCeramicCtx()
+  const [models, setModels] = useState<Array<ModelStream>>([])
+  const [hasMore, setHasMore] = useState(true)
+  const pageNum = useRef(1)
 
   const fetchModel = useCallback(async () => {
-    if (!did) return;
-    const resp = await getModelStreamList({ did: did, network });
-    const list = resp.data.data;
-    setModels(list);
-    setHasMore(list.length >= PageSize);
-    pageNum.current = 1;
-  }, [did, network]);
+    if (!did) return
+    const resp = await getModelStreamList({ did: did, network })
+    const list = resp.data.data
+    setModels(list)
+    setHasMore(list.length >= PageSize)
+    pageNum.current = 1
+  }, [did, network])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
@@ -32,17 +32,17 @@ export default function UserModels() {
         pageNumber,
         did,
         network,
-      });
-      const list = resp.data.data;
-      setHasMore(list.length >= PageSize);
-      setModels([...models, ...list]);
+      })
+      const list = resp.data.data
+      setHasMore(list.length >= PageSize)
+      setModels([...models, ...list])
     },
     [did, models, network]
-  );
+  )
 
   useEffect(() => {
-    fetchModel();
-  }, [fetchModel]);
+    fetchModel()
+  }, [fetchModel])
 
   return (
     <PageBox>
@@ -55,9 +55,9 @@ export default function UserModels() {
       <InfiniteScroll
         dataLength={models.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreModel(pageNum.current);
-          console.log("fetch more");
+          pageNum.current += 1
+          fetchMoreModel(pageNum.current)
+          console.log('fetch more')
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -85,7 +85,7 @@ export default function UserModels() {
                     </td>
                     <td>
                       <Link to={`/model/${item.stream_id}`}>
-                        {shortPubKey(item.stream_id, { len: 8, split: "-" })}
+                        {shortPubKey(item.stream_id, { len: 8, split: '-' })}
                       </Link>
                     </td>
                     <td>
@@ -95,13 +95,13 @@ export default function UserModels() {
                       <div className="release-date">
                         {(item.last_anchored_at &&
                           dayjs(item.created_at).format(
-                            "YYYY-MM-DD HH:mm:ss"
+                            'YYYY-MM-DD HH:mm:ss'
                           )) ||
-                          "-"}
+                          '-'}
                       </div>
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </TableContainer>
@@ -109,7 +109,7 @@ export default function UserModels() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 const TableContainer = styled.table`
@@ -242,13 +242,13 @@ const TableContainer = styled.table`
 
     color: #ffffff;
   }
-`;
+`
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
 const PageBox = styled.div`
   margin-bottom: 20px;
@@ -308,4 +308,4 @@ const PageBox = styled.div`
 
     color: #ffffff;
   }
-`;
+`

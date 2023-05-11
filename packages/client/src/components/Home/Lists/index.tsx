@@ -46,7 +46,7 @@ export const ListsMobile = styled(Lists)`
     }
     .avatar {
       margin-top: 25px;
-      span{
+      span {
         width: 20px;
         height: 20px;
       }

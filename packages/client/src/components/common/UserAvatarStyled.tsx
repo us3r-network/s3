@@ -1,5 +1,5 @@
-import { UserAvatar } from "@us3r-network/profile";
-import styled from "styled-components";
+import { UserAvatar } from '@us3r-network/profile'
+import styled from 'styled-components'
 const UserAvatarStyled = styled(UserAvatar)`
   display: inline-block;
   width: 32px;
@@ -16,5 +16,5 @@ const UserAvatarStyled = styled(UserAvatar)`
     height: 100%;
     border-radius: 50%;
   }
-`;
-export default UserAvatarStyled;
+`
+export default UserAvatarStyled

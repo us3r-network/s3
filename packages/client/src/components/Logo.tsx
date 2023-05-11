@@ -33,5 +33,5 @@ export default function Logo(props: any) {
         </linearGradient>
       </defs>
     </svg>
-  );
+  )
 }
