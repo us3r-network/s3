@@ -80,7 +80,7 @@ export default function StreamPage() {
 
 const PageBox = styled.div<{ isMobile?: boolean }>`
   margin-bottom: 50px;
-  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : 'padding: 20px 0')};
+  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : 'padding: 24px 0')};
 
   > .err {
     display: flex;
