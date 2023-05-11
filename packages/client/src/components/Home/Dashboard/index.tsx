@@ -1,19 +1,26 @@
-import styled from "styled-components";
-import NumbersContainer from "./Totals";
-import { ChartContainer } from "./Charts";
-import { Stats } from "../../../types";
+import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
 
-export default function Dashboard({ data }: { data: Stats | undefined }) {
+import NumbersContainer from './Totals'
+import { ChartContainer } from './Charts'
+import { Stats } from '../../../types'
+
+export default function Dashboard({
+  data,
+  ...props
+}: {
+  data: Stats | undefined
+}) {
   if (!data) {
-    return null;
+    return null
   }
   return (
-    <Box>
-      <NumbersContainer data={data}/>
+    <Box {...props}>
+      <NumbersContainer data={data} />
       <div className="split-line"></div>
-      <ChartContainer data={data.streamsLastWeek}/>
+      <ChartContainer data={data.streamsLastWeek} />
     </Box>
-  );
+  )
 }
 const Box = styled.div`
   display: grid;
@@ -34,4 +41,31 @@ const Box = styled.div`
   div.charts {
     flex-grow: 1;
   }
-`;
+`
+export const DashboardMobile = styled(Dashboard)`
+  grid-template-columns: 1fr;
+  .title {
+    white-space: nowrap;
+    font-size: 12px;
+    span {
+      font-size: 16px;
+    }
+  }
+  .value {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .numberCardBox {
+    padding: 10px 5px;
+  }
+
+  .chat-title {
+    padding-top: 0;
+    font-size: 18px;
+  }
+
+  .chart {
+    height: 234px;
+  }
+`

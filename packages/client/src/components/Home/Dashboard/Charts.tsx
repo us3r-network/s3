@@ -1,19 +1,19 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
-import dayjs from "dayjs";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import dayjs from 'dayjs'
 
 export function ChartContainer({ data }: { data: number[] }) {
-  const today = dayjs();
+  const today = dayjs()
   const chartData = data.map((item, idx) => {
     return {
-      name: today.subtract(data.length - idx, 'day').format("DD/MM"),
+      name: today.subtract(data.length - idx, 'day').format('DD/MM'),
       stream: item,
-    };
-  });
+    }
+  })
   return (
     <Box>
-      <div className="title">Stream history in 7 days</div>
+      <div className="title chat-title">Stream history in 7 days</div>
       <div className="chart">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -39,7 +39,7 @@ export function ChartContainer({ data }: { data: number[] }) {
         </ResponsiveContainer>
       </div>
     </Box>
-  );
+  )
 }
 
 const Box = styled.div`
@@ -47,7 +47,7 @@ const Box = styled.div`
   flex-direction: column;
   .title {
     padding: 20px;
-    font-family: "Rubik";
+    font-family: 'Rubik';
     font-style: normal;
     font-weight: 700;
     font-size: 18px;
@@ -59,4 +59,4 @@ const Box = styled.div`
   .chart {
     flex-grow: 1;
   }
-`;
+`

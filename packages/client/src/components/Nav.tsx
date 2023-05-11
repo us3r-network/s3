@@ -1,20 +1,20 @@
-import { Link, useLocation } from "react-router-dom";
-import styled from "styled-components";
-import GitHubButton from "react-github-btn";
+import { Link, useLocation } from 'react-router-dom'
+import styled from 'styled-components'
+import GitHubButton from 'react-github-btn'
 
-import Logo from "./Logo";
-import LoginButton from "./LoginButton";
+import Logo from './Logo'
+import LoginButton from './LoginButton'
 
 export default function Nav() {
-  let location = useLocation();
+  let location = useLocation()
 
-  const homeActive = location.pathname === "/";
-  const modelActive = location.pathname.startsWith("/models");
+  const homeActive = location.pathname === '/'
+  const modelActive = location.pathname.startsWith('/models')
   const streamActive = location.pathname.startsWith('/streams')
   return (
     <NavContainer>
       <div className="fixed">
-        <Link to={"/"}>
+        <Link to={'/'}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             <span>Alpha</span>
@@ -22,27 +22,27 @@ export default function Nav() {
         </Link>
 
         <div className="nav">
-          <Link to={"/"}>
-            <div className={`nav-item ${homeActive ? "active" : ""}`}>
-              <HomeIcon stroke={homeActive ? "white" : "#718096"} />
+          <Link to={'/'}>
+            <div className={`nav-item ${homeActive ? 'active' : ''}`}>
+              <HomeIcon stroke={homeActive ? 'white' : '#718096'} />
               <div className="tint-c">
                 <div className="tint">Home</div>
               </div>
             </div>
           </Link>
 
-          <Link to={"/streams"}>
-            <div className={`nav-item ${streamActive ? "active" : ""}`}>
-              <StreamIcon stroke={streamActive ? "white" : "#718096"} />
+          <Link to={'/streams'}>
+            <div className={`nav-item ${streamActive ? 'active' : ''}`}>
+              <StreamIcon stroke={streamActive ? 'white' : '#718096'} />
               <div className="tint-c">
                 <div className="tint">Streams</div>
               </div>
             </div>
           </Link>
 
-          <Link to={"/models"}>
-            <div className={`nav-item ${modelActive ? "active" : ""}`}>
-              <ModelIcon stroke={modelActive ? "white" : "#718096"} />
+          <Link to={'/models'}>
+            <div className={`nav-item ${modelActive ? 'active' : ''}`}>
+              <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
               <div className="tint-c">
                 <div className="tint">ComposeDB Models</div>
               </div>
@@ -65,10 +65,10 @@ export default function Nav() {
         </div>
       </div>
     </NavContainer>
-  );
+  )
 }
 
-function HomeIcon({ stroke = "white" }) {
+function HomeIcon({ stroke = 'white' }) {
   return (
     <svg
       width="17"
@@ -84,10 +84,10 @@ function HomeIcon({ stroke = "white" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }
 
-function StreamIcon({ stroke = "white" }) {
+function StreamIcon({ stroke = 'white' }) {
   return (
     <svg
       width="17"
@@ -103,10 +103,10 @@ function StreamIcon({ stroke = "white" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }
 
-function ModelIcon({ stroke = "#718096" }) {
+function ModelIcon({ stroke = '#718096' }) {
   return (
     <svg
       width="17"
@@ -122,7 +122,7 @@ function ModelIcon({ stroke = "#718096" }) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }
 
 const NavContainer = styled.nav`
@@ -266,4 +266,4 @@ const NavContainer = styled.nav`
       transform: rotate(360deg);
     }
   }
-`;
+`

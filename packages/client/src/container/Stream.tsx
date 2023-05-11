@@ -1,47 +1,47 @@
-import { AxiosError, isAxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import styled from "styled-components";
-import { isMobile } from "react-device-detect";
+import { AxiosError, isAxiosError } from 'axios'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
 
-import { getStreamInfo } from "../api";
-import StreamTable from "../components/StreamTable";
-import { Network, Stream } from "../types";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import { getStreamInfo } from '../api'
+import StreamTable from '../components/StreamTable'
+import { Network, Stream } from '../types'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function StreamPage() {
-  const { streamId } = useParams();
-  const { network } = useCeramicCtx();
-  const [stream, setStream] = useState<Stream>();
+  const { streamId } = useParams()
+  const { network } = useCeramicCtx()
+  const [stream, setStream] = useState<Stream>()
   const [serverErrMsg, setServerErrMsg] = useState<{
-    status: number;
-    msg: string;
-  }>();
-  const [unknownErr, setUnknownErr] = useState<string>();
+    status: number
+    msg: string
+  }>()
+  const [unknownErr, setUnknownErr] = useState<string>()
 
   const loadStreamInfo = async (network: Network, streamId: string) => {
     try {
-      const resp = await getStreamInfo(network, streamId);
-      setStream(resp.data.data);
+      const resp = await getStreamInfo(network, streamId)
+      setStream(resp.data.data)
     } catch (error) {
-      const err = error as Error | AxiosError;
+      const err = error as Error | AxiosError
       if (isAxiosError(err) && err.response) {
         setServerErrMsg({
           status: err.response.status,
           msg: err.response.data.msg,
-        });
+        })
       } else {
-        setUnknownErr(err.message);
+        setUnknownErr(err.message)
       }
     }
-  };
+  }
 
   useEffect(() => {
-    if (!streamId || !network) return;
-    setServerErrMsg(undefined);
-    setUnknownErr(undefined);
-    loadStreamInfo(network as Network, streamId);
-  }, [streamId, network]);
+    if (!streamId || !network) return
+    setServerErrMsg(undefined)
+    setUnknownErr(undefined)
+    loadStreamInfo(network as Network, streamId)
+  }, [streamId, network])
 
   if (unknownErr) {
     return (
@@ -53,7 +53,7 @@ export default function StreamPage() {
           </p>
         </div>
       </PageBox>
-    );
+    )
   }
 
   if (serverErrMsg) {
@@ -68,7 +68,7 @@ export default function StreamPage() {
           </p>
         </div>
       </PageBox>
-    );
+    )
   }
 
   return (
@@ -76,7 +76,7 @@ export default function StreamPage() {
       <BackContainer />
       {stream && <StreamTable data={stream} network={network as Network} />}
     </PageBox>
-  );
+  )
 }
 
 const BackContainer = styled.div`
@@ -109,11 +109,11 @@ const BackContainer = styled.div`
 
     color: #718096;
   }
-`;
+`
 
 const PageBox = styled.div<{ isMobile?: boolean }>`
   margin-bottom: 50px;
-  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : "")};
+  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : '')};
 
   > .err {
     display: flex;
@@ -126,4 +126,4 @@ const PageBox = styled.div<{ isMobile?: boolean }>`
       color: darkgray;
     }
   }
-`;
+`

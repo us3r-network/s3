@@ -1,93 +1,93 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react'
 
-import styled from "styled-components";
-import FileSaver from "file-saver";
-import { GraphQLEditor, PassedSchema } from "graphql-editor";
-import { schemas } from "../utils/composedb-types/schemas";
-import { createModel } from "../api";
-import { AxiosError } from "axios";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import styled from 'styled-components'
+import FileSaver from 'file-saver'
+import { GraphQLEditor, PassedSchema } from 'graphql-editor'
+import { schemas } from '../utils/composedb-types/schemas'
+import { createModel } from '../api'
+import { AxiosError } from 'axios'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ModelCreate() {
-  const { network } = useCeramicCtx();
-  const [composite, setComposite] = useState("");
-  const [runtimeDefinition, setRuntimeDefinition] = useState("");
+  const { network } = useCeramicCtx()
+  const [composite, setComposite] = useState('')
+  const [runtimeDefinition, setRuntimeDefinition] = useState('')
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
     libraries: schemas.library,
-  });
+  })
 
-  const [submitting, setSubmitting] = useState(false);
-  const [createNew, setCreateNew] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const [submitting, setSubmitting] = useState(false)
+  const [createNew, setCreateNew] = useState(false)
+  const [errMsg, setErrMsg] = useState('')
 
   const resetState = () => {
-    setErrMsg("");
-    setCreateNew(false);
-    setRuntimeDefinition("");
-    setComposite("");
+    setErrMsg('')
+    setCreateNew(false)
+    setRuntimeDefinition('')
+    setComposite('')
     setGqlSchema({
       code: schemas.code,
       libraries: schemas.library,
-    });
-  };
+    })
+  }
 
   const submit = useCallback(async () => {
-    setErrMsg("");
-    if (!gqlSchema.code) return;
+    setErrMsg('')
+    if (!gqlSchema.code) return
     try {
-      setSubmitting(true);
-      const resp = await createModel(gqlSchema.code, network);
-      const { composite, runtimeDefinition } = resp.data.data;
+      setSubmitting(true)
+      const resp = await createModel(gqlSchema.code, network)
+      const { composite, runtimeDefinition } = resp.data.data
 
-      setComposite(JSON.stringify(composite));
-      setRuntimeDefinition(JSON.stringify(runtimeDefinition));
-      setCreateNew(true);
+      setComposite(JSON.stringify(composite))
+      setRuntimeDefinition(JSON.stringify(runtimeDefinition))
+      setCreateNew(true)
     } catch (error) {
-      const err = error as AxiosError;
-      setErrMsg((err.response?.data as any).message || err.message);
+      const err = error as AxiosError
+      setErrMsg((err.response?.data as any).message || err.message)
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  }, [gqlSchema.code, network]);
+  }, [gqlSchema.code, network])
 
   const download = (text: string, filename: string) => {
-    console.log(text);
+    console.log(text)
     const blob = new Blob([text], {
-      type: "text/plain;charset=utf-8",
-    });
+      type: 'text/plain;charset=utf-8',
+    })
 
-    FileSaver.saveAs(blob, filename);
-  };
+    FileSaver.saveAs(blob, filename)
+  }
 
   let status = (
     <button
       onClick={() => {
-        submit();
+        submit()
       }}
     >
       submit
     </button>
-  );
+  )
   if (submitting) {
     status = (
       <div className="loading">
-        <img src="/loading.gif" title="loading" alt="" />{" "}
+        <img src="/loading.gif" title="loading" alt="" />{' '}
         <span>submitting</span>
       </div>
-    );
+    )
   }
 
   if (createNew) {
     status = (
       <button
         onClick={() => {
-          resetState();
+          resetState()
         }}
       >
         New Model
       </button>
-    );
+    )
   }
 
   return (
@@ -99,8 +99,8 @@ export default function ModelCreate() {
       <EditorBox>
         <GraphQLEditor
           setSchema={(props) => {
-            setErrMsg("");
-            setGqlSchema(props);
+            setErrMsg('')
+            setGqlSchema(props)
           }}
           schema={gqlSchema}
         />
@@ -112,7 +112,7 @@ export default function ModelCreate() {
               <h3>Model's composite</h3>
               <button
                 onClick={() => {
-                  download(composite, "my-composite.json");
+                  download(composite, 'my-composite.json')
                 }}
               >
                 Download
@@ -134,8 +134,8 @@ export default function ModelCreate() {
                   download(
                     `// This is an auto-generated file, do not edit manually
 export const definition = ${runtimeDefinition}`,
-                    "runtime-composite.js"
-                  );
+                    'runtime-composite.js'
+                  )
                 }}
               >
                 Download
@@ -152,7 +152,7 @@ export const definition = ${runtimeDefinition}`,
         )}
       </div>
     </PageBox>
-  );
+  )
 }
 
 const EditorBox = styled.div`
@@ -162,7 +162,7 @@ const EditorBox = styled.div`
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
-`;
+`
 
 const PageBox = styled.div`
   > .err {
@@ -187,7 +187,7 @@ const PageBox = styled.div`
     .tools {
       display: flex;
       align-items: center;
-      
+
       gap: 15px;
 
       > button {
@@ -287,4 +287,4 @@ const PageBox = styled.div`
       height: 25px;
     }
   }
-`;
+`

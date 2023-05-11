@@ -1,75 +1,75 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import styled from "styled-components";
-import FileSaver from "file-saver";
-import { GraphQLEditor, PassedSchema } from "graphql-editor";
-import { getModelInfo, queryModelGraphql } from "../../api";
-import { ModeQueryResult, ModelStream } from "../../types";
-import { schemas } from "../../utils/composedb-types/schemas";
-import { AxiosError } from "axios";
-import { useCeramicCtx } from "../../context/CeramicCtx";
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import styled from 'styled-components'
+import FileSaver from 'file-saver'
+import { GraphQLEditor, PassedSchema } from 'graphql-editor'
+import { getModelInfo, queryModelGraphql } from '../../api'
+import { ModeQueryResult, ModelStream } from '../../types'
+import { schemas } from '../../utils/composedb-types/schemas'
+import { AxiosError } from 'axios'
+import { useCeramicCtx } from '../../context/CeramicCtx'
 
 export default function Definition() {
-  const { streamId } = useParams();
-  const { network } = useCeramicCtx();
-  const [modelData, setModelData] = useState<ModeQueryResult>();
+  const { streamId } = useParams()
+  const { network } = useCeramicCtx()
+  const [modelData, setModelData] = useState<ModeQueryResult>()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
-  });
-  const [errMsg, setErrMsg] = useState("");
-  const [modelStream, setModelStream] = useState<ModelStream>();
+  })
+  const [errMsg, setErrMsg] = useState('')
+  const [modelStream, setModelStream] = useState<ModelStream>()
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const fetchModelInfo = useCallback(
     async (streamId: string) => {
-      const resp = await getModelInfo({ network, id: streamId });
-      setModelStream(resp.data.data);
+      const resp = await getModelInfo({ network, id: streamId })
+      setModelStream(resp.data.data)
     },
     [network]
-  );
+  )
 
   const fetchModelGraphql = useCallback(
     async (streamId: string) => {
       try {
-        setLoading(true);
-        setErrMsg("");
-        const resp = await queryModelGraphql(streamId, network);
-        const { data } = resp.data;
-        setModelData(data);
+        setLoading(true)
+        setErrMsg('')
+        const resp = await queryModelGraphql(streamId, network)
+        const { data } = resp.data
+        setModelData(data)
         setGqlSchema({
           code: data.graphqlSchema,
-        });
+        })
       } catch (error) {
-        const err = error as AxiosError;
-        setErrMsg((err.response?.data as any).message || err.message);
+        const err = error as AxiosError
+        setErrMsg((err.response?.data as any).message || err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     },
     [network]
-  );
+  )
 
   const download = (text: string, filename: string) => {
     const blob = new Blob([text], {
-      type: "text/plain;charset=utf-8",
-    });
+      type: 'text/plain;charset=utf-8',
+    })
 
-    FileSaver.saveAs(blob, filename);
-  };
+    FileSaver.saveAs(blob, filename)
+  }
 
   useEffect(() => {
-    if (!streamId) return;
-    fetchModelGraphql(streamId);
-    fetchModelInfo(streamId);
-  }, [fetchModelGraphql, streamId, fetchModelInfo]);
+    if (!streamId) return
+    fetchModelGraphql(streamId)
+    fetchModelInfo(streamId)
+  }, [fetchModelGraphql, streamId, fetchModelInfo])
 
   if (loading) {
     return (
       <div>
         <Loading>Loading...</Loading>
       </div>
-    );
+    )
   }
 
   if (errMsg) {
@@ -78,7 +78,7 @@ export default function Definition() {
         <div className="title-box" />
         <Loading>{errMsg}</Loading>
       </div>
-    );
+    )
   }
 
   return (
@@ -86,7 +86,7 @@ export default function Definition() {
       <EditorBox>
         <GraphQLEditor
           setSchema={(props) => {
-            setGqlSchema(props);
+            setGqlSchema(props)
           }}
           schema={gqlSchema}
         />
@@ -100,8 +100,8 @@ export default function Definition() {
                 onClick={() => {
                   download(
                     JSON.stringify(modelData.composite),
-                    "composite.json"
-                  );
+                    'composite.json'
+                  )
                 }}
               >
                 Download
@@ -123,8 +123,8 @@ export default function Definition() {
                   download(
                     `// This is an auto-generated file, do not edit manually
   export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
-                    "runtime-composite.js"
-                  );
+                    'runtime-composite.js'
+                  )
                 }}
               >
                 Download
@@ -141,7 +141,7 @@ export default function Definition() {
         )}
       </ResultBox>
     </div>
-  );
+  )
 }
 
 const EditorBox = styled.div`
@@ -151,7 +151,7 @@ const EditorBox = styled.div`
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
-`;
+`
 
 const ResultBox = styled.div`
   display: flex;
@@ -218,10 +218,10 @@ const ResultBox = styled.div`
     font-weight: 500;
     color: #14171a;
   }
-`;
+`
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`

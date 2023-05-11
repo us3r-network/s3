@@ -1,18 +1,18 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { useSession } from "@us3r-network/auth-with-rainbowkit";
-import UserAvatarStyled from "./common/UserAvatarStyled";
-import { LoginButton as LoginButtonStyled } from "@us3r-network/profile";
+import { useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import UserAvatarStyled from './common/UserAvatarStyled'
+import { LoginButton as LoginButtonStyled } from '@us3r-network/profile'
 
 const LoginButton = () => {
-  const session = useSession();
-  const sessId = session?.id;
-  const navigate = useNavigate();
+  const session = useSession()
+  const sessId = session?.id
+  const navigate = useNavigate()
 
   const navToProfile = useCallback(() => {
-    navigate(`/streams/profile/${sessId}`);
-  }, [navigate, sessId]);
+    navigate(`/streams/profile/${sessId}`)
+  }, [navigate, sessId])
 
   return (
     <Wrapper>
@@ -24,10 +24,10 @@ const LoginButton = () => {
         <LoginButtonStyled>Login</LoginButtonStyled>
       )}
     </Wrapper>
-  );
-};
+  )
+}
 
-export default LoginButton;
+export default LoginButton
 const Wrapper = styled.div`
   width: 100%;
   height: 80px;
@@ -50,4 +50,4 @@ const Wrapper = styled.div`
   > div {
     cursor: pointer;
   }
-`;
+`

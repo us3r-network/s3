@@ -1,42 +1,42 @@
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createProxyMiddleware } = require('http-proxy-middleware')
 
 module.exports = function (app) {
   app
     .use(
-      "/api",
+      '/api',
       createProxyMiddleware({
-        target: "https://ceramic-private-clay.3boxlabs.com",
+        target: 'https://ceramic-private-clay.3boxlabs.com',
         changeOrigin: true,
       })
     )
     .use(
-      "/streams",
+      '/streams',
       createProxyMiddleware({
-        target: "https://cscan.onrender.com/",
+        target: 'https://cscan.onrender.com/',
         changeOrigin: true,
       })
     )
     .use(
-      "/models",
+      '/models',
       createProxyMiddleware({
-        target: "https://cscan.onrender.com/",
+        target: 'https://cscan.onrender.com/',
         changeOrigin: true,
       })
     )
     .use(
-      "/testnet",
+      '/testnet',
       createProxyMiddleware({
-        target: "https://cscan.onrender.com/",
+        target: 'https://cscan.onrender.com/',
         changeOrigin: true,
       })
     )
     .use(
-      "/MAINNET",
+      '/MAINNET',
       createProxyMiddleware({
-        target: "https://cscan.onrender.com/",
+        target: 'https://cscan.onrender.com/',
         changeOrigin: true,
       })
-    );
+    )
   // .use(
   //   "/model",
   //   createProxyMiddleware({
@@ -44,4 +44,4 @@ module.exports = function (app) {
   //     changeOrigin: true,
   //   })
   // );
-};
+}

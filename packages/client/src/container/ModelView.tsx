@@ -1,31 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
-import {  useParams } from "react-router-dom";
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from "react-aria-components";
-import { getModelInfo } from "../api";
-import {  ModelStream } from "../types";
-import { useCeramicCtx } from "../context/CeramicCtx";
-import Definition from "../components/ModelView/Definition";
-import Instance from "../components/ModelView/Instance";
-import PlaygroundGraphiQL from "../components/ModelView/Playground";
+import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
+import { getModelInfo } from '../api'
+import { ModelStream } from '../types'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import Definition from '../components/ModelView/Definition'
+import Instance from '../components/ModelView/Instance'
+import PlaygroundGraphiQL from '../components/ModelView/Playground'
 
 export default function ModelView() {
-  const { streamId } = useParams();
-  const { network } = useCeramicCtx();
+  const { streamId } = useParams()
+  const { network } = useCeramicCtx()
 
-  const [modelStream, setModelStream] = useState<ModelStream>();
+  const [modelStream, setModelStream] = useState<ModelStream>()
 
   const fetchModelInfo = useCallback(
     async (streamId: string) => {
-      const resp = await getModelInfo({ network, id: streamId });
-      setModelStream(resp.data.data);
+      const resp = await getModelInfo({ network, id: streamId })
+      setModelStream(resp.data.data)
     },
     [network]
-  );
+  )
 
   useEffect(() => {
-    if (!streamId) return;
-    fetchModelInfo(streamId);
-  }, [ streamId, fetchModelInfo]);
+    if (!streamId) return
+    fetchModelInfo(streamId)
+  }, [streamId, fetchModelInfo])
 
   return (
     <Tabs>
@@ -49,6 +49,5 @@ export default function ModelView() {
         </TabPanel>
       </TabPanels>
     </Tabs>
-  );
-
+  )
 }

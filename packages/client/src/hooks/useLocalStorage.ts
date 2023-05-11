@@ -4,7 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
-} from 'react';
+} from 'react'
 
 export function useLocalStorage<T>(
   key: string,
@@ -12,38 +12,38 @@ export function useLocalStorage<T>(
 ): [T, Dispatch<SetStateAction<T>>] {
   const state = useState<T>(() => {
     try {
-      const value = localStorage.getItem(key);
-      if (value) return JSON.parse(value) as T;
+      const value = localStorage.getItem(key)
+      if (value) return JSON.parse(value) as T
     } catch (error: any) {
       if (typeof window !== 'undefined') {
-        console.error(error);
+        console.error(error)
       }
     }
 
-    return defaultState;
-  });
+    return defaultState
+  })
 
-  const value = state[0];
+  const value = state[0]
 
-  const isFirstRenderRef = useRef(true);
+  const isFirstRenderRef = useRef(true)
 
   useEffect(() => {
     if (isFirstRenderRef.current) {
-      isFirstRenderRef.current = false;
-      return;
+      isFirstRenderRef.current = false
+      return
     }
     try {
       if (value === null) {
-        localStorage.removeItem(key);
+        localStorage.removeItem(key)
       } else {
-        localStorage.setItem(key, JSON.stringify(value));
+        localStorage.setItem(key, JSON.stringify(value))
       }
     } catch (error: any) {
       if (typeof window !== 'undefined') {
-        console.error(error);
+        console.error(error)
       }
     }
-  }, [value, key]);
+  }, [value, key])
 
-  return state;
+  return state
 }

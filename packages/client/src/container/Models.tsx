@@ -1,61 +1,61 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styled from "styled-components";
-import { isMobile } from "react-device-detect";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { TableBox } from "../components/TableBox";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import styled from 'styled-components'
+import { isMobile } from 'react-device-detect'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { TableBox } from '../components/TableBox'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   useAuthentication,
   useSession,
-} from "@us3r-network/auth-with-rainbowkit";
-import { getModelStreamList, getStarModels, PageSize } from "../api";
-import { ModelStream } from "../types";
-import { shortPubKey } from "../utils/shortPubKey";
-import dayjs from "dayjs";
-import Search from "../components/Search";
-import Star from "../components/icons/Star";
-import StarEmpty from "../components/icons/StarEmpty";
-import getCurrNetwork from "../utils/getCurrNetwork";
-import { useCeramicCtx } from "../context/CeramicCtx";
+} from '@us3r-network/auth-with-rainbowkit'
+import { getModelStreamList, getStarModels, PageSize } from '../api'
+import { ModelStream } from '../types'
+import { shortPubKey } from '../utils/shortPubKey'
+import dayjs from 'dayjs'
+import Search from '../components/Search'
+import Star from '../components/icons/Star'
+import StarEmpty from '../components/icons/StarEmpty'
+import getCurrNetwork from '../utils/getCurrNetwork'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ModelsPage() {
-  const [searchParams] = useSearchParams();
-  const { signIn } = useAuthentication();
-  const { network } = useCeramicCtx();
-  const session = useSession();
-  const sessId = session?.id;
-  const [models, setModels] = useState<Array<ModelStream>>([]);
-  const [starModels, setStarModels] = useState<Array<ModelStream>>([]);
-  const navigate = useNavigate();
-  const searchText = useRef(searchParams.get("searchText") || "");
-  const [hasMore, setHasMore] = useState(true);
-  const pageNum = useRef(1);
-  const [filterStar, setFilterStar] = useState(false);
+  const [searchParams] = useSearchParams()
+  const { signIn } = useAuthentication()
+  const { network } = useCeramicCtx()
+  const session = useSession()
+  const sessId = session?.id
+  const [models, setModels] = useState<Array<ModelStream>>([])
+  const [starModels, setStarModels] = useState<Array<ModelStream>>([])
+  const navigate = useNavigate()
+  const searchText = useRef(searchParams.get('searchText') || '')
+  const [hasMore, setHasMore] = useState(true)
+  const pageNum = useRef(1)
+  const [filterStar, setFilterStar] = useState(false)
   const [personalCollections, setPersonalCollections] = useState<
     { modelId: string; id: string; revoke: boolean }[]
-  >([]);
-  const { s3ModelCollection } = useCeramicCtx();
+  >([])
+  const { s3ModelCollection } = useCeramicCtx()
 
   const fetchStarModels = useCallback(async () => {
     const ids = personalCollections.map((item) => {
-      return item.modelId;
-    });
+      return item.modelId
+    })
 
-    const network = getCurrNetwork();
-    const resp = await getStarModels({ network, ids });
+    const network = getCurrNetwork()
+    const resp = await getStarModels({ network, ids })
 
-    const list = resp.data.data;
-    setHasMore(false);
-    setStarModels([...list]);
-  }, [personalCollections]);
+    const list = resp.data.data
+    setHasMore(false)
+    setStarModels([...list])
+  }, [personalCollections])
 
   const fetchPersonal = useCallback(async () => {
-    if (!session) return;
-    s3ModelCollection.authComposeClient(session);
+    if (!session) return
+    s3ModelCollection.authComposeClient(session)
     const personal = await s3ModelCollection.queryPersonalCollections({
       first: 500,
-    });
-    const collected = personal.data?.viewer.modelCollectionList;
+    })
+    const collected = personal.data?.viewer.modelCollectionList
 
     if (collected) {
       setPersonalCollections(
@@ -66,45 +66,45 @@ export default function ModelsPage() {
               modelId: item.node.modelID,
               id: item.node.id!,
               revoke: !!item.node.revoke,
-            };
+            }
           })
-      );
+      )
     }
-  }, [s3ModelCollection, session]);
+  }, [s3ModelCollection, session])
 
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
-      if (!session) return;
-      s3ModelCollection.authComposeClient(session);
+      if (!session) return
+      s3ModelCollection.authComposeClient(session)
 
       if (id) {
         await s3ModelCollection.updateCollection(id, {
           revoke: !revoke,
-        });
+        })
       } else {
         await s3ModelCollection.createCollection({
           modelID: modelId,
           revoke: false,
-        });
+        })
       }
 
-      await fetchPersonal();
+      await fetchPersonal()
     },
     [session, s3ModelCollection, fetchPersonal]
-  );
+  )
 
   const fetchModel = useCallback(async () => {
-    setModels([]);
-    setHasMore(true);
+    setModels([])
+    setHasMore(true)
     const resp = await getModelStreamList({
       name: searchText.current,
       network,
-    });
-    const list = resp.data.data;
-    setModels(list);
-    setHasMore(list.length >= PageSize);
-    pageNum.current = 1;
-  }, [network]);
+    })
+    const list = resp.data.data
+    setModels(list)
+    setHasMore(list.length >= PageSize)
+    pageNum.current = 1
+  }, [network])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
@@ -112,40 +112,40 @@ export default function ModelsPage() {
         pageNumber,
         name: searchText.current,
         network,
-      });
-      const list = resp.data.data;
-      setHasMore(list.length >= PageSize);
-      setModels([...models, ...list]);
+      })
+      const list = resp.data.data
+      setHasMore(list.length >= PageSize)
+      setModels([...models, ...list])
     },
     [models, network]
-  );
+  )
 
   const navToStream = useCallback(
     (streamId: string) => {
-      navigate(`/streams/stream/${streamId}`);
+      navigate(`/streams/stream/${streamId}`)
     },
     [navigate]
-  );
+  )
 
   useEffect(() => {
     if (!session) {
-      setPersonalCollections([]);
+      setPersonalCollections([])
     }
-  }, [session]);
+  }, [session])
 
   useEffect(() => {
-    fetchModel();
-    fetchPersonal();
-  }, [fetchModel, fetchPersonal]);
+    fetchModel()
+    fetchPersonal()
+  }, [fetchModel, fetchPersonal])
 
   const lists = useMemo(() => {
-    if (!filterStar) return models;
-    return starModels;
-  }, [filterStar, models, starModels]);
+    if (!filterStar) return models
+    return starModels
+  }, [filterStar, models, starModels])
 
   return (
     <PageBox isMobile={isMobile}>
-      <div className={isMobile ? "title-box mobile-models-box" : "title-box"}>
+      <div className={isMobile ? 'title-box mobile-models-box' : 'title-box'}>
         {!isMobile && <div className="title">ComposeDB Models</div>}
 
         <div className="tools">
@@ -154,23 +154,23 @@ export default function ModelsPage() {
               <Search
                 text={searchText.current}
                 searchAction={(text) => {
-                  searchText.current = text;
-                  setModels([]);
-                  fetchModel();
+                  searchText.current = text
+                  setModels([])
+                  fetchModel()
                 }}
-                placeholder={"Search by model name"}
+                placeholder={'Search by model name'}
               />
               <button
                 className="star-btn"
                 onClick={() => {
                   if (!sessId) {
-                    signIn();
-                    return;
+                    signIn()
+                    return
                   }
-                  setFilterStar(!filterStar);
-                  setHasMore(filterStar);
+                  setFilterStar(!filterStar)
+                  setHasMore(filterStar)
                   if (!filterStar) {
-                    fetchStarModels();
+                    fetchStarModels()
                   }
                 }}
               >
@@ -178,7 +178,7 @@ export default function ModelsPage() {
               </button>
               <button
                 onClick={() => {
-                  navigate("/models/model/create");
+                  navigate('/models/model/create')
                 }}
               >
                 + New Model
@@ -190,9 +190,9 @@ export default function ModelsPage() {
       <InfiniteScroll
         dataLength={lists.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreModel(pageNum.current);
-          console.log("fetch more");
+          pageNum.current += 1
+          fetchMoreModel(pageNum.current)
+          console.log('fetch more')
         }}
         hasMore={filterStar ? false : hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -213,7 +213,7 @@ export default function ModelsPage() {
               {lists.map((item, idx) => {
                 const hasStarItem = personalCollections.find(
                   (starItem) => starItem.modelId === item.stream_id
-                );
+                )
                 return (
                   <tr key={item.stream_id + idx}>
                     <td>
@@ -242,10 +242,10 @@ export default function ModelsPage() {
                       <div
                         className="nav-stream"
                         onClick={() => {
-                          navToStream(item.stream_id);
+                          navToStream(item.stream_id)
                         }}
                       >
-                        {shortPubKey(item.stream_id, { len: 8, split: "-" })}
+                        {shortPubKey(item.stream_id, { len: 8, split: '-' })}
                       </div>
                     </td>
                     <td>
@@ -263,9 +263,9 @@ export default function ModelsPage() {
                       <div className="release-date">
                         {(item.last_anchored_at &&
                           dayjs(item.created_at).format(
-                            "YYYY-MM-DD HH:mm:ss"
+                            'YYYY-MM-DD HH:mm:ss'
                           )) ||
-                          "-"}
+                          '-'}
                       </div>
                     </td>
                     <td>
@@ -277,7 +277,7 @@ export default function ModelsPage() {
                       />
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </TableContainer>
@@ -285,7 +285,7 @@ export default function ModelsPage() {
       </InfiniteScroll>
       {!filterStar && !hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 function ModelStarItem({
@@ -294,82 +294,81 @@ function ModelStarItem({
   fetchPersonal,
   stream_id,
 }: {
-  stream_id: string;
-  signIn: () => void;
+  stream_id: string
+  signIn: () => void
   hasStarItem:
     | {
-        modelId: string;
-        id: string;
-        revoke: boolean;
+        modelId: string
+        id: string
+        revoke: boolean
       }
-    | undefined;
-  fetchPersonal: () => void;
+    | undefined
+  fetchPersonal: () => void
 }) {
-  const session = useSession();
-  const { s3ModelCollection } = useCeramicCtx();
-  const [staring, setStaring] = useState(false);
+  const session = useSession()
+  const { s3ModelCollection } = useCeramicCtx()
+  const [staring, setStaring] = useState(false)
 
-  const sessId = session?.id;
+  const sessId = session?.id
 
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
       try {
-        
-      
-      if (!session) return;
-      s3ModelCollection.authComposeClient(session);
-      setStaring(true)
-      if (id) {
-        await s3ModelCollection.updateCollection(id, {
-          revoke: !revoke,
-        });
-      } else {
-        await s3ModelCollection.createCollection({
-          modelID: modelId,
-          revoke: false,
-        });
+        if (!session) return
+        s3ModelCollection.authComposeClient(session)
+        setStaring(true)
+        if (id) {
+          await s3ModelCollection.updateCollection(id, {
+            revoke: !revoke,
+          })
+        } else {
+          await s3ModelCollection.createCollection({
+            modelID: modelId,
+            revoke: false,
+          })
+        }
+      } catch (error) {
+      } finally {
+        setStaring(false)
       }
-    } catch (error) {
-        
-    } finally {
-      setStaring(false)
-    }
 
-      await fetchPersonal();
+      await fetchPersonal()
     },
     [session, s3ModelCollection, fetchPersonal]
-  );
+  )
   if (staring) {
-    return <div className="star">
-      <img src="/loading.gif" title="loading" alt="" />{" "}
-    </div>
+    return (
+      <div className="star">
+        <img src="/loading.gif" title="loading" alt="" />{' '}
+      </div>
+    )
   }
   return (
     <div
       className="star"
       onClick={() => {
         if (!sessId) {
-          signIn();
-          return;
+          signIn()
+          return
         }
 
-        starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke);
+        starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
       }}
     >
       {hasStarItem ? <Star /> : <StarEmpty />}
     </div>
-  );
+  )
 }
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
 const PageBox = styled.div<{ isMobile: boolean }>`
   margin-bottom: 20px;
-  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : "")};
+  ${({ isMobile }) => (isMobile ? `padding: 0 10px;` : '')};
 
   .no-more {
     padding: 20px;
@@ -447,10 +446,10 @@ const PageBox = styled.div<{ isMobile: boolean }>`
 
     color: #ffffff;
   }
-`;
+`
 
 const TableContainer = styled.table<{ isMobile: boolean }>`
-  ${({ isMobile }) => (isMobile ? `` : "width: 100%;")}
+  ${({ isMobile }) => (isMobile ? `` : 'width: 100%;')}
   table-layout: fixed;
   border-collapse: collapse;
 
@@ -471,7 +470,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
 
     width: calc((100% - 70px) / 7) !important;
     overflow: hidden;
-    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : "")};
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
 
     &:first-child {
       padding-left: 20px;
@@ -490,7 +489,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     line-height: 19px;
     overflow: hidden;
     color: #ffffff;
-    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : "")};
+    ${({ isMobile }) => (isMobile ? `padding: 0 20px !important;` : '')};
 
     &:first-child {
       padding-left: 20px;
@@ -591,7 +590,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     cursor: pointer;
 
     > img {
-      width: 23px
+      width: 23px;
     }
   }
-`;
+`

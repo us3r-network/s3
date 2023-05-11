@@ -1,64 +1,64 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate } from "react-router-dom";
-import { isMobile } from "react-device-detect";
+import { useCallback, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useNavigate } from 'react-router-dom'
+import { isMobile } from 'react-device-detect'
 
-import ListTable from "../components/ListTable";
-import Search from "../components/Search";
-import useListData from "../hooks/useListData";
-import SelectIcon from "../components/icons/Select";
-import FeedsFilterBox from "../components/FeedsFilterBox";
-import { getStreamTopics } from "../api";
-import Filter from "../components/Filter";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import ListTable from '../components/ListTable'
+import Search from '../components/Search'
+import useListData from '../hooks/useListData'
+import SelectIcon from '../components/icons/Select'
+import FeedsFilterBox from '../components/FeedsFilterBox'
+import { getStreamTopics } from '../api'
+import Filter from '../components/Filter'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function Streams() {
-  const { network } = useCeramicCtx();
-  const navigate = useNavigate();
+  const { network } = useCeramicCtx()
+  const navigate = useNavigate()
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network,
-  });
-  const [showSelect, setShowSelect] = useState(false);
+  })
+  const [showSelect, setShowSelect] = useState(false)
   const [domains, setDomains] = useState<Array<{ name: string; num: number }>>(
     []
-  );
+  )
   const [families, setFamilies] = useState<
     Array<{ name: string; num: number }>
-  >([]);
+  >([])
   const filterRef = useRef<{
-    domains: string[];
-    families: string[];
-    types: string[];
+    domains: string[]
+    families: string[]
+    types: string[]
   }>({
     domains: [],
     families: [],
     types: [],
-  });
+  })
 
   const loadTopics = useCallback(async () => {
-    const resp = await getStreamTopics(network);
-    setDomains(resp.data.data.domains);
-    setFamilies(resp.data.data.familys);
-  }, [network]);
+    const resp = await getStreamTopics(network)
+    setDomains(resp.data.data.domains)
+    setFamilies(resp.data.data.familys)
+  }, [network])
 
   useEffect(() => {
-    loadData({ network });
-    loadTopics();
+    loadData({ network })
+    loadTopics()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network]);
+  }, [network])
 
   return (
     <PageBox isMobile={isMobile}>
       <FilterBox>
         {!isMobile && <div className="title">Streams</div>}
-        <div className={isMobile ? "mobileBox" : ""}>
+        <div className={isMobile ? 'mobileBox' : ''}>
           {!isMobile && (
             <>
               <SelectBox
                 isActive={showSelect}
                 onClick={() => {
-                  setShowSelect(!showSelect);
+                  setShowSelect(!showSelect)
                 }}
               >
                 <SelectIcon />
@@ -66,12 +66,12 @@ export default function Streams() {
               <Search
                 text=""
                 searchAction={(text) => {
-                  if (text.startsWith("did")) {
-                    navigate(`/streams/profile/${text}`);
+                  if (text.startsWith('did')) {
+                    navigate(`/streams/profile/${text}`)
                   } else if (text.length < 62) {
-                    navigate(`/streams/family/${text}`);
+                    navigate(`/streams/family/${text}`)
                   } else {
-                    navigate(`/streams/stream/${text}`);
+                    navigate(`/streams/stream/${text}`)
                   }
                 }}
               />
@@ -84,23 +84,23 @@ export default function Streams() {
           domains={domains}
           families={families}
           filterAction={(data) => {
-            filterRef.current = data;
+            filterRef.current = data
             loadData({
               network,
               familyOrApp: [...data.families, ...data.domains],
               types: data.types,
-            });
+            })
           }}
         />
       </FeedsFilterBox>
       <InfiniteScroll
         dataLength={data.length}
         next={() => {
-          pageNum.current += 1;
+          pageNum.current += 1
           fetchMoreData(pageNum.current, filterRef.current.types, [
             ...filterRef.current.domains,
             ...filterRef.current.families,
-          ]);
+          ])
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -109,14 +109,14 @@ export default function Streams() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
-  );
+  )
 }
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`
 
 const SelectBox = styled.div<{ isActive?: boolean }>`
   width: 52px;
@@ -145,8 +145,7 @@ const SelectBox = styled.div<{ isActive?: boolean }>`
         background: #718096;
       `}
   }
-`;
-
+`
 
 const PageBox = styled.div<{ isMobile: boolean }>`
   margin-bottom: 20px;
@@ -155,8 +154,8 @@ const PageBox = styled.div<{ isMobile: boolean }>`
     text-align: center;
     color: gray;
   }
-  padding: ${({ isMobile }) => (isMobile ? "0 10px" : "0")};
-`;
+  padding: ${({ isMobile }) => (isMobile ? '0 10px' : '0')};
+`
 
 const FilterBox = styled.div`
   position: sticky;
@@ -191,4 +190,4 @@ const FilterBox = styled.div`
       flex-grow: 1;
     }
   }
-`;
+`

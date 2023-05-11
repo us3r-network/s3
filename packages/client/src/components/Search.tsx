@@ -1,32 +1,32 @@
-import { useCallback } from "react";
-import { useState } from "react";
-import styled from "styled-components";
+import { useCallback } from 'react'
+import { useState } from 'react'
+import styled from 'styled-components'
 
 export default function Search({
   text,
   searchAction,
-  placeholder = "Search by stream id, did or family...",
+  placeholder = 'Search by stream id, did or family...',
 }: {
-  text: string,
-  searchAction: (text: string) => void;
-  placeholder?: string;
+  text: string
+  searchAction: (text: string) => void
+  placeholder?: string
 }) {
-  const [search, setSearch] = useState(text || "");
+  const [search, setSearch] = useState(text || '')
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {
-        searchAction(search);
+      if (event.key === 'Enter') {
+        searchAction(search)
       }
     },
     [search, searchAction]
-  );
+  )
 
   return (
     <SearchBox>
       <span
         onClick={() => {
-          if (search.trim()) searchAction(search.trim());
+          if (search.trim()) searchAction(search.trim())
         }}
       >
         <SearchIcon />
@@ -37,12 +37,12 @@ export default function Search({
         type="text"
         value={search}
         onChange={(e) => {
-          setSearch(e.target.value);
+          setSearch(e.target.value)
         }}
         onKeyDown={handleKeyDown}
       />
     </SearchBox>
-  );
+  )
 }
 
 const SearchBox = styled.div`
@@ -76,7 +76,7 @@ const SearchBox = styled.div`
     vertical-align: middle;
     cursor: pointer;
   }
-`;
+`
 
 function SearchIcon() {
   return (
@@ -94,5 +94,5 @@ function SearchIcon() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

@@ -15,5 +15,5 @@ export default function RadioIcon() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

@@ -1,39 +1,39 @@
-import { useEffect } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useParams } from "react-router-dom";
-import styled from "styled-components";
+import { useEffect } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useParams } from 'react-router-dom'
+import styled from 'styled-components'
 
-import { Network } from "../types";
-import ListTable from "../components/ListTable";
-import useListData from "../hooks/useListData";
-import { useCeramicCtx } from "../context/CeramicCtx";
+import { Network } from '../types'
+import ListTable from '../components/ListTable'
+import useListData from '../hooks/useListData'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function Family() {
-  const { familyOrApp } = useParams();
-  const { network } = useCeramicCtx();
+  const { familyOrApp } = useParams()
+  const { network } = useCeramicCtx()
   const { pageNum, data, hasMore, loadData, fetchMoreData } = useListData({
     network: network as Network,
-  });
+  })
 
   useEffect(() => {
-    if (!network || !familyOrApp) return;
-    loadData({ network: network as Network, familyOrApp: [familyOrApp || ""] });
+    if (!network || !familyOrApp) return
+    loadData({ network: network as Network, familyOrApp: [familyOrApp || ''] })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [network, familyOrApp]);
+  }, [network, familyOrApp])
 
   return (
     <div>
       <Title>
         <h3>
-          Activity for the family: <span>{familyOrApp}</span> on{" "}
+          Activity for the family: <span>{familyOrApp}</span> on{' '}
           <span>{network}</span>
         </h3>
       </Title>
       <InfiniteScroll
         dataLength={data.length}
         next={() => {
-          pageNum.current += 1;
-          fetchMoreData(pageNum.current);
+          pageNum.current += 1
+          fetchMoreData(pageNum.current)
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -42,7 +42,7 @@ export default function Family() {
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </div>
-  );
+  )
 }
 
 const Title = styled.div`
@@ -68,10 +68,10 @@ const Title = styled.div`
       color: #6c8fc1;
     }
   }
-`;
+`
 
 const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
-`;
+`

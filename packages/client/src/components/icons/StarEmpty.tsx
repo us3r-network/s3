@@ -14,5 +14,5 @@ export default function StarEmpty() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

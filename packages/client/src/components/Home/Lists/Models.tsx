@@ -1,24 +1,24 @@
-import styled from "styled-components";
-import Title from "./Title";
-import { useCallback, useEffect, useState } from "react";
-import { getModelStreamList } from "../../../api";
-import { ModelStream } from "../../../types";
-import { shortPubKey } from "../../../utils/shortPubKey";
-import { useCeramicCtx } from "../../../context/CeramicCtx";
-import { Link } from "react-router-dom";
+import styled from 'styled-components'
+import Title from './Title'
+import { useCallback, useEffect, useState } from 'react'
+import { getModelStreamList } from '../../../api'
+import { ModelStream } from '../../../types'
+import { shortPubKey } from '../../../utils/shortPubKey'
+import { useCeramicCtx } from '../../../context/CeramicCtx'
+import { Link } from 'react-router-dom'
 
 export default function Models() {
-  const [list, setList] = useState<Array<ModelStream>>([]);
-  const { network } = useCeramicCtx();
+  const [list, setList] = useState<Array<ModelStream>>([])
+  const { network } = useCeramicCtx()
   const fetchModel = useCallback(async () => {
-    const resp = await getModelStreamList({ network });
-    const list = resp.data.data;
-    setList(list);
-  }, [network]);
+    const resp = await getModelStreamList({ network })
+    const list = resp.data.data
+    setList(list)
+  }, [network])
 
   useEffect(() => {
-    fetchModel();
-  }, [fetchModel]);
+    fetchModel()
+  }, [fetchModel])
   return (
     <Box>
       <Title title="Total Models" viewAll="/models" />
@@ -30,14 +30,14 @@ export default function Models() {
               stream_id={item.stream_id}
               count={item.useCount}
               isIndexed={item.isIndexed}
-              description={item.stream_content.description || ""}
+              description={item.stream_content.description || ''}
               name={item.stream_content.name}
             />
-          );
+          )
         })}
       </div>
     </Box>
-  );
+  )
 }
 
 function ListCard({
@@ -47,24 +47,24 @@ function ListCard({
   count,
   isIndexed,
 }: {
-  stream_id: string;
-  name: string;
-  description: string;
-  count: number;
-  isIndexed?: boolean;
+  stream_id: string
+  name: string
+  description: string
+  count: number
+  isIndexed?: boolean
 }) {
   return (
-    <CardBox>
+    <CardBox className="models-box">
       <div className="name">
         {(isIndexed && (
           <Link to={`/models/modelview/${stream_id}`}>
             <h4>{name}</h4>
-            <span>{shortPubKey(stream_id, { len: 8, split: "-" })}</span>
+            <span>{shortPubKey(stream_id, { len: 8, split: '-' })}</span>
           </Link>
         )) || (
           <>
             <h4>{name}</h4>
-            <span>{shortPubKey(stream_id, { len: 8, split: "-" })}</span>
+            <span>{shortPubKey(stream_id, { len: 8, split: '-' })}</span>
           </>
         )}
       </div>
@@ -76,7 +76,7 @@ function ListCard({
           count}
       </div>
     </CardBox>
-  );
+  )
 }
 
 const CardBox = styled.div`
@@ -127,8 +127,8 @@ const CardBox = styled.div`
       color: #ffffff;
     }
   }
-`;
+`
 
 const Box = styled.div`
   padding: 20px;
-`;
+`

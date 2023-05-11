@@ -12,5 +12,5 @@ export default function ChevronDown(props: any) {
         fill="white"
       />
     </svg>
-  );
+  )
 }

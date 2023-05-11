@@ -1,18 +1,18 @@
-import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 
-type Ops = "model" | "stream";
+type Ops = 'model' | 'stream'
 export default function SearchFilter() {
-  const [ops, setOps] = useState<Ops>("model");
-  const [searchText, setSearchText] = useState("");
-  const navigate = useNavigate();
+  const [ops, setOps] = useState<Ops>('model')
+  const [searchText, setSearchText] = useState('')
+  const navigate = useNavigate()
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {
-        if (ops === "model") {
-          navigate(`/models?searchText=${searchText}`);
+      if (event.key === 'Enter') {
+        if (ops === 'model') {
+          navigate(`/models?searchText=${searchText}`)
         } else {
           if (searchText.startsWith('did')) {
             navigate(`/streams/profile/${searchText}`)
@@ -25,7 +25,7 @@ export default function SearchFilter() {
       }
     },
     [ops, searchText, navigate]
-  );
+  )
 
   return (
     <Box className="search-area">
@@ -35,7 +35,7 @@ export default function SearchFilter() {
           id=""
           value={ops}
           onChange={(e) => {
-            setOps(e.target.value as Ops);
+            setOps(e.target.value as Ops)
           }}
         >
           <option value="model">Model</option>
@@ -44,15 +44,19 @@ export default function SearchFilter() {
       </div>
       <input
         type="text"
-        placeholder={ops === 'stream' ? 'Search by stream id, did or family...' : "Search by model name"}
+        placeholder={
+          ops === 'stream'
+            ? 'Search by stream id, did or family...'
+            : 'Search by model name'
+        }
         value={searchText}
         onChange={(e) => {
-          setSearchText(e.target.value);
+          setSearchText(e.target.value)
         }}
         onKeyDown={handleKeyDown}
       />
     </Box>
-  );
+  )
 }
 
 const Box = styled.div`
@@ -95,10 +99,10 @@ const Box = styled.div`
   }
 
   input {
-    font-family: "Rubik";
+    font-family: 'Rubik';
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
     flex-grow: 1;
   }
-`;
+`

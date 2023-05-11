@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import { useCeramicCtx } from "../context/CeramicCtx";
-import ChevronDown from "./icons/ChevronDown";
-import { Network } from "../types";
-import BackBtn from "./BackBtn";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useMemo } from "react";
+import styled from 'styled-components'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import ChevronDown from './icons/ChevronDown'
+import { Network } from '../types'
+import BackBtn from './BackBtn'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useMemo } from 'react'
 import {
   Button,
   Item,
@@ -13,36 +13,36 @@ import {
   Popover,
   Select,
   SelectValue,
-} from "react-aria-components";
-import { isMobile } from "react-device-detect";
-import { useSession } from "@us3r-network/auth-with-rainbowkit";
-import { LogoutButton } from "@us3r-network/profile";
+} from 'react-aria-components'
+import { isMobile } from 'react-device-detect'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { LogoutButton } from '@us3r-network/profile'
 
 export default function Header() {
-  const navigate = useNavigate();
-  let location = useLocation();
+  const navigate = useNavigate()
+  let location = useLocation()
 
   const showBack = useMemo(() => {
     const show =
-      location.pathname === "/" ||
-      location.pathname === "/models" ||
-      location.pathname === "/streams";
-    return !show;
-  }, [location]);
+      location.pathname === '/' ||
+      location.pathname === '/models' ||
+      location.pathname === '/streams'
+    return !show
+  }, [location])
 
-  const params = useParams();
-  const session = useSession();
+  const params = useParams()
+  const session = useSession()
   const showLogoutButton = useMemo(() => {
     return (
-      location.pathname.startsWith("/streams/profile") &&
+      location.pathname.startsWith('/streams/profile') &&
       session &&
       session.id &&
       session.id === params?.did
-    );
-  }, [location, session, params?.did]);
+    )
+  }, [location, session, params?.did])
 
   if (isMobile) {
-    return null;
+    return null
   }
 
   return (
@@ -51,10 +51,10 @@ export default function Header() {
         {(showBack && (
           <BackBtn
             backAction={() => {
-              if (location.pathname.startsWith("/models/modelview")) {
-                navigate("/models");
+              if (location.pathname.startsWith('/models/modelview')) {
+                navigate('/models')
               } else {
-                navigate(-1);
+                navigate(-1)
               }
             }}
           />
@@ -63,17 +63,17 @@ export default function Header() {
         {showLogoutButton && <LogoutButton />}
       </div>
     </Box>
-  );
+  )
 }
 
 function NetworkSwitch() {
-  const { network, setNetwork } = useCeramicCtx();
+  const { network, setNetwork } = useCeramicCtx()
 
   return (
     <Select
       selectedKey={network}
       onSelectionChange={(k) => {
-        setNetwork(k as Network);
+        setNetwork(k as Network)
       }}
     >
       <Label></Label>
@@ -90,7 +90,7 @@ function NetworkSwitch() {
         </ListBox>
       </Popover>
     </Select>
-  );
+  )
 }
 
 const Box = styled.div`
@@ -121,4 +121,4 @@ const Box = styled.div`
     outline: none;
     border: 1px solid gray;
   }
-`;
+`
