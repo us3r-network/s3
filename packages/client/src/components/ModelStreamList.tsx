@@ -30,7 +30,7 @@ export default function ModelStreamList({
               <tr key={item.streamId}>
                 <td>
                   <div className="stream-id">
-                    <Link to={`/models/model/${modelId}/mids/${item.streamId}`}>
+                    <Link to={`/streams/stream/${modelId}`}>
                       {shortPubKey(item.streamId, {
                         len: 8,
                         split: '-',
