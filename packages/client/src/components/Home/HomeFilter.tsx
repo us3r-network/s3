@@ -1,6 +1,16 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import {
+  Button,
+  Item,
+  Label,
+  ListBox,
+  Popover,
+  Select,
+  SelectValue,
+} from 'react-aria-components'
+import ChevronDown from '../icons/ChevronDown'
 
 type Ops = 'model' | 'stream'
 export default function SearchFilter() {
@@ -30,17 +40,26 @@ export default function SearchFilter() {
   return (
     <Box className="search-area">
       <div className="select-box">
-        <select
-          name=""
-          id=""
-          value={ops}
-          onChange={(e) => {
-            setOps(e.target.value as Ops)
+        <Select
+          selectedKey={ops}
+          onSelectionChange={(k) => {
+            setOps(k as Ops)
           }}
         >
-          <option value="model">Model</option>
-          <option value="stream">Stream</option>
-        </select>
+          <Label></Label>
+          <Button>
+            <SelectValue />
+            <span aria-hidden="true">
+              <ChevronDown  fill='#000'/>
+            </span>
+          </Button>
+          <Popover className={'home-popover'}>
+            <ListBox>
+              <Item id={'model'}>Model</Item>
+              <Item id={'stream'}>Stream</Item>
+            </ListBox>
+          </Popover>
+        </Select>
       </div>
       <input
         type="text"
@@ -84,11 +103,12 @@ const Box = styled.div`
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 0px 10px;
+    /* padding: 0px 10px; */
     gap: 10px;
     box-sizing: border-box;
-    width: 130px;
+    /* width: 130px; */
     height: 40px;
+    color: #000;
 
     background: rgba(113, 128, 150, 0.1);
     border-radius: 10px;
