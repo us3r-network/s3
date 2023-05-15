@@ -68,7 +68,7 @@ function Routers() {
 export default function App() {
   const [network, setNetwork] = useLocalStorage(
     'network-select',
-    Network.MAINNET
+    Network.TESTNET
   )
 
   return (
