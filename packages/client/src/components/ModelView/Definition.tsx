@@ -151,6 +151,10 @@ const EditorBox = styled.div`
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
+
+  * {
+    box-sizing: border-box;
+  }
 `
 
 const ResultBox = styled.div`
