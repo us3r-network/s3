@@ -220,7 +220,7 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    /* width: 130px; */
+    width: 120px;
 
     &[data-focus-visible] {
       border-color: var(--focus-ring-color);
