@@ -29,8 +29,41 @@ import { Network } from './types'
 import CeramicProvider from './context/CeramicCtx'
 import Header from './components/Header'
 import ModelStreams from './container/ModelStreams'
+import DappCreate from './container/DappCreate'
 
 dayjs.extend(relativeTime)
+
+function Routers() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+
+        <Route path="streams">
+          <Route index element={<Streams />} />
+          <Route path="stream/:streamId" element={<Stream />} />
+          <Route path="profile/:did" element={<Profile />} />
+          <Route path="family/:familyOrApp" element={<Family />} />
+        </Route>
+
+        <Route path="models">
+          <Route index element={<Models />} />
+          <Route path="model/:streamId" element={<ModelStream />} />
+          <Route path="model/:modelId/mids" element={<ModelStreams />} />
+          <Route path="model/:modelId/mids/:mid" element={<ModelMidInfo />} />
+          <Route path="model/create" element={<ModelCreate />} />
+          <Route path="did/:did" element={<UserModels />} />
+          <Route path="modelview/:streamId" element={<ModelView />} />
+        </Route>
+
+        <Route path="dapp">
+          <Route path="create" element={<DappCreate />} />
+        </Route>
+      </Route>
+      <Route path="*" element={<NoMatch />} />
+    </Routes>
+  )
+}
 
 export default function App() {
   const [network, setNetwork] = useLocalStorage(
@@ -42,32 +75,7 @@ export default function App() {
     <Us3rAuthWithRainbowkitProvider>
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider network={network} setNetwork={setNetwork}>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-
-              <Route path="streams">
-                <Route index element={<Streams />} />
-                <Route path="stream/:streamId" element={<Stream />} />
-                <Route path="profile/:did" element={<Profile />} />
-                <Route path="family/:familyOrApp" element={<Family />} />
-              </Route>
-
-              <Route path="models">
-                <Route index element={<Models />} />
-                <Route path="model/:streamId" element={<ModelStream />} />
-                <Route path="model/:modelId/mids" element={<ModelStreams />} />
-                <Route
-                  path="model/:modelId/mids/:mid"
-                  element={<ModelMidInfo />}
-                />
-                <Route path="model/create" element={<ModelCreate />} />
-                <Route path="did/:did" element={<UserModels />} />
-                <Route path="modelview/:streamId" element={<ModelView />} />
-              </Route>
-            </Route>
-            <Route path="*" element={<NoMatch />} />
-          </Routes>
+          <Routers />
         </CeramicProvider>
       </ProfileStateProvider>
     </Us3rAuthWithRainbowkitProvider>

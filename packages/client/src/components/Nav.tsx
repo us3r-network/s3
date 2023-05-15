@@ -4,9 +4,23 @@ import GitHubButton from 'react-github-btn'
 
 import Logo from './Logo'
 import LoginButton from './LoginButton'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import { useEffect } from 'react'
+import DappAdd from './icons/DappAdd'
 
 export default function Nav() {
   let location = useLocation()
+
+  const { s3Dapp } = useCeramicCtx()
+
+  useEffect(() => {
+    s3Dapp
+      .queryPersonalDapps({ first: 100 })
+      .then((data) => {
+        console.log('s3Dapp', data)
+      })
+      .catch((err) => console.error)
+  }, [s3Dapp])
 
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
@@ -48,6 +62,13 @@ export default function Nav() {
               </div>
             </div>
           </Link>
+
+          <div className="dapp">
+            <hr />
+            <Link to={'/dapp/create'}>
+              <DappAdd />
+            </Link>
+          </div>
         </div>
 
         <div className="nav-bottom">
@@ -199,6 +220,19 @@ const NavContainer = styled.nav`
         }
 
         /* font-weight: 700; */
+      }
+    }
+
+    .dapp {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      hr {
+        width: 70%;
+        border-color: #39424C;
       }
     }
 
