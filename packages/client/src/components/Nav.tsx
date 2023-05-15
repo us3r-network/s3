@@ -16,6 +16,8 @@ export default function Nav() {
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
   const streamActive = location.pathname.startsWith('/streams')
+
+  console.log({dapps})
   return (
     <NavContainer>
       <div className="fixed">
@@ -57,9 +59,10 @@ export default function Nav() {
           <div className="dapp">
             <hr />
             {dapps?.map(item => {
-              return <Link to={`/dapp/${item.node.id!}`}>
+              return <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
                 <div>
-                  {item.node.name}
+                  <img src={item.node.icon!} />
+                  {/* {item.node.name} */}
                 </div>
               </Link>
             })}
@@ -231,6 +234,11 @@ const NavContainer = styled.nav`
       hr {
         width: 70%;
         border-color: #39424C;
+      }
+
+      img {
+        width: 39px;
+        height: 39px;
       }
     }
 

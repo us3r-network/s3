@@ -20,7 +20,7 @@ export default function DappCreate() {
   const [medium, setMedium] = useState('')
   const [mirror, setMirror] = useState('')
   const [github, setGithub] = useState('')
-  
+
   const navigate = useNavigate()
   const { signIn } = useAuthentication()
   const { s3Dapp } = useCeramicCtx()
@@ -72,17 +72,19 @@ export default function DappCreate() {
       dapp.url = redirectUrl
     }
     if (description) {
-      dapp.description = description 
+      dapp.description = description
     }
     const resp = await s3Dapp.createDapp({
       name: appName,
       icon,
       socialLink: socialLink,
     })
-    console.log(resp.errors)
-    console.log(resp.data?.createDapp.document.id)
-    
+
+    if (resp.data?.createDapp.document.id) {
+      navigate(`/dapp/${resp.data?.createDapp.document.id}`)
+    }
   }, [
+    navigate,
     session,
     s3Dapp,
     icon,
@@ -166,7 +168,7 @@ export default function DappCreate() {
         </div>
       </InfoBox>
       <BtnsBox>
-        <button>Cancel</button>
+        <button onClick={() => navigate(-1)}>Cancel</button>
         <button
           className="create"
           onClick={() => {
