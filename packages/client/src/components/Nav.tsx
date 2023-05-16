@@ -12,12 +12,10 @@ export default function Nav() {
 
   const { dapps } = useCeramicCtx()
 
-
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
   const streamActive = location.pathname.startsWith('/streams')
 
-  console.log({dapps})
   return (
     <NavContainer>
       <div className="fixed">

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import AddIcon from '../components/icons/Add'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { uploadImage } from '../api'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import {
@@ -8,9 +8,11 @@ import {
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import { Dapp } from '@us3r-network/dapp'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
-export default function DappCreate() {
+export default function DappEdit() {
+  const { appId } = useParams()
+
   const [icon, setIcon] = useState('')
   const [appName, setAppName] = useState('')
   const [redirectUrl, setRedirectUrl] = useState('')
@@ -28,7 +30,43 @@ export default function DappCreate() {
   const session = useSession()
   const sessId = session?.id
 
-  const createAppAction = useCallback(async () => {
+  const updateInfo = (dapp: Dapp) => {
+    setAppName(dapp.name)
+    setIcon(dapp.icon || '')
+    setRedirectUrl(dapp.url || '')
+    setDescription(dapp.description || '')
+    const socialLink = dapp.socialLink || []
+
+    const twitter = socialLink.find(item => item.platform === 'twitter')
+    if (twitter) setTwitter(twitter.url)
+
+    const discord = socialLink.find(item => item.platform === 'discord')
+    if (discord) setDiscord(discord.url)
+
+    const medium = socialLink.find(item => item.platform === 'medium')
+    if (medium) setMedium(medium.url)
+
+    const mirror = socialLink.find(item => item.platform === 'mirror')
+    if (mirror) setMirror(mirror.url)
+
+    const github = socialLink.find(item => item.platform === 'github')
+    if (github) setGithub(github.url)
+  }
+
+  const loadDapp = useCallback(async () => {
+    if (!appId) return
+    const resp = await s3Dapp.queryDappWithId(appId)
+    const dapp = resp.data?.node
+    if (!dapp) return
+    updateInfo(dapp)
+  }, [appId, s3Dapp])
+
+  useEffect(() => {
+    loadDapp()
+  }, [loadDapp])
+
+  const updateAppAction = useCallback(async () => {
+    if (!appId) return
     if (!session) return
     if (!appName) return
     const socialLink = []
@@ -74,13 +112,16 @@ export default function DappCreate() {
     if (description) {
       dapp.description = description
     }
-    const resp = await s3Dapp.createDapp(dapp)
+    const resp = await s3Dapp.updateDapp(appId, {
+      ...dapp,
+    })
     await loadDapps()
-    if (resp.data?.createDapp.document.id) {
-      navigate(`/dapp/${resp.data?.createDapp.document.id}`)
+    if (resp.data?.updateDapp.document.id) {
+      navigate(`/dapp/${resp.data?.updateDapp.document.id}`)
     }
   }, [
     loadDapps,
+    appId,
     navigate,
     session,
     s3Dapp,
@@ -173,10 +214,10 @@ export default function DappCreate() {
               signIn()
               return
             }
-            createAppAction()
+            updateAppAction()
           }}
         >
-          Create Application
+          Save
         </button>
       </BtnsBox>
     </PageBox>
