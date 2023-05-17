@@ -66,6 +66,9 @@ export default function Nav() {
             })}
             <Link to={'/dapp/create'}>
               <DappAdd />
+              <div className="tint-c">
+                <div className="tint">Create Application</div>
+              </div>
             </Link>
           </div>
         </div>
@@ -237,6 +240,44 @@ const NavContainer = styled.nav`
       img {
         width: 39px;
         height: 39px;
+      }
+
+      a {
+        position: relative;
+      
+        .tint-c {
+          position: absolute;
+          right: -5px;
+          top: 3px;
+        }
+
+        .tint {
+          position: fixed;
+          display: none;
+          font-size: 16px;
+          width: fit-content;
+          padding: 8px;
+          background: linear-gradient(52.42deg, #CD62FF 35.31%, #62AAFF 89.64%), #343941;
+          border-radius: 10px;
+          &::before {
+            content: ' ';
+            position: absolute;
+            top: 15px;
+            left: -5px;
+            width: 7px;
+            height: 5px;
+            background: linear-gradient(52.42deg, #CD62FF 35.31%, #62AAFF 89.64%), #343941;
+            transform: rotate(-90deg);
+            border-top-left-radius: 100px;
+            border-top-right-radius: 100px;
+          }
+        }
+
+        &:hover {
+          .tint {
+            display: block;
+          }
+        }
       }
     }
 

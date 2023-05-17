@@ -12,6 +12,8 @@ import { getStarModels } from '../api'
 import { ModelStream } from '../types'
 import Trash from '../components/icons/Trash'
 
+import ModelTabs from '../components/Dapp/Tabs'
+
 export default function DappInfo() {
   const { appId } = useParams()
   const { s3Dapp, loadDapps } = useCeramicCtx()
@@ -39,27 +41,46 @@ export default function DappInfo() {
     [appId, dapp, loadDapps, s3Dapp, session]
   )
 
+  const removeModelFromDapp = useCallback(
+    async (modelId: string) => {
+      if (!session) return
+      if (!appId) return
+      const models = dapp?.models || []
+      const idx = models.indexOf(modelId)
+      console.log({ idx })
+      if (idx === -1) return
+      await s3Dapp.updateDapp(appId, {
+        models: [...models.slice(0, idx), ...models.slice(idx + 1)],
+      })
+      await loadDapps()
+    },
+    [appId, dapp, loadDapps, s3Dapp, session]
+  )
+
   useEffect(() => {
     loadDapp()
   }, [loadDapp])
+
+  console.log(dapp)
 
   return (
     <div>
       <BasicInfo dapp={dapp} />
       <DappModels
         models={dapp?.models || []}
-        addModelToDapp={(modelId) => {
-          addModelToDapp(modelId)
-        }}
+        addModelToDapp={addModelToDapp}
+        removeModelFromDapp={removeModelFromDapp}
       />
     </div>
   )
 }
 
 function DappModels({
+  removeModelFromDapp,
   addModelToDapp,
   models,
 }: {
+  removeModelFromDapp: (modelId: string) => void
   addModelToDapp: (modelId: string) => void
   models: string[]
 }) {
@@ -71,14 +92,24 @@ function DappModels({
         <div>
           <div className="title">
             <h3> ModelList</h3>
-            {/* TODO */}
-            <button>
-              <Add />
-            </button>
+            <Link to={'/models/model/create'}>
+              <button>
+                <Add />
+              </button>
+            </Link>
           </div>
-          <DappModelList ids={models} selectAction={(model: ModelStream) => {
-            setSelectModel(model)
-          }}/>
+          <DappModelList
+            ids={models}
+            selectAction={(model: ModelStream) => {
+              setSelectModel(model)
+            }}
+            removeModelAction={(id: string) => {
+              if (id === selectModel?.stream_id) {
+                setSelectModel(undefined)
+              }
+              removeModelFromDapp(id)
+            }}
+          />
         </div>
         <Link to={'/models'}>
           <div className="explore">
@@ -101,18 +132,37 @@ function DappModels({
           </div>
         </div>
       </ModelsListBox>
-      <div>model name {selectModel?.stream_content.name}</div>
+      <div className="tabs">
+        {selectModel && (
+          <ModelTabs
+            name={selectModel?.stream_content.name || ''}
+            modelId={selectModel?.stream_id || ''}
+          />
+        )}
+      </div>
     </ModelsBox>
   )
 }
 
-function DappModelList({ ids, selectAction }: { ids: string[], selectAction: (model: ModelStream) => void }) {
+function DappModelList({
+  ids,
+  selectAction,
+  removeModelAction,
+}: {
+  ids: string[]
+  selectAction: (model: ModelStream) => void
+  removeModelAction: (modelId: string) => void
+}) {
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const { network } = useCeramicCtx()
+  const [selected, setSelected] = useState<ModelStream>()
 
   const loadModelsInfo = useCallback(
     async (models: string[]) => {
-      if (models.length === 0) return
+      if (models.length === 0) {
+        setDappModels([])
+        return
+      }
       const resp = await getStarModels({ network, ids: models })
 
       const list = resp.data.data
@@ -127,16 +177,33 @@ function DappModelList({ ids, selectAction }: { ids: string[], selectAction: (mo
   return (
     <DappModelsListBox>
       {dappModels?.map((item) => {
+        const active = selected?.stream_id === item.stream_id
         return (
-          <div key={item.stream_id} >
-            <div onClick={() => {
-              selectAction(item)
-            }}>
-            {item.stream_content.name}
+          <div key={item.stream_id} className={active ? 'active' : ''}>
+            <div className="title">
+              <div
+                onClick={() => {
+                  selectAction(item)
+                  setSelected(item)
+                }}
+              >
+                {item.stream_content.name}
+              </div>
+              <button
+                onClick={() => {
+                  removeModelAction(item.stream_id)
+                }}
+              >
+                <Trash />
+              </button>
             </div>
-            <button>
-              <Trash />
-            </button>
+            {active && (
+              <>
+                <hr />
+                <p>{selected.stream_content.description}</p>
+                <p>Streams:{selected.useCount}</p>
+              </>
+            )}
           </div>
         )
       })}
@@ -146,28 +213,50 @@ function DappModelList({ ids, selectAction }: { ids: string[], selectAction: (mo
 
 const DappModelsListBox = styled.div`
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   > div {
+    padding: 10px 16px;
+    box-sizing: border-box;
+    border: 1px solid #39424c;
+    border-radius: 12px;
+  }
+
+  div.title {
     > div {
       cursor: pointer;
     }
-    
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
-    box-sizing: border-box;
-
-    background: #1a1e23;
-
-    border: 1px solid #39424c;
+  }
+  
+  div.active {
+    background: rgba(113, 128, 150, 0.3);
+    border: 1px solid #718096;
     border-radius: 12px;
+  }
+
+  hr {
+    border-color: rgba(255, 255, 255, 0.2);
+    margin-top: 10px;
+  }
+
+  p {
+    color: #718096;
   }
 `
 
 const ModelsBox = styled.div`
   display: flex;
   gap: 20px;
+
+  > .tabs {
+    width: calc(1300px - 261px - 20px);
+  }
 `
 
 const ModelsListBox = styled.div`
@@ -180,6 +269,8 @@ const ModelsListBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  height: fit-content;
+
   button {
     background: none;
     border: none;
@@ -211,13 +302,13 @@ const ModelsListBox = styled.div`
     height: 48px;
     gap: 10px;
 
-    background: #718096;
+    border: 1px solid #39424c;
     border-radius: 12px;
 
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    color: #14171a;
+    color: #fff;
   }
 
   .fav-list {

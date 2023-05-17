@@ -4,8 +4,18 @@ import DappTwitter from '../icons/DappTwitter'
 import DappDiscord from '../icons/DappDiscord'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import DappMirror from '../icons/DappMirror'
+import DappMedium from '../icons/DappMedium'
+import DappGithub from '../icons/DappGithub'
 
 export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
+  const socialLink = dapp?.socialLink || []
+  const socialTwitter = socialLink.find((item) => item.platform === 'twitter')
+  const socialDiscord = socialLink.find((item) => item.platform === 'discord')
+  const socialMirror = socialLink.find((item) => item.platform === 'mirror')
+  const socialGithub = socialLink.find((item) => item.platform === 'github')
+  const socialMedium = socialLink.find((item) => item.platform === 'medium')
+
   return (
     <BasicBox>
       <div>
@@ -21,12 +31,41 @@ export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
             </button>
           </Link>
           <div className="social">
-            <button>
-              <DappTwitter />
-            </button>
-            <button>
-              <DappDiscord />
-            </button>
+            {socialTwitter && (
+              <Link to={socialTwitter.url} target="_blank">
+                <button>
+                  <DappTwitter />
+                </button>
+              </Link>
+            )}
+            {socialDiscord && (
+              <Link to={socialDiscord.url} target="_blank">
+                <button>
+                  <DappDiscord />
+                </button>
+              </Link>
+            )}
+            {socialMirror && (
+              <Link to={socialMirror.url} target="_blank">
+                <button>
+                  <DappMirror />
+                </button>
+              </Link>
+            )}
+            {socialMedium && (
+              <Link to={socialMedium.url} target="_blank">
+                <button>
+                  <DappMedium />
+                </button>
+              </Link>
+            )}
+            {socialGithub && (
+              <Link to={socialGithub.url} target="_blank">
+                <button>
+                  <DappGithub />
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
