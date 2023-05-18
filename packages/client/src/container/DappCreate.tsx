@@ -1,7 +1,5 @@
-import styled from 'styled-components'
-import AddIcon from '../components/icons/Add'
-import { useCallback, useRef, useState } from 'react'
-import { uploadImage } from '../api'
+
+import { useCallback, useState } from 'react'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import {
   useAuthentication,
@@ -9,6 +7,9 @@ import {
 } from '@us3r-network/auth-with-rainbowkit'
 import { Dapp } from '@us3r-network/dapp'
 import { useNavigate } from 'react-router-dom'
+import InputItem from '../components/Dapp/InputItem'
+import AppIconInput from '../components/Dapp/AppIconInput'
+import { EditBtnsBox, EditInfoBox, EditPageBox } from '../components/Dapp/EditPageBox'
 
 export default function DappCreate() {
   const [icon, setIcon] = useState('')
@@ -96,8 +97,8 @@ export default function DappCreate() {
   ])
 
   return (
-    <PageBox>
-      <InfoBox>
+    <EditPageBox>
+      <EditInfoBox>
         <div>
           <h3>Information</h3>
           <div className="app-basic">
@@ -163,8 +164,8 @@ export default function DappCreate() {
             />
           </div>
         </div>
-      </InfoBox>
-      <BtnsBox>
+      </EditInfoBox>
+      <EditBtnsBox>
         <button onClick={() => navigate(-1)}>Cancel</button>
         <button
           className="create"
@@ -178,205 +179,10 @@ export default function DappCreate() {
         >
           Create Application
         </button>
-      </BtnsBox>
-    </PageBox>
+      </EditBtnsBox>
+    </EditPageBox>
   )
 }
 
-function AppIconInput({
-  icon,
-  setIcon,
-}: {
-  icon?: string
-  setIcon: (url: string) => void
-}) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  return (
-    <AppIconBox>
-      <h4>App Icon:</h4>
-      <div
-        className="add-place"
-        onClick={() => {
-          inputRef.current!.click()
-        }}
-      >
-        {(icon && <img src={icon} alt="icon" />) || (
-          <>
-            <AddIcon />
-            <input
-              type="file"
-              accept="image/*"
-              ref={inputRef}
-              onChange={async (e) => {
-                const files = e.target.files
-                if (!files) return
-                const file = files[0]
-                const resp = await uploadImage({ file })
-                const iconUrl = resp.data.url
-                setIcon(iconUrl)
-              }}
-            />
-          </>
-        )}
-      </div>
-    </AppIconBox>
-  )
-}
 
-function InputItem({
-  label,
-  placeHolder,
-  value,
-  setValue,
-}: {
-  label: string
-  value: string
-  setValue: (v: string) => void
-  placeHolder?: string
-}) {
-  return (
-    <InputItemBox>
-      <h4>{label}</h4>
-      <input
-        type="text"
-        placeholder={placeHolder}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value)
-        }}
-      />
-    </InputItemBox>
-  )
-}
 
-const InputItemBox = styled.div``
-
-const AppIconBox = styled.div`
-  width: 150px;
-  flex-grow: 0 !important;
-  .add-place {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    isolation: isolate;
-    box-sizing: border-box;
-    width: 150px;
-    height: 150px;
-    background: #1a1e23;
-    border: 1px solid #39424c;
-    border-radius: 12px;
-
-    img {
-      width: 100%;
-    }
-    input {
-      display: none;
-    }
-  }
-`
-
-const PageBox = styled.div`
-  background-color: #1b1e23;
-  margin-top: 24px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 20px;
-
-  .app-basic {
-    display: flex;
-    gap: 20px;
-
-    > div {
-      flex-grow: 1;
-    }
-  }
-
-  input,
-  textarea {
-    color: #fff;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 24px;
-
-    background: #1a1e23;
-    border: 1px solid #39424c;
-    border-radius: 12px;
-    padding: 16px;
-    outline: none;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  input {
-    height: 48px;
-  }
-
-  textarea {
-    padding: 10px 16px;
-    resize: none;
-  }
-`
-
-const InfoBox = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-
-  > div {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .items {
-    gap: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  h3 {
-    margin: 0;
-    font-style: italic;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 21px;
-    color: #ffffff;
-  }
-
-  h4 {
-    margin: 0 0 5px 0;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
-    color: #ffffff;
-  }
-`
-
-const BtnsBox = styled.div`
-  display: flex;
-  justify-content: end;
-  gap: 20px;
-  margin-top: 40px;
-  button {
-    width: 180px;
-    height: 48px;
-
-    background: #1b1e23;
-    border: 1px solid #39424c;
-    border-radius: 24px;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
-    color: #ffffff;
-    cursor: pointer;
-
-    &.create {
-      background: #ffffff;
-      color: #14171a;
-    }
-  }
-`
