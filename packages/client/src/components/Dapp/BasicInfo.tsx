@@ -1,4 +1,6 @@
 import { Dapp } from '@us3r-network/dapp'
+import { useCallback, useState } from 'react'
+
 import DappEdit from '../icons/DappEdit'
 import DappTwitter from '../icons/DappTwitter'
 import DappDiscord from '../icons/DappDiscord'
@@ -7,6 +9,8 @@ import { Link } from 'react-router-dom'
 import DappMirror from '../icons/DappMirror'
 import DappMedium from '../icons/DappMedium'
 import DappGithub from '../icons/DappGithub'
+import Copy from '../icons/Copy'
+
 
 export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
   const socialLink = dapp?.socialLink || []
@@ -16,13 +20,40 @@ export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
   const socialGithub = socialLink.find((item) => item.platform === 'github')
   const socialMedium = socialLink.find((item) => item.platform === 'medium')
 
+  const [showCopyTint, setShowCopyTint] = useState(false)
+
+  const copyAppId = useCallback(async (appId: string) => {
+    try {
+      await navigator.clipboard.writeText(appId)
+      setShowCopyTint(true)
+      setTimeout(() => {
+        setShowCopyTint(false)
+      }, 2000)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
   return (
     <BasicBox>
       <div>
         <img src={dapp?.icon} alt="" />
         <div className="app-id">
           <h3>{dapp?.name}</h3>
-          <p>APP ID: {dapp?.id}</p>
+          <div>
+            <p>APP ID: {dapp?.id} </p>
+            <div className="copy">
+              <button
+                onClick={() => {
+                  if (!dapp?.id) return
+                  copyAppId(dapp?.id)
+                }}
+              >
+                <Copy />
+              </button>
+              {showCopyTint && <span>Copied</span>}
+            </div>
+          </div>
         </div>
         <div className="edit">
           <Link to={`/dapp/${dapp?.id}/edit`}>
@@ -109,6 +140,28 @@ const BasicBox = styled.div`
         font-size: 24px;
         line-height: 28px;
         margin: 0;
+      }
+
+      > div {
+        display: flex;
+        align-items: center;
+
+        .copy {
+          position: relative;
+
+          span {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            color: #718096;
+          }
+        }
+
+        button {
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
       }
     }
 
