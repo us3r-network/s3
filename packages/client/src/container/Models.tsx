@@ -41,13 +41,12 @@ export default function ModelsPage() {
       return item.modelId
     })
 
-    const network = getCurrNetwork()
     const resp = await getStarModels({ network, ids })
 
     const list = resp.data.data
     setHasMore(false)
     setStarModels([...list])
-  }, [personalCollections])
+  }, [personalCollections, network])
 
   const fetchPersonal = useCallback(async () => {
     if (!session) return

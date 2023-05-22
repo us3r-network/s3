@@ -1,14 +1,27 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Network } from '../types'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
 import { S3ModelCollectionModel } from '@us3r-network/model-collection'
 import { CeramicClient } from '@ceramicnetwork/http-client'
+import { Dapp, S3DappModel } from '@us3r-network/dapp'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { Edge } from '@ceramicnetwork/common'
 
 export interface CeramicContextData {
   ceramic: CeramicClient
   network: Network
   setNetwork: (arg0: Network) => void
   s3ModelCollection: S3ModelCollectionModel
+  s3Dapp: S3DappModel
+  dapps: Edge<Dapp>[] | undefined
+  loadDapps: () => void
 }
 
 const CeramicContext = createContext<CeramicContextData | null>(null)
@@ -22,11 +35,21 @@ export default function CeramicProvider({
   network: Network
   setNetwork: (arg0: Network) => void
 }) {
+  const [dapps, setDapps] = useState<Edge<Dapp>[]>()
+  const session = useSession()
+
   const s3ModelCollection = useMemo(() => {
     if (network === Network.MAINNET) {
       return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
     }
     return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
+  }, [network])
+
+  const s3Dapp = useMemo(() => {
+    if (network === Network.MAINNET) {
+      return new S3DappModel(CERAMIC_MAINNET_HOST)
+    }
+    return new S3DappModel(CERAMIC_TESTNET_HOST)
   }, [network])
 
   const ceramic = useMemo(() => {
@@ -36,13 +59,27 @@ export default function CeramicProvider({
     return new CeramicClient(CERAMIC_TESTNET_HOST)
   }, [network])
 
+  const loadDapps = useCallback(async () => {
+    if (!session) return
+    s3Dapp.authComposeClient(session)
+    const data = await s3Dapp.queryPersonalDapps({ first: 100 })
+    setDapps(data.data?.viewer.dappList.edges)
+  }, [session, s3Dapp])
+
+  useEffect(() => {
+    loadDapps()
+  }, [loadDapps])
+
   return (
     <CeramicContext.Provider
       value={{
+        dapps,
         ceramic,
         network,
         setNetwork,
         s3ModelCollection,
+        s3Dapp,
+        loadDapps,
       }}
     >
       {children}
