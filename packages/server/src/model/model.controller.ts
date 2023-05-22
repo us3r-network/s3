@@ -5,6 +5,8 @@ import {
   Get,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
+  Param,
   Post,
   Query,
   Req,
@@ -59,7 +61,7 @@ export class ModelController {
     required: false,
   })
   @ApiOkResponse({ type: BasicMessageDto })
-  async getStreams(
+  async getModels(
     @Query('name') name?: string,
     @Query('did') did?: string,
     @Query('description') description?: string,
@@ -81,12 +83,19 @@ export class ModelController {
         pageNumber,
       );
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
+      this.logger.log(`${network} model usecount ${useCountMap}`);
 
       const metaModels = await this.modelService.findModelsByIds(
         Array.from(useCountMap.keys()),
         network,
       );
+      this.logger.log(`${network} model ${metaModels}`);
+
       if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
+      const modelStreamIds = metaModels.map((m) => m.getStreamId);
+      const indexedModelStreamIds = await this.modelService.findIndexedModelIds(network, modelStreamIds)
+      const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
+
       return new BasicMessageDto(
         'ok',
         0,
@@ -94,6 +103,7 @@ export class ModelController {
           .map((m) => ({
             ...m,
             useCount: useCountMap?.get(m.getStreamId) ?? 0,
+            isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
           }))
           .sort((a, b) => b.useCount - a.useCount),
       );
@@ -110,38 +120,84 @@ export class ModelController {
     );
     if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
 
-    const models = metaModels.map((m) => m.getStreamId);
+    const modelStreamIds = metaModels.map((m) => m.getStreamId);
     const useCountMap = await this.streamService.findModelUseCount(
       network,
-      models,
+      modelStreamIds,
     );
 
+    const indexedModelStreamIds = await this.modelService.findIndexedModelIds(network, modelStreamIds)
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     return new BasicMessageDto(
       'ok',
       0,
       metaModels.map((m) => ({
         ...m,
         useCount: useCountMap?.get(m.getStreamId) ?? 0,
+        isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
       })),
     );
   }
 
+  @Get('/:modelStreamId/mids')
+  @ApiQuery({
+    name: 'pageNumber',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'network',
+    required: false,
+  })
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModelStreams(
+    @Query('pageSize') pageSize: number,
+    @Query('pageNumber') pageNumber: number,
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
+    if (!pageSize || pageSize == 0) pageSize = 50;
+    if (!pageNumber || pageNumber == 0) pageNumber = 1;
+    this.logger.log(`Seaching model(${modelStreamId})'s streams`);
+
+    const streams = await this.modelService.getStreams(network, modelStreamId, pageSize, pageNumber);
+    return new BasicMessageDto('ok', 0, streams);
+  }
+
+  @Get('/:modelStreamId/mids/:midStreamId')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getMid(@Param('midStreamId') midStreamId: string,
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching mid(${midStreamId}) on network ${network}.`);
+
+    const mid = await this.modelService.getMid(network, modelStreamId, midStreamId);
+    if (!mid) {
+      throw new NotFoundException(new BasicMessageDto(`midStreamId ${midStreamId} does not exist on network ${network}`, 0),
+      )
+    }
+    return new BasicMessageDto('ok', 0, mid);
+  }
+
   @Cron('0/10 * * * *')
   @Post('/usecount/build')
-  async buildUseCount(
-    @Query('network') network: Network = Network.TESTNET,
-  ): Promise<BasicMessageDto> {
-    const models = await this.modelService.findAllModelIds(network);
-    this.logger.log(`All ${network} model count: ${models?.length}`);
-    const useCountMap = await this.streamService.findAllModelUseCount(
-      network,
-      models,
-    );
-    if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
-    await this.modelService.updateModelUseCount(network, useCountMap);
-    return new BasicMessageDto('ok', 0, {
-      'useCountMap.size': useCountMap.size,
-    });
+  async buildUseCount(): Promise<BasicMessageDto> {
+    const networks = [Network.TESTNET, Network.MAINNET];
+    for await (const network of networks) {
+      const models = await this.modelService.findAllModelIds(network);
+      // console.time(`${network} model count cost`);
+      this.logger.log(`All ${network} model count: ${models?.length}`);
+      const useCountMap = await this.streamService.findAllModelUseCount(
+        network,
+      );
+      // console.timeEnd(`${network} model count cost`);
+      if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
+      await this.modelService.updateModelUseCount(network, useCountMap);
+    }
+    return new BasicMessageDto('ok', 0);
   }
 
   @Post('/indexing')
@@ -268,21 +324,37 @@ export class ModelController {
     const { printGraphQLSchema } = await importDynamic('@composedb/runtime');
 
     try {
+      console.time('initing ceramic client');
       const ceramic = new CeramicClient(getCeramicNode(dto.network));
+      console.timeEnd('initing ceramic client');
+
       // build all model stream ids for the model
+      console.time('fetching relation model streamIds');
       const allModelStreamIds = [];
       for await (const streamId of dto.models) {
         const relationModelStreamIds =
           await this.streamService.getRelationStreamIds(ceramic, streamId);
         allModelStreamIds.push(...relationModelStreamIds);
       }
+      console.timeEnd('fetching relation model streamIds');
+
       // buid composite
+      console.time('creating composite');
+      console.log('creating composite models:', dto.models, allModelStreamIds);
       const composite = await Composite.fromModels({
         ceramic: ceramic,
         models: [...dto.models, ...allModelStreamIds],
       });
+      console.timeEnd('creating composite');
+
+      console.time('creating runtimeDefinition');
       const runtimeDefinition = composite.toRuntime();
+      console.timeEnd('creating runtimeDefinition');
+
+      console.time('buiding graphqlSchema');
       const graphqlSchema = printGraphQLSchema(runtimeDefinition);
+      console.timeEnd('buiding graphqlSchema');
+
       return new BasicMessageDto('ok', 0, {
         composite,
         runtimeDefinition,
@@ -291,5 +363,40 @@ export class ModelController {
     } catch (e) {
       throw new InternalServerErrorException(`ModelIdToGraphql: ${e}`);
     }
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/ids')
+  async getModelsByIds(@Body() dto: { network: Network, ids: string[] }) {
+
+    const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
+      this.modelService.findModelsByIds(dto.ids, dto.network)
+      , this.streamService.findModelUseCount(dto.network, dto.ids)
+      , this.modelService.findIndexedModelIds(dto.network, dto.ids)
+    ]);
+
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
+
+    models.forEach(e => {
+      e.useCount = useCountMap?.get(e.getStreamId) ?? 0,
+        e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
+    });
+
+    return new BasicMessageDto('ok', 0, models);
+  }
+
+  @Get('/:modelStreamId')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModel(
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching model(${modelStreamId}) on network ${network}.`);
+
+    const mid = await this.modelService.getModel(network, modelStreamId);
+    if (!mid) {
+      throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0),
+      )
+    }
+    return new BasicMessageDto('ok', 0, mid);
   }
 }

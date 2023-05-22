@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -8,6 +8,8 @@ import { StreamModule } from './stream/stream.module';
 import { ModelModule } from './model/model.module';
 import 'dotenv/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { HealthModule } from './health/health.module';
+
 
 const env: string | undefined = process.env.NODE_ENV;
 
@@ -26,6 +28,11 @@ const env: string | undefined = process.env.NODE_ENV;
       logging: false,
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
+      pool: {
+        max: 20,
+        min: 10,
+        idleTimeoutMillis: 60000,
+      },
       extra: {
         ssl: {
           rejectUnauthorized: false,
@@ -44,6 +51,11 @@ const env: string | undefined = process.env.NODE_ENV;
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
       ssl: true,
+      pool: {
+        max: 20,
+        min: 10,
+        idleTimeoutMillis: 60000,
+      },
       extra: {
         ssl: {
           rejectUnauthorized: false,
@@ -55,6 +67,7 @@ const env: string | undefined = process.env.NODE_ENV;
       ttl: +process.env.THROTTLE_TTL,
       limit: +process.env.THROTTLE_LIMIT,
     }),
+    HealthModule,
     StreamModule,
     ModelModule,
     RedisModule.forRoot({

@@ -1,17 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import {
+  CeramicModelMainNet,
   CeramicModelTestNet,
   MetaModel,
   MetaModelMainnet,
 } from '../entities/model/model.entity';
 import {
+  CeramicModelMainNetRepository,
   CeramicModelTestNetRepository,
   MetaModelMainnetRepository,
   MetaModelRepository,
 } from '../entities/model/model.repository';
-import { In, Repository } from 'typeorm';
-import { Network } from 'src/entities/stream/stream.entity';
+import { EntityManager, In, Repository } from 'typeorm';
+import { Network, Stream } from 'src/entities/stream/stream.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
@@ -39,8 +41,86 @@ export default class ModelService {
     @InjectRepository(CeramicModelTestNet, 'testnet')
     private readonly ceramicModelTestNetRepository: CeramicModelTestNetRepository,
 
+    @InjectRepository(CeramicModelMainNet, 'mainnet')
+    private readonly ceramicModelMainNetRepository: CeramicModelMainNetRepository,
+
+    @InjectEntityManager('testnet')
+    private testnetCeramicEntityManager: EntityManager,
+
+    @InjectEntityManager('mainnet')
+    private mainnetCeramicEntityManager: EntityManager,
+
     @InjectRedis() private readonly redis: Redis,
-  ) {}
+  ) { }
+
+  async getStreams(network: Network, modelStreamId: string, pageSize: number, pageNumber: number): Promise<any[]> {
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+
+    const mids = await ceramicEntityManager.query(`select * from ${modelStreamId} order by created_at DESC limit ${pageSize} offset ${pageSize * (pageNumber - 1)}`)
+    if (mids.length == 0) return [];
+
+    return mids.map((mid: any) => {
+      return {
+        streamId: mid.stream_id,
+        controllerDid: mid.controller_did,
+        tip: mid.tip,
+        streamContent: mid.stream_content,
+        lastAnchoredAt: mid.last_anchored_at?.getTime(),
+        firstAnchoredAt: mid.first_anchored_at?.getTime(),
+        createdAt: mid.created_at?.getTime(),
+        updatedAt: mid.updated_at?.getTime(),
+      };
+    });
+  }
+
+  async getMid(network: Network, modelStreamId: string, midStreamId: string): Promise<any> {
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+
+    const mids = await ceramicEntityManager.query(`select * from ${modelStreamId} where stream_id='${midStreamId}'`)
+    if (mids.length == 0) return;
+
+    const indexedModels = await this.findIndexedModelIds(network, [modelStreamId]);
+
+    const mid = mids[0];
+    return {
+      streamId: mid.stream_id,
+      controllerDid: mid.controller_did,
+      tip: mid.tip,
+      streamContent: mid.stream_content,
+      lastAnchoredAt: mid.last_anchored_at?.getTime(),
+      firstAnchoredAt: mid.first_anchored_at?.getTime(),
+      createdAt: mid.created_at?.getTime(),
+      updatedAt: mid.updated_at?.getTime(),
+      isIndexed: indexedModels.length == 1,
+    };
+  }
+
+  async getModel(network: Network, modelStreamId: string): Promise<any> {
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+
+    const metaModel = 'kh4q0ozorrgaq2mezktnrmdwleo1d';
+    const mids = await ceramicEntityManager.query(`select * from ${metaModel} where stream_id='${modelStreamId}'`)
+    if (mids.length == 0) return;
+
+    const indexedModels = await this.findIndexedModelIds(network, [modelStreamId]);
+
+    const mid = mids[0];
+    return {
+      streamId: mid.stream_id,
+      controllerDid: mid.controller_did,
+      tip: mid.tip,
+      streamContent: mid.stream_content,
+      lastAnchoredAt: mid.last_anchored_at?.getTime(),
+      firstAnchoredAt: mid.first_anchored_at?.getTime(),
+      createdAt: mid.created_at?.getTime(),
+      updatedAt: mid.updated_at?.getTime(),
+      isIndexed: indexedModels.length == 1,
+    };
+  }
+
 
   // Currently only support testnet.
   async indexTopModelsForTestNet(topNum: number) {
@@ -174,6 +254,17 @@ export default class ModelService {
     return result.map((r) => r['stream_id']);
   }
 
+  async findIndexedModelIds(network: Network, modelStreamIds: string[]): Promise<string[]> {
+    let models: any[] = [];
+    if (network == Network.MAINNET) {
+      models = await this.ceramicModelMainNetRepository.find({ where: { model: In(modelStreamIds) } });
+    } else if (network == Network.TESTNET) {
+      models = await this.ceramicModelTestNetRepository.find({ where: { model: In(modelStreamIds) } });
+    }
+
+    return models?.map(m => m.getModel);
+  }
+
   async findModels(
     pageSize: number,
     pageNumber: number,
@@ -263,4 +354,29 @@ export default class ModelService {
     });
     await this.redis.zadd(key, ...members);
   }
+
+  async getModelStatistics(
+    network: Network = Network.TESTNET,
+  ): Promise<any> {
+
+    console.time(`${network}-getModelStatistics`);
+
+    const models = await this.getMetaModelRepository(network)
+      .createQueryBuilder('kh4q0ozorrgaq2mezktnrmdwleo1d')
+      .select(['kh4q0ozorrgaq2mezktnrmdwleo1d.created_at'])
+      .orderBy('created_at', 'DESC')
+      .getMany();
+
+    console.timeEnd(`${network}-getModelStatistics`);
+
+    const now = Math.floor((new Date()).getTime() / 1000);
+    const today = Math.floor(now / (24 * 3600)) * 24 * 3600;
+    let i = 0;
+    for (i = 0; i < models.length; ++i) {
+      const t = Math.floor(models[i].getCreatedAt.getTime() / 1000);
+      if (t < today) { break; }
+    }
+    return { totalModels: models.length, todayModels: i + 1 }
+  }
+
 }

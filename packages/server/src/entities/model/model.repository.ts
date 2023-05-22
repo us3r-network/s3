@@ -1,5 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 import {
+  CeramicModelMainNet,
   CeramicModelTestNet,
   MetaModel,
   MetaModelMainnet,
@@ -13,3 +14,6 @@ export class MetaModelMainnetRepository extends Repository<MetaModelMainnet> {}
 
 @EntityRepository(CeramicModelTestNet)
 export class CeramicModelTestNetRepository extends Repository<CeramicModelTestNet> {}
+
+@EntityRepository(CeramicModelMainNet)
+export class CeramicModelMainNetRepository extends Repository<CeramicModelMainNet> {}

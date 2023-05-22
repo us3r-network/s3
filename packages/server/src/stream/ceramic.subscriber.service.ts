@@ -11,8 +11,8 @@ export default class CeramicSubscriberService {
   constructor(
     @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
-  ) {}
-  async SubCeramic(
+  ) { }
+  async subCeramic(
     network: Network,
     bootstrapMultiaddrs: string[],
     listen: string[],
@@ -30,19 +30,21 @@ export default class CeramicSubscriberService {
         const parsed = JSON.parse(asString);
         if (parsed.typ == 0) {
           // MsgType: UPDATE
+          // console.log(network, ' p2p message:', parsed);
           await this.store(ceramic, network, parsed.stream);
-        } else if (parsed.typ == 2) {
-          // MsgType: RESPONSE
-          const streamIds = Object.keys(parsed.tips);
-          await Promise.all(
-            streamIds?.map(async (streamId) => {
-              await this.store(ceramic, network, streamId);
-            }),
-          );
         }
+        // else if (parsed.typ == 2) {
+        //   // MsgType: RESPONSE
+        //   const streamIds = Object.keys(parsed.tips);
+        //   await Promise.all(
+        //     streamIds?.map(async (streamId) => {
+        //       await this.store(ceramic, network, streamId);
+        //     }),
+        //   );
+        // }
       } catch (error) {
         this.logger.error(
-          `ceramic sub err, messgage:${message} error:${error}`,
+          `${network} ceramic sub err, messgage:${message} error:${error}`,
         );
       }
     });
@@ -57,7 +59,6 @@ export default class CeramicSubscriberService {
       });
 
       const genesisDag = await ipfs.dag.get(cid, { timeout: 6000 });
-
       if (!genesisDag?.value) return;
 
       const { base64urlToJSON } = await _importDynamic(
@@ -73,9 +74,9 @@ export default class CeramicSubscriberService {
       const cacaoCid = CID.parse(capIPFSUri.replace('ipfs://', ''));
       if (!cacaoCid) return;
 
-      cacaoDag = await ipfs.dag.get(cacaoCid);
+      cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
+      // this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
     }
 
     return cacaoDag;
@@ -180,11 +181,11 @@ export default class CeramicSubscriberService {
       // this.logger.log(`Saved network(${network}) stream id(${streamId})`);
       return savedStream;
     } catch (error) {
-      this.logger.error(
-        `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
-          error,
-        )}`,
-      );
+      // this.logger.error(
+      //   `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
+      //     error,
+      //   )}`,
+      // );
     }
   }
 

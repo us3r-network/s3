@@ -43,29 +43,60 @@ export class StreamController {
     name: 'pageSize',
     required: false,
   })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+  })
   @ApiOkResponse({ type: BasicMessageDto })
   async getStreams(
     @Query('network') network: Network,
-    @Query('familyOrApp') familyOrApp?: string,
+    @Query('familyOrApp') familyOrApps?: string[],
     @Query('did') did?: string,
     @Query('pageSize') pageSize?: number,
     @Query('pageNumber') pageNumber?: number,
+    @Query('type') types?: string[],
   ): Promise<BasicMessageDto> {
     if (!pageSize || pageSize == 0) pageSize = 50;
     if (!pageNumber || pageNumber == 0) pageNumber = 1;
+    
+    if (familyOrApps && !Array.isArray(familyOrApps)) {
+      familyOrApps = [familyOrApps]
+    }
+    if (types && !Array.isArray(types)) {
+      types = [types];
+    }
 
     const streams = await this.streamService.findStreams(
       network,
-      familyOrApp,
+      familyOrApps,
       did,
       pageSize,
       pageNumber,
+      types,
     );
     return new BasicMessageDto(
       'ok',
       0,
       ConvertToStreamsReponseDto(streams, 0, 0),
     );
+  }
+
+  @Get('/:network/streams/topics')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getStreamTopics(
+    @Param('network') network: Network,
+  ): Promise<BasicMessageDto> {
+    const topics = await this.streamService.getTopics(network);
+    return new BasicMessageDto('ok', 0, topics);
+  }
+
+  @Get('/:network/stats')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getStats(
+    @Param('network') network: Network,
+  ): Promise<BasicMessageDto> {
+    const stats = await this.streamService.getStats(network);
+    return new BasicMessageDto('ok', 0, stats);
   }
 
   @Get('/:network/streams/:streamId')
@@ -136,7 +167,7 @@ export class StreamController {
 
     let ceramic;
     if (network == Network.MAINNET) {
-      ceramic = new CeramicClient(process.env.CERAMIC_NODE_MAINET);
+      ceramic = new CeramicClient(process.env.CERAMIC_NODE_MAINNET);
     } else {
       ceramic = new CeramicClient(process.env.CERAMIC_NODE);
     }
@@ -171,4 +202,5 @@ export class StreamController {
 
     return handler(req, res, { req, res });
   }
+
 }

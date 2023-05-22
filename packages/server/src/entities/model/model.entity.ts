@@ -75,6 +75,71 @@ export class CeramicModelTestNet extends BaseEntity {
 }
 
 @Entity({
+  name: 'ceramic_models',
+})
+export class CeramicModelMainNet extends BaseEntity {
+  @PrimaryColumn()
+  private model: string;
+
+  @Column({ nullable: false })
+  private is_indexed: boolean;
+
+  @Column({ nullable: false })
+  private enable_historical_sync: boolean;
+
+  @Column({ type: 'timestamptz' })
+  private created_at: Date;
+
+  @Column({ type: 'timestamptz' })
+  private updated_at: Date;
+
+  @Column({ nullable: false })
+  private updated_by: string;
+
+  get getModel(): string {
+    return this.model;
+  }
+  set setModel(model: string) {
+    this.model = model;
+  }
+
+  get getIsIndexed(): boolean {
+    return this.is_indexed;
+  }
+  set setIsIndexed(isIndexed: boolean) {
+    this.is_indexed = isIndexed;
+  }
+
+  get getEnableHistoricalSync(): boolean {
+    return this.enable_historical_sync;
+  }
+  set setEnableHistoricalSync(enableHistoricalSync: boolean) {
+    this.enable_historical_sync = enableHistoricalSync;
+  }
+
+  get getCreatedAt(): Date {
+    return this.created_at;
+  }
+  set setCreatedAt(createdAt: Date) {
+    this.created_at = createdAt;
+  }
+
+  get getUpdatedAt(): Date {
+    return this.updated_at;
+  }
+  set setUpdatedAt(updatedAt: Date) {
+    this.updated_at = updatedAt;
+  }
+
+  get getUpdatedBy(): string {
+    return this.updated_by;
+  }
+  set setUpdatedBy(updatedBy: string) {
+    this.updated_by = updatedBy;
+  }
+}
+
+@Entity({
   name: 'kh4q0ozorrgaq2mezktnrmdwleo1d',
 })
 export class MetaModel extends BaseEntity {

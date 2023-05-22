@@ -12,6 +12,11 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       logging: false,
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
+      pool: {
+        max: 20,
+        min: 10,
+        idleTimeoutMillis: 60000,
+      },
       extra: {
         ssl: {
           rejectUnauthorized: false,
