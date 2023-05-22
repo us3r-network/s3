@@ -58,7 +58,7 @@ export default function Nav() {
             <hr />
             {dapps?.map(item => {
               return <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
-                <div>
+                <div className='icon'>
                   <img src={item.node.icon!} />
                   {/* {item.node.name} */}
                 </div>
@@ -240,6 +240,11 @@ const NavContainer = styled.nav`
       img {
         width: 39px;
         height: 39px;
+      }
+
+      .icon {
+        border-radius: 10px;
+        overflow: hidden;
       }
 
       a {

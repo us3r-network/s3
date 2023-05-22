@@ -16,7 +16,7 @@ import ModelTabs from '../components/Dapp/Tabs'
 
 export default function DappInfo() {
   const { appId } = useParams()
-  const { s3Dapp, loadDapps } = useCeramicCtx()
+  const { s3Dapp } = useCeramicCtx()
   const [dapp, setDapp] = useState<Dapp>()
   const session = useSession()
 
@@ -36,9 +36,9 @@ export default function DappInfo() {
       await s3Dapp.updateDapp(appId, {
         models,
       })
-      await loadDapps()
+      await loadDapp()
     },
-    [appId, dapp, loadDapps, s3Dapp, session]
+    [appId, dapp, loadDapp, s3Dapp, session]
   )
 
   const removeModelFromDapp = useCallback(
@@ -47,21 +47,20 @@ export default function DappInfo() {
       if (!appId) return
       const models = dapp?.models || []
       const idx = models.indexOf(modelId)
-      console.log({ idx })
+
       if (idx === -1) return
       await s3Dapp.updateDapp(appId, {
         models: [...models.slice(0, idx), ...models.slice(idx + 1)],
       })
-      await loadDapps()
+      await loadDapp()
     },
-    [appId, dapp, loadDapps, s3Dapp, session]
+    [appId, dapp, loadDapp, s3Dapp, session]
   )
 
   useEffect(() => {
     loadDapp()
   }, [loadDapp])
 
-  console.log(dapp)
 
   return (
     <div>
@@ -80,8 +79,8 @@ function DappModels({
   addModelToDapp,
   models,
 }: {
-  removeModelFromDapp: (modelId: string) => void
-  addModelToDapp: (modelId: string) => void
+  removeModelFromDapp: (modelId: string) => Promise<void>
+  addModelToDapp: (modelId: string) => Promise<void>
   models: string[]
 }) {
   const { starModels } = useStarModels()
@@ -99,15 +98,15 @@ function DappModels({
             </Link>
           </div>
           <DappModelList
-            ids={models}
+            ids={[...models]}
             selectAction={(model: ModelStream) => {
               setSelectModel(model)
             }}
-            removeModelAction={(id: string) => {
+            removeModelAction={async (id: string) => {
               if (id === selectModel?.stream_id) {
                 setSelectModel(undefined)
               }
-              removeModelFromDapp(id)
+              await removeModelFromDapp(id)
             }}
           />
         </div>
@@ -120,12 +119,16 @@ function DappModels({
           <h3>My Favorite Models({starModels.length})</h3>
           <div className="fav-list">
             {starModels.map((item) => {
+              const hasInclude = models.includes(item.stream_id)
               return (
                 <div key={item.stream_id}>
                   {item.stream_content.name}
-                  <button onClick={() => addModelToDapp(item.stream_id)}>
-                    <Add />
-                  </button>
+                  {!hasInclude && (
+                    <ModelListItemAdd
+                      streamId={item.stream_id}
+                      addModelToDapp={addModelToDapp}
+                    />
+                  )}
                 </div>
               )
             })}
@@ -151,28 +154,27 @@ function DappModelList({
 }: {
   ids: string[]
   selectAction: (model: ModelStream) => void
-  removeModelAction: (modelId: string) => void
+  removeModelAction: (modelId: string) => Promise<void>
 }) {
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const { network } = useCeramicCtx()
   const [selected, setSelected] = useState<ModelStream>()
 
-  const loadModelsInfo = useCallback(
-    async (models: string[]) => {
-      if (models.length === 0) {
-        setDappModels([])
-        return
-      }
-      const resp = await getStarModels({ network, ids: models })
+  const loadModelsInfo = useCallback(async () => {
+    const models = ids
+    if (models.length === 0) {
+      setDappModels([])
+      return
+    }
+    const resp = await getStarModels({ network, ids: models })
 
-      const list = resp.data.data
-      setDappModels(list)
-    },
-    [network]
-  )
+    const list = resp.data.data
+    setDappModels(list)
+  }, [network, ids])
   useEffect(() => {
-    loadModelsInfo(ids)
-  }, [loadModelsInfo, ids])
+    loadModelsInfo()
+  }, [loadModelsInfo])
+
 
   return (
     <DappModelsListBox>
@@ -189,13 +191,10 @@ function DappModelList({
               >
                 {item.stream_content.name}
               </div>
-              <button
-                onClick={() => {
-                  removeModelAction(item.stream_id)
-                }}
-              >
-                <Trash />
-              </button>
+              <ModelListItemTrash
+                removeModelAction={removeModelAction}
+                streamId={item.stream_id}
+              />
             </div>
             {active && (
               <>
@@ -208,6 +207,62 @@ function DappModelList({
         )
       })}
     </DappModelsListBox>
+  )
+}
+
+function ModelListItemTrash({
+  streamId,
+  removeModelAction,
+}: {
+  streamId: string
+  removeModelAction: (modelId: string) => Promise<void>
+}) {
+  const [removing, setRemoving] = useState(false)
+  if (removing) {
+    return (
+      <div className="removing">
+        <img src="/loading.gif" title="loading" alt="" />{' '}
+      </div>
+    )
+  }
+  return (
+    <button
+      onClick={async () => {
+        setRemoving(true)
+        await removeModelAction(streamId)
+        setRemoving(false)
+      }}
+    >
+      <Trash />
+    </button>
+  )
+}
+
+function ModelListItemAdd({
+  streamId,
+  addModelToDapp,
+}: {
+  streamId: string
+  addModelToDapp: (streamId: string) => Promise<void>
+}) {
+  const [adding, setAdding] = useState(false)
+  if (adding) {
+    return (
+      <div className="removing">
+        <img src="/loading.gif" title="loading" alt="" />{' '}
+      </div>
+    )
+  }
+  return (
+    <button
+      onClick={async () => {
+        setAdding(true)
+        await addModelToDapp(streamId)
+        setAdding(false)
+      }}
+    >
+      <Add />
+    </button>
   )
 }
 
@@ -233,7 +288,7 @@ const DappModelsListBox = styled.div`
     justify-content: space-between;
     align-items: center;
   }
-  
+
   div.active {
     background: rgba(113, 128, 150, 0.3);
     border: 1px solid #718096;
@@ -328,6 +383,14 @@ const ModelsListBox = styled.div`
 
       border: 1px solid #39424c;
       border-radius: 12px;
+    }
+  }
+
+  .removing {
+    width: 25px;
+    height: 25px;
+    > img {
+      width: 100%;
     }
   }
 `
