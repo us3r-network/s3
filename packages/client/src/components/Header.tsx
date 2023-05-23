@@ -60,7 +60,7 @@ export default function Header() {
           />
         )) || <div></div>}
         <NetworkSwitch />
-        {showLogoutButton && <LogoutButton />}
+        {/* {showLogoutButton && <LogoutButton />} */}
       </div>
     </Box>
   )
