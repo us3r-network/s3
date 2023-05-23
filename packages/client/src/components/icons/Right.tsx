@@ -1,4 +1,4 @@
-export default function AddIcon({stroke = '#718096' }: {stroke?: string}) {
+export default function Right() {
   return (
     <svg
       width="24"
@@ -8,8 +8,8 @@ export default function AddIcon({stroke = '#718096' }: {stroke?: string}) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 5V19M5 12H19"
-        stroke={stroke}
+        d="M13.6001 18L19.6001 12L13.6001 6M5.6001 6L11.4001 12L5.6001 18"
+        stroke="#718096"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

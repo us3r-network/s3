@@ -13,6 +13,9 @@ import { ModelStream } from '../types'
 import Trash from '../components/icons/Trash'
 
 import ModelTabs from '../components/Dapp/Tabs'
+import Left from '../components/icons/Left'
+import { divide } from 'lodash'
+import Right from '../components/icons/Right'
 
 export default function DappInfo() {
   const { appId } = useParams()
@@ -61,7 +64,6 @@ export default function DappInfo() {
     loadDapp()
   }, [loadDapp])
 
-
   return (
     <div>
       <BasicInfo dapp={dapp} />
@@ -83,85 +85,13 @@ function DappModels({
   addModelToDapp: (modelId: string) => Promise<void>
   models: string[]
 }) {
+  const { network } = useCeramicCtx()
   const { starModels } = useStarModels()
   const [selectModel, setSelectModel] = useState<ModelStream>()
-  return (
-    <ModelsBox>
-      <ModelsListBox>
-        <div>
-          <div className="title">
-            <h3> ModelList</h3>
-            <Link to={'/models/model/create'}>
-              <button>
-                <Add />
-              </button>
-            </Link>
-          </div>
-          <DappModelList
-            ids={[...models]}
-            selectAction={(model: ModelStream) => {
-              setSelectModel(model)
-            }}
-            removeModelAction={async (id: string) => {
-              if (id === selectModel?.stream_id) {
-                setSelectModel(undefined)
-              }
-              await removeModelFromDapp(id)
-            }}
-          />
-        </div>
-        <Link to={'/models'}>
-          <div className="explore">
-            <ExploreAdd /> Explore More
-          </div>
-        </Link>
-        <div>
-          <h3>My Favorite Models({starModels.length})</h3>
-          <div className="fav-list">
-            {starModels.map((item) => {
-              const hasInclude = models.includes(item.stream_id)
-              return (
-                <div key={item.stream_id}>
-                  {item.stream_content.name}
-                  {!hasInclude && (
-                    <ModelListItemAdd
-                      streamId={item.stream_id}
-                      addModelToDapp={addModelToDapp}
-                    />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </ModelsListBox>
-      <div className="tabs">
-        {selectModel && (
-          <ModelTabs
-            name={selectModel?.stream_content.name || ''}
-            modelId={selectModel?.stream_id || ''}
-          />
-        )}
-      </div>
-    </ModelsBox>
-  )
-}
-
-function DappModelList({
-  ids,
-  selectAction,
-  removeModelAction,
-}: {
-  ids: string[]
-  selectAction: (model: ModelStream) => void
-  removeModelAction: (modelId: string) => Promise<void>
-}) {
+  const [scale, setScale] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
-  const { network } = useCeramicCtx()
-  const [selected, setSelected] = useState<ModelStream>()
 
   const loadModelsInfo = useCallback(async () => {
-    const models = ids
     if (models.length === 0) {
       setDappModels([])
       return
@@ -170,11 +100,105 @@ function DappModelList({
 
     const list = resp.data.data
     setDappModels(list)
-  }, [network, ids])
+  }, [network, models])
+
   useEffect(() => {
     loadModelsInfo()
   }, [loadModelsInfo])
 
+  const leftWidth = scale ? 60 : 260
+
+  return (
+    <ModelsBox>
+      <ModelsListBox width={leftWidth} scale={scale}>
+        {(scale && (
+          <div className="scaled">
+            <p>Models List</p>
+            <button onClick={() => setScale(false)}>
+              <Right />
+            </button>
+          </div>
+        )) || (
+          <>
+            <div>
+              <div className="title">
+                <h3> ModelList</h3>
+                {selectModel && <button
+                  onClick={() => {
+                    setScale(true)
+                  }}
+                >
+                  <Left />
+                </button>}
+              </div>
+              <Link to={'/models/model/create'}>
+                <div className="create">
+                  <Add stroke="#fff" /> Create
+                </div>
+              </Link>
+              <DappModelList
+                dappModels={dappModels || []}
+                selectAction={(model: ModelStream) => {
+                  setSelectModel(model)
+                }}
+                removeModelAction={async (id: string) => {
+                  if (id === selectModel?.stream_id) {
+                    setSelectModel(undefined)
+                  }
+                  await removeModelFromDapp(id)
+                }}
+              />
+            </div>
+            <Link to={'/models'}>
+              <div className="explore">
+                <ExploreAdd /> Explore More
+              </div>
+            </Link>
+            <div>
+              <h3>My Favorite Models({starModels.length})</h3>
+              <div className="fav-list">
+                {starModels.map((item) => {
+                  const hasInclude = models.includes(item.stream_id)
+                  return (
+                    <div key={item.stream_id}>
+                      {item.stream_content.name}
+                      {!hasInclude && (
+                        <ModelListItemAdd
+                          streamId={item.stream_id}
+                          addModelToDapp={addModelToDapp}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </>
+        )}
+      </ModelsListBox>
+
+      <Tabs leftWidth={leftWidth}>
+        {selectModel && (
+          <ModelTabs
+            name={selectModel?.stream_content.name || ''}
+            modelId={selectModel?.stream_id || ''}
+          />
+        )}
+      </Tabs>
+    </ModelsBox>
+  )
+}
+
+function DappModelList({
+  dappModels,
+  selectAction,
+  removeModelAction,
+}: {
+  dappModels: ModelStream[]
+  selectAction: (model: ModelStream) => void
+  removeModelAction: (modelId: string) => Promise<void>
+}) {
+  const [selected, setSelected] = useState<ModelStream>()
 
   return (
     <DappModelsListBox>
@@ -308,23 +332,37 @@ const DappModelsListBox = styled.div`
 const ModelsBox = styled.div`
   display: flex;
   gap: 20px;
-
-  > .tabs {
-    width: calc(1300px - 261px - 20px);
-  }
 `
 
-const ModelsListBox = styled.div`
-  padding: 20px;
+const Tabs = styled.div<{ leftWidth: number }>`
+  width: ${({ leftWidth }) => ` calc(1300px - ${leftWidth}px - 20px)`};
+`
+
+const ModelsListBox = styled.div<{ width: number; scale: boolean }>`
+  padding: ${({ scale }) => (scale ? `5px` : '20px')};
   box-sizing: border-box;
-  width: 261px;
+  width: ${({ width }) => `${width}px`};
   background: #1b1e23;
   border: 1px solid #39424c;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: fit-content;
+  height: ${({ scale }) => (scale ? 'calc(100vh - 260px)' : `fit-content`)};
+
+  .scaled {
+    font-size: 12px;
+    line-height: 14px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: #718096;
+    height: 100%;
+    justify-content: center;
+    p {
+      text-align: center;
+    }
+  }
 
   button {
     background: none;
@@ -345,6 +383,16 @@ const ModelsListBox = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .create {
+    border: 1px solid #39424c;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    margin-top: 20px;
   }
 
   .explore {
