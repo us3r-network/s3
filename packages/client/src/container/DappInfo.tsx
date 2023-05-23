@@ -90,6 +90,7 @@ function DappModels({
   const [selectModel, setSelectModel] = useState<ModelStream>()
   const [scale, setScale] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
+  const [selected, setSelected] = useState<ModelStream>()
 
   const loadModelsInfo = useCallback(async () => {
     if (models.length === 0) {
@@ -123,13 +124,15 @@ function DappModels({
             <div>
               <div className="title">
                 <h3> ModelList</h3>
-                {selectModel && <button
-                  onClick={() => {
-                    setScale(true)
-                  }}
-                >
-                  <Left />
-                </button>}
+                {selectModel && (
+                  <button
+                    onClick={() => {
+                      setScale(true)
+                    }}
+                  >
+                    <Left />
+                  </button>
+                )}
               </div>
               <Link to={'/models/model/create'}>
                 <div className="create">
@@ -137,6 +140,8 @@ function DappModels({
                 </div>
               </Link>
               <DappModelList
+                selected={selected}
+                setSelected={setSelected}
                 dappModels={dappModels || []}
                 selectAction={(model: ModelStream) => {
                   setSelectModel(model)
@@ -190,16 +195,18 @@ function DappModels({
 }
 
 function DappModelList({
+  selected,
+  setSelected,
   dappModels,
   selectAction,
   removeModelAction,
 }: {
+  selected?: ModelStream
+  setSelected: (ms: ModelStream) => void
   dappModels: ModelStream[]
   selectAction: (model: ModelStream) => void
   removeModelAction: (modelId: string) => Promise<void>
 }) {
-  const [selected, setSelected] = useState<ModelStream>()
-
   return (
     <DappModelsListBox>
       {dappModels?.map((item) => {
