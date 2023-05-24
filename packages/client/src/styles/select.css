@@ -247,7 +247,7 @@
   }
 }
 
-.home-popover {
+.home-popover, .modelview-popover {
   border: 1px solid #39424c;
   padding: 10px 20px 10px 5px;
   box-sizing: border-box;
@@ -270,4 +270,8 @@
   &[data-exiting] {
     animation: slide 200ms reverse ease-in;
   }
+}
+
+.modelview-popover {
+  width: 165px;
 }
