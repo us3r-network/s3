@@ -95,7 +95,7 @@ export default function ModelView() {
     async (dappId: string) => {
       const modelId = streamId
       if (!modelId) return
-      const dappItem = dapps?.find((item) => item.node.id === dappId)
+      const dappItem = dapps?.find((item) => item.node && item.node.id === dappId)
       if (!dappItem) return
 
       if (!dappItem.node.models?.includes(modelId)) {
@@ -115,7 +115,7 @@ export default function ModelView() {
   }, [streamId, fetchModelInfo])
 
   let options = useMemo(() => {
-    return dapps?.map((item) => {
+    return dapps?.filter(item => item.node).map((item) => {
       return {
         id: item.node.id,
         name: item.node.name,
