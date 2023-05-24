@@ -15,13 +15,12 @@ import dayjs from 'dayjs'
 import Search from '../components/Search'
 import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
-import getCurrNetwork from '../utils/getCurrNetwork'
 import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
   const { signIn } = useAuthentication()
-  const { network } = useCeramicCtx()
+  const { network, fetchPersonalCollections, personalCollections } = useCeramicCtx()
   const session = useSession()
   const sessId = session?.id
   const [models, setModels] = useState<Array<ModelStream>>([])
@@ -31,9 +30,7 @@ export default function ModelsPage() {
   const [hasMore, setHasMore] = useState(true)
   const pageNum = useRef(1)
   const [filterStar, setFilterStar] = useState(false)
-  const [personalCollections, setPersonalCollections] = useState<
-    { modelId: string; id: string; revoke: boolean }[]
-  >([])
+
   const { s3ModelCollection } = useCeramicCtx()
 
   const fetchStarModels = useCallback(async () => {
@@ -48,28 +45,6 @@ export default function ModelsPage() {
     setStarModels([...list])
   }, [personalCollections, network])
 
-  const fetchPersonal = useCallback(async () => {
-    if (!session) return
-    s3ModelCollection.authComposeClient(session)
-    const personal = await s3ModelCollection.queryPersonalCollections({
-      first: 500,
-    })
-    const collected = personal.data?.viewer.modelCollectionList
-
-    if (collected) {
-      setPersonalCollections(
-        collected?.edges
-          .filter((item) => item.node.revoke !== true)
-          .map((item) => {
-            return {
-              modelId: item.node.modelID,
-              id: item.node.id!,
-              revoke: !!item.node.revoke,
-            }
-          })
-      )
-    }
-  }, [s3ModelCollection, session])
 
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
@@ -87,9 +62,9 @@ export default function ModelsPage() {
         })
       }
 
-      await fetchPersonal()
+      await fetchPersonalCollections()
     },
-    [session, s3ModelCollection, fetchPersonal]
+    [session, s3ModelCollection, fetchPersonalCollections]
   )
 
   const fetchModel = useCallback(async () => {
@@ -126,16 +101,11 @@ export default function ModelsPage() {
     [navigate]
   )
 
-  useEffect(() => {
-    if (!session) {
-      setPersonalCollections([])
-    }
-  }, [session])
 
   useEffect(() => {
     fetchModel()
-    fetchPersonal()
-  }, [fetchModel, fetchPersonal])
+    fetchPersonalCollections()
+  }, [fetchModel, fetchPersonalCollections])
 
   const lists = useMemo(() => {
     if (!filterStar) return models
@@ -271,7 +241,7 @@ export default function ModelsPage() {
                       <ModelStarItem
                         stream_id={item.stream_id}
                         hasStarItem={hasStarItem}
-                        fetchPersonal={fetchPersonal}
+                        fetchPersonal={fetchPersonalCollections}
                         signIn={signIn}
                       />
                     </td>

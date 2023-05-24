@@ -14,7 +14,6 @@ import Trash from '../components/icons/Trash'
 
 import ModelTabs from '../components/Dapp/Tabs'
 import Left from '../components/icons/Left'
-import { divide } from 'lodash'
 import Right from '../components/icons/Right'
 
 export default function DappInfo() {
@@ -32,6 +31,7 @@ export default function DappInfo() {
   const addModelToDapp = useCallback(
     async (modelId: string) => {
       if (!session) return
+      s3Dapp.authComposeClient(session)
       if (!appId) return
       const models = dapp?.models || []
       if (models.includes(modelId)) return
@@ -85,6 +85,7 @@ function DappModels({
   addModelToDapp: (modelId: string) => Promise<void>
   models: string[]
 }) {
+  const { appId } = useParams()
   const { network } = useCeramicCtx()
   const { starModels } = useStarModels()
   const [selectModel, setSelectModel] = useState<ModelStream>()
@@ -111,7 +112,7 @@ function DappModels({
 
   return (
     <ModelsBox>
-      <ModelsListBox width={leftWidth} scale={scale}>
+      <ModelsListBox width={leftWidth} scale={scale ? 'scale' : ''}>
         {(scale && (
           <div className="scaled">
             <p>Models List</p>
@@ -134,7 +135,7 @@ function DappModels({
                   </button>
                 )}
               </div>
-              <Link to={'/models/model/create'}>
+              <Link to={`/models/model/create?dapp=${appId}`}>
                 <div className="create">
                   <Add stroke="#fff" /> Create
                 </div>
@@ -345,7 +346,7 @@ const Tabs = styled.div<{ leftWidth: number }>`
   width: ${({ leftWidth }) => ` calc(1300px - ${leftWidth}px - 20px)`};
 `
 
-const ModelsListBox = styled.div<{ width: number; scale: boolean }>`
+const ModelsListBox = styled.div<{ width: number; scale: string }>`
   padding: ${({ scale }) => (scale ? `5px` : '20px')};
   box-sizing: border-box;
   width: ${({ width }) => `${width}px`};

@@ -14,6 +14,11 @@ import { Dapp, S3DappModel } from '@us3r-network/dapp'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Edge } from '@ceramicnetwork/common'
 
+export type PersonalCollection = {
+  modelId: string
+  id: string
+  revoke: boolean
+}
 export interface CeramicContextData {
   ceramic: CeramicClient
   network: Network
@@ -22,6 +27,9 @@ export interface CeramicContextData {
   s3Dapp: S3DappModel
   dapps: Edge<Dapp>[] | undefined
   loadDapps: () => void
+  personalCollections: Array<PersonalCollection>
+  personalCollectionsWithoutFilter: Array<PersonalCollection>
+  fetchPersonalCollections: () => void
 }
 
 const CeramicContext = createContext<CeramicContextData | null>(null)
@@ -36,6 +44,13 @@ export default function CeramicProvider({
   setNetwork: (arg0: Network) => void
 }) {
   const [dapps, setDapps] = useState<Edge<Dapp>[]>()
+  const [personalCollections, setPersonalCollections] = useState<
+    PersonalCollection[]
+  >([])
+  const [
+    personalCollectionsWithoutFilter,
+    setPersonalCollectionsWithoutFilter,
+  ] = useState<PersonalCollection[]>([])
   const session = useSession()
 
   const s3ModelCollection = useMemo(() => {
@@ -66,13 +81,55 @@ export default function CeramicProvider({
     setDapps(data.data?.viewer.dappList.edges)
   }, [session, s3Dapp])
 
+  const fetchPersonalCollections = useCallback(async () => {
+    if (!session) return
+    s3ModelCollection.authComposeClient(session)
+    const personal = await s3ModelCollection.queryPersonalCollections({
+      first: 500,
+    })
+    const collected = personal.data?.viewer.modelCollectionList
+
+    if (collected) {
+      setPersonalCollections(
+        collected?.edges
+          .filter((item) => item.node.revoke !== true)
+          .map((item) => {
+            return {
+              modelId: item.node.modelID,
+              id: item.node.id!,
+              revoke: !!item.node.revoke,
+            }
+          })
+      )
+      setPersonalCollectionsWithoutFilter(
+        collected?.edges.map((item) => {
+          return {
+            modelId: item.node.modelID,
+            id: item.node.id!,
+            revoke: !!item.node.revoke,
+          }
+        })
+      )
+    }
+  }, [s3ModelCollection, session])
+
   useEffect(() => {
     loadDapps()
-  }, [loadDapps])
+    fetchPersonalCollections()
+  }, [loadDapps, fetchPersonalCollections])
+
+  useEffect(() => {
+    if (!session) {
+      setPersonalCollections([])
+    }
+  }, [session])
 
   return (
     <CeramicContext.Provider
       value={{
+        personalCollectionsWithoutFilter,
+        personalCollections,
+        fetchPersonalCollections,
         dapps,
         ceramic,
         network,
