@@ -92,7 +92,7 @@ export default function CeramicProvider({
     if (collected) {
       setPersonalCollections(
         collected?.edges
-          .filter((item) => item.node.revoke !== true)
+          .filter((item) => item.node && item.node.revoke !== true)
           .map((item) => {
             return {
               modelId: item.node.modelID,
@@ -102,7 +102,7 @@ export default function CeramicProvider({
           })
       )
       setPersonalCollectionsWithoutFilter(
-        collected?.edges.map((item) => {
+        collected?.edges.filter(item => item.node).map((item) => {
           return {
             modelId: item.node.modelID,
             id: item.node.id!,

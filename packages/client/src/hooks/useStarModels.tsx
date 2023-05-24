@@ -40,7 +40,7 @@ export default function useStarModels() {
 
     if (collected) {
       const personalCollections = collected?.edges
-        .filter((item) => item.node.revoke !== true)
+        .filter((item) => item.node && item.node.revoke !== true)
         .map((item) => {
           return {
             modelId: item.node.modelID,

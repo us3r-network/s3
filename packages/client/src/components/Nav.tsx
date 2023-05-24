@@ -6,10 +6,11 @@ import Logo from './Logo'
 import LoginButton from './LoginButton'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import DappAdd from './icons/DappAdd'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 
 export default function Nav() {
   let location = useLocation()
-
+  const session = useSession()
   const { dapps } = useCeramicCtx()
 
   const homeActive = location.pathname === '/'
@@ -54,23 +55,30 @@ export default function Nav() {
             </div>
           </Link>
 
-          <div className="dapp">
-            <hr />
-            {dapps?.map(item => {
-              return <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
-                <div className='icon'>
-                  <img src={item.node.icon!} />
-                  {/* {item.node.name} */}
+          {session && (
+            <div className="dapp">
+              <hr />
+              {dapps
+                ?.filter((item) => item.node)
+                .map((item) => {
+                  return (
+                    <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
+                      <div className="icon">
+                        <img src={item.node.icon!} />
+                        {/* {item.node.name} */}
+                      </div>
+                    </Link>
+                  )
+                })}
+
+              <Link to={'/dapp/create'}>
+                <DappAdd />
+                <div className="tint-c">
+                  <div className="tint">Create Application</div>
                 </div>
               </Link>
-            })}
-            <Link to={'/dapp/create'}>
-              <DappAdd />
-              <div className="tint-c">
-                <div className="tint">Create Application</div>
-              </div>
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="nav-bottom">
@@ -234,7 +242,7 @@ const NavContainer = styled.nav`
       gap: 20px;
       hr {
         width: 70%;
-        border-color: #39424C;
+        border-color: #39424c;
       }
 
       img {
@@ -249,7 +257,7 @@ const NavContainer = styled.nav`
 
       a {
         position: relative;
-      
+
         .tint-c {
           position: absolute;
           right: -5px;
@@ -262,7 +270,8 @@ const NavContainer = styled.nav`
           font-size: 16px;
           width: fit-content;
           padding: 8px;
-          background: linear-gradient(52.42deg, #CD62FF 35.31%, #62AAFF 89.64%), #343941;
+          background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%),
+            #343941;
           border-radius: 10px;
           &::before {
             content: ' ';
@@ -271,7 +280,12 @@ const NavContainer = styled.nav`
             left: -5px;
             width: 7px;
             height: 5px;
-            background: linear-gradient(52.42deg, #CD62FF 35.31%, #62AAFF 89.64%), #343941;
+            background: linear-gradient(
+                52.42deg,
+                #cd62ff 35.31%,
+                #62aaff 89.64%
+              ),
+              #343941;
             transform: rotate(-90deg);
             border-top-left-radius: 100px;
             border-top-right-radius: 100px;
