@@ -7,9 +7,14 @@ import { schemas } from '../utils/composedb-types/schemas'
 import { createModel } from '../api'
 import { AxiosError } from 'axios'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { useSearchParams } from 'react-router-dom'
 
 export default function ModelCreate() {
-  const { network } = useCeramicCtx()
+  const { network, s3ModelCollection, dapps, s3Dapp, loadDapps } =
+    useCeramicCtx()
+  const session = useSession()
+  const [searchParams] = useSearchParams()
   const [composite, setComposite] = useState('')
   const [runtimeDefinition, setRuntimeDefinition] = useState('')
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
@@ -32,6 +37,41 @@ export default function ModelCreate() {
     })
   }
 
+  const actionAfterCreate = useCallback(
+    async (modelId: string) => {
+      try {
+        // add to collection
+        if (modelId && session) {
+          s3ModelCollection.authComposeClient(session)
+          await s3ModelCollection.createCollection({
+            modelID: modelId,
+            revoke: false,
+          })
+        }
+
+        // add to dappModels
+        const dappId = searchParams.get('dappId')
+        if (dappId && session) {
+          s3Dapp.authComposeClient(session)
+          const dapp = dapps?.filter(item => item.node).find((item) => item.node.id === dappId)
+
+          const models = dapp?.node?.models || []
+          console.log({ dappId, dapp })
+          if (dapp && models.indexOf(modelId) === -1) {
+            models.push(modelId)
+            await s3Dapp.updateDapp(dappId, {
+              models,
+            })
+            await loadDapps()
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    [dapps, loadDapps, s3Dapp, s3ModelCollection, searchParams, session]
+  )
+
   const submit = useCallback(async () => {
     setErrMsg('')
     if (!gqlSchema.code) return
@@ -39,6 +79,9 @@ export default function ModelCreate() {
       setSubmitting(true)
       const resp = await createModel(gqlSchema.code, network)
       const { composite, runtimeDefinition } = resp.data.data
+      const modelsId = Object.keys(composite.models)
+      const modelId = modelsId[0]
+      modelId && actionAfterCreate(modelId)
 
       setComposite(JSON.stringify(composite))
       setRuntimeDefinition(JSON.stringify(runtimeDefinition))
@@ -49,7 +92,7 @@ export default function ModelCreate() {
     } finally {
       setSubmitting(false)
     }
-  }, [gqlSchema.code, network])
+  }, [gqlSchema.code, network, actionAfterCreate])
 
   const download = (text: string, filename: string) => {
     console.log(text)
@@ -103,6 +146,10 @@ export default function ModelCreate() {
             setGqlSchema(props)
           }}
           schema={gqlSchema}
+          sidebarExpanded={false}
+          routeState={{
+            code: 'on',
+          }}
         />
       </EditorBox>
       <div className="result-box">

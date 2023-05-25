@@ -135,7 +135,7 @@ function DappModels({
                   </button>
                 )}
               </div>
-              <Link to={`/models/model/create?dapp=${appId}`}>
+              <Link to={`/models/model/create?dappId=${appId}`}>
                 <div className="create">
                   <Add stroke="#fff" /> Create
                 </div>
