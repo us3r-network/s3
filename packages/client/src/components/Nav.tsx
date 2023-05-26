@@ -4,13 +4,19 @@ import GitHubButton from 'react-github-btn'
 
 import Logo from './Logo'
 import LoginButton from './LoginButton'
+import { useCeramicCtx } from '../context/CeramicCtx'
+import DappAdd from './icons/DappAdd'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 
 export default function Nav() {
   let location = useLocation()
+  const session = useSession()
+  const { dapps } = useCeramicCtx()
 
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
   const streamActive = location.pathname.startsWith('/streams')
+
   return (
     <NavContainer>
       <div className="fixed">
@@ -48,6 +54,31 @@ export default function Nav() {
               </div>
             </div>
           </Link>
+
+          {session && (
+            <div className="dapp">
+              <hr />
+              {dapps
+                ?.filter((item) => item.node)
+                .map((item) => {
+                  return (
+                    <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
+                      <div className="icon">
+                        <img src={item.node.icon!} />
+                        {/* {item.node.name} */}
+                      </div>
+                    </Link>
+                  )
+                })}
+
+              <Link to={'/dapp/create'}>
+                <DappAdd />
+                <div className="tint-c">
+                  <div className="tint">Create Application</div>
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="nav-bottom">
@@ -199,6 +230,73 @@ const NavContainer = styled.nav`
         }
 
         /* font-weight: 700; */
+      }
+    }
+
+    .dapp {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      hr {
+        width: 70%;
+        border-color: #39424c;
+      }
+
+      img {
+        width: 39px;
+        height: 39px;
+      }
+
+      .icon {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      a {
+        position: relative;
+
+        .tint-c {
+          position: absolute;
+          right: -5px;
+          top: 3px;
+        }
+
+        .tint {
+          position: fixed;
+          display: none;
+          font-size: 16px;
+          width: fit-content;
+          padding: 8px;
+          background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%),
+            #343941;
+          border-radius: 10px;
+          &::before {
+            content: ' ';
+            position: absolute;
+            top: 15px;
+            left: -5px;
+            width: 7px;
+            height: 5px;
+            background: linear-gradient(
+                52.42deg,
+                #cd62ff 35.31%,
+                #62aaff 89.64%
+              ),
+              #343941;
+            transform: rotate(-90deg);
+            border-top-left-radius: 100px;
+            border-top-right-radius: 100px;
+          }
+        }
+
+        &:hover {
+          .tint {
+            display: block;
+          }
+        }
       }
     }
 

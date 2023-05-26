@@ -1,5 +1,5 @@
 import axios, { AxiosPromise } from 'axios'
-import { API_BASE_URL } from '../constants'
+import { API_BASE_URL, UPLOAD_API_URL } from '../constants'
 import {
   ModeCreateResult,
   ModelMid,
@@ -199,5 +199,15 @@ export function getModelInfo({
     params: {
       network: network.toUpperCase(),
     },
+  })
+}
+
+export function uploadImage({ file }: { file: File }) {
+  const form = new FormData()
+  form.append('file', file)
+  return axios({
+    url: UPLOAD_API_URL + '/medium/upload',
+    method: 'post',
+    data: form,
   })
 }

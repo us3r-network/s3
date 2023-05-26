@@ -1,4 +1,6 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+export const UPLOAD_API_URL = process.env.REACT_APP_UPLOAD_API_URL
+
 export const CERAMIC_NODE =
   process.env.REACT_APP_CERAMIC_NODE || 'https://ceramic.s3.xyz/'
 export const CERAMIC_NODE_ADMIN_PRIVATE_KEY =

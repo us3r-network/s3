@@ -1,8 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import multiavatar from '@multiavatar/multiavatar'
 
 import { Network } from '../types'
 import ListTable from '../components/ListTable'
@@ -11,6 +10,10 @@ import { shortPubKeyHash } from '../utils/shortPubKey'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import UserAvatarStyled from '../components/common/UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import {
+  useAuthentication,
+  useIsAuthenticated,
+} from '@us3r-network/auth-with-rainbowkit'
 
 export default function Profile() {
   const { did } = useParams()
@@ -19,6 +22,16 @@ export default function Profile() {
     network: network as Network,
     did,
   })
+
+  const { ready, signOut } = useAuthentication()
+  const isAuthenticated = useIsAuthenticated()
+  const isDisabled = !ready || !isAuthenticated
+  const logoutAction = useCallback(() => {
+    if (!isDisabled && isAuthenticated) {
+      signOut()
+      window.location.href = '/'
+    }
+  }, [isDisabled, isAuthenticated, signOut])
 
   useEffect(() => {
     if (!network || !did) return
@@ -41,6 +54,7 @@ export default function Profile() {
           </h3>
           <span>{shortPubKeyHash(pubkey)}</span>
         </div>
+        <button onClick={logoutAction}>Logout</button>
       </Title>
       <InfiniteScroll
         dataLength={data.length}
@@ -82,6 +96,18 @@ const Title = styled.div`
 
   > h2 {
     margin: 0;
+  }
+
+  button {
+    overflow: hidden;
+    cursor: pointer;
+    width: 54px;
+    height: 32px;
+    border-radius: 10px;
+    color: #fff;
+    background: none;
+    outline: none;
+    border: 1px solid gray;
   }
 `
 
