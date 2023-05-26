@@ -39,7 +39,6 @@ export async function submitComposeDBModel(graphql: string, myCeramicNode: strin
             const session = await DIDSession.authorize(authMethod, { resources: ["ceramic://*"] })
 
             // Uses DIDs in ceramic, composedb & glaze libraries, ie
-            const ceramic = new CeramicClient()
             ceramic.did = session.did
         }
 
@@ -48,16 +47,16 @@ export async function submitComposeDBModel(graphql: string, myCeramicNode: strin
         console.error((e as Error).message)
         return
     }
-
+    
     //1 Create My Composite
     let myComposite
     try {
         console.log('Creating the composite...')
-        myComposite = await Composite.create({ ceramic: ceramic as unknown as CeramicApi, schema: graphql })
+        myComposite = await Composite.create({ ceramic: ceramic as unknown as CeramicApi, schema: graphql, index: false})
         console.log(`Creating the composite... Done! The encoded representation:`)
         console.log(myComposite)
     } catch (e) {
-        console.error((e as Error).message)
+        console.error((e as Error))
         return
     }
 
