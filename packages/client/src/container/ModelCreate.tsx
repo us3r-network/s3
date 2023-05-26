@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 import styled from 'styled-components'
 import FileSaver from 'file-saver'
-import { GraphQLGqlEditor, PassedSchema } from 'graphql-editor'
+import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { schemas } from '../utils/composedb-types/schemas'
 import { createModel } from '../api'
 import { AxiosError } from 'axios'
@@ -21,7 +21,6 @@ export default function ModelCreate() {
     code: schemas.code,
     libraries: schemas.library,
   })
-  const [gql, setGql] = useState(schemas.code)
 
   const [submitting, setSubmitting] = useState(false)
   const [createNew, setCreateNew] = useState(false)
@@ -36,7 +35,6 @@ export default function ModelCreate() {
       code: schemas.code,
       libraries: schemas.library,
     })
-    setGql(schemas.code)
   }
 
   const actionAfterCreate = useCallback(
@@ -55,9 +53,7 @@ export default function ModelCreate() {
         const dappId = searchParams.get('dappId')
         if (dappId && session) {
           s3Dapp.authComposeClient(session)
-          const dapp = dapps
-            ?.filter((item) => item.node)
-            .find((item) => item.node.id === dappId)
+          const dapp = dapps?.filter(item => item.node).find((item) => item.node.id === dappId)
 
           const models = dapp?.node?.models || []
           console.log({ dappId, dapp })
@@ -78,11 +74,10 @@ export default function ModelCreate() {
 
   const submit = useCallback(async () => {
     setErrMsg('')
-    if (!gql) return
-    console.log({gql})
+    if (!gqlSchema.code) return
     try {
       setSubmitting(true)
-      const resp = await createModel(gql, network)
+      const resp = await createModel(gqlSchema.code, network)
       const { composite, runtimeDefinition } = resp.data.data
       const modelsId = Object.keys(composite.models)
       const modelId = modelsId[0]
@@ -97,7 +92,7 @@ export default function ModelCreate() {
     } finally {
       setSubmitting(false)
     }
-  }, [gql, network, actionAfterCreate])
+  }, [gqlSchema.code, network, actionAfterCreate])
 
   const download = (text: string, filename: string) => {
     console.log(text)
@@ -145,10 +140,16 @@ export default function ModelCreate() {
       </div>
       {errMsg && <div className="err-msg">{errMsg}</div>}
       <EditorBox>
-        <GraphQLGqlEditor
+        <GraphQLEditor
+          setSchema={(props) => {
+            setErrMsg('')
+            setGqlSchema(props)
+          }}
           schema={gqlSchema}
-          gql={gql}
-          setGql={(gqlString) => setGql(gqlString)}
+          sidebarExpanded={false}
+          routeState={{
+            code: 'on',
+          }}
         />
       </EditorBox>
       <div className="result-box">
