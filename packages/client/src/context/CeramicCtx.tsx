@@ -77,8 +77,9 @@ export default function CeramicProvider({
   const loadDapps = useCallback(async () => {
     if (!session) return
     s3Dapp.authComposeClient(session)
-    const data = await s3Dapp.queryPersonalDapps({ first: 100 })
-    setDapps(data.data?.viewer.dappList.edges)
+    const resp = await s3Dapp.queryPersonalDapps({ first: 100 })
+    const nodes = resp.data?.viewer.dappList?.edges;
+    setDapps(nodes)
   }, [session, s3Dapp])
 
   const fetchPersonalCollections = useCallback(async () => {
