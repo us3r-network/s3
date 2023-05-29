@@ -31,8 +31,6 @@ export default function ModelsPage() {
   const pageNum = useRef(1)
   const [filterStar, setFilterStar] = useState(false)
 
-  const { s3ModelCollection } = useCeramicCtx()
-
   const fetchStarModels = useCallback(async () => {
     const ids = personalCollections.map((item) => {
       return item.modelId
@@ -45,27 +43,6 @@ export default function ModelsPage() {
     setStarModels([...list])
   }, [personalCollections, network])
 
-
-  const starModelAction = useCallback(
-    async (modelId: string, id?: string, revoke?: boolean) => {
-      if (!session) return
-      s3ModelCollection.authComposeClient(session)
-
-      if (id) {
-        await s3ModelCollection.updateCollection(id, {
-          revoke: !revoke,
-        })
-      } else {
-        await s3ModelCollection.createCollection({
-          modelID: modelId,
-          revoke: false,
-        })
-      }
-
-      await fetchPersonalCollections()
-    },
-    [session, s3ModelCollection, fetchPersonalCollections]
-  )
 
   const fetchModel = useCallback(async () => {
     setModels([])
@@ -296,12 +273,12 @@ function ModelStarItem({
             revoke: false,
           })
         }
+        await fetchPersonal()
       } catch (error) {
+        console.error(error)
       } finally {
         setStaring(false)
       }
-
-      await fetchPersonal()
     },
     [session, s3ModelCollection, fetchPersonal]
   )
@@ -315,13 +292,13 @@ function ModelStarItem({
   return (
     <div
       className="star"
-      onClick={() => {
+      onClick={async () => {
         if (!sessId) {
           signIn()
           return
         }
 
-        starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
+        await starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
       }}
     >
       {hasStarItem ? <Star /> : <StarEmpty />}
