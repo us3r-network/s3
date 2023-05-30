@@ -20,7 +20,8 @@ import { useCeramicCtx } from '../context/CeramicCtx'
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
   const { signIn } = useAuthentication()
-  const { network, fetchPersonalCollections, personalCollections } = useCeramicCtx()
+  const { network, fetchPersonalCollections, personalCollections } =
+    useCeramicCtx()
   const session = useSession()
   const sessId = session?.id
   const [models, setModels] = useState<Array<ModelStream>>([])
@@ -42,7 +43,6 @@ export default function ModelsPage() {
     setHasMore(false)
     setStarModels([...list])
   }, [personalCollections, network])
-
 
   const fetchModel = useCallback(async () => {
     setModels([])
@@ -77,7 +77,6 @@ export default function ModelsPage() {
     },
     [navigate]
   )
-
 
   useEffect(() => {
     fetchModel()
@@ -259,6 +258,7 @@ function ModelStarItem({
 
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
+      if (staring) return
       try {
         if (!session) return
         s3ModelCollection.authComposeClient(session)
@@ -280,18 +280,18 @@ function ModelStarItem({
         setStaring(false)
       }
     },
-    [session, s3ModelCollection, fetchPersonal]
+    [session, s3ModelCollection, fetchPersonal, staring]
   )
   if (staring) {
     return (
-      <div className="star">
+      <div className="staring">
         <img src="/loading.gif" title="loading" alt="" />{' '}
       </div>
     )
   }
   return (
     <div
-      className="star"
+      className={'star'}
       onClick={async () => {
         if (!sessId) {
           signIn()
@@ -532,11 +532,16 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     cursor: pointer;
   }
 
-  .star {
-    cursor: pointer;
-
+  .star,
+  .staring {
     > img {
       width: 23px;
     }
+  }
+  .star {
+    cursor: pointer;
+  }
+  .staring {
+    cursor: not-allowed;
   }
 `
