@@ -20,7 +20,7 @@ import { useCeramicCtx } from '../context/CeramicCtx'
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
   const { signIn } = useAuthentication()
-  const { network, fetchPersonalCollections, personalCollections } =
+  const { network, fetchPersonalCollections, personalCollections, personalCollectionsWithoutFilter } =
     useCeramicCtx()
   const session = useSession()
   const sessId = session?.id
@@ -156,7 +156,7 @@ export default function ModelsPage() {
             </thead>
             <tbody>
               {lists.map((item, idx) => {
-                const hasStarItem = personalCollections.find(
+                const hasStarItem = personalCollectionsWithoutFilter.find(
                   (starItem) => starItem.modelId === item.stream_id
                 )
                 return (
@@ -301,7 +301,7 @@ function ModelStarItem({
         await starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
       }}
     >
-      {hasStarItem ? <Star /> : <StarEmpty />}
+      {(hasStarItem && hasStarItem.revoke === false) ? <Star /> : <StarEmpty />}
     </div>
   )
 }
