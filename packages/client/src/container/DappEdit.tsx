@@ -5,7 +5,7 @@ import {
   useAuthentication,
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
-import { Dapp } from '@us3r-network/dapp'
+import { Dapp } from '@us3r-network/data-model'
 import { useNavigate, useParams } from 'react-router-dom'
 import InputItem from '../components/Dapp/InputItem'
 import AppIconInput from '../components/Dapp/AppIconInput'

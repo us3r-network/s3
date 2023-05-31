@@ -8,9 +8,9 @@ import React, {
 } from 'react'
 import { Network } from '../types'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
-import { S3ModelCollectionModel } from '@us3r-network/model-collection'
+import { S3ModelCollectionModel } from '@us3r-network/data-model'
 import { CeramicClient } from '@ceramicnetwork/http-client'
-import { Dapp, S3DappModel } from '@us3r-network/dapp'
+import { Dapp, S3DappModel } from '@us3r-network/data-model'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Edge } from '@ceramicnetwork/common'
 
@@ -62,9 +62,9 @@ export default function CeramicProvider({
 
   const s3Dapp = useMemo(() => {
     if (network === Network.MAINNET) {
-      return new S3DappModel(CERAMIC_MAINNET_HOST)
+      return new S3DappModel(CERAMIC_MAINNET_HOST, 'mainnet')
     }
-    return new S3DappModel(CERAMIC_TESTNET_HOST)
+    return new S3DappModel(CERAMIC_TESTNET_HOST, 'testnet')
   }, [network])
 
   const ceramic = useMemo(() => {
