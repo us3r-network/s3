@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import { useCallback, useEffect, useState } from 'react'
-import { Dapp } from '@us3r-network/dapp'
+import { Dapp } from '@us3r-network/data-model'
 import styled from 'styled-components'
 import BasicInfo from '../components/Dapp/BasicInfo'
 import Add from '../components/icons/Add'

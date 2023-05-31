@@ -18,7 +18,7 @@ import {
 } from 'react-aria-components'
 import AddIcon from '../components/icons/Add'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { Dapp } from '@us3r-network/dapp'
+import { Dapp } from '@us3r-network/data-model'
 
 export default function ModelView() {
   const { streamId } = useParams()

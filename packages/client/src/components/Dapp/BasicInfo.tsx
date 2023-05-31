@@ -1,4 +1,4 @@
-import { Dapp } from '@us3r-network/dapp'
+import { Dapp } from '@us3r-network/data-model'
 import { useCallback, useState } from 'react'
 
 import DappEdit from '../icons/DappEdit'
