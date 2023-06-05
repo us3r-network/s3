@@ -1,7 +1,7 @@
 {
-  "name": "@us3r/userscan",
-  "version": "0.0.1",
-  "description": "a open source ceramic explorer",
+  "name": "@us3r/s3",
+  "version": "0.1.0",
+  "description": "open source ceramic develop tools",
   "workspaces": [
     "*"
   ],
