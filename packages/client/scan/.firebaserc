@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "us3r-network"
+  },
+  "targets": {
+    "us3r-network": {
+      "hosting": {
+        "scan": [
+          "us3rscan"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
