@@ -5,6 +5,7 @@ name: Deploy to Firebase Hosting on merge
 'on':
   push:
     branches:
+      - scan
       - scan-dev
 jobs:
   build_and_deploy:

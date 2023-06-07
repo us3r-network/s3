@@ -1,7 +1,7 @@
 {
   "hosting": {
-    "site": "us3rscan",
-    "public": "build",
+    "target": "scan",
+    "public": "./packages/client/scan/build",
     "ignore": [
       "firebase.json",
       "**/.*",
