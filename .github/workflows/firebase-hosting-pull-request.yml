@@ -7,13 +7,6 @@ name: Deploy to Firebase Hosting on PR
     branches:
       - scan
       - scan-dev
-env:
-  REACT_APP_NAME: "Us3r Scan"
-  REACT_APP_VERSION: $npm_package_version
-  REACT_APP_API_BASE_URL: ${{ vars.REACT_APP_API_BASE_URL }}
-  REACT_APP_UPLOAD_API_URL: ${{ vars.REACT_APP_UPLOAD_API_URL }}
-  REACT_APP_CERAMIC_MAINNET_HOST: ${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}
-  REACT_APP_CERAMIC_TESTNET_HOST: ${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
@@ -29,6 +22,12 @@ jobs:
           yarn build
         env:
           CI: false
+          REACT_APP_NAME: "Us3r Scan"
+          REACT_APP_VERSION: $npm_package_version
+          REACT_APP_API_BASE_URL: ${{ vars.REACT_APP_API_BASE_URL }}
+          REACT_APP_UPLOAD_API_URL: ${{ vars.REACT_APP_UPLOAD_API_URL }}
+          REACT_APP_CERAMIC_MAINNET_HOST: ${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}
+          REACT_APP_CERAMIC_TESTNET_HOST: ${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
