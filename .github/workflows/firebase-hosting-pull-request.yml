@@ -8,9 +8,12 @@ name: Deploy to Firebase Hosting on PR
       - scan
       - scan-dev
 jobs:
-  build_and_preview:
-    if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
+  prod_build_and_deploy:
+    if: github.ref == 'refs/heads/scan' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://scan.s3.xyz
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -22,7 +25,7 @@ jobs:
           yarn build
         env:
           CI: false
-          REACT_APP_NAME: "Us3r Scan"
+          REACT_APP_NAME: '${{ vars.REACT_APP_NAME }}'
           REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
           REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
           REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
@@ -34,3 +37,32 @@ jobs:
           projectId: us3r-network
           target: scan
           entryPoint: './packages/client/scan/' 
+  dev_build_and_deploy:
+    if: github.ref == 'refs/heads/scan-dev' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: 
+      name: development
+      url: https://scan-dev.s3.xyz
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: |
+          cd packages/client/scan
+          yarn 
+          yarn build
+        env:
+          CI: false
+          REACT_APP_NAME: '${{ vars.REACT_APP_NAME }}'
+          REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
+          REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
+          REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
+          REACT_APP_CERAMIC_TESTNET_HOST: '${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}'
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_US3R_NETWORK }}'
+          projectId: us3r-network
+          target: scan-dev
+          entryPoint: './packages/client/scan/'

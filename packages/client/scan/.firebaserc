@@ -7,6 +7,9 @@
       "hosting": {
         "scan": [
           "us3rscan"
+        ],
+        "scan-dev": [
+          "us3rscan-dev"
         ]
       }
     }
