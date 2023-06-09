@@ -158,4 +158,9 @@ export const TableContainer = styled.table<{ isMobile?: boolean }>`
   .staring {
     cursor: not-allowed;
   }
+
+  a {
+    text-decoration: none;
+    color: #fff;
+  }
 `

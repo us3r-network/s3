@@ -15,6 +15,7 @@ import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Network } from '../components/Selector/EnumSelect'
 import StarIcon from '../components/Icons/StarIcon'
 import StarGoldIcon from '../components/Icons/StarGoldIcon'
+import { S3_SCAN_URL } from '../constants'
 
 export default function ExploreModel() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -176,18 +177,38 @@ export default function ExploreModel() {
                 return (
                   <tr key={item.stream_id + idx}>
                     <td>
-                      <div>{item.stream_content.name}</div>
+                      <div>
+                        <a
+                          href={`${S3_SCAN_URL}/models/modelview/${item.stream_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.stream_content.name}
+                        </a>
+                      </div>
                     </td>
                     <td className="description">
                       <div>{item.stream_content.description}</div>
                     </td>
                     <td>
                       <div>
-                        {shortPubKey(item.stream_id, { len: 8, split: '-' })}
+                        <a
+                          href={`${S3_SCAN_URL}/streams/stream/${item.stream_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {shortPubKey(item.stream_id, { len: 8, split: '-' })}
+                        </a>
                       </div>
                     </td>
                     <td>
-                      <div>{item.useCount}</div>
+                      <div>
+                        <a
+                          href={`${S3_SCAN_URL}/models/model/${item.stream_id}/mids`}
+                        >
+                          {item.useCount}
+                        </a>
+                      </div>
                     </td>
                     <td>
                       <div>
