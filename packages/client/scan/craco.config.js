@@ -2,9 +2,16 @@ const webpack = require('webpack')
 
 module.exports = {
   webpack: {
-    configure: {
-      resolve: {
-        fallback: {
+    configure: (config) => {
+      // Replace include option for babel loader with exclude
+      // so babel will handle workspace projects as well.
+      config.module.rules[1].oneOf.forEach((r) => {
+        if (r.loader && r.loader.indexOf('babel') !== -1) {
+          r.exclude = /node_modules/;
+          delete r.include;
+        }
+      });
+      config.resolve.fallback = {
           process: require.resolve('process/browser'),
           zlib: require.resolve('browserify-zlib'),
           stream: require.resolve('stream-browserify'),
@@ -18,20 +25,16 @@ module.exports = {
           os: require.resolve('os-browserify/browser'),
           constants: require.resolve('constants-browserify'),
           console: require.resolve('console-browserify'),
-        },
-      },
-      plugins: [
+      };
+
+      config.plugins.push(
         new webpack.ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
           process: 'process/browser',
-        }),
-      ],
-      ignoreWarnings: [/Failed to parse source map/],
+          Buffer: ['buffer', 'Buffer'],
+        })
+      );
+      config.ignoreWarnings = [/Failed to parse source map/];
+      return config;
     },
-    alias: {
-      'rebass/styled-components': 'rebass/styled-components/index.js',
-    },
-    // externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-    // externals: [nodeExternals()],
   },
 }

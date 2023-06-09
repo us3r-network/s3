@@ -1,5 +1,6 @@
 {
   "name": "@us3r/userscan-client",
+  "description": "a open source ceramic explorer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
