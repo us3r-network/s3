@@ -13,6 +13,7 @@ export const CERAMIC_TESTNET_HOST = process.env
   .REACT_APP_CERAMIC_TESTNET_HOST as string
 
 export const DOCS_URL = process.env.REACT_APP_DOCS_URL as string
+export const S3_SCAN_URL = process.env.REACT_APP_S3_SCAN_URL as string
 
 export const TWITTER = 'twitter'
 export const DISCORD = 'discord'
