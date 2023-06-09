@@ -26,7 +26,6 @@ jobs:
         env:
           CI: false
           GENERATE_SOURCEMAP: false
-          NODE_OPTIONS: '--max-old-space-size=8192'
           REACT_APP_NAME: 'US3R DASHBOARD'
           REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
           REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
@@ -56,6 +55,7 @@ jobs:
           yarn build
         env:
           CI: false
+          GENERATE_SOURCEMAP: false
           REACT_APP_NAME: 'US3R DASHBOARD DEV'
           REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
           REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
