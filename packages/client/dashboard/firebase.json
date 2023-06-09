@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "target": "us3rdashboard",
+      "target": "dashboard",
       "public": "build",
       "ignore": [
         "firebase.json",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "target": "us3rdashboard-dev",
+      "target": "dashboard-dev",
       "public": "build",
       "ignore": [
         "firebase.json",
