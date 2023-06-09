@@ -1,0 +1,250 @@
+import styled from 'styled-components'
+import CloseIcon from './Icons/CloseIcon'
+import { TableBox, TableContainer } from './TableBox'
+import PlusCircleIcon from './Icons/PlusCircleIcon'
+import StarGoldIcon from './Icons/StarGoldIcon'
+import CheckCircleIcon from './Icons/CheckCircleIcon'
+import { useCallback, useEffect, useState } from 'react'
+import useSelectedDapp from '../hooks/useSelectedDapp'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { PersonalCollection, useAppCtx } from '../context/AppCtx'
+import { Network } from './Selector/EnumSelect'
+import { getStarModels, updateDapp } from '../api'
+import { ModelStream } from '../types'
+import { shortPubKey } from '../utils/shortPubKey'
+import dayjs from 'dayjs'
+
+export default function FavoriteModal({
+  closeModal,
+}: {
+  closeModal: () => void
+}) {
+  return (
+    <FavoriteBox>
+      <div className="title">
+        <h1>My Favorite Models</h1>
+        <button onClick={closeModal}>
+          <CloseIcon />
+        </button>
+      </div>
+      <div>
+        <ModelList />
+      </div>
+    </FavoriteBox>
+  )
+}
+
+function ModelList() {
+  const { s3ModelCollection, selectedDapp } = useSelectedDapp()
+  const session = useSession()
+  const [starModels, setStarModels] = useState<Array<ModelStream>>([])
+  const [personalCollections, setPersonalCollections] = useState<
+    PersonalCollection[]
+  >([])
+  const fetchPersonalCollections = useCallback(async () => {
+    if (!session) return
+    s3ModelCollection.authComposeClient(session)
+    try {
+      const personal = await s3ModelCollection.queryPersonalCollections({
+        first: 500,
+      })
+      if (personal.errors) throw new Error(personal.errors[0].message)
+      const collected = personal.data?.viewer.modelCollectionList
+
+      if (collected) {
+        setPersonalCollections(
+          collected?.edges
+            .filter((item) => item.node && item.node.revoke === false)
+            .map((item) => {
+              return {
+                modelId: item.node.modelID,
+                id: item.node.id!,
+                revoke: !!item.node.revoke,
+              }
+            })
+        )
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }, [s3ModelCollection, session])
+
+  const fetchStarModels = useCallback(async () => {
+    const ids = personalCollections
+      .filter((item) => item.revoke === false)
+      .map((item) => {
+        return item.modelId
+      })
+    if (ids.length === 0) {
+      setStarModels([])
+      return
+    }
+
+    const resp = await getStarModels({
+      network: (selectedDapp?.network as Network) || Network.TESTNET,
+      ids,
+    })
+    if (resp.data.code !== 0) {
+      throw new Error(resp.data.msg)
+    }
+
+    const list = resp.data.data
+    setStarModels([...list])
+  }, [personalCollections, selectedDapp?.network])
+
+  useEffect(() => {
+    fetchPersonalCollections()
+  }, [fetchPersonalCollections])
+
+  useEffect(() => {
+    fetchStarModels().catch(console.error)
+  }, [fetchStarModels])
+
+  return (
+    <ListBox>
+      <TableBox>
+        <TableContainer>
+          <thead>
+            <tr>
+              <th>Model Name</th>
+              <th>Description</th>
+              <th>ID</th>
+              <th>Usage Count</th>
+              <th>Release Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {starModels.map((item, idx) => {
+              return (
+                <tr key={item.stream_id + idx}>
+                  <td>
+                    <div className="usage-count">
+                      {item.stream_content.name}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="description">
+                      {item.stream_content.description}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="nav-stream">
+                      {shortPubKey(item.stream_id, { len: 8, split: '-' })}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="usage-count">{item.useCount}</div>
+                  </td>
+                  <td>
+                    <div className="release-date">
+                      {(item.last_anchored_at &&
+                        dayjs(item.created_at).format('YYYY-MM-DD HH:mm:ss')) ||
+                        '-'}
+                    </div>
+                  </td>
+
+                  <td>
+                    <OpsBtns modelId={item.stream_id} />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </TableContainer>
+      </TableBox>
+    </ListBox>
+  )
+}
+
+function OpsBtns({ modelId }: { modelId: string }) {
+  const { loadDapps } = useAppCtx()
+  const session = useSession()
+  const { selectedDapp } = useSelectedDapp()
+  const [adding, setAdding] = useState(false)
+  const addToModelList = useCallback(
+    async (modelId: string) => {
+      if (!session || !selectedDapp) return
+      try {
+        setAdding(true)
+        const models = selectedDapp.models || []
+        models.push(modelId)
+        await updateDapp({ ...selectedDapp, models }, session.serialize())
+        await loadDapps()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setAdding(false)
+      }
+    },
+    [loadDapps, selectedDapp, session, setAdding]
+  )
+  return (
+    <div className="btns">
+      <button>
+        <StarGoldIcon />
+      </button>
+      {adding ? (
+        <button>
+          <img className="loading" src="/loading.gif" alt="loading" />
+        </button>
+      ) : (
+        <>
+          {selectedDapp?.models?.includes(modelId) ? (
+            <button>
+              <CheckCircleIcon />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                addToModelList(modelId)
+              }}
+            >
+              <PlusCircleIcon />
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+const FavoriteBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+
+  position: relative;
+  width: 1240px;
+  margin: 0 auto;
+
+  background: #1b1e23;
+  border-radius: 20px;
+
+  > div.title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #ffffff;
+    > h1 {
+      margin: 0;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 28px;
+    }
+  }
+`
+
+const ListBox = styled.div`
+  .btns {
+    display: flex;
+    align-items: center;
+
+    .loading {
+      width: 20px;
+    }
+  }
+`
