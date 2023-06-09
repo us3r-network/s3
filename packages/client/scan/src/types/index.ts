@@ -75,6 +75,7 @@ export type ModeQueryResult = {
   composite: any
   runtimeDefinition: any
   graphqlSchema: string
+  graphqlSchemaDefinition?: string
   isIndexed?: boolean
 }
 
