@@ -6,10 +6,10 @@
     "us3r-network": {
       "hosting": {
         "scan": [
-          "us3r-scan"
+          "us3r-dashboard"
         ],
         "scan-dev": [
-          "us3r-scan-dev"
+          "us3r-dashboard-dev"
         ]
       }
     }
