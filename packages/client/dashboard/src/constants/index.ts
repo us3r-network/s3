@@ -1,5 +1,4 @@
-export const API_MAINNET_URL = process.env.REACT_APP_API_MAINNET_URL
-export const API_TESTNET_URL = process.env.REACT_APP_API_TESTNET_URL
+export const APP_API_URL = process.env.REACT_APP_API_URL
 
 export const UPLOAD_API_URL = process.env.REACT_APP_UPLOAD_API_URL
 
@@ -7,7 +6,7 @@ export const CERAMIC_NODE =
   process.env.REACT_APP_CERAMIC_NODE || 'https://ceramic.s3.xyz/'
 export const CERAMIC_NODE_ADMIN_PRIVATE_KEY =
   process.env.REACT_APP_CERAMIC_NODE_ADMIN_PRIVATE_KEY
-export const USER_API_BASE_URL = process.env.REACT_APP_USER_API_BASE_URL
+
 export const CERAMIC_MAINNET_HOST = process.env
   .REACT_APP_CERAMIC_MAINNET_HOST as string
 export const CERAMIC_TESTNET_HOST = process.env

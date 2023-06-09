@@ -1,5 +1,5 @@
 import axios, { AxiosPromise } from 'axios'
-import { API_MAINNET_URL, API_TESTNET_URL, UPLOAD_API_URL } from '../constants'
+import { APP_API_URL, UPLOAD_API_URL } from '../constants'
 import {
   ClientDApp,
   ModeCreateResult,
@@ -36,8 +36,7 @@ export function createDapp(
   dapp: ClientDApp,
   didSession: string
 ): AxiosPromise<ApiResp<ClientDApp>> {
-  let host =
-    dapp.network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios({
     url: host + '/dapps',
     method: 'POST',
@@ -54,8 +53,7 @@ export function updateDapp(
 ): AxiosPromise<ApiResp<ClientDApp>> {
   if (!dapp.id) throw new Error('dapp id is required')
 
-  let host =
-    dapp.network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
 
   return axios({
     url: host + '/dapps',
@@ -73,8 +71,7 @@ export function delDapp(
 ): AxiosPromise<ApiResp<undefined>> {
   if (!dapp.id) throw new Error('dapp id is required')
 
-  let host =
-    dapp.network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
 
   return axios({
     url: host + '/dapps/' + dapp.id,
@@ -89,7 +86,7 @@ export function getDappWithDid(
   didSession: string,
   network?: Network
 ): AxiosPromise<ApiResp<ClientDApp[]>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
 
   return axios({
     url: host + '/dapps',
@@ -113,7 +110,7 @@ export function getModelStreamList({
   pageNumber?: number
   network?: Network
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   let net = network === Network.MAINNET ? Network.MAINNET : Network.TESTNET
   return axios.get(`${host}/models`, {
     params: {
@@ -131,7 +128,7 @@ export function createModel(
   graphql: string,
   network: Network
 ): AxiosPromise<ApiResp<ModeCreateResult>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios.post(`${host}/models`, {
     graphql: graphql,
     network: network.toUpperCase(),
@@ -145,7 +142,7 @@ export function getStarModels({
   network: Network
   ids: string[]
 }): AxiosPromise<ApiResp<Array<ModelStream>>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios.post(`${host}/models/ids`, {
     network: network.toUpperCase(),
     ids,
@@ -156,7 +153,7 @@ export function queryModelGraphql(
   streamId: string,
   network: Network
 ): AxiosPromise<ApiResp<ModeQueryResult>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios.post(`${host}/models/graphql`, {
     models: [streamId],
     network: network.toUpperCase(),
@@ -174,7 +171,7 @@ export function getModelMid({
   pageSize?: number
   pageNumber?: number
 }): AxiosPromise<ApiResp<ModelMid[]>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios.get(`${host}/models/${modelId}/mids`, {
     params: {
       network: network.toUpperCase(),
@@ -191,7 +188,7 @@ export function getModelInfo({
   network: Network
   id: string
 }): AxiosPromise<ApiResp<ModelStream>> {
-  let host = network === Network.MAINNET ? API_MAINNET_URL : API_TESTNET_URL
+  let host = APP_API_URL
   return axios.get(`${host}/models/${id}`, {
     params: {
       network: network.toUpperCase(),
