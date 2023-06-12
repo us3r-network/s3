@@ -2,6 +2,7 @@ import { Select } from './Select'
 import { Item } from './ComboBox'
 import { Label } from './ListBox'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
 
 export default function DappSelector({
   dapps,
@@ -13,12 +14,21 @@ export default function DappSelector({
   const navigate = useNavigate()
   const location = useLocation()
 
+  const dappItems = useMemo(() => {
+    return [...dapps, { id: 0, name: '+ Create Dapp' }]
+  }, [dapps])
+
   return (
     <Select
       label="Reviewer"
-      items={dapps}
+      items={dappItems}
       selectedKey={Number(selected)}
       onSelectionChange={(k) => {
+        console.log({ k })
+        if (k === 0) {
+          navigate('/dapp/create')
+          return
+        }
         const { pathname } = location
         const data = pathname.split('/')
         data[2] = `${k}`
