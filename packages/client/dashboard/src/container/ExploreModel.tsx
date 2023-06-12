@@ -4,18 +4,20 @@ import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { ModelStream } from '../types'
-import { PageSize, getModelStreamList, getStarModels } from '../api'
+import { PageSize, getModelStreamList, getStarModels, updateDapp } from '../api'
 import { TableBox, TableContainer } from '../components/TableBox'
 import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
 import Search from '../components/Search'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { PersonalCollection } from '../context/AppCtx'
+import { PersonalCollection, useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Network } from '../components/Selector/EnumSelect'
 import StarIcon from '../components/Icons/StarIcon'
 import StarGoldIcon from '../components/Icons/StarGoldIcon'
 import { S3_SCAN_URL } from '../constants'
+import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
+import PlusCircleIcon from '../components/Icons/PlusCircleIcon'
 
 export default function ExploreModel() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -220,6 +222,7 @@ export default function ExploreModel() {
                       </div>
                     </td>
                     <td>
+                      {/* <OpsBtns modelId={item.stream_id} /> */}
                       <ModelStarItem
                         stream_id={item.stream_id}
                         hasStarItem={hasStarItem}
@@ -257,6 +260,27 @@ function ModelStarItem({
   const { s3ModelCollection } = useSelectedDapp()
   const [staring, setStaring] = useState(false)
 
+  const { loadDapps } = useAppCtx()
+  const { selectedDapp } = useSelectedDapp()
+  const [adding, setAdding] = useState(false)
+  const addToModelList = useCallback(
+    async (modelId: string) => {
+      if (!session || !selectedDapp) return
+      try {
+        setAdding(true)
+        const models = selectedDapp.models || []
+        models.push(modelId)
+        await updateDapp({ ...selectedDapp, models }, session.serialize())
+        await loadDapps()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setAdding(false)
+      }
+    },
+    [loadDapps, selectedDapp, session, setAdding]
+  )
+
   const starModelAction = useCallback(
     async (modelId: string, id?: string, revoke?: boolean) => {
       if (staring) return
@@ -289,28 +313,67 @@ function ModelStarItem({
     },
     [session, s3ModelCollection, fetchPersonal, staring]
   )
-  if (staring) {
-    return (
-      <div className="staring">
-        <img src="/loading.gif" title="loading" alt="" />{' '}
-      </div>
-    )
-  }
+
+  const modelId = stream_id
+
   return (
-    <div
-      className={'star'}
-      onClick={async () => {
-        await starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
-      }}
-    >
-      {hasStarItem && hasStarItem.revoke === false ? (
-        <StarGoldIcon />
-      ) : (
-        <StarIcon />
+    <OpsBox className={''}>
+      {(staring && (
+        <button>
+          <img src="/loading.gif" title="loading" alt="" />
+        </button>
+      )) || (
+        <button
+          onClick={async () => {
+            await starModelAction(
+              stream_id,
+              hasStarItem?.id,
+              !!hasStarItem?.revoke
+            )
+          }}
+        >
+          {hasStarItem && hasStarItem.revoke === false ? (
+            <StarGoldIcon />
+          ) : (
+            <StarIcon />
+          )}
+        </button>
       )}
-    </div>
+
+      {adding ? (
+        <button>
+          <img className="loading" src="/loading.gif" alt="loading" />
+        </button>
+      ) : (
+        <>
+          {selectedDapp?.models?.includes(modelId) ? (
+            <button>
+              <CheckCircleIcon />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                addToModelList(modelId)
+              }}
+            >
+              <PlusCircleIcon />
+            </button>
+          )}
+        </>
+      )}
+    </OpsBox>
   )
 }
+
+const OpsBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  img {
+    width: 17px;
+  }
+`
 
 const ExploreModelContainer = styled.div`
   margin-top: 25px;
