@@ -264,6 +264,7 @@ const ListBox = styled.div`
   width: 261px;
   min-width: 261px;
   box-sizing: border-box;
+  height: fit-content;
   > div {
     width: 100%;
   }
