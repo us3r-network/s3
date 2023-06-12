@@ -104,7 +104,7 @@ export default function Nav({ appId }: { appId: string }) {
             }}
           >
             {(filterStar && <StarGoldIcon />) || <StarIcon />}
-            <span>Star</span>
+            <span>Favorite Models</span>
           </div>
 
           <Link to={DOCS_URL} target="_blank">

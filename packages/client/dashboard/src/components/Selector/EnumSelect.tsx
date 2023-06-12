@@ -12,8 +12,9 @@ import SelectorIcon from './SelectorIcon'
 import { useMemo, useState } from 'react'
 
 export enum Stage {
-  RELEASE = 'Release',
-  DEVELOPMENT = 'Under Development',
+  DEVELOPMENT = 'Under development',
+  NOT_RELEASE = 'Completed but not released',
+  RELEASE = 'Completed and released',
 }
 
 export enum Network {
@@ -22,8 +23,12 @@ export enum Network {
 }
 
 export enum AppType {
+  GAME = 'Game',
   SOCIAL = 'Social',
-  FINANCE = 'Finance',
+  MARKETPLACE = 'Marketplace',
+  TOOL = 'Tool',
+  DEFI = 'DeFi',
+  OTHER = 'Other',
 }
 
 export default function EnumSelector<T extends Stage | Network | AppType>({
