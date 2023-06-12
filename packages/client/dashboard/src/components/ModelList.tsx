@@ -19,9 +19,11 @@ import { updateDapp } from '../api'
 export default function ModelList({
   setSelectModelId,
   setSelectModelName,
+  editable,
 }: {
   setSelectModelId: (id: string) => void
   setSelectModelName?: (name: string) => void
+  editable?: boolean
 }) {
   const session = useSession()
   const { loadDapps } = useAppCtx()
@@ -94,28 +96,30 @@ export default function ModelList({
     <ListBox>
       <div className="title">
         <h3>ModelList</h3>
-        <DialogTrigger>
-          <Button>
-            <PlusIcon />
-          </Button>
-          <Popover>
-            <Dialog>
-              <div>
-                <Link to={`/dapp/${appId}/explore`}>
+        {editable && (
+          <DialogTrigger>
+            <Button>
+              <PlusIcon />
+            </Button>
+            <Popover>
+              <Dialog>
+                <div>
+                  <Link to={`/dapp/${appId}/explore`}>
+                    <div className="popover-item">
+                      <button>Explore Models</button>
+                    </div>
+                  </Link>
                   <div className="popover-item">
-                    <button>Explore Models</button>
+                    <Favorite />
                   </div>
-                </Link>
-                <div className="popover-item">
-                  <Favorite />
+                  <div className="popover-item">
+                    <CreateNew />
+                  </div>
                 </div>
-                <div className="popover-item">
-                  <CreateNew />
-                </div>
-              </div>
-            </Dialog>
-          </Popover>
-        </DialogTrigger>
+              </Dialog>
+            </Popover>
+          </DialogTrigger>
+        )}
       </div>
       {(loading && (
         <div className="loading">

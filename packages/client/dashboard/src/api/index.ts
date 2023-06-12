@@ -150,12 +150,12 @@ export function getStarModels({
 }
 
 export function queryModelGraphql(
-  streamId: string,
+  streamId: string | string[],
   network: Network
 ): AxiosPromise<ApiResp<ModeQueryResult>> {
   let host = APP_API_URL
   return axios.post(`${host}/models/graphql`, {
-    models: [streamId],
+    models: Array.isArray(streamId) ? streamId : [streamId],
     network: network.toUpperCase(),
   })
 }
