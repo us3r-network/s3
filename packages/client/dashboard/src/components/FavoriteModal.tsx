@@ -157,7 +157,7 @@ function ModelList() {
   )
 }
 
-function OpsBtns({ modelId }: { modelId: string }) {
+export function OpsBtns({ modelId }: { modelId: string }) {
   const { loadDapps } = useAppCtx()
   const session = useSession()
   const { selectedDapp } = useSelectedDapp()
