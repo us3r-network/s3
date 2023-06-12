@@ -14,6 +14,7 @@ export default function DappModelEditor() {
       <ModelList
         setSelectModelId={setSelectModelId}
         setSelectModelName={setSelectModelName}
+        editable
       />
       <div className="ops">
         {selectModelId && (
