@@ -78,15 +78,14 @@ function ItemCard({ dapp }: { dapp: ClientDApp }) {
             <img src={dapp.icon || '/logo512.png'} alt="" />
             <h3>{dapp.name}</h3>
           </div>
-          {/* TODO：not default network */}
-          <div className="net">{dapp.network || Network.TESTNET}</div>
+          <div className="net">{dapp.network}</div>
         </div>
-        {dapp.modelId && (
-          <div className="appid">
-            APP ID:{' '}
-            <span> {shortPubKey(`${dapp.modelId}` || '', { len: 16 })}</span>
-          </div>
-        )}
+        {/* {dapp.modelId && ( */}
+        <div className="appid">
+          APP ID: {dapp.id}
+          {/* <span> {shortPubKey(`${dapp.modelId}` || '', { len: 16 })}</span> */}
+        </div>
+        {/* )} */}
         <p>{dapp.description}</p>
       </ItemCardBox>
     </Link>
