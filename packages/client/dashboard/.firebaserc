@@ -5,11 +5,11 @@
   "targets": {
     "us3r-network": {
       "hosting": {
-        "scan": [
-          "us3r-scan"
+        "dashboard": [
+          "us3r-dashboard"
         ],
-        "scan-dev": [
-          "us3r-scan-dev"
+        "dashboard-dev": [
+          "us3r-dashboard-dev"
         ]
       }
     }

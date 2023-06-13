@@ -1,23 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { getModelInfo, queryModelGraphql } from '../../api'
-import { ModeQueryResult, ModelStream } from '../../types'
-import { schemas } from '../../utils/composedb-types/schemas'
+import { getModelInfo, queryModelGraphql } from '../api'
+import { ModeQueryResult, ModelStream } from '../types'
+import { schemas } from '../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
-import { useCeramicCtx } from '../../context/CeramicCtx'
+import { Network } from './Selector/EnumSelect'
+// import { useCeramicCtx } from '../../context/CeramicCtx'
 
-export default function Definition() {
-  const { streamId } = useParams()
-  const { network } = useCeramicCtx()
+export default function Definition({
+  streamId,
+  network,
+}: {
+  streamId: string
+  network: Network
+}) {
   const [modelData, setModelData] = useState<ModeQueryResult>()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
-    libraries: schemas.library,
   })
   const [errMsg, setErrMsg] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [modelStream, setModelStream] = useState<ModelStream>()
 
   const [loading, setLoading] = useState(false)
@@ -38,16 +42,9 @@ export default function Definition() {
         const resp = await queryModelGraphql(streamId, network)
         const { data } = resp.data
         setModelData(data)
-        if (data.graphqlSchemaDefinition) {
-          setGqlSchema({
-            code: data.graphqlSchemaDefinition,
-            libraries: schemas.library,
-          })
-        } else {
-          setGqlSchema({
-            code: data.graphqlSchema,
-          })
-        }
+        setGqlSchema({
+          code: data.graphqlSchema,
+        })
       } catch (error) {
         const err = error as AxiosError
         setErrMsg((err.response?.data as any).message || err.message)
@@ -159,30 +156,28 @@ const EditorBox = styled.div`
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
-
+  width: inherit;
   * {
     box-sizing: border-box;
   }
 `
 
 const ResultBox = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
-  width: 100%;
   > div {
     background: #1b1e23;
     border: 1px solid #39424c;
     border-radius: 20px;
+    overflow: hidden;
   }
   div {
-    width: calc(50% - 10px);
     margin: 20px 0px;
     padding: 10px;
     box-sizing: border-box;
     background-color: #1a1a1c;
     .title {
-      width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -200,14 +195,17 @@ const ResultBox = styled.div`
       h3 {
         margin: 0;
         padding: 0;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 24px;
       }
     }
   }
   .result-text {
-    width: 100%;
     word-wrap: break-word;
     color: #718096;
     overflow: scroll;
+    width: 100%;
   }
 
   button {
