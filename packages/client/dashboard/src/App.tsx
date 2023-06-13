@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes, useParams } from 'react-router-dom'
+import { Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -21,6 +21,8 @@ import ExploreModel from './container/ExploreModel'
 import DappModelEditor from './container/DappModelEditor'
 import DappModelPlayground from './container/DappModelPlayground'
 import DappDataStatistic from './container/DappDataStatistic'
+import { useState } from 'react'
+import ModelList from './components/ModelList'
 
 dayjs.extend(relativeTime)
 
@@ -32,9 +34,11 @@ function Routers() {
         <Route path="dapp/create" element={<DappCreate />} />
         <Route path="dapp/:appId" element={<DappLayout />}>
           <Route path="index" element={<DappHome />} />
-          <Route path="model-editor" element={<DappModelEditor />} />
-          <Route path="model-playground" element={<DappModelPlayground />} />
-          <Route path="statistic" element={<DappDataStatistic />} />
+          <Route element={<ModelEditorLayout />}>
+            <Route path="model-editor" element={<DappModelEditor />} />
+            <Route path="model-playground" element={<DappModelPlayground />} />
+            <Route path="statistic" element={<DappDataStatistic />} />
+          </Route>
           <Route path="info" element={<DappInfo />} />
           <Route path="explore" element={<ExploreModel />} />
         </Route>
@@ -90,6 +94,57 @@ function DappLayout() {
     </main>
   )
 }
+
+function ModelEditorLayout() {
+  const [selectModelId, setSelectModelId] = useState<string>('')
+  const [selectModelName, setSelectModelName] = useState<string>('')
+
+  const { pathname } = useLocation()
+
+  return (
+    <EditorLayoutContainer>
+      <ModelList
+        setSelectModelId={setSelectModelId}
+        setSelectModelName={setSelectModelName}
+        editable={pathname.includes('model-editor')}
+      />
+      <Outlet
+        context={{
+          selectModelId,
+          selectModelName,
+        }}
+      />
+    </EditorLayoutContainer>
+  )
+}
+
+const EditorLayoutContainer = styled.div`
+  margin-top: 25px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 20px;
+
+  > .list {
+    flex-grow: 1;
+  }
+
+  .ops {
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .playground-ops {
+    flex-grow: 1;
+    overflow: hidden;
+
+    > div {
+      height: calc(100vh - 100px);
+    }
+    .graphiql-container {
+      height: 100%;
+    }
+  }
+`
 
 const AppContainer = styled.div`
   display: flex;

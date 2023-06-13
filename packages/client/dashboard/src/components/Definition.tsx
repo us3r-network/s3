@@ -42,9 +42,16 @@ export default function Definition({
         const resp = await queryModelGraphql(streamId, network)
         const { data } = resp.data
         setModelData(data)
-        setGqlSchema({
-          code: data.graphqlSchema,
-        })
+        if (data.graphqlSchemaDefinition) {
+          setGqlSchema({
+            code: data.graphqlSchemaDefinition,
+            libraries: schemas.library,
+          })
+        } else {
+          setGqlSchema({
+            code: data.graphqlSchema,
+          })
+        }
       } catch (error) {
         const err = error as AxiosError
         setErrMsg((err.response?.data as any).message || err.message)
