@@ -1,0 +1,65 @@
+{
+  "name": "dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ceramicnetwork/http-client": "^2.22.0",
+    "@graphiql/plugin-explorer": "^0.1.20",
+    "@monaco-editor/react": "^4.5.1",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/file-saver": "^2.0.5",
+    "@types/jest": "^27.0.1",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^16.7.13",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/styled-components": "^5.1.26",
+    "@us3r-network/auth-with-rainbowkit": "^0.1.4",
+    "@us3r-network/data-model": "^0.2.1",
+    "@us3r-network/profile": "^0.4.11",
+    "dayjs": "^1.11.7",
+    "file-saver": "^2.0.5",
+    "graphiql": "^2.4.7",
+    "graphql-editor": "6.3.2",
+    "json-bigint-patch": "^0.0.8",
+    "lodash": "^4.17.21",
+    "monaco-editor": "^0.38.0",
+    "react": "^18.2.0",
+    "react-aria-components": "^1.0.0-alpha.4",
+    "react-dom": "^18.2.0",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-router-dom": "^6.11.2",
+    "react-scripts": "5.0.1",
+    "styled-components": "^5.3.11",
+    "typescript": "^4.4.2",
+    "use-url-search-params": "^2.5.1",
+    "web-vitals": "^2.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      "last 2 chrome version",
+      "last 2 firefox version",
+      "last 2 safari version",
+      "last 2 edge version"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
