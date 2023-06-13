@@ -207,6 +207,8 @@ export default function ExploreModel() {
                       <div>
                         <a
                           href={`${S3_SCAN_URL}/models/model/${item.stream_id}/mids`}
+                          target="_blank"
+                          rel="noreferrer"
                         >
                           {item.useCount}
                         </a>
