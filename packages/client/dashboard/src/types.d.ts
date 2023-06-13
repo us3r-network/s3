@@ -1,28 +1,18 @@
-type Json = any
-
-export type Stream = {
-  streamId: string
-  did: string
+export type ClientDApp = {
+  id?: number
+  modelId?: string
+  icon?: string
+  name: string
   network: string
-  indexingTime: number
-  familyOrApp: string | null
-  type: string
-  from: string
-  tags: string[]
-  status: string
-  hash: string
-  schema: string
-  model?: string
-  anchorStatus: string
-  commitIds: string[]
-  content: Json
-  metadata: Json
-  domain?: string
-}
-
-export enum Network {
-  MAINNET = 'MAINNET',
-  TESTNET = 'TESTNET',
+  type?: string
+  stage?: string
+  url?: string
+  description?: string
+  socialLinks?: { platform: string; url: string }[]
+  tags?: string[]
+  models?: string[]
+  createdAt?: number
+  lastModifiedAt?: number
 }
 
 export type ModelStream = {
@@ -61,11 +51,6 @@ export type ModelStream = {
   isIndexed?: boolean
 }
 
-export type ModelStreamInfo = {
-  content: any
-  state: any
-}
-
 export type ModeCreateResult = {
   composite: any
   runtimeDefinition: any
@@ -77,14 +62,6 @@ export type ModeQueryResult = {
   graphqlSchema: string
   graphqlSchemaDefinition?: string
   isIndexed?: boolean
-}
-
-export type Stats = {
-  streamsLastWeek: number[]
-  streamsPerHour: number | null
-  todayModels: number | null
-  totalModels: number | null
-  totalStreams: number | null
 }
 
 export type ModelMid = {

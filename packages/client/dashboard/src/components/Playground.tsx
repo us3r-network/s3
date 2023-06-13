@@ -16,17 +16,15 @@ import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
 
 import 'graphiql/graphiql.css'
-import '../../styles/playground.css'
-import { useParams } from 'react-router-dom'
-import { queryModelGraphql } from '../../api'
 import { AxiosError } from 'axios'
 import styled from 'styled-components'
-import { createGraphqlDefaultQuery } from '../../utils/createDefaultQuery'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { DID } from 'dids'
-import { useCeramicCtx } from '../../context/CeramicCtx'
-import { CERAMIC_TESTNET_HOST, CERAMIC_MAINNET_HOST } from '../../constants'
-import { Network } from '../../types'
+import useSelectedDapp from '../hooks/useSelectedDapp'
+import { Network } from './Selector/EnumSelect'
+import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
+import { queryModelGraphql } from '../api'
+import { createGraphqlDefaultQuery } from '../utils/createDefaultQuery'
 
 const type = {
   query: String,
@@ -44,9 +42,9 @@ export type YogaGraphiQLProps = Omit<
   | 'onEditQuery'
 > &
   Partial<Omit<LoadFromUrlOptions, 'headers'>> & {
-    streamId: string
     title?: string
     additionalHeaders?: LoadFromUrlOptions['headers']
+    streamId: string
   }
 
 const initialQuery = /* GraphQL */ `
@@ -78,7 +76,9 @@ export default function PlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
   const { streamId } = props
-  const { network } = useCeramicCtx()
+  // const { network } = useCeramicCtx()
+  //   const [modelData, setModelData] = useState<ModeQueryResult>();
+  const { selectedDapp } = useSelectedDapp()
 
   const [definition, setDefinition] = useState({
     models: {
@@ -128,10 +128,13 @@ export default function PlaygroundGraphiQL(
 
   const [loading, setLoading] = useState(false)
   const fetchModelGraphql = useCallback(async () => {
-    if (!streamId) return
+    if (!streamId || !selectedDapp) return
     try {
       setLoading(true)
-      const resp = await queryModelGraphql(streamId, network)
+      const resp = await queryModelGraphql(
+        streamId,
+        selectedDapp.network as Network
+      )
       const { data } = resp.data
       setDefinition(data.runtimeDefinition)
       if (data.graphqlSchemaDefinition) {
@@ -153,7 +156,7 @@ export default function PlaygroundGraphiQL(
     } finally {
       setLoading(false)
     }
-  }, [streamId, network])
+  }, [streamId, selectedDapp])
 
   const session = useSession()
 
@@ -161,12 +164,12 @@ export default function PlaygroundGraphiQL(
     () =>
       new ComposeClient({
         ceramic:
-          network === Network.MAINNET
+          selectedDapp?.network === Network.MAINNET
             ? CERAMIC_MAINNET_HOST
             : CERAMIC_TESTNET_HOST,
         definition: definition as RuntimeCompositeDefinition,
       }),
-    [definition, network]
+    [definition, selectedDapp?.network]
   )
   const [composeClientAuthenticated, setComposeClientAuthenticated] =
     useState(false)
@@ -216,10 +219,10 @@ export default function PlaygroundGraphiQL(
   })
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const isAuthenticated = useMemo(() => {
-    return composeClientAuthenticated && composeClient.context.isAuthenticated()
-  }, [composeClient, composeClientAuthenticated])
-  console.log({ isAuthenticated })
+  // const isAuthenticated = useMemo(() => {
+  //   return composeClientAuthenticated && composeClient.context.isAuthenticated()
+  // }, [composeClient, composeClientAuthenticated])
+  // console.log({ isAuthenticated })
 
   if (loading) {
     return <Loading>Loading</Loading>
@@ -230,7 +233,7 @@ export default function PlaygroundGraphiQL(
   }
 
   return (
-    <div className="graphiql-container">
+    <GraphiqlContainer>
       <GraphiQLProvider
         plugins={[explorerPlugin]}
         query={query}
@@ -254,7 +257,7 @@ export default function PlaygroundGraphiQL(
           </GraphiQL.Logo>
         </GraphiQLInterface>
       </GraphiQLProvider>
-    </div>
+    </GraphiqlContainer>
   )
 }
 
@@ -262,4 +265,17 @@ const Loading = styled.div`
   padding: 20px;
   text-align: center;
   color: gray;
+`
+
+const GraphiqlContainer = styled.div`
+  border-radius: 20px;
+  overflow: hidden;
+  height: calc(100vh - 200px);
+  > div {
+    height: 100%;
+    .graphiql-container {
+      height: 100%;
+      width: 100%;
+    }
+  }
 `
