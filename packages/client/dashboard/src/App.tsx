@@ -118,6 +118,32 @@ function ModelEditorLayout() {
   )
 }
 
+const AppContainer = styled.div`
+  display: flex;
+  margin-top: 60px;
+  > main.container {
+    display: flex;
+    width: 100%;
+
+    > div {
+      flex-grow: 1;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1300px;
+      z-index: 0;
+    }
+
+    .login-first {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      justify-content: center;
+    }
+  }
+`
+
 const EditorLayoutContainer = styled.div`
   margin-top: 25px;
   margin-bottom: 25px;
@@ -142,32 +168,6 @@ const EditorLayoutContainer = styled.div`
     }
     .graphiql-container {
       height: 100%;
-    }
-  }
-`
-
-const AppContainer = styled.div`
-  display: flex;
-  margin-top: 60px;
-  > main.container {
-    display: flex;
-    width: 100%;
-
-    > div {
-      flex-grow: 1;
-      margin: 0 auto;
-      width: 100%;
-      max-width: 1300px;
-      z-index: 0;
-    }
-
-    .login-first {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-      justify-content: center;
     }
   }
 `
