@@ -115,10 +115,16 @@ const ItemCardBox = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     > div {
+      &:first-child {
+        flex-grow: 1;
+        width: calc(100% - 50px);
+      }
       display: flex;
       gap: 10px;
       align-items: center;
+
       img {
         width: 48px;
         height: 48px;
@@ -131,8 +137,13 @@ const ItemCardBox = styled.div`
         font-weight: 700;
         font-size: 18px;
         line-height: 21px;
+        flex-grow: 1;
 
         color: #ffffff;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
     .net {
@@ -162,6 +173,12 @@ const ItemCardBox = styled.div`
     margin: 0;
     padding: 0;
     color: #718096;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
   }
 `
 
