@@ -43,7 +43,6 @@ export default function Definition({ streamId }: { streamId: string }) {
         } else {
           setGqlSchema({
             code: data.graphqlSchema,
-            libraries: schemas.library,
           })
         }
       } catch (error) {

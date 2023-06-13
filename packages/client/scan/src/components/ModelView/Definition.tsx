@@ -46,7 +46,6 @@ export default function Definition() {
         } else {
           setGqlSchema({
             code: data.graphqlSchema,
-            libraries: schemas.library,
           })
         }
       } catch (error) {
