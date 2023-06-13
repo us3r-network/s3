@@ -11,7 +11,6 @@ import { createModel, updateDapp } from '../api'
 import { Network } from './Selector/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { set } from 'lodash'
 
 export default function CreateNewModel({
   closeModal,
