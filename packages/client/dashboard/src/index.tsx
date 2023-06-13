@@ -9,6 +9,9 @@ import './index.css'
 import './styles/tab.css'
 import './styles/playground.css'
 
+import '@graphiql/plugin-explorer/dist/style.css'
+import 'graphiql/graphiql.css'
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>

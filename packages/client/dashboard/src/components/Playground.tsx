@@ -11,11 +11,9 @@ import {
 } from 'graphiql'
 import { useUrlSearchParams } from 'use-url-search-params'
 
-import '@graphiql/plugin-explorer/dist/style.css'
 import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
 
-import 'graphiql/graphiql.css'
 import { AxiosError } from 'axios'
 import styled from 'styled-components'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'

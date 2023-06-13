@@ -127,6 +127,7 @@ export default function ModelList({
         </div>
       )) || (
         <DappModelList
+          editable={editable}
           selected={selected}
           setSelected={setSelected}
           dappModels={dappModels || []}
@@ -151,12 +152,14 @@ function DappModelList({
   dappModels,
   selectAction,
   removeModelAction,
+  editable,
 }: {
   selected?: ModelStream
   setSelected: (ms: ModelStream) => void
   dappModels: ModelStream[]
   selectAction: (model: ModelStream) => void
   removeModelAction: (modelId: string) => Promise<void>
+  editable?: boolean
 }) {
   if (dappModels.length === 0) {
     return (
@@ -179,10 +182,12 @@ function DappModelList({
               }}
             >
               <div>{item.stream_content.name}</div>
-              <ModelListItemTrash
-                removeModelAction={removeModelAction}
-                streamId={item.stream_id}
-              />
+              {editable && (
+                <ModelListItemTrash
+                  removeModelAction={removeModelAction}
+                  streamId={item.stream_id}
+                />
+              )}
             </div>
             {active && (
               <>

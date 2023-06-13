@@ -87,12 +87,21 @@ export default function CreateNewModel({
   )
 }
 const EditorBox = styled.div`
-  height: calc(100% - 88px);
-  max-height: 800px;
+  height: calc(100vh - 88px);
+  /* max-height: 800px; */
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
+
+  div {
+    /* height: calc(100v - 88px); */
+    box-sizing: border-box;
+  }
+
+  input {
+    width: auto;
+  }
 `
 
 const CreateBox = styled.div`
