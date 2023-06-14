@@ -3,13 +3,13 @@ import { useAppCtx } from '../context/AppCtx'
 import ChevronLeft from '../components/Icons/ChevronLeft'
 import PlusIcon from '../components/Icons/PlusIcon'
 import { Link, useNavigate } from 'react-router-dom'
-import { shortPubKey } from '../utils/shortPubKey'
 import {
   useAuthentication,
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import { ClientDApp } from '../types'
-import { Network } from '../components/Selector/EnumSelect'
+import { createImageFromInitials } from '../utils/createImage'
+import { getRandomColor } from '../utils/randomColor'
 
 export default function MyDapps() {
   const { dapps } = useAppCtx()
@@ -75,7 +75,17 @@ function ItemCard({ dapp }: { dapp: ClientDApp }) {
       <ItemCardBox>
         <div>
           <div>
-            <img src={dapp.icon || '/logo512.png'} alt="" />
+            <img
+              src={
+                dapp.icon ||
+                createImageFromInitials(
+                  60,
+                  dapp.name.slice(0, 1),
+                  getRandomColor()
+                )
+              }
+              alt=""
+            />
             <h3>{dapp.name}</h3>
           </div>
           <div className="net">{dapp.network}</div>

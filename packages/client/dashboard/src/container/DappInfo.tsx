@@ -10,6 +10,8 @@ import CopyIcon from '../components/Icons/CopyIcon'
 
 import DelConfirmModal from '../components/DelDappConfirmModal'
 import { useNavigate } from 'react-router-dom'
+import { createImageFromInitials } from '../utils/createImage'
+import { getRandomColor } from '../utils/randomColor'
 
 export default function DappInfo() {
   const { selectedDapp } = useSelectedDapp()
@@ -35,7 +37,17 @@ export default function DappInfo() {
   return (
     <DappInfoContainer>
       <div className="info items">
-        <img src={selectedDapp.icon || '/logo512.png'} alt="icon" />
+        <img
+          src={
+            selectedDapp.icon ||
+            createImageFromInitials(
+              120,
+              selectedDapp.name.slice(0, 1),
+              getRandomColor()
+            )
+          }
+          alt="icon"
+        />
         <div>
           <DappTitleEditor selectedDapp={selectedDapp} />
           <div className="appid">
