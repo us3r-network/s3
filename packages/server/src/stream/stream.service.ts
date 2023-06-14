@@ -17,7 +17,7 @@ export default class StreamService {
     private readonly streamRepository: StreamRepository,
     private readonly modelService: ModelService,
     @InjectRedis() private readonly redis: Redis,
-  ) { }
+  ) {}
 
   async findByStreamId(network: Network, streamId: string): Promise<Stream> {
     return await this.streamRepository.findOne({
@@ -38,7 +38,8 @@ export default class StreamService {
       if (whereSql.length > 0) {
         whereSql += ' AND ';
       }
-      whereSql += '(family IN (:...familyOrApps) OR domain IN (:...familyOrApps))';
+      whereSql +=
+        '(family IN (:...familyOrApps) OR domain IN (:...familyOrApps))';
     }
     if (did?.trim().length > 0) {
       if (whereSql.length > 0) {
@@ -63,7 +64,7 @@ export default class StreamService {
       })
       .limit(pageSize)
       .offset(pageSize * (pageNumber - 1))
-      .orderBy('created_at', 'DESC')
+      .orderBy('last_modified_at', 'DESC')
       .getMany();
   }
 
@@ -156,31 +157,34 @@ export default class StreamService {
     this.getTopicsJob(Network.TESTNET);
   }
 
-  async getTopics(
-    network: Network,
-  ) {
+  async getTopics(network: Network) {
     const val = await this.redis.get(`cscan-streams-topics-${network}`);
-    if (!val) { return {} }
+    if (!val) {
+      return {};
+    }
     return JSON.parse(val);
   }
 
-  async getTopicsJob(
-    network: Network,
-  ): Promise<any> {
+  async getTopicsJob(network: Network): Promise<any> {
     const sortmap = (map) => {
       const arr = Array.from(map);
       arr.sort((a, b) => b[1] - a[1]);
       return arr;
     };
     const sortmapex = (map) => {
-      return sortmap(map).map(e => ({ name: e[0], num: e[1] }))
+      return sortmap(map).map((e) => ({ name: e[0], num: e[1] }));
     };
 
     console.time(`${network}-getTopics`);
 
     const streams = await this.streamRepository
       .createQueryBuilder('streams')
-      .select(['streams.id', 'streams.family', 'streams.domain', 'streams.network'])
+      .select([
+        'streams.id',
+        'streams.family',
+        'streams.domain',
+        'streams.network',
+      ])
       .limit(200000)
       .orderBy('id', 'DESC')
       .getMany();
@@ -190,7 +194,7 @@ export default class StreamService {
     const familyMap = new Map<string, number>();
     const domainMap = new Map<string, number>();
 
-    streams.forEach(e => {
+    streams.forEach((e) => {
       if (e.getNetwork != network) {
         return;
       }
@@ -199,28 +203,35 @@ export default class StreamService {
 
       key = e.getFamily;
       map = familyMap;
-      if (key) { map.set(key, (map.get(key) ?? 0) + 1); }
+      if (key) {
+        map.set(key, (map.get(key) ?? 0) + 1);
+      }
 
       key = e.getDomain;
       map = domainMap;
-      if (key) { map.set(key, (map.get(key) ?? 0) + 1); }
-    })
+      if (key) {
+        map.set(key, (map.get(key) ?? 0) + 1);
+      }
+    });
 
     const res = {
       familys: sortmapex(familyMap),
       domains: sortmapex(domainMap),
     };
 
-    await this.redis.set(`cscan-streams-topics-${network}`, JSON.stringify(res));
+    await this.redis.set(
+      `cscan-streams-topics-${network}`,
+      JSON.stringify(res),
+    );
 
     return res;
   }
 
-  async getStats(
-    network: Network,
-  ): Promise<StatsDto> {
+  async getStats(network: Network): Promise<StatsDto> {
     const val = await this.redis.get(`cscan-stats-${network}`);
-    if (!val) { return new StatsDto() }
+    if (!val) {
+      return new StatsDto();
+    }
     return JSON.parse(val);
   }
 
@@ -230,14 +241,11 @@ export default class StreamService {
     this.getStatsJob(Network.TESTNET);
   }
 
-  async getStatsJob(
-    network: Network,
-  ): Promise<StatsDto> {
-
+  async getStatsJob(network: Network): Promise<StatsDto> {
     try {
       const dto = new StatsDto();
 
-      const now = Math.floor((new Date()).getTime() / 1000);
+      const now = Math.floor(new Date().getTime() / 1000);
       const weekAgo = new Date((now - 7 * 24 * 3600) * 1000);
 
       console.time(`${network}-getStats`);
@@ -246,32 +254,44 @@ export default class StreamService {
         this.streamRepository
           .createQueryBuilder('streams')
           .select(['streams.id', 'streams.network', 'streams.created_at'])
-          .where('created_at BETWEEN :start AND :end', { start: weekAgo, end: new Date() })
+          .where('created_at BETWEEN :start AND :end', {
+            start: weekAgo,
+            end: new Date(),
+          })
           .orderBy('created_at', 'DESC')
-          .getMany()
-        , this.modelService.getModelStatistics(network)
+          .getMany(),
+        this.modelService.getModelStatistics(network),
       ]);
 
       console.timeEnd(`${network}-getStats`);
 
-      streams = streams.filter(e => e.getNetwork == network);
+      streams = streams.filter((e) => e.getNetwork == network);
 
-      if (!streams || streams.length == 0) { console.log("getStatsJob found no streams"); return dto; }
+      if (!streams || streams.length == 0) {
+        console.log('getStatsJob found no streams');
+        return dto;
+      }
 
       const t1 = Math.floor(streams[0].getCreatedAt.getTime() / 1000);
-      const t2 = Math.floor(streams[streams.length - 1].getCreatedAt.getTime() / 1000);
+      const t2 = Math.floor(
+        streams[streams.length - 1].getCreatedAt.getTime() / 1000,
+      );
 
       const weeks = [0, 0, 0, 0, 0, 0, 0];
       for (let i = 0; i < streams.length; ++i) {
         const t = Math.floor(streams[i].getCreatedAt.getTime() / 1000);
-        if (t > now) { continue; }
+        if (t > now) {
+          continue;
+        }
         const idx = weeks.length - 1 - Math.floor((now - t) / (24 * 3600));
-        if (idx < 0) { break; }
+        if (idx < 0) {
+          break;
+        }
         weeks[idx] += 1;
       }
 
       dto.totalStreams = streams[0].getId;
-      dto.streamsPerHour = Math.floor(streams.length * 3600 / (t1 - t2));
+      dto.streamsPerHour = Math.floor((streams.length * 3600) / (t1 - t2));
       dto.streamsLastWeek = weeks;
 
       Object.assign(dto, modelStatistics);
@@ -279,7 +299,6 @@ export default class StreamService {
       await this.redis.set(`cscan-stats-${network}`, JSON.stringify(dto));
 
       return dto;
-
     } catch (e) {
       console.log(`get StatsJob failed: ${e}`);
     }

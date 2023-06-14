@@ -3,14 +3,14 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import {
   CeramicModelMainNet,
   CeramicModelTestNet,
-  MetaModel,
+  MetaModelTestNet,
   MetaModelMainnet,
 } from '../entities/model/model.entity';
 import {
   CeramicModelMainNetRepository,
   CeramicModelTestNetRepository,
   MetaModelMainnetRepository,
-  MetaModelRepository,
+  MetaModelTestNetRepository,
 } from '../entities/model/model.repository';
 import { EntityManager, In, Repository } from 'typeorm';
 import { Network, Stream } from 'src/entities/stream/stream.entity';
@@ -18,6 +18,9 @@ import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
   S3_MAINNET_MODELS_USE_COUNT_ZSET,
+  S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX,
+  S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX,
+  S3_MODEL_GRAPHQL_RUNTIMEDEFINITION_CACHE_PREFIX,
   S3_TESTNET_MODELS_USE_COUNT_ZSET,
 } from 'src/common/constants';
 import { Cron } from '@nestjs/schedule';
@@ -26,14 +29,15 @@ import {
   getCeramicNodeAdminKey,
   importDynamic,
 } from 'src/common/utils';
+import { get } from 'http';
 
 @Injectable()
 export default class ModelService {
   private readonly logger = new Logger(ModelService.name);
 
   constructor(
-    @InjectRepository(MetaModel, 'testnet')
-    private readonly metaModelRepository: MetaModelRepository,
+    @InjectRepository(MetaModelTestNet, 'testnet')
+    private readonly metaModelRepository: MetaModelTestNetRepository,
 
     @InjectRepository(MetaModelMainnet, 'mainnet')
     private readonly metaModelMainnetRepository: MetaModelMainnetRepository,
@@ -51,14 +55,116 @@ export default class ModelService {
     private mainnetCeramicEntityManager: EntityManager,
 
     @InjectRedis() private readonly redis: Redis,
-  ) { }
+  ) {}
 
-  async getStreams(network: Network, modelStreamId: string, pageSize: number, pageNumber: number): Promise<any[]> {
+  async saveModelGraphCache(
+    network: Network,
+    model: string,
+    composite: any,
+    runtimeDefinition: any,
+    graphqlSchema: any,
+  ) {
+    try {
+      const pipeline = this.redis.pipeline();
+      pipeline.set(
+        S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX + network + ':' + model,
+        JSON.stringify(composite),
+      );
+      pipeline.set(
+        S3_MODEL_GRAPHQL_RUNTIMEDEFINITION_CACHE_PREFIX + network + ':' + model,
+        JSON.stringify(runtimeDefinition),
+      );
+      pipeline.set(
+        S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX + network + ':' + model,
+        graphqlSchema,
+      );
+      const results = await pipeline.exec();
+      this.logger.log(
+        `Saving ${network} model ${model} graph cache result ${results}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Saving ${network} model ${model} graph cache err ${error}`,
+      );
+    }
+  }
+
+  async storeModelGraphql(network: Network, modelStreamId: string, graphqls: string[]){
+    const redisKey = `s3:${network}:model:${modelStreamId}:graphqls`;
+    try {
+     const result = await this.redis.sadd(redisKey, ...graphqls);
+    this.logger.log(`Storing ${network} model ${modelStreamId} graphqls ${graphqls} result ${result}`);
+    } catch (error) {
+      this.logger.error(`Storing ${network} model ${modelStreamId} graphqls ${graphqls} err ${error}`);
+    }
+  }
+
+  async getModelGraphql(network: Network, modelStreamId: string): Promise<string[]>{
+    const redisKey = `s3:${network}:model:${modelStreamId}:graphqls`;
+    try {
+      const graphqls = await this.redis.smembers(redisKey);
+      this.logger.log(`Getting ${network} model ${modelStreamId} graphqls ${graphqls}`);
+      return graphqls;
+    } catch (error) {
+      this.logger.error(`Getting ${network} model ${modelStreamId} graphqls err ${error}`);
+    }
+  }
+
+  async getModelGraphCache(network: Network, model: string): Promise<any> {
+    try {
+      const composite = await this.redis.get(
+        S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX + network + ':' + model,
+      );
+      const runtimeDefinition = await this.redis.get(
+        S3_MODEL_GRAPHQL_RUNTIMEDEFINITION_CACHE_PREFIX + network + ':' + model,
+      );
+      const graphqlSchema = await this.redis.get(
+        S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX + network + ':' + model,
+      );
+      if (composite && runtimeDefinition && graphqlSchema) {
+        this.logger.log(
+          `Getting ${network} model ${model} graph cache conposite ${JSON.parse(
+            composite,
+          )},  runtimeDefinition ${JSON.parse(
+            runtimeDefinition,
+          )},  graphqlSchema ${graphqlSchema}`,
+        );
+        return {
+          composite: JSON.parse(composite),
+          runtimeDefinition: JSON.parse(runtimeDefinition),
+          graphqlSchema: graphqlSchema,
+        };
+      }
+      return;
+    } catch (error) {
+      this.logger.error(
+        `Getting ${network} model ${model} graph cache err ${error}`,
+      );
+    }
+  }
+
+  async getStreams(
+    network: Network,
+    modelStreamId: string,
+    pageSize: number,
+    pageNumber: number,
+  ): Promise<any[]> {
     let ceramicEntityManager: EntityManager;
-    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
 
-    const mids = await ceramicEntityManager.query(`select * from ${modelStreamId} order by created_at DESC limit ${pageSize} offset ${pageSize * (pageNumber - 1)}`)
-    if (mids.length == 0) return [];
+    let mids = [];
+    try {
+      mids = await ceramicEntityManager.query(
+        `select * from ${modelStreamId} order by created_at DESC limit ${pageSize} offset ${
+          pageSize * (pageNumber - 1)
+        }`,
+      );
+    } catch (error) {
+      this.logger.error(`querying model ${modelStreamId} err: ${error}`);
+    }
+    if (mids?.length == 0) return [];
 
     return mids.map((mid: any) => {
       return {
@@ -74,14 +180,24 @@ export default class ModelService {
     });
   }
 
-  async getMid(network: Network, modelStreamId: string, midStreamId: string): Promise<any> {
+  async getMid(
+    network: Network,
+    modelStreamId: string,
+    midStreamId: string,
+  ): Promise<any> {
     let ceramicEntityManager: EntityManager;
-    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
 
-    const mids = await ceramicEntityManager.query(`select * from ${modelStreamId} where stream_id='${midStreamId}'`)
+    const mids = await ceramicEntityManager.query(
+      `select * from ${modelStreamId} where stream_id='${midStreamId}'`,
+    );
     if (mids.length == 0) return;
 
-    const indexedModels = await this.findIndexedModelIds(network, [modelStreamId]);
+    const indexedModels = await this.findIndexedModelIds(network, [
+      modelStreamId,
+    ]);
 
     const mid = mids[0];
     return {
@@ -99,13 +215,19 @@ export default class ModelService {
 
   async getModel(network: Network, modelStreamId: string): Promise<any> {
     let ceramicEntityManager: EntityManager;
-    network == Network.MAINNET ? ceramicEntityManager = this.mainnetCeramicEntityManager : ceramicEntityManager = this.testnetCeramicEntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
 
     const metaModel = 'kh4q0ozorrgaq2mezktnrmdwleo1d';
-    const mids = await ceramicEntityManager.query(`select * from ${metaModel} where stream_id='${modelStreamId}'`)
+    const mids = await ceramicEntityManager.query(
+      `select * from ${metaModel} where stream_id='${modelStreamId}'`,
+    );
     if (mids.length == 0) return;
 
-    const indexedModels = await this.findIndexedModelIds(network, [modelStreamId]);
+    const indexedModels = await this.findIndexedModelIds(network, [
+      modelStreamId,
+    ]);
 
     const mid = mids[0];
     return {
@@ -121,16 +243,8 @@ export default class ModelService {
     };
   }
 
-
-  // Currently only support testnet.
-  async indexTopModelsForTestNet(topNum: number) {
+  async indexModels(models: string[], network: Network): Promise<void> {
     try {
-      const modelMap = await this.getModelsByDecsPagination(
-        Network.TESTNET,
-        topNum,
-        1,
-      );
-
       // index new models
       const { CeramicClient } = await importDynamic(
         '@ceramicnetwork/http-client',
@@ -141,8 +255,8 @@ export default class ModelService {
       );
       const { getResolver } = await importDynamic('key-did-resolver');
       const { fromString } = await importDynamic('uint8arrays/from-string');
-      const ceramicNode = getCeramicNode(Network.TESTNET);
-      const ceramicNodeAdminKey = getCeramicNodeAdminKey(Network.TESTNET);
+      const ceramicNode = getCeramicNode(network);
+      const ceramicNodeAdminKey = getCeramicNodeAdminKey(network);
       const ceramic = new CeramicClient(ceramicNode);
       const privateKey = fromString(ceramicNodeAdminKey, 'base16');
       const did = new DID({
@@ -152,19 +266,13 @@ export default class ModelService {
       await did.authenticate();
       ceramic.did = did;
 
-      const indexedModels = await this.ceramicModelTestNetRepository.find({
-        where: { model: In(Array.from(modelMap.keys())) },
-      });
-      const indexedModelIds = indexedModels.map((m) => m.getModel);
-      for await (const m of modelMap) {
+      for await (const m of models) {
         try {
-          this.logger.log(`To index models, stream id:${m[0]}`);
-          if (indexedModelIds.includes(m[0])) continue;
-          this.logger.log(`Index models, stream id:${m[0]}`);
-          const res = await ceramic.admin.startIndexingModels([m[0]]);
-          this.logger.log(`Indexed model: ${m[0]}.`);
+          this.logger.log(`Index models, stream id:${m}`);
+          const res = await ceramic.admin.startIndexingModels([m]);
+          this.logger.log(`Indexed model: ${m}.`);
         } catch (error) {
-          this.logger.error(`Add model ${m[0]} index err: ${error}`);
+          this.logger.error(`Add model ${m} index err: ${error}`);
         }
       }
     } catch (error) {
@@ -240,7 +348,7 @@ export default class ModelService {
   async findModelsByIds(
     streamIds: string[],
     network: Network = Network.TESTNET,
-  ): Promise<MetaModel[] | MetaModelMainnet[]> {
+  ): Promise<MetaModelTestNet[] | MetaModelMainnet[]> {
     return this.getMetaModelRepository(network).find({
       where: { stream_id: In(streamIds) },
     });
@@ -254,15 +362,22 @@ export default class ModelService {
     return result.map((r) => r['stream_id']);
   }
 
-  async findIndexedModelIds(network: Network, modelStreamIds: string[]): Promise<string[]> {
+  async findIndexedModelIds(
+    network: Network,
+    modelStreamIds: string[],
+  ): Promise<string[]> {
     let models: any[] = [];
     if (network == Network.MAINNET) {
-      models = await this.ceramicModelMainNetRepository.find({ where: { model: In(modelStreamIds) } });
+      models = await this.ceramicModelMainNetRepository.find({
+        where: { model: In(modelStreamIds) },
+      });
     } else if (network == Network.TESTNET) {
-      models = await this.ceramicModelTestNetRepository.find({ where: { model: In(modelStreamIds) } });
+      models = await this.ceramicModelTestNetRepository.find({
+        where: { model: In(modelStreamIds) },
+      });
     }
 
-    return models?.map(m => m.getModel);
+    return models?.map((m) => m.getModel);
   }
 
   async findModels(
@@ -273,7 +388,7 @@ export default class ModelService {
     description?: string,
     startTimeMs?: number,
     network?: Network,
-  ): Promise<MetaModel[] | MetaModelMainnet[]> {
+  ): Promise<MetaModelTestNet[] | MetaModelMainnet[]> {
     let whereSql = '';
     if (name?.trim().length > 0) {
       if (whereSql.length > 0) {
@@ -355,10 +470,7 @@ export default class ModelService {
     await this.redis.zadd(key, ...members);
   }
 
-  async getModelStatistics(
-    network: Network = Network.TESTNET,
-  ): Promise<any> {
-
+  async getModelStatistics(network: Network = Network.TESTNET): Promise<any> {
     console.time(`${network}-getModelStatistics`);
 
     const models = await this.getMetaModelRepository(network)
@@ -369,14 +481,15 @@ export default class ModelService {
 
     console.timeEnd(`${network}-getModelStatistics`);
 
-    const now = Math.floor((new Date()).getTime() / 1000);
+    const now = Math.floor(new Date().getTime() / 1000);
     const today = Math.floor(now / (24 * 3600)) * 24 * 3600;
     let i = 0;
     for (i = 0; i < models.length; ++i) {
       const t = Math.floor(models[i].getCreatedAt.getTime() / 1000);
-      if (t < today) { break; }
+      if (t < today) {
+        break;
+      }
     }
-    return { totalModels: models.length, todayModels: i + 1 }
+    return { totalModels: models.length, todayModels: i + 1 };
   }
-
 }

@@ -25,6 +25,7 @@ import {
   importDynamic,
 } from 'src/common/utils';
 import { Cron } from '@nestjs/schedule';
+import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils/graphql/parser';
 
 @ApiTags('/models')
 @Controller('/models')
@@ -93,7 +94,10 @@ export class ModelController {
 
       if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
       const modelStreamIds = metaModels.map((m) => m.getStreamId);
-      const indexedModelStreamIds = await this.modelService.findIndexedModelIds(network, modelStreamIds)
+      const indexedModelStreamIds = await this.modelService.findIndexedModelIds(
+        network,
+        modelStreamIds,
+      );
       const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
       return new BasicMessageDto(
@@ -126,7 +130,10 @@ export class ModelController {
       modelStreamIds,
     );
 
-    const indexedModelStreamIds = await this.modelService.findIndexedModelIds(network, modelStreamIds)
+    const indexedModelStreamIds = await this.modelService.findIndexedModelIds(
+      network,
+      modelStreamIds,
+    );
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     return new BasicMessageDto(
       'ok',
@@ -163,21 +170,36 @@ export class ModelController {
     if (!pageNumber || pageNumber == 0) pageNumber = 1;
     this.logger.log(`Seaching model(${modelStreamId})'s streams`);
 
-    const streams = await this.modelService.getStreams(network, modelStreamId, pageSize, pageNumber);
+    const streams = await this.modelService.getStreams(
+      network,
+      modelStreamId,
+      pageSize,
+      pageNumber,
+    );
     return new BasicMessageDto('ok', 0, streams);
   }
 
   @Get('/:modelStreamId/mids/:midStreamId')
   @ApiOkResponse({ type: BasicMessageDto })
-  async getMid(@Param('midStreamId') midStreamId: string,
+  async getMid(
+    @Param('midStreamId') midStreamId: string,
     @Query('network') network: Network = Network.TESTNET,
-    @Param('modelStreamId') modelStreamId: string,): Promise<BasicMessageDto> {
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
     this.logger.log(`Seaching mid(${midStreamId}) on network ${network}.`);
 
-    const mid = await this.modelService.getMid(network, modelStreamId, midStreamId);
+    const mid = await this.modelService.getMid(
+      network,
+      modelStreamId,
+      midStreamId,
+    );
     if (!mid) {
-      throw new NotFoundException(new BasicMessageDto(`midStreamId ${midStreamId} does not exist on network ${network}`, 0),
-      )
+      throw new NotFoundException(
+        new BasicMessageDto(
+          `midStreamId ${midStreamId} does not exist on network ${network}`,
+          0,
+        ),
+      );
     }
     return new BasicMessageDto('ok', 0, mid);
   }
@@ -202,10 +224,11 @@ export class ModelController {
 
   @Post('/indexing')
   async indexModels(
-    @Query('num') num: number = 20000,
+    @Query('model') model: string,
+    @Query('network') network: Network = Network.TESTNET,
   ): Promise<BasicMessageDto> {
-    this.logger.log(`Staring index ${num} models on testnet.`);
-    await this.modelService.indexTopModelsForTestNet(num);
+    this.logger.log(`Starting index ${network} models ${model}.`);
+    await this.modelService.indexModels([model], network);
     return new BasicMessageDto('ok', 0);
   }
 
@@ -214,7 +237,6 @@ export class ModelController {
   async CreateAndDeployModel(@Req() req: Request, @Body() dto: CreateModelDto) {
     const ceramic_node = getCeramicNode(dto.network);
     const ceramic_node_admin_key = getCeramicNodeAdminKey(dto.network);
-
     const { CeramicClient } = await importDynamic(
       '@ceramicnetwork/http-client',
     );
@@ -223,6 +245,7 @@ export class ModelController {
     const { Ed25519Provider } = await importDynamic('key-did-provider-ed25519');
     const { getResolver } = await importDynamic('key-did-resolver');
     const { fromString } = await importDynamic('uint8arrays/from-string');
+
     // TODO  verify the syntax of the graphql paramter.
     this.logger.log(`Create and deploy model, graphql: ${dto.graphql}`);
     if (!dto.graphql || dto.graphql.length == 0) {
@@ -230,7 +253,7 @@ export class ModelController {
       throw new BadRequestException('Graphql paramter is empty.');
     }
 
-    // 0 Login
+    // Login
     this.logger.log('Connecting to the our ceramic node...');
     const ceramic = new CeramicClient(ceramic_node);
     try {
@@ -240,15 +263,12 @@ export class ModelController {
         const session = await DIDSession.fromSession(didSession);
         ceramic.did = session.did;
       } else {
-        // Hexadecimal-encoded private key for a DID having admin access to the target Ceramic node
-        // Replace the example key here by your admin private key
         const privateKey = fromString(ceramic_node_admin_key, 'base16');
         const did = new DID({
           resolver: getResolver(),
           provider: new Ed25519Provider(privateKey),
         });
         await did.authenticate();
-        // An authenticated DID with admin access must be set on the Ceramic instance
         ceramic.did = did;
       }
       this.logger.log('Connected to the our ceramic node!');
@@ -257,50 +277,53 @@ export class ModelController {
       throw new ServiceUnavailableException((e as Error).message);
     }
 
-    //1 Create My Composite
-    let composite;
-    let doRetryTimes = 2;
-    do {
-      try {
-        this.logger.log('Creating the composite...');
-        composite = await Composite.create({
-          ceramic: ceramic,
-          schema: dto.graphql,
-        });
-        doRetryTimes = 0;
-        this.logger.log(
-          `Creating the composite... Done! The encoded representation:`,
-        );
-        this.logger.log(composite);
-      } catch (e) {
-        this.logger.error((e as Error).message);
-        this.logger.log(
-          `Creating the composite... retry ${doRetryTimes} times`,
-        );
-        doRetryTimes--;
-      }
-    } while (doRetryTimes > 0);
+    // Create composites
+    let composites = [];
+    const createModelGraphqlsMap = parseToCreateModelGraphqls(dto.graphql);
+    const modelStreamIdMap = new Map<string, string>();
+    if (createModelGraphqlsMap.size > 0) {
+      // For creating model and load model graphql
+      for await (const [model, graphqls] of createModelGraphqlsMap) {
+        // Generate associated loading model graphql
+        const schema :string[] = [];
+        const loadingGraphqls = generateLoadModelGraphqls( dto.graphql, model, modelStreamIdMap);
+        if (loadingGraphqls?.length > 0){
+          schema.push(...loadingGraphqls)
+        }
 
-    //2 Deploy My Composite
-    try {
-      this.logger.log('Deploying the composite...');
-      // Notify the Ceramic node to index the models present in the composite
-      await composite.startIndexingOn(ceramic);
-      // Logging the model stream IDs to stdout, so that they can be piped using standard I/O or redirected to a file
+        schema.push(...graphqls);
+        createModelGraphqlsMap.set(model, schema);
+        this.logger.log(`Creating ${model} ${schema} the composite...`);
+        let composite = await Composite.create({
+          ceramic: ceramic,
+          schema: schema,
+        });
+        this.logger.log(
+          `Creating ${model} the composite... Done! The encoded representation:${composite.toJSON()}`,
+        );
+        composites.push(composite);
+        modelStreamIdMap.set(model, composite.toRuntime()?.models[model].id);
+      }
+    } else {
+      // For loading model graphql
+      let composite = await Composite.create({
+        ceramic: ceramic,
+        schema: dto.graphql,
+      });
       this.logger.log(
-        JSON.stringify(Object.keys(composite.toParams().definition.models)),
+        `Creating the composite... Done! The encoded representation:${composite.toJSON()}`,
       );
-      this.logger.log(`Deploying the composite... Done!`);
-    } catch (e) {
-      this.logger.error((e as Error).message);
-      throw new ServiceUnavailableException((e as Error).message);
+      composites.push(composite);
     }
 
-    //3 Compile My Composite
+    // Merge composites
+    const mergedComposite = Composite.from(composites);
+
+    // Compile composites
     let runtimeDefinition;
     try {
       this.logger.log('Compiling the composite...');
-      runtimeDefinition = composite.toRuntime();
+      runtimeDefinition = mergedComposite.toRuntime();
       this.logger.log(JSON.stringify(runtimeDefinition));
       this.logger.log(`Compiling the composite... Done!`);
     } catch (e) {
@@ -308,8 +331,24 @@ export class ModelController {
       throw new ServiceUnavailableException((e as Error).message);
     }
 
+    const { printGraphQLSchema } = await importDynamic('@composedb/runtime');
+    const graphqlSchema = printGraphQLSchema(runtimeDefinition);
+
+    // Store the model graphs 
+    if (createModelGraphqlsMap.size > 0) {
+      for await (const [model, graphqls] of createModelGraphqlsMap) {
+        const modelStreamId = runtimeDefinition?.models[model].id;
+        await this.modelService.storeModelGraphql(
+          dto.network,
+          modelStreamId,
+          graphqls,
+        );
+      }
+    }
+
     return new BasicMessageDto('ok', 0, {
-      composite: composite,
+      graphqlSchema: graphqlSchema,
+      composite: mergedComposite,
       runtimeDefinition: runtimeDefinition,
     });
   }
@@ -317,69 +356,109 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/graphql')
   async ModelIdToGraphql(@Body() dto: ModelIdToGaphqlDto) {
-    const { CeramicClient } = await importDynamic(
-      '@ceramicnetwork/http-client',
+    if (dto.models?.length != 1) {
+      throw new BadRequestException("models' length is not 1.");
+    }
+
+    const graphqlSchemaDefinitionSet = await this.modelService.getModelGraphql(dto.network, dto.models[0]);
+    let graphqlSchemaDefinition;
+    if (graphqlSchemaDefinitionSet?.length > 0) {
+      graphqlSchemaDefinition = graphqlSchemaDefinitionSet.join('\n');
+    }
+
+    const graphCache = await this.modelService.getModelGraphCache(
+      dto.network,
+      dto.models[0],
     );
-    const { Composite } = await importDynamic('@composedb/devtools');
-    const { printGraphQLSchema } = await importDynamic('@composedb/runtime');
+    if (graphCache) {
+      return new BasicMessageDto('ok', 0, { ...graphCache, graphqlSchemaDefinition });
+    } else {
+      try {
+        const { CeramicClient } = await importDynamic(
+          '@ceramicnetwork/http-client',
+        );
+        const { Composite } = await importDynamic('@composedb/devtools');
+        const { printGraphQLSchema } = await importDynamic(
+          '@composedb/runtime',
+        );
+        console.time('initing ceramic client');
+        const ceramic = new CeramicClient(getCeramicNode(dto.network));
+        console.timeEnd('initing ceramic client');
 
-    try {
-      console.time('initing ceramic client');
-      const ceramic = new CeramicClient(getCeramicNode(dto.network));
-      console.timeEnd('initing ceramic client');
+        // build all model stream ids for the model
+        console.time('fetching relation model streamIds');
+        const allModelStreamIds = [];
+        for await (const streamId of dto.models) {
+          const relationModelStreamIds =
+            await this.streamService.getRelationStreamIds(ceramic, streamId);
+          allModelStreamIds.push(...relationModelStreamIds);
+        }
+        console.timeEnd('fetching relation model streamIds');
 
-      // build all model stream ids for the model
-      console.time('fetching relation model streamIds');
-      const allModelStreamIds = [];
-      for await (const streamId of dto.models) {
-        const relationModelStreamIds =
-          await this.streamService.getRelationStreamIds(ceramic, streamId);
-        allModelStreamIds.push(...relationModelStreamIds);
+        // buid composite
+        console.time('creating composite');
+        console.log(
+          'creating composite models:',
+          dto.models,
+          allModelStreamIds,
+        );
+        const composite = await Composite.fromModels({
+          ceramic: ceramic,
+          models: [...dto.models, ...allModelStreamIds],
+        });
+        console.timeEnd('creating composite');
+
+        console.time('creating runtimeDefinition');
+        const runtimeDefinition = composite.toRuntime();
+        console.timeEnd('creating runtimeDefinition');
+
+        console.time('buiding graphqlSchema');
+        const graphqlSchema = printGraphQLSchema(runtimeDefinition);
+        console.timeEnd('buiding graphqlSchema');
+
+        // cache the model graph info
+        await this.modelService.saveModelGraphCache(
+          dto.network,
+          dto.models[0],
+          composite,
+          runtimeDefinition,
+          graphqlSchema,
+        );
+        return new BasicMessageDto('ok', 0, {
+          composite,
+          runtimeDefinition,
+          graphqlSchema,
+          graphqlSchemaDefinition,
+        });
+      } catch (e) {
+        throw new InternalServerErrorException(`ModelIdToGraphql: ${e}`);
       }
-      console.timeEnd('fetching relation model streamIds');
-
-      // buid composite
-      console.time('creating composite');
-      console.log('creating composite models:', dto.models, allModelStreamIds);
-      const composite = await Composite.fromModels({
-        ceramic: ceramic,
-        models: [...dto.models, ...allModelStreamIds],
-      });
-      console.timeEnd('creating composite');
-
-      console.time('creating runtimeDefinition');
-      const runtimeDefinition = composite.toRuntime();
-      console.timeEnd('creating runtimeDefinition');
-
-      console.time('buiding graphqlSchema');
-      const graphqlSchema = printGraphQLSchema(runtimeDefinition);
-      console.timeEnd('buiding graphqlSchema');
-
-      return new BasicMessageDto('ok', 0, {
-        composite,
-        runtimeDefinition,
-        graphqlSchema,
-      });
-    } catch (e) {
-      throw new InternalServerErrorException(`ModelIdToGraphql: ${e}`);
     }
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/ids')
-  async getModelsByIds(@Body() dto: { network: Network, ids: string[] }) {
-
+  async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
     const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
-      this.modelService.findModelsByIds(dto.ids, dto.network)
-      , this.streamService.findModelUseCount(dto.network, dto.ids)
-      , this.modelService.findIndexedModelIds(dto.network, dto.ids)
+      this.modelService.findModelsByIds(dto.ids, dto.network),
+      this.streamService.findModelUseCount(dto.network, dto.ids),
+      this.modelService.findIndexedModelIds(dto.network, dto.ids),
     ]);
-
+    if (!models) {
+      throw new NotFoundException(
+        new BasicMessageDto(`no models found for ids ${dto.ids}`, 0),
+      );
+    }
+    if (!indexedModelStreamIds) {
+      throw new NotFoundException(
+        new BasicMessageDto(`no indexed models found for ids ${dto.ids}`, 0),
+      );
+    }
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
-    models.forEach(e => {
-      e.useCount = useCountMap?.get(e.getStreamId) ?? 0,
-        e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
+    models.forEach((e) => {
+      (e.useCount = useCountMap?.get(e.getStreamId) ?? 0),
+        (e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId));
     });
 
     return new BasicMessageDto('ok', 0, models);
@@ -389,13 +468,18 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   async getModel(
     @Query('network') network: Network = Network.TESTNET,
-    @Param('modelStreamId') modelStreamId: string,): Promise<BasicMessageDto> {
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
     this.logger.log(`Seaching model(${modelStreamId}) on network ${network}.`);
 
     const mid = await this.modelService.getModel(network, modelStreamId);
     if (!mid) {
-      throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0),
-      )
+      throw new NotFoundException(
+        new BasicMessageDto(
+          `modelStreamId ${modelStreamId} does not exist on network ${network}`,
+          0,
+        ),
+      );
     }
     return new BasicMessageDto('ok', 0, mid);
   }

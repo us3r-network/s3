@@ -10,7 +10,7 @@ export class HealthController {
   constructor(
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
-  ) { }
+  ) {}
 
   @Get()
   @HealthCheck()

@@ -30,7 +30,7 @@ services:
       timeout: 5s
       retries: 5
 
-   postgres-mainnet:
+  postgres-mainnet:
     image: postgres:14.2-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-userscan_user}

@@ -28,7 +28,7 @@ export function ConvertToStream(stream: Stream): StreamDto {
   const streamDto = new StreamDto();
   streamDto.streamId = stream.getStreamId;
   streamDto.network = stream.getNetwork;
-  streamDto.indexingTime = stream.getCreatedAt.getTime();
+  streamDto.indexingTime = stream.getLastModifiedAt.getTime();
   streamDto.familyOrApp = stream.getFamily;
   streamDto.type = stream.getType;
   streamDto.did = stream.getDid;

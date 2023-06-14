@@ -11,7 +11,7 @@ export default class CeramicSubscriberService {
   constructor(
     @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
-  ) { }
+  ) {}
   async subCeramic(
     network: Network,
     bootstrapMultiaddrs: string[],
@@ -30,7 +30,9 @@ export default class CeramicSubscriberService {
         const parsed = JSON.parse(asString);
         if (parsed.typ == 0) {
           // MsgType: UPDATE
-          // console.log(network, ' p2p message:', parsed);
+          this.logger.log(
+            `${network}, sub p2p message: ${JSON.stringify(parsed)}`,
+          );
           await this.store(ceramic, network, parsed.stream);
         }
         // else if (parsed.typ == 2) {
@@ -159,11 +161,11 @@ export default class CeramicSubscriberService {
   ) {
     try {
       let domian: string;
-      if (genesisCid) {
-        // this.logger.log(`To store stream(${streamId})  network:${network}`);
-        const cacao = await this.getCacao(genesisCid);
-        domian = cacao?.value?.p?.domain;
-      }
+      // if (genesisCid) {
+      //   // this.logger.log(`To store stream(${streamId})  network:${network}`);
+      //   const cacao = await this.getCacao(genesisCid);
+      //   domian = cacao?.value?.p?.domain;
+      // }
 
       const stream = this.convertToStreamEntity(
         network,
@@ -178,7 +180,7 @@ export default class CeramicSubscriberService {
         'network',
         'stream_id',
       ]);
-      // this.logger.log(`Saved network(${network}) stream id(${streamId})`);
+      this.logger.log(`Saved network(${network}) stream id(${streamId})`);
       return savedStream;
     } catch (error) {
       // this.logger.error(

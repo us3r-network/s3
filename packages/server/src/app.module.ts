@@ -9,15 +9,34 @@ import { ModelModule } from './model/model.module';
 import 'dotenv/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
-
+import { DappModule } from './dapp/dapp.module';
 
 const env: string | undefined = process.env.NODE_ENV;
 
 @Module({
   imports: [
-    // TypeOrmModule.forRootAsync({
-    //   useClass: DatabaseConfiguration,
-    // }),
+    TypeOrmModule.forRoot({
+      name: 's3-server-db',
+      port: 5432,
+      host: process.env.DATABASE_HOST,
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE,
+      logging: true,
+      entities: ['dist/**/dapp.entity{.ts,.js}'],
+      type: 'postgres',
+      pool: {
+        max: 70,
+        min: 10,
+        idleTimeoutMillis: 600000,
+      },
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
+    }),
+
     TypeOrmModule.forRoot({
       name: 'testnet',
       port: 5432,
@@ -29,9 +48,9 @@ const env: string | undefined = process.env.NODE_ENV;
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',
       pool: {
-        max: 20,
+        max: 70,
         min: 10,
-        idleTimeoutMillis: 60000,
+        idleTimeoutMillis: 600000,
       },
       extra: {
         ssl: {
@@ -52,9 +71,9 @@ const env: string | undefined = process.env.NODE_ENV;
       type: 'postgres',
       ssl: true,
       pool: {
-        max: 20,
+        max: 70,
         min: 10,
-        idleTimeoutMillis: 60000,
+        idleTimeoutMillis: 600000,
       },
       extra: {
         ssl: {
@@ -70,6 +89,7 @@ const env: string | undefined = process.env.NODE_ENV;
     HealthModule,
     StreamModule,
     ModelModule,
+    DappModule,
     RedisModule.forRoot({
       config: {
         url: process.env.REDIS_URL,

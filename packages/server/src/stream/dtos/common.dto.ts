@@ -15,8 +15,8 @@ export class BasicMessageDto {
 }
 
 export class StatsDto {
-  constructor(){
-    this.streamsLastWeek = []; 
+  constructor() {
+    this.streamsLastWeek = [];
   }
   @ApiProperty()
   totalModels: number;

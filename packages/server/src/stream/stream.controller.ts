@@ -58,9 +58,9 @@ export class StreamController {
   ): Promise<BasicMessageDto> {
     if (!pageSize || pageSize == 0) pageSize = 50;
     if (!pageNumber || pageNumber == 0) pageNumber = 1;
-    
+
     if (familyOrApps && !Array.isArray(familyOrApps)) {
-      familyOrApps = [familyOrApps]
+      familyOrApps = [familyOrApps];
     }
     if (types && !Array.isArray(types)) {
       types = [types];
@@ -92,9 +92,7 @@ export class StreamController {
 
   @Get('/:network/stats')
   @ApiOkResponse({ type: BasicMessageDto })
-  async getStats(
-    @Param('network') network: Network,
-  ): Promise<BasicMessageDto> {
+  async getStats(@Param('network') network: Network): Promise<BasicMessageDto> {
     const stats = await this.streamService.getStats(network);
     return new BasicMessageDto('ok', 0, stats);
   }
@@ -202,5 +200,4 @@ export class StreamController {
 
     return handler(req, res, { req, res });
   }
-
 }

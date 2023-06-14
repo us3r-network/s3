@@ -142,7 +142,7 @@ export class CeramicModelMainNet extends BaseEntity {
 @Entity({
   name: 'kh4q0ozorrgaq2mezktnrmdwleo1d',
 })
-export class MetaModel extends BaseEntity {
+export class MetaModelTestNet extends BaseEntity {
   @PrimaryColumn()
   private stream_id: string;
 
