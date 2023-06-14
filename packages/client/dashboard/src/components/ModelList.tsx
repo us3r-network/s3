@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components'
+import { MenuTrigger, Menu, Item } from 'react-aria-components'
+
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
@@ -97,28 +99,26 @@ export default function ModelList({
       <div className="title">
         <h3>ModelList</h3>
         {editable && (
-          <DialogTrigger>
-            <Button>
+          <MenuTrigger>
+            <Button aria-label="Menu">
               <PlusIcon />
             </Button>
             <Popover>
-              <Dialog>
-                <div>
-                  <Link to={`/dapp/${appId}/explore`}>
-                    <div className="popover-item">
-                      <button>Explore Models</button>
-                    </div>
-                  </Link>
+              <div>
+                <Link to={`/dapp/${appId}/explore`}>
                   <div className="popover-item">
-                    <Favorite />
+                    <button>Explore Models</button>
                   </div>
-                  <div className="popover-item">
-                    <CreateNew />
-                  </div>
+                </Link>
+                <div className="popover-item">
+                  <Favorite />
                 </div>
-              </Dialog>
+                <div className="popover-item">
+                  <CreateNew />
+                </div>
+              </div>
             </Popover>
-          </DialogTrigger>
+          </MenuTrigger>
         )}
       </div>
       {(loading && (
