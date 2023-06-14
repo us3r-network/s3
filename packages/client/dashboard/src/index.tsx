@@ -8,6 +8,7 @@ import reportWebVitals from './reportWebVitals'
 import './index.css'
 import './styles/tab.css'
 import './styles/playground.css'
+import './styles/menu.css'
 
 import '@graphiql/plugin-explorer/dist/style.css'
 import 'graphiql/graphiql.css'

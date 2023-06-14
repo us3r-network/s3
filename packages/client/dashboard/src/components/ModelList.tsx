@@ -5,7 +5,7 @@ import { MenuTrigger, Menu, Item } from 'react-aria-components'
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import CreateNewModel from './CreateNewModel'
 import { useCallback, useEffect, useState } from 'react'
@@ -30,7 +30,7 @@ export default function ModelList({
   const session = useSession()
   const { loadDapps } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
-
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const [selected, setSelected] = useState<ModelStream>()
@@ -98,25 +98,34 @@ export default function ModelList({
     <ListBox>
       <div className="title">
         <h3>ModelList</h3>
+        <Favorite />
+        <CreateNew />
         {editable && (
           <MenuTrigger>
             <Button aria-label="Menu">
               <PlusIcon />
             </Button>
             <Popover>
-              <div>
-                <Link to={`/dapp/${appId}/explore`}>
-                  <div className="popover-item">
-                    <button>Explore Models</button>
-                  </div>
-                </Link>
-                <div className="popover-item">
-                  <Favorite />
-                </div>
-                <div className="popover-item">
-                  <CreateNew />
-                </div>
-              </div>
+              <Menu
+                onAction={(id) => {
+                  if (id === 'explore') {
+                    navigate(`/dapp/${appId}/explore`)
+                    return
+                  }
+                  if (id === 'favorite') {
+                    document.getElementById('add-from-favorite')?.click()
+                    return
+                  }
+                  if (id === 'create') {
+                    document.getElementById('create-new')?.click()
+                    return
+                  }
+                }}
+              >
+                <Item id="explore">Explore Models</Item>
+                <Item id="favorite">Add From Favorite</Item>
+                <Item id="create">CreateNew</Item>
+              </Menu>
             </Popover>
           </MenuTrigger>
         )}
@@ -235,7 +244,14 @@ function ModelListItemTrash({
 function Favorite() {
   return (
     <DialogTrigger>
-      <Button>Add From Favorite</Button>
+      <Button
+        style={{
+          display: 'none',
+        }}
+        id="add-from-favorite"
+      >
+        Add From Favorite
+      </Button>
       <ModalOverlay>
         <Modal>
           <Dialog>{({ close }) => <FavoriteModel closeModal={close} />}</Dialog>
@@ -248,7 +264,14 @@ function Favorite() {
 function CreateNew() {
   return (
     <DialogTrigger>
-      <Button>Create New</Button>
+      <Button
+        style={{
+          display: 'none',
+        }}
+        id="create-new"
+      >
+        Create New
+      </Button>
       <ModalOverlay>
         <Modal>
           <Dialog>
