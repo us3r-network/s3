@@ -5,18 +5,19 @@ import { MenuTrigger, Menu, Item } from 'react-aria-components'
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import CreateNewModel from './CreateNewModel'
 import { useCallback, useEffect, useState } from 'react'
 import { ModelStream } from '../types'
-import { getStarModels } from '../api'
+import { getStarModels, queryModelGraphql } from '../api'
 import { Network } from './Selector/EnumSelect'
 import TrashIcon from './Icons/TrashIcon'
 import FavoriteModel from './FavoriteModal'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { useAppCtx } from '../context/AppCtx'
 import { updateDapp } from '../api'
+import MergeModal from './MergeModal'
+import CreateNewModel from './CreateNewModel'
 
 export default function ModelList({
   setSelectModelId,
@@ -151,6 +152,24 @@ export default function ModelList({
           }}
         />
       )}
+
+      <MergeBox>
+        <DialogTrigger>
+          <Button className={'merge-btn'}>Merge</Button>
+          <ModalOverlay>
+            <Modal>
+              <Dialog>
+                {({ close }) => (
+                  <MergeModal
+                    closeModal={close}
+                    dappModels={dappModels || []}
+                  />
+                )}
+              </Dialog>
+            </Modal>
+          </ModalOverlay>
+        </DialogTrigger>
+      </MergeBox>
     </ListBox>
   )
 }
@@ -363,5 +382,17 @@ const DappModelsListBox = styled.div`
     > img {
       width: 20px;
     }
+  }
+`
+
+const MergeBox = styled.div`
+  .merge-btn {
+    width: 100%;
+    background: #718096;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
   }
 `
