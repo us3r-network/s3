@@ -1182,11 +1182,45 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@ceramicnetwork/codecs@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.npmmirror.com/@ceramicnetwork/codecs/-/codecs-1.1.0.tgz#ab4ac5703f8afd18986a41ef6dd9c8cd68755749"
+  integrity sha512-wgzDpenoxxOObGYDMeEwLJ1htz0FfX8e5sJZTC6Qn9HC4EF9QZ6kGtayB3BRUNlXpQTkJPdSJAhe09/T9EOK5g==
+  dependencies:
+    "@ceramicnetwork/streamid" "^2.14.0"
+    codeco "^1.1.0"
+    multiformats "^11.0.1"
+    uint8arrays "^4.0.3"
+
 "@ceramicnetwork/common@^2.24.0", "@ceramicnetwork/common@^2.25.0":
   version "2.25.0"
   resolved "https://registry.npmjs.org/@ceramicnetwork/common/-/common-2.25.0.tgz#61e41afc5701175206a8ab0a2c967237fa3a25cc"
   integrity sha512-KDdBkIRuK+5fShyUNdwTMi1EYWSVGOEkwnXCvyQp4TQESRgSyvLE8KQ47jJ6kGtPNhEkSlmrr/qRNgE63/JJYw==
   dependencies:
+    "@ceramicnetwork/streamid" "^2.14.0"
+    "@didtools/cacao" "^2.0.0"
+    "@didtools/pkh-ethereum" "^0.1.0"
+    "@didtools/pkh-solana" "^0.1.0"
+    "@didtools/pkh-stacks" "^0.1.0"
+    "@didtools/pkh-tezos" "^0.2.1"
+    "@stablelib/random" "^1.0.1"
+    caip "~1.1.0"
+    cross-fetch "^3.1.4"
+    flat "^5.0.2"
+    it-first "^1.0.7"
+    jet-logger "1.2.2"
+    lodash.clonedeep "^4.5.0"
+    logfmt "^1.3.2"
+    multiformats "^11.0.1"
+    rxjs "^7.5.2"
+    uint8arrays "^4.0.3"
+
+"@ceramicnetwork/common@^2.26.0":
+  version "2.26.0"
+  resolved "https://registry.npmmirror.com/@ceramicnetwork/common/-/common-2.26.0.tgz#b0b6d10ec08b1cb40ff387e5ca143224914ff3c0"
+  integrity sha512-bNLQw6LJsyMcxA7vSY4uLVryWAIJCLAESaJfWtSJSLh0pJxC7Jrf9ESt7knvcoETSSD91klHaBCjf9NeW9mGXA==
+  dependencies:
+    "@ceramicnetwork/codecs" "^1.1.0"
     "@ceramicnetwork/streamid" "^2.14.0"
     "@didtools/cacao" "^2.0.0"
     "@didtools/pkh-ethereum" "^0.1.0"
@@ -1370,9 +1404,9 @@
   resolved "https://registry.npmjs.org/@composedb/constants/-/constants-0.4.0.tgz#67749c629580e7fb0271401a06e949ed979b6f9f"
   integrity sha512-juphxE0LPqzOh9Yojw6JrkvV3UI1RIhiI11MUHfsxC4m6KP8uxq0or1xKP7jQPNHGhqgtOomMezCXFUTcPVotQ==
 
-"@composedb/devtools@^0.4.3":
+"@composedb/devtools@0.4", "@composedb/devtools@^0.4.3":
   version "0.4.4"
-  resolved "https://registry.npmjs.org/@composedb/devtools/-/devtools-0.4.4.tgz#c506827e26789d6b73e16b2b75f2827415cead15"
+  resolved "https://registry.npmmirror.com/@composedb/devtools/-/devtools-0.4.4.tgz#c506827e26789d6b73e16b2b75f2827415cead15"
   integrity sha512-ACfTIrTDRH/A4vZU66k+jnVmVqTvQn7vThSjoDOMdqwI4BMp3BAGoNHRJJv60AXAMrC0qDvhr/td2VcNOcwKqQ==
   dependencies:
     "@ceramicnetwork/stream-model" "^1.6.0"
@@ -6913,6 +6947,11 @@ coa@^2.0.2:
     "@types/q" "^1.5.1"
     chalk "^2.4.1"
     q "^1.1.2"
+
+codeco@^1.1.0:
+  version "1.1.3"
+  resolved "https://registry.npmmirror.com/codeco/-/codeco-1.1.3.tgz#3bd0630b1fe4b715c4b8cd1882610b70ab86cc30"
+  integrity sha512-6OZfR+VEH2izag86ZudHPDn0H2kau7pwExtHeKdemWiFWZvSGhRm3u4bv7FndCS8W88f0NvlSfHp7Xlv+/VMCw==
 
 codemirror-graphql@^2.0.8:
   version "2.0.8"

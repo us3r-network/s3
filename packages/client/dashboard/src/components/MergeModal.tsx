@@ -11,6 +11,7 @@ import { ModelStream } from '../types'
 import styled from 'styled-components'
 import FileSaver from 'file-saver'
 import { CeramicClient } from '@ceramicnetwork/http-client'
+import type { EncodedCompositeDefinition, RuntimeCompositeDefinition } from '@composedb/types'
 
 export default function MergeModal({
   closeModal,
@@ -54,13 +55,13 @@ export default function MergeModal({
         console.log(resp.data.data.runtimeDefinition)
         return await Composite.fromJSON({
           ceramic: new CeramicClient(ceramicHost) as any,
-          definition: resp.data.data.runtimeDefinition,
+          definition: resp.data.data.composite as EncodedCompositeDefinition,
         })
       })
       const sourceComposites = await Promise.all(composites)
       console.log(sourceComposites)
-      // const mergedComposite = Composite.from(sourceComposites)
-      // console.log(mergedComposite)
+      const mergedComposite = Composite.from(sourceComposites)
+      console.log('mergedComposite: ',mergedComposite)
     } catch (error) {
       console.error(error)
     } finally {
