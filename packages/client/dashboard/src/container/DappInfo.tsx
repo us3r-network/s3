@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { Button, Dialog, DialogTrigger, Modal } from 'react-aria-components'
 
 import useSelectedDapp from '../hooks/useSelectedDapp'
 
@@ -7,17 +7,17 @@ import DappTitleEditor from '../components/DappTitleEditor'
 import DappSocialEditor from '../components/DappSocialEditor'
 import { useCallback, useState } from 'react'
 import CopyIcon from '../components/Icons/CopyIcon'
-import { delDapp } from '../api'
+
+import DelConfirmModal from '../components/DelDappConfirmModal'
 import { useNavigate } from 'react-router-dom'
-import { useAppCtx } from '../context/AppCtx'
+import { createImageFromInitials } from '../utils/createImage'
+import { getRandomColor } from '../utils/randomColor'
 
 export default function DappInfo() {
   const { selectedDapp } = useSelectedDapp()
-  const session = useSession()
   const navigate = useNavigate()
-  const { loadDapps } = useAppCtx()
   const [showCopyTint, setShowCopyTint] = useState(false)
-  const [delting, setDelting] = useState(false)
+
   const copyAppId = useCallback(async (appId: string) => {
     try {
       await navigator.clipboard.writeText(appId)
@@ -30,20 +30,6 @@ export default function DappInfo() {
     }
   }, [])
 
-  const delDappAction = useCallback(async () => {
-    if (!selectedDapp || !session) return
-    try {
-      setDelting(true)
-      await delDapp(selectedDapp, session.serialize())
-      await loadDapps()
-      navigate('/')
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setDelting(false)
-    }
-  }, [selectedDapp, session, loadDapps, navigate])
-
   if (!selectedDapp) {
     return null
   }
@@ -51,7 +37,17 @@ export default function DappInfo() {
   return (
     <DappInfoContainer>
       <div className="info items">
-        <img src={selectedDapp.icon || '/logo512.png'} alt="icon" />
+        <img
+          src={
+            selectedDapp.icon ||
+            createImageFromInitials(
+              120,
+              selectedDapp.name.slice(0, 1),
+              getRandomColor()
+            )
+          }
+          alt="icon"
+        />
         <div>
           <DappTitleEditor selectedDapp={selectedDapp} />
           <div className="appid">
@@ -92,15 +88,24 @@ export default function DappInfo() {
             <h3>Delete</h3>
             <p>Delete the Dapp will also remove your data.</p>
             <div className="btns">
-              {delting ? (
-                <button className="del">
-                  <img src="/loading.gif" alt="" />
-                </button>
-              ) : (
-                <button className="del" onClick={delDappAction}>
-                  Delete
-                </button>
-              )}
+              <DialogTrigger>
+                <Button className="del">Delete</Button>
+                <Modal className={'confirm-modal'}>
+                  <Dialog>
+                    {({ close }) => (
+                      <DelConfirmModal
+                        closeModal={(del) => {
+                          close()
+                          if (!del) return
+                          setTimeout(() => {
+                            navigate('/')
+                          }, 1)
+                        }}
+                      />
+                    )}
+                  </Dialog>
+                </Modal>
+              </DialogTrigger>
             </div>
           </div>
         </div>

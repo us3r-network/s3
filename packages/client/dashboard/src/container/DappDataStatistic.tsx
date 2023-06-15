@@ -1,16 +1,13 @@
-import styled from 'styled-components'
-import ModelList from '../components/ModelList'
-import { useState } from 'react'
 import Instance from '../components/ModelInstance'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { Network } from '../components/Selector/EnumSelect'
+import { useOutletContext } from 'react-router-dom'
 
 export default function DappDataStatistic() {
-  const [selectModelId, setSelectModelId] = useState<string>('')
+  const { selectModelId } = useOutletContext<{ selectModelId: string }>()
   const { selectedDapp } = useSelectedDapp()
   return (
-    <StatisticContainer>
-      <ModelList setSelectModelId={setSelectModelId} />
+    <>
       {selectModelId && (
         <div className="list">
           <Instance
@@ -19,17 +16,6 @@ export default function DappDataStatistic() {
           />
         </div>
       )}
-    </StatisticContainer>
+    </>
   )
 }
-
-const StatisticContainer = styled.div`
-  margin-top: 25px;
-  margin-bottom: 25px;
-  display: flex;
-  gap: 20px;
-
-  > .list {
-    flex-grow: 1;
-  }
-`

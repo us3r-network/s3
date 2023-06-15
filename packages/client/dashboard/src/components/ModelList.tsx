@@ -1,12 +1,13 @@
 import styled from 'styled-components'
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components'
+import { MenuTrigger, Menu, Item } from 'react-aria-components'
+
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import CreateNewModel from './CreateNewModel'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ModelStream } from '../types'
 import { getStarModels } from '../api'
 import { Network } from './Selector/EnumSelect'
@@ -15,6 +16,8 @@ import FavoriteModel from './FavoriteModal'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { useAppCtx } from '../context/AppCtx'
 import { updateDapp } from '../api'
+import MergeModal from './MergeModal'
+import CreateNewModel from './CreateNewModel'
 
 export default function ModelList({
   setSelectModelId,
@@ -28,7 +31,7 @@ export default function ModelList({
   const session = useSession()
   const { loadDapps } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
-
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const [selected, setSelected] = useState<ModelStream>()
@@ -70,8 +73,14 @@ export default function ModelList({
     [loadDapps, selectedDapp, session]
   )
 
+  const isFirstRenderRef = useRef(true)
+
   useEffect(() => {
-    setLoading(true)
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false
+      setLoading(true)
+    }
+
     loadModelsInfo().finally(() => setLoading(false))
   }, [loadModelsInfo])
 
@@ -95,30 +104,37 @@ export default function ModelList({
   return (
     <ListBox>
       <div className="title">
-        <h3>ModelList</h3>
+        <h3>Models</h3>
+        <Favorite />
+        <CreateNew />
         {editable && (
-          <DialogTrigger>
-            <Button>
+          <MenuTrigger>
+            <Button aria-label="Menu">
               <PlusIcon />
             </Button>
             <Popover>
-              <Dialog>
-                <div>
-                  <Link to={`/dapp/${appId}/explore`}>
-                    <div className="popover-item">
-                      <button>Explore Models</button>
-                    </div>
-                  </Link>
-                  <div className="popover-item">
-                    <Favorite />
-                  </div>
-                  <div className="popover-item">
-                    <CreateNew />
-                  </div>
-                </div>
-              </Dialog>
+              <Menu
+                onAction={(id) => {
+                  if (id === 'explore') {
+                    navigate(`/dapp/${appId}/explore`)
+                    return
+                  }
+                  if (id === 'favorite') {
+                    document.getElementById('add-from-favorite')?.click()
+                    return
+                  }
+                  if (id === 'create') {
+                    document.getElementById('create-new')?.click()
+                    return
+                  }
+                }}
+              >
+                <Item id="explore">Explore Models</Item>
+                <Item id="favorite">Add From Favorite</Item>
+                <Item id="create">Create New Model</Item>
+              </Menu>
             </Popover>
-          </DialogTrigger>
+          </MenuTrigger>
         )}
       </div>
       {(loading && (
@@ -127,6 +143,7 @@ export default function ModelList({
         </div>
       )) || (
         <DappModelList
+          editable={editable}
           selected={selected}
           setSelected={setSelected}
           dappModels={dappModels || []}
@@ -134,12 +151,36 @@ export default function ModelList({
             setSelectModel(model)
           }}
           removeModelAction={async (id: string) => {
+            await removeModelFromDapp(id)
             if (id === selectModel?.stream_id) {
               setSelectModel(undefined)
+              setSelectModelId('')
+              setSelectModelName && setSelectModelName('')
+              setDappModels(undefined)
+              setSelected(undefined)
             }
-            await removeModelFromDapp(id)
           }}
         />
+      )}
+
+      {editable && (
+        <MergeBox>
+          <DialogTrigger>
+            <Button className={'merge-btn'}>Merge</Button>
+            <ModalOverlay>
+              <Modal>
+                <Dialog>
+                  {({ close }) => (
+                    <MergeModal
+                      closeModal={close}
+                      dappModels={dappModels || []}
+                    />
+                  )}
+                </Dialog>
+              </Modal>
+            </ModalOverlay>
+          </DialogTrigger>
+        </MergeBox>
       )}
     </ListBox>
   )
@@ -151,12 +192,14 @@ function DappModelList({
   dappModels,
   selectAction,
   removeModelAction,
+  editable,
 }: {
   selected?: ModelStream
   setSelected: (ms: ModelStream) => void
   dappModels: ModelStream[]
   selectAction: (model: ModelStream) => void
   removeModelAction: (modelId: string) => Promise<void>
+  editable?: boolean
 }) {
   if (dappModels.length === 0) {
     return (
@@ -179,10 +222,12 @@ function DappModelList({
               }}
             >
               <div>{item.stream_content.name}</div>
-              <ModelListItemTrash
-                removeModelAction={removeModelAction}
-                streamId={item.stream_id}
-              />
+              {editable && (
+                <ModelListItemTrash
+                  removeModelAction={removeModelAction}
+                  streamId={item.stream_id}
+                />
+              )}
             </div>
             {active && (
               <>
@@ -230,7 +275,14 @@ function ModelListItemTrash({
 function Favorite() {
   return (
     <DialogTrigger>
-      <Button>Add From Favorite</Button>
+      <Button
+        style={{
+          display: 'none',
+        }}
+        id="add-from-favorite"
+      >
+        Add From Favorite
+      </Button>
       <ModalOverlay>
         <Modal>
           <Dialog>{({ close }) => <FavoriteModel closeModal={close} />}</Dialog>
@@ -243,7 +295,14 @@ function Favorite() {
 function CreateNew() {
   return (
     <DialogTrigger>
-      <Button>Create New</Button>
+      <Button
+        style={{
+          display: 'none',
+        }}
+        id="create-new"
+      >
+        Create New
+      </Button>
       <ModalOverlay>
         <Modal>
           <Dialog>
@@ -273,6 +332,7 @@ const ListBox = styled.div`
     width: 100%;
   }
   .title {
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -334,5 +394,17 @@ const DappModelsListBox = styled.div`
     > img {
       width: 20px;
     }
+  }
+`
+
+const MergeBox = styled.div`
+  .merge-btn {
+    width: 100%;
+    background: #718096;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
   }
 `

@@ -24,6 +24,15 @@ const List = styled.ul`
   margin: 4px 0;
   outline: none;
   width: 100%;
+
+  li {
+    div {
+      width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
 `
 
 interface ListItemProps {
