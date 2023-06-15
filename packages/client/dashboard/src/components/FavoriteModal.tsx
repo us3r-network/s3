@@ -13,6 +13,7 @@ import { getStarModels, updateDapp } from '../api'
 import { ModelStream } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
+import { S3_SCAN_URL } from '../constants'
 
 export default function FavoriteModal({
   closeModal,
@@ -120,7 +121,13 @@ function ModelList() {
                 <tr key={item.stream_id + idx}>
                   <td>
                     <div className="usage-count">
-                      {item.stream_content.name}
+                      <a
+                        href={`${S3_SCAN_URL}/models/modelview/${item.stream_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {item.stream_content.name}
+                      </a>
                     </div>
                   </td>
                   <td>
@@ -130,11 +137,25 @@ function ModelList() {
                   </td>
                   <td>
                     <div className="nav-stream">
-                      {shortPubKey(item.stream_id, { len: 8, split: '-' })}
+                      <a
+                        href={`${S3_SCAN_URL}/streams/stream/${item.stream_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {shortPubKey(item.stream_id, { len: 8, split: '-' })}
+                      </a>
                     </div>
                   </td>
                   <td>
-                    <div className="usage-count">{item.useCount}</div>
+                    <div className="usage-count">
+                      <a
+                        href={`${S3_SCAN_URL}/models/model/${item.stream_id}/mids`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {item.useCount}
+                      </a>
+                    </div>
                   </td>
                   <td>
                     <div className="release-date">
@@ -214,7 +235,7 @@ const FavoriteBox = styled.div`
   flex-direction: column;
   padding: 20px;
   gap: 20px;
-
+  min-height: calc(100vh - 300px);
   position: relative;
   width: 1240px;
   margin: 0 auto;

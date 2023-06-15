@@ -11,7 +11,6 @@ import { createModel, updateDapp } from '../api'
 import { Network } from './Selector/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { set } from 'lodash'
 
 export default function CreateNewModel({
   closeModal,
@@ -42,9 +41,8 @@ export default function CreateNewModel({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { composite, runtimeDefinition } = resp.data.data
       const modelsId = Object.keys(composite.models)
-      const modelId = modelsId[0]
       const models = selectedDapp.models || []
-      models.push(modelId)
+      models.push(...modelsId)
       await updateDapp({ ...selectedDapp, models }, session.serialize())
       await loadDapps()
       closeModal()
@@ -88,12 +86,20 @@ export default function CreateNewModel({
   )
 }
 const EditorBox = styled.div`
-  height: calc(100% - 88px);
-  max-height: 800px;
+  height: calc(100vh - 230px);
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
   overflow: hidden;
+
+  div {
+    /* height: calc(100v - 88px); */
+    box-sizing: border-box;
+  }
+
+  input {
+    width: auto;
+  }
 `
 
 const CreateBox = styled.div`

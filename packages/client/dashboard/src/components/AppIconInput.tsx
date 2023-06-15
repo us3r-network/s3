@@ -8,6 +8,7 @@ export default function AppIconInput({
   setIcon,
 }: {
   icon?: string
+  name?: string
   setIcon: (url: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
