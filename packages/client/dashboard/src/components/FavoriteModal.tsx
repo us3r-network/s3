@@ -235,7 +235,7 @@ const FavoriteBox = styled.div`
   flex-direction: column;
   padding: 20px;
   gap: 20px;
-
+  min-height: calc(100vh - 300px);
   position: relative;
   width: 1240px;
   margin: 0 auto;
