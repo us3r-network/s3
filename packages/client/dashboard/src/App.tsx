@@ -41,6 +41,7 @@ function Routers() {
           </Route>
           <Route path="info" element={<DappInfo />} />
           <Route path="explore" element={<ExploreModel />} />
+          <Route path="favorite" element={<ExploreModel />} />
         </Route>
       </Route>
       <Route path="*" element={<NoMatch />} />

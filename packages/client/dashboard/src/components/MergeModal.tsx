@@ -81,30 +81,40 @@ export default function MergeModal({
             setModels(v)
           }}
         >
-          <Label>Models</Label>
-          {dappModels.map((item) => {
-            return (
-              <Checkbox value={item.stream_id} key={item.stream_id}>
-                <div className="checkbox" aria-hidden="true">
-                  <svg viewBox="0 0 18 18">
-                    <polyline points="1 9 7 14 15 4" />
-                  </svg>
-                </div>
-                {item.stream_content.name}
-              </Checkbox>
-            )
-          })}
+          {(dappModels.length === 0 && (
+            <p>This Dapp has no model available to be merged.</p>
+          )) || (
+            <>
+              <Label>Models</Label>
+              {dappModels.map((item) => {
+                return (
+                  <Checkbox value={item.stream_id} key={item.stream_id}>
+                    <div className="checkbox" aria-hidden="true">
+                      <svg viewBox="0 0 18 18">
+                        <polyline points="1 9 7 14 15 4" />
+                      </svg>
+                    </div>
+                    {item.stream_content.name}
+                  </Checkbox>
+                )
+              })}
+            </>
+          )}
         </CheckboxGroup>
       </div>
 
       <div className="btns">
         <button onClick={closeModal}>Cancel</button>
-        {loading ? (
-          <button>
-            <img src="/loading.gif" alt="loading" />
-          </button>
-        ) : (
-          <button onClick={mergeModelAction}>Merge</button>
+        {dappModels.length !== 0 && (
+          <>
+            {loading ? (
+              <button>
+                <img src="/loading.gif" alt="loading" />
+              </button>
+            ) : (
+              <button onClick={mergeModelAction}>Merge</button>
+            )}
+          </>
         )}
       </div>
     </MergeModalBox>
