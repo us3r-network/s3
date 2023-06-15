@@ -17,8 +17,8 @@
     --label-color: var(--spectrum-alias-text-color);
     --deselected-color: gray;
     --deselected-color-pressed: dimgray;
-    --selected-color: slateblue;
-    --selected-color-pressed: lch(from slateblue calc(l - 10%) c h);
+    --selected-color: #14171a;
+    --selected-color-pressed: lch(from #14171a calc(l - 10%) c h);
     --checkmark-color: white;
     --invalid-color: var(--spectrum-global-color-static-red-600);
     --invalid-color-pressed: var(--spectrum-global-color-static-red-700);
@@ -58,7 +58,7 @@
     &[data-selected],
     &[data-indeterminate] {
       .checkbox {
-        border-color: var(--selected-color);
+        /* border-color: var(--selected-color); */
         background: var(--selected-color);
       }
   

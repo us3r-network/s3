@@ -1,12 +1,16 @@
 import { useCallback, useState } from 'react'
 import { CheckboxGroup, Checkbox, Label } from 'react-aria-components'
-
-import { getStarModels, queryModelGraphql } from '../api'
+import { Composite } from '@composedb/devtools'
+// import { CeramicApi } from '@ceramicnetwork/common'
+import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
+import { queryModelGraphql } from '../api'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { Network } from './Selector/EnumSelect'
 import CloseIcon from './Icons/CloseIcon'
 import { ModelStream } from '../types'
 import styled from 'styled-components'
+import FileSaver from 'file-saver'
+import { CeramicClient } from '@ceramicnetwork/http-client'
 
 export default function MergeModal({
   closeModal,
@@ -15,15 +19,54 @@ export default function MergeModal({
   closeModal: () => void
   dappModels: ModelStream[]
 }) {
+  const [loading, setLoading] = useState(false)
   const { selectedDapp } = useSelectedDapp()
   const [models, setModels] = useState<string[]>([])
+
+  const download = (text: string, filename: string) => {
+    const blob = new Blob([text], {
+      type: 'text/plain;charset=utf-8',
+    })
+
+    FileSaver.saveAs(blob, filename)
+  }
+
   const mergeModelAction = useCallback(async () => {
     if (!selectedDapp || !selectedDapp.models) return
-    const resp = await queryModelGraphql(
-      models,
-      selectedDapp.network as Network
-    )
-    console.log(resp.data.data)
+    if (models.length === 0) return
+    try {
+      setLoading(true)
+      const ceramicHost =
+        selectedDapp.network === Network.MAINNET
+          ? CERAMIC_MAINNET_HOST
+          : CERAMIC_TESTNET_HOST
+
+      const resps = models.map(async (modelId) => {
+        const resp = await queryModelGraphql(
+          [modelId],
+          selectedDapp.network as Network
+        )
+        return resp
+      })
+
+      const data = await Promise.all(resps)
+      const composites = data.map(async (resp) => {
+        console.log(resp.data.data.runtimeDefinition)
+        return await Composite.fromJSON({
+          ceramic: new CeramicClient(ceramicHost) as any,
+          definition: resp.data.data.runtimeDefinition,
+        })
+      })
+      const sourceComposites = await Promise.all(composites)
+      console.log(sourceComposites)
+      // const mergedComposite = Composite.from(sourceComposites)
+      // console.log(mergedComposite)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+      // closeModal()
+    }
   }, [models, selectedDapp])
 
   return (
@@ -58,7 +101,13 @@ export default function MergeModal({
 
       <div className="btns">
         <button onClick={closeModal}>Cancel</button>
-        <button onClick={mergeModelAction}>Merge</button>
+        {loading ? (
+          <button>
+            <img src="/loading.gif" alt="loading" />
+          </button>
+        ) : (
+          <button onClick={mergeModelAction}>Merge</button>
+        )}
       </div>
     </MergeModalBox>
   )
@@ -110,13 +159,9 @@ const MergeModalBox = styled.div`
       font-weight: 500;
       font-size: 16px;
       line-height: 24px;
-      &.del {
-        cursor: pointer;
-        background: #aa4f4f;
 
-        > img {
-          width: 24px;
-        }
+      > img {
+        width: 24px;
       }
     }
   }

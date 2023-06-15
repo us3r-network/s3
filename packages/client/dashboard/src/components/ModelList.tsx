@@ -153,23 +153,25 @@ export default function ModelList({
         />
       )}
 
-      <MergeBox>
-        <DialogTrigger>
-          <Button className={'merge-btn'}>Merge</Button>
-          <ModalOverlay>
-            <Modal>
-              <Dialog>
-                {({ close }) => (
-                  <MergeModal
-                    closeModal={close}
-                    dappModels={dappModels || []}
-                  />
-                )}
-              </Dialog>
-            </Modal>
-          </ModalOverlay>
-        </DialogTrigger>
-      </MergeBox>
+      {editable && (
+        <MergeBox>
+          <DialogTrigger>
+            <Button className={'merge-btn'}>Merge</Button>
+            <ModalOverlay>
+              <Modal>
+                <Dialog>
+                  {({ close }) => (
+                    <MergeModal
+                      closeModal={close}
+                      dappModels={dappModels || []}
+                    />
+                  )}
+                </Dialog>
+              </Modal>
+            </ModalOverlay>
+          </DialogTrigger>
+        </MergeBox>
+      )}
     </ListBox>
   )
 }
