@@ -94,8 +94,9 @@ export default function DappInfo() {
                   <Dialog>
                     {({ close }) => (
                       <DelConfirmModal
-                        closeModal={() => {
+                        closeModal={(del) => {
                           close()
+                          if (!del) return
                           setTimeout(() => {
                             navigate('/')
                           }, 1)

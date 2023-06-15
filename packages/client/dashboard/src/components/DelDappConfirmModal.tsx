@@ -8,7 +8,7 @@ import { delDapp } from '../api'
 export default function DelConfirmModal({
   closeModal,
 }: {
-  closeModal: () => void
+  closeModal: (withDel: boolean) => void
 }) {
   const { selectedDapp } = useSelectedDapp()
   const session = useSession()
@@ -21,7 +21,7 @@ export default function DelConfirmModal({
       setDelting(true)
       await delDapp(selectedDapp, session.serialize())
       await loadDapps()
-      closeModal()
+      closeModal(true)
     } catch (error) {
       console.error(error)
     } finally {
@@ -41,7 +41,7 @@ export default function DelConfirmModal({
         </p>
       </div>
       <div className="btns">
-        <button onClick={closeModal}>Cancel</button>
+        <button onClick={() => closeModal(false)}>Cancel</button>
         {delting ? (
           <button className="del">
             <img src="/loading.gif" alt="" />
