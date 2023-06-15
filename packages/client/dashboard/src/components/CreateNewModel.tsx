@@ -41,9 +41,8 @@ export default function CreateNewModel({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { composite, runtimeDefinition } = resp.data.data
       const modelsId = Object.keys(composite.models)
-      const modelId = modelsId[0]
       const models = selectedDapp.models || []
-      models.push(modelId)
+      models.push(...modelsId)
       await updateDapp({ ...selectedDapp, models }, session.serialize())
       await loadDapps()
       closeModal()

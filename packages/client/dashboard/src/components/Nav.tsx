@@ -37,7 +37,7 @@ export default function Nav({ appId }: { appId: string }) {
           {[
             {
               path: `/dapp/${appId}/index`,
-              name: 'home',
+              name: 'Home',
               icon: Home,
             },
             {
@@ -52,7 +52,7 @@ export default function Nav({ appId }: { appId: string }) {
             },
             {
               path: `/dapp/${appId}/statistic`,
-              name: 'Data statistic',
+              name: 'Model Metrics',
               icon: ChartIcon,
             },
             {
