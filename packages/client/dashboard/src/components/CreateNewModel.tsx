@@ -86,8 +86,7 @@ export default function CreateNewModel({
   )
 }
 const EditorBox = styled.div`
-  height: calc(100vh - 88px);
-  /* max-height: 800px; */
+  height: calc(100vh - 230px);
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;
