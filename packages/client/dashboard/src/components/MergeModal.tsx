@@ -54,12 +54,12 @@ export default function MergeModal({
       const composites = data.map(async (resp) => {
         return await Composite.fromJSON({
           ceramic: new CeramicClient(ceramicHost) as any,
-          definition: resp.data.data.composite,
+          definition: resp.data.data.composite as EncodedCompositeDefinition,
         })
       })
       const sourceComposites = await Promise.all(composites)
       const mergedComposite = Composite.from(sourceComposites)
-      download(JSON.stringify(mergedComposite.toJSON()), 'merged.json')
+      download(JSON.stringify(mergedComposite.toRuntime()), 'merged.json')
     } catch (error) {
       console.error(error)
     } finally {
