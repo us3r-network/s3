@@ -1,5 +1,4 @@
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAppCtx } from '../context/AppCtx'
 import { useCallback, useState } from 'react'

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useCallback, useEffect, useState } from 'react'
 import { ModelStream } from '../types'
-import { getStarModels, queryModelGraphql } from '../api'
+import { getStarModels } from '../api'
 import { Network } from './Selector/EnumSelect'
 import TrashIcon from './Icons/TrashIcon'
 import FavoriteModel from './FavoriteModal'
@@ -98,7 +98,7 @@ export default function ModelList({
   return (
     <ListBox>
       <div className="title">
-        <h3>ModelList</h3>
+        <h3>Models</h3>
         <Favorite />
         <CreateNew />
         {editable && (
@@ -125,7 +125,7 @@ export default function ModelList({
               >
                 <Item id="explore">Explore Models</Item>
                 <Item id="favorite">Add From Favorite</Item>
-                <Item id="create">CreateNew</Item>
+                <Item id="create">Create New Model</Item>
               </Menu>
             </Popover>
           </MenuTrigger>
