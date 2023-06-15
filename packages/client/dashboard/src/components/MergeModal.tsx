@@ -11,7 +11,7 @@ import { ModelStream } from '../types'
 import styled from 'styled-components'
 import FileSaver from 'file-saver'
 import { CeramicClient } from '@ceramicnetwork/http-client'
-import type { EncodedCompositeDefinition, RuntimeCompositeDefinition } from '@composedb/types'
+import type { EncodedCompositeDefinition } from '@composedb/types'
 
 export default function MergeModal({
   closeModal,
@@ -42,7 +42,7 @@ export default function MergeModal({
           ? CERAMIC_MAINNET_HOST
           : CERAMIC_TESTNET_HOST
 
-      const resps = models.map(async (modelId) => {
+      const respData = models.map(async (modelId) => {
         const resp = await queryModelGraphql(
           [modelId],
           selectedDapp.network as Network
@@ -50,23 +50,20 @@ export default function MergeModal({
         return resp
       })
 
-      const data = await Promise.all(resps)
+      const data = await Promise.all(respData)
       const composites = data.map(async (resp) => {
-        console.log(resp.data.data.runtimeDefinition)
         return await Composite.fromJSON({
           ceramic: new CeramicClient(ceramicHost) as any,
-          definition: resp.data.data.composite as EncodedCompositeDefinition,
+          definition: resp.data.data.composite,
         })
       })
       const sourceComposites = await Promise.all(composites)
-      console.log(sourceComposites)
       const mergedComposite = Composite.from(sourceComposites)
-      console.log('mergedComposite: ',mergedComposite)
+      download(JSON.stringify(mergedComposite.toJSON()), 'merged.json')
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false)
-      // closeModal()
     }
   }, [models, selectedDapp])
 
