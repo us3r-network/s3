@@ -7,7 +7,7 @@ import { Modal, ModalOverlay } from 'react-aria-components'
 import PlusIcon from './Icons/PlusIcon'
 import { useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ModelStream } from '../types'
 import { getStarModels } from '../api'
 import { Network } from './Selector/EnumSelect'
@@ -73,8 +73,14 @@ export default function ModelList({
     [loadDapps, selectedDapp, session]
   )
 
+  const isFirstRenderRef = useRef(true)
+
   useEffect(() => {
-    setLoading(true)
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false
+      setLoading(true)
+    }
+
     loadModelsInfo().finally(() => setLoading(false))
   }, [loadModelsInfo])
 
@@ -145,10 +151,14 @@ export default function ModelList({
             setSelectModel(model)
           }}
           removeModelAction={async (id: string) => {
+            await removeModelFromDapp(id)
             if (id === selectModel?.stream_id) {
               setSelectModel(undefined)
+              setSelectModelId('')
+              setSelectModelName && setSelectModelName('')
+              setDappModels(undefined)
+              setSelected(undefined)
             }
-            await removeModelFromDapp(id)
           }}
         />
       )}

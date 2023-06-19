@@ -83,30 +83,12 @@ export default function Nav({ appId }: { appId: string }) {
             )}
           </NavLink>
 
-          <div
-            className="item star"
-            onClick={() => {
-              if (!pathname.endsWith('explore')) {
-                navigate(`/dapp/${appId}/explore?filterStar=filter`)
-                return
-              }
-              if (filterStar) {
-                setSearchParams((params) => {
-                  params.delete('filterStar')
-                  return params
-                })
-              } else {
-                setSearchParams((params) => {
-                  params.set('filterStar', 'filter')
-                  return params
-                })
-              }
-            }}
-          >
-            {(filterStar && <StarGoldIcon />) || <StarIcon />}
-            <span>Favorite Models</span>
-          </div>
-
+          <NavLink to={`/dapp/${appId}/favorite?filterStar=filter`}>
+            <div className={'item star'}>
+              {(filterStar && <StarGoldIcon />) || <StarIcon />}
+              <span>Favorite Models</span>
+            </div>
+          </NavLink>
           <Link to={DOCS_URL} target="_blank">
             <div className="item">
               <DocIcon />
@@ -162,6 +144,11 @@ const NavContainer = styled.nav<{ open?: boolean }>`
         left: 37px;
         width: 150px;
         transition: opacity 0.09s ease-in-out;
+      }
+
+      &.active {
+        background: #14171a;
+        color: #fff;
       }
     }
 
