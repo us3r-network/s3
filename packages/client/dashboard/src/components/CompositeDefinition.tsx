@@ -1,65 +1,26 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { getModelInfo, queryModelGraphql } from '../api'
-import { ModeQueryResult, ModelStream } from '../types'
+import { DappComposite } from '../types'
 import { schemas } from '../utils/composedb-types/schemas'
-import { AxiosError } from 'axios'
-import { Network } from './Selector/EnumSelect'
 
-export default function Definition({
-  streamId,
-  network,
+export default function CompositeDefinition({
+  composite,
 }: {
-  streamId: string
-  network: Network
+  composite: DappComposite
 }) {
-  const [modelData, setModelData] = useState<ModeQueryResult>()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
-    code: schemas.code,
+    code: composite.graphql,
+    libraries: schemas.library,
   })
-  const [errMsg, setErrMsg] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [modelStream, setModelStream] = useState<ModelStream>()
 
-  const [loading, setLoading] = useState(false)
-
-  const fetchModelInfo = useCallback(
-    async (streamId: string) => {
-      const resp = await getModelInfo({ network, id: streamId })
-      setModelStream(resp.data.data)
-    },
-    [network]
-  )
-
-  const fetchModelGraphql = useCallback(
-    async (streamId: string) => {
-      try {
-        setLoading(true)
-        setErrMsg('')
-        const resp = await queryModelGraphql(streamId, network)
-        const { data } = resp.data
-        setModelData(data)
-        if (data.graphqlSchemaDefinition) {
-          setGqlSchema({
-            code: data.graphqlSchemaDefinition,
-            libraries: schemas.library,
-          })
-        } else {
-          setGqlSchema({
-            code: data.graphqlSchema,
-          })
-        }
-      } catch (error) {
-        const err = error as AxiosError
-        setErrMsg((err.response?.data as any).message || err.message)
-      } finally {
-        setLoading(false)
-      }
-    },
-    [network]
-  )
+  useEffect(() => {
+    setGqlSchema({
+      code: composite.graphql,
+      libraries: schemas.library,
+    })
+  }, [composite])
 
   const download = (text: string, filename: string) => {
     const blob = new Blob([text], {
@@ -69,31 +30,11 @@ export default function Definition({
     FileSaver.saveAs(blob, filename)
   }
 
-  useEffect(() => {
-    if (!streamId) return
-    fetchModelGraphql(streamId)
-    fetchModelInfo(streamId)
-  }, [fetchModelGraphql, streamId, fetchModelInfo])
-
-  if (loading) {
-    return (
-      <div>
-        <Loading>Loading...</Loading>
-      </div>
-    )
-  }
-
-  if (errMsg) {
-    return (
-      <div>
-        <div className="title-box" />
-        <Loading>{errMsg}</Loading>
-      </div>
-    )
-  }
-
   return (
-    <div>
+    <DefinitionBox>
+      <div className="title">
+        <span>{composite.name}</span>
+      </div>
       <EditorBox>
         <GraphQLEditor
           setSchema={(props) => {
@@ -103,16 +44,13 @@ export default function Definition({
         />
       </EditorBox>
       <ResultBox>
-        {modelData?.composite && (
+        {composite.composite && (
           <div>
             <div className="title">
               <h3>Model's composite</h3>
               <button
                 onClick={() => {
-                  download(
-                    JSON.stringify(modelData.composite),
-                    'composite.json'
-                  )
+                  download(composite.composite, 'composite.json')
                 }}
               >
                 Download
@@ -120,12 +58,14 @@ export default function Definition({
             </div>
             <div className="result-text">
               <pre>
-                <code>{JSON.stringify(modelData.composite, null, 2)}</code>
+                <code>
+                  {JSON.stringify(JSON.parse(composite.composite), null, 2)}
+                </code>
               </pre>
             </div>
           </div>
         )}
-        {modelData?.runtimeDefinition && (
+        {composite.runtimeDefinition && (
           <div>
             <div className="title">
               <h3>Model's runtime definition</h3>
@@ -133,7 +73,7 @@ export default function Definition({
                 onClick={() => {
                   download(
                     `// This is an auto-generated file, do not edit manually
-  export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
+  export const definition = ${composite.runtimeDefinition}`,
                     'runtime-composite.js'
                   )
                 }}
@@ -144,16 +84,38 @@ export default function Definition({
             <div className="result-text">
               <pre>
                 <code>
-                  {JSON.stringify(modelData.runtimeDefinition, null, 2)}
+                  {JSON.stringify(
+                    JSON.parse(composite.runtimeDefinition),
+                    null,
+                    2
+                  )}
                 </code>
               </pre>
             </div>
           </div>
         )}
       </ResultBox>
-    </div>
+    </DefinitionBox>
   )
 }
+
+const DefinitionBox = styled.div`
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #14171a;
+    margin-bottom: 20px;
+
+    > span {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 28px;
+      color: #ffffff;
+    }
+  }
+`
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
@@ -234,10 +196,4 @@ const ResultBox = styled.div`
     font-weight: 500;
     color: #14171a;
   }
-`
-
-const Loading = styled.div`
-  padding: 20px;
-  text-align: center;
-  color: gray;
 `
