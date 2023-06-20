@@ -4,37 +4,36 @@ import ChevronRightDouble from '../components/icons/ChevronRightDouble'
 
 const COMPONENT_DOC_URL = 'https://component-doc.s3.xyz'
 
-export default function Components() {
-  const pkgs = [
-    {
-      name: 'Profile',
-      desc: 'A data model, based on Ceramic ComposeDB, includes the following information for each user: name, bio, avatar, wallet address list, and user tags.',
-      link:
-        COMPONENT_DOC_URL +
-        '/?path=/docs/components-profile-introduction--docs',
-    },
-    {
-      name: 'Link',
-      desc: 'Link is a data model based on Ceramic ComposeDB. It represents the content of a URL that users can comment on, bookmark, vote on, and rate.',
-      link:
-        COMPONENT_DOC_URL + '/?path=/docs/components-link-introduction--docs',
-    },
-  ]
+const pkgs = [
+  {
+    name: 'Profile',
+    desc: 'A data model, based on Ceramic ComposeDB, includes the following information for each user: name, bio, avatar, wallet address list, and user tags.',
+    link:
+      COMPONENT_DOC_URL + '/?path=/docs/components-profile-introduction--docs',
+  },
+  {
+    name: 'Link',
+    desc: 'Link is a data model based on Ceramic ComposeDB. It represents the content of a URL that users can comment on, bookmark, vote on, and rate.',
+    link: COMPONENT_DOC_URL + '/?path=/docs/components-link-introduction--docs',
+  },
+]
 
-  const guides = [
-    {
-      title: 'What is Component ?',
-      link: COMPONENT_DOC_URL + '/?path=/docs/what-is-underglaze--docs',
-    },
-    {
-      title: 'Who is component for ?',
-      link: COMPONENT_DOC_URL + '/?path=/docs/who-is-underglaze-for--docs',
-    },
-    {
-      title: 'How to use component ?',
-      link: COMPONENT_DOC_URL + '/?path=/docs/how-to-use-underglaze--docs',
-    },
-  ]
+const guides = [
+  {
+    title: 'What is Component ?',
+    link: COMPONENT_DOC_URL + '/?path=/docs/what-is-underglaze--docs',
+  },
+  {
+    title: 'Who is component for ?',
+    link: COMPONENT_DOC_URL + '/?path=/docs/who-is-underglaze-for--docs',
+  },
+  {
+    title: 'How to use component ?',
+    link: COMPONENT_DOC_URL + '/?path=/docs/how-to-use-underglaze--docs',
+  },
+]
+
+export default function Components() {
   return (
     <Box>
       <Banner>
