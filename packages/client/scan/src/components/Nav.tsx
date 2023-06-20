@@ -55,7 +55,7 @@ export default function Nav() {
             </div>
           </Link>
 
-          {session && (
+          {/*session && (
             <div className="dapp">
               <hr />
               {dapps
@@ -64,8 +64,7 @@ export default function Nav() {
                   return (
                     <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
                       <div className="icon">
-                        <img src={item.node.icon!} />
-                        {/* {item.node.name} */}
+                        <img src={item.node.icon!} alt="" />
                       </div>
                     </Link>
                   )
@@ -78,7 +77,7 @@ export default function Nav() {
                 </div>
               </Link>
             </div>
-          )}
+              )*/}
         </div>
 
         <div className="nav-bottom">
