@@ -7,16 +7,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html,body,#root {
+html,
+body,
+#root {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #14171A;
   color: #fff;
+  font-family: 'Rubik';
 }
 
-a, a:hover {
+a,
+a:hover {
   /* color: #5196d5; */
   color: #FFFFFF;
   text-decoration: none;
