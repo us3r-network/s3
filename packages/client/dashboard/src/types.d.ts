@@ -70,3 +70,14 @@ export type ModelMid = {
   createdAt: number
   updatedAt: number
 }
+
+export type DappComposite = {
+  id: number
+  name: string
+  dappId: number
+  graphql: string
+  composite: string
+  runtimeDefinition: string
+  createdAt: number
+  lastModifiedAt: number
+}

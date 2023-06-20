@@ -6,13 +6,7 @@ import LayoutIcon from './Icons/LayoutIcon'
 import InfoIcon from './Icons/InfoIcon'
 import TerminalIcon from './Icons/TerminalIcon'
 import ChartIcon from './Icons/ChartIcon'
-import {
-  NavLink,
-  Link,
-  useSearchParams,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
+import { NavLink, Link, useSearchParams } from 'react-router-dom'
 import ExploreIcon from './Icons/ExploreIcon'
 import StarIcon from './Icons/StarIcon'
 import DocIcon from './Icons/DocIcon'
@@ -21,9 +15,7 @@ import StarGoldIcon from './Icons/StarGoldIcon'
 
 export default function Nav({ appId }: { appId: string }) {
   const [open, setOpen] = useState(true)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const filterStar = useMemo(() => {
     return searchParams.get('filterStar') || ''

@@ -8,8 +8,8 @@ import PlusIcon from './Icons/PlusIcon'
 import { useNavigate } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ModelStream } from '../types'
-import { getStarModels } from '../api'
+import { DappComposite, ModelStream } from '../types'
+import { getStarModels, getDappComposites, deleteDappComposites } from '../api'
 import { Network } from './Selector/EnumSelect'
 import TrashIcon from './Icons/TrashIcon'
 import FavoriteModel from './FavoriteModal'
@@ -18,14 +18,21 @@ import { useAppCtx } from '../context/AppCtx'
 import { updateDapp } from '../api'
 import MergeModal from './MergeModal'
 import CreateNewModel from './CreateNewModel'
+import CreateCompositeModal from './CreateCompositeModal'
+import MergeIcon from './Icons/MergeIcon'
 
 export default function ModelList({
-  setSelectModelId,
-  setSelectModelName,
   editable,
+  selectComposite,
+  setSelectComposite,
+  selectModel,
+  setSelectModel,
 }: {
-  setSelectModelId: (id: string) => void
-  setSelectModelName?: (name: string) => void
+  selectModel: ModelStream | undefined
+  setSelectModel: (m: ModelStream | undefined) => void
+  selectComposite: DappComposite | undefined
+  setSelectComposite: (composite: DappComposite | undefined) => void
+
   editable?: boolean
 }) {
   const session = useSession()
@@ -34,8 +41,7 @@ export default function ModelList({
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
-  const [selected, setSelected] = useState<ModelStream>()
-  const [selectModel, setSelectModel] = useState<ModelStream>()
+  const [composites, setComposites] = useState<DappComposite[]>([])
 
   const loadModelsInfo = useCallback(async () => {
     if (selectedDapp?.models?.length === 0 || !selectedDapp) {
@@ -51,6 +57,21 @@ export default function ModelList({
     const list = resp.data.data
     setDappModels(list)
   }, [selectedDapp])
+
+  const loadDappComposites = useCallback(async () => {
+    if (!session) return
+    if (!selectedDapp) return
+    try {
+      const resp = await getDappComposites({
+        dapp: selectedDapp,
+        didSession: session.serialize(),
+      })
+      if (resp.data.code !== 0) throw new Error(resp.data.msg)
+      setComposites(resp.data.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [selectedDapp, session])
 
   const removeModelFromDapp = useCallback(
     async (modelId: string) => {
@@ -73,33 +94,59 @@ export default function ModelList({
     [loadDapps, selectedDapp, session]
   )
 
+  const delDappComposite = useCallback(
+    async (id: number) => {
+      if (!session) return
+      if (!selectedDapp) return
+      try {
+        await deleteDappComposites({
+          compositeId: id,
+          didSession: session.serialize(),
+          dapp: selectedDapp,
+        })
+        await loadDappComposites()
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    [selectedDapp, session, loadDappComposites]
+  )
+
   const isFirstRenderRef = useRef(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false
       setLoading(true)
     }
 
-    loadModelsInfo().finally(() => setLoading(false))
-  }, [loadModelsInfo])
+    Promise.all([loadDappComposites(), loadModelsInfo()]).finally(() =>
+      setLoading(false)
+    )
+  }, [loadModelsInfo, loadDappComposites, mounted])
 
   useEffect(() => {
-    if (selected) {
-      setSelectModelId(selected.stream_id)
-      setSelectModelName && setSelectModelName(selected.stream_content.name)
-    } else {
-      setSelectModelId('')
-    }
-  }, [selected, setSelectModelId, setSelectModelName])
-
-  useEffect(() => {
-    setSelected(undefined)
     setSelectModel(undefined)
-    setSelectModelId('')
-    setSelectModelName && setSelectModelName('')
     setDappModels(undefined)
-  }, [appId, setSelectModelId, setSelectModelName])
+    setSelectComposite(undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appId])
+
+  if (loading) {
+    return (
+      <ListBox>
+        <div className="loading">
+          <img src="/loading.gif" alt="" />
+        </div>
+      </ListBox>
+    )
+  }
 
   return (
     <ListBox>
@@ -137,42 +184,54 @@ export default function ModelList({
           </MenuTrigger>
         )}
       </div>
-      {(loading && (
-        <div className="loading">
-          <img src="/loading.gif" alt="" />
-        </div>
-      )) || (
-        <DappModelList
-          editable={editable}
-          selected={selected}
-          setSelected={setSelected}
-          dappModels={dappModels || []}
-          selectAction={(model: ModelStream) => {
-            setSelectModel(model)
-          }}
-          removeModelAction={async (id: string) => {
-            await removeModelFromDapp(id)
-            if (id === selectModel?.stream_id) {
-              setSelectModel(undefined)
-              setSelectModelId('')
-              setSelectModelName && setSelectModelName('')
-              setDappModels(undefined)
-              setSelected(undefined)
-            }
-          }}
-        />
-      )}
+
+      <DappModelList
+        editable={editable}
+        selected={selectModel}
+        setSelected={setSelectModel}
+        dappModels={dappModels || []}
+        selectAction={(model: ModelStream) => {
+          setSelectModel(model)
+        }}
+        removeModelAction={async (id: string) => {
+          await removeModelFromDapp(id)
+          if (id === selectModel?.stream_id) {
+            setSelectModel(undefined)
+            setDappModels(undefined)
+            setSelectModel(undefined)
+          }
+        }}
+      />
+
+      <div className="title">
+        <h3>Composites</h3>
+        {editable && (
+          <CreateComposite loadDappComposites={loadDappComposites} />
+        )}
+      </div>
+
+      <DappCompositeList
+        composites={composites}
+        editable={editable}
+        selectComposite={selectComposite}
+        setSelectedComposite={setSelectComposite}
+        removeAction={delDappComposite}
+      />
 
       {editable && (
         <MergeBox>
           <DialogTrigger>
-            <Button className={'merge-btn'}>Merge</Button>
+            <Button className={'merge-btn'}>
+              <MergeIcon />
+              Merge
+            </Button>
             <ModalOverlay>
               <Modal>
                 <Dialog>
                   {({ close }) => (
                     <MergeModal
                       closeModal={close}
+                      composites={composites}
                       dappModels={dappModels || []}
                     />
                   )}
@@ -183,6 +242,55 @@ export default function ModelList({
         </MergeBox>
       )}
     </ListBox>
+  )
+}
+
+function DappCompositeList({
+  composites,
+  removeAction,
+  editable,
+  selectComposite,
+  setSelectedComposite,
+}: {
+  composites: DappComposite[]
+  selectComposite: DappComposite | undefined
+  setSelectedComposite: (composite: DappComposite) => void
+  removeAction: (id: number) => Promise<void>
+  editable?: boolean
+}) {
+  if (composites.length === 0) {
+    return (
+      <DappModelsListBox>
+        <p>This Dapp has no composites available yet.</p>
+      </DappModelsListBox>
+    )
+  }
+  return (
+    <DappModelsListBox>
+      {composites?.map((item) => {
+        const active = selectComposite?.id === item.id
+        return (
+          <div key={item.id} className={active ? 'active' : ''}>
+            <div
+              className="title"
+              onClick={() => {
+                setSelectedComposite(item)
+              }}
+            >
+              <div>{item.name}</div>
+              {editable && (
+                <ModelListItemTrash
+                  removeModelAction={async () => {
+                    await removeAction(item.id)
+                  }}
+                  streamId={item.id + ''}
+                />
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </DappModelsListBox>
   )
 }
 
@@ -314,6 +422,32 @@ function CreateNew() {
   )
 }
 
+function CreateComposite({
+  loadDappComposites,
+}: {
+  loadDappComposites: () => Promise<void>
+}) {
+  return (
+    <DialogTrigger>
+      <Button>
+        <PlusIcon />
+      </Button>
+      <ModalOverlay>
+        <Modal>
+          <Dialog>
+            {({ close }) => (
+              <CreateCompositeModal
+                closeModal={close}
+                loadDappComposites={loadDappComposites}
+              />
+            )}
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
+    </DialogTrigger>
+  )
+}
+
 const ListBox = styled.div`
   background: #1b1e23;
   border: 1px solid #39424c;
@@ -367,6 +501,10 @@ const DappModelsListBox = styled.div`
   div.title {
     > div {
       cursor: pointer;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     display: flex;
@@ -402,9 +540,14 @@ const MergeBox = styled.div`
     width: 100%;
     background: #718096;
     color: #ffffff;
-    padding: 10px 16px;
+    padding: 12px 24px;
     border-radius: 12px;
     font-weight: 700;
     font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 `

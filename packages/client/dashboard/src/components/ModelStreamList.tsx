@@ -119,6 +119,7 @@ const TableContainer = styled.table`
 
     > div {
       text-overflow: ellipsis;
+      white-space: nowrap;
       overflow: hidden;
       padding-right: 5px;
     }
