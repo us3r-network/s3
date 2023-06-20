@@ -32,6 +32,7 @@ import ModelStreams from './container/ModelStreams'
 import DappCreate from './container/DappCreate'
 import DappInfo from './container/DappInfo'
 import DappEdit from './container/DappEdit'
+import Components from './container/Components'
 
 dayjs.extend(relativeTime)
 
@@ -63,6 +64,8 @@ function Routers() {
           <Route path=":appId/edit" element={<DappEdit />} />
           <Route path=":appId" element={<DappInfo />} />
         </Route>
+
+        <Route path="components" element={<Components />} />
       </Route>
       <Route path="*" element={<NoMatch />} />
     </Routes>
