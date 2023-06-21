@@ -5,16 +5,29 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 // import ModelStreamList from '../../components/ModelStreamList'
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
-import { ModelMid } from '../types'
+import { ModelMid, ModelStream } from '../types'
 import { getModelMid, PageSize } from '../api'
 import ModelStreamList from './ModelStreamList'
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Heading,
+  Modal,
+  ModalOverlay,
+} from 'react-aria-components'
+import ModelInstanceForm from './ModelInstanceForm'
+import PlusIcon from './Icons/PlusIcon'
+import CloseIcon from './Icons/CloseIcon'
 
 export default function Instance({
   streamId,
   network,
+  schema,
 }: {
   streamId: string
   network: Network
+  schema: ModelStream['stream_content']['schema']
 }) {
   const pageNum = useRef(1)
   // const { network } = useCeramicCtx()
@@ -22,6 +35,7 @@ export default function Instance({
   const [streams, setStreams] = useState<Array<ModelMid>>([])
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState('')
+  const [formData, setFormData] = useState({})
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
@@ -77,6 +91,35 @@ export default function Instance({
 
   return (
     <PageBox>
+      <ListHeading>
+        <DialogTrigger>
+          <PlusButton>
+            <PlusIcon />
+          </PlusButton>
+          <ModalOverlay>
+            <Modal>
+              <Dialog>
+                {({ close }) => (
+                  <FormContentBox>
+                    <Heading className="title">
+                      <span>Create Stream</span>
+                      <button onClick={close}>
+                        <CloseIcon />
+                      </button>
+                    </Heading>
+                    <ModelInstanceForm
+                      schema={schema}
+                      formData={formData}
+                      onChange={(e) => setFormData(e.formData)}
+                      onSubmit={() => close()}
+                    />
+                  </FormContentBox>
+                )}
+              </Dialog>
+            </Modal>
+          </ModalOverlay>
+        </DialogTrigger>
+      </ListHeading>
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
@@ -129,5 +172,67 @@ const PageBox = styled.div`
         padding: 0;
       }
     }
+  }
+`
+const ListHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+`
+const PlusButton = styled(Button)`
+  box-sizing: border-box;
+
+  /* Auto layout */
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 24px;
+  isolation: isolate;
+
+  height: 36px;
+
+  /* 🌘 $neutral/100 */
+
+  background: #1a1e23;
+  border: 1px solid #39424c;
+  border-radius: 12px;
+
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  /* identical to box height, or 150% */
+
+  text-align: center;
+
+  /* #718096 */
+
+  color: #718096;
+`
+const FormContentBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+
+  position: relative;
+  width: 800px;
+  margin: 0 auto;
+
+  /* #1B1E23 */
+
+  background: #1b1e23;
+  border-radius: 20px;
+
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #ffffff;
   }
 `
