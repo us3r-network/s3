@@ -21,6 +21,8 @@ import ExploreModel from './container/ExploreModel'
 import DappModelEditor from './container/DappModelEditor'
 import DappModelPlayground from './container/DappModelPlayground'
 import DappDataStatistic from './container/DappDataStatistic'
+import Components from './container/Components'
+
 import { useState } from 'react'
 import ModelList from './components/ModelList'
 import { DappComposite, ModelStream } from './types'
@@ -43,6 +45,7 @@ function Routers() {
           <Route path="info" element={<DappInfo />} />
           <Route path="explore" element={<ExploreModel />} />
           <Route path="favorite" element={<ExploreModel />} />
+          <Route path="components" element={<Components />} />
         </Route>
       </Route>
       <Route path="*" element={<NoMatch />} />
