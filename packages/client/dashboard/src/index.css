@@ -15,6 +15,11 @@ body,
   font-family: 'Rubik';
 }
 
+a,
+a:hover {
+  text-decoration: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
