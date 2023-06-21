@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import multiavatar from '@multiavatar/multiavatar'
 import dayjs from 'dayjs'
 import { isMobile } from 'react-device-detect'
 

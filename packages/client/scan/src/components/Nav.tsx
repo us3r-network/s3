@@ -5,13 +5,10 @@ import GitHubButton from 'react-github-btn'
 import Logo from './Logo'
 import LoginButton from './LoginButton'
 import { useCeramicCtx } from '../context/CeramicCtx'
-import DappAdd from './icons/DappAdd'
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
 
 export default function Nav() {
   let location = useLocation()
-  const session = useSession()
-  const { dapps } = useCeramicCtx()
+  const { network } = useCeramicCtx()
 
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
@@ -20,7 +17,7 @@ export default function Nav() {
   return (
     <NavContainer>
       <div className="fixed">
-        <Link to={'/'}>
+        <Link to={`/?network=${network}`}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             <span>Alpha</span>
@@ -28,7 +25,7 @@ export default function Nav() {
         </Link>
 
         <div className="nav">
-          <Link to={'/'}>
+          <Link to={`/?network=${network}`}>
             <div className={`nav-item ${homeActive ? 'active' : ''}`}>
               <HomeIcon stroke={homeActive ? 'white' : '#718096'} />
               <div className="tint-c">
@@ -37,7 +34,7 @@ export default function Nav() {
             </div>
           </Link>
 
-          <Link to={'/streams'}>
+          <Link to={`/streams?network=${network}`}>
             <div className={`nav-item ${streamActive ? 'active' : ''}`}>
               <StreamIcon stroke={streamActive ? 'white' : '#718096'} />
               <div className="tint-c">
@@ -46,7 +43,7 @@ export default function Nav() {
             </div>
           </Link>
 
-          <Link to={'/models'}>
+          <Link to={`/models?network=${network}`}>
             <div className={`nav-item ${modelActive ? 'active' : ''}`}>
               <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
               <div className="tint-c">
@@ -54,30 +51,6 @@ export default function Nav() {
               </div>
             </div>
           </Link>
-
-          {/*session && (
-            <div className="dapp">
-              <hr />
-              {dapps
-                ?.filter((item) => item.node)
-                .map((item) => {
-                  return (
-                    <Link to={`/dapp/${item.node.id!}`} key={item.node.id!}>
-                      <div className="icon">
-                        <img src={item.node.icon!} alt="" />
-                      </div>
-                    </Link>
-                  )
-                })}
-
-              <Link to={'/dapp/create'}>
-                <DappAdd />
-                <div className="tint-c">
-                  <div className="tint">Create Application</div>
-                </div>
-              </Link>
-            </div>
-              )*/}
         </div>
 
         <div className="nav-bottom">
