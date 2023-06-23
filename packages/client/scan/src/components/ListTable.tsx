@@ -9,6 +9,7 @@ import { TableBox } from './TableBox'
 import { FamilyOrAppMapReverse, Types } from '../constants'
 import UserAvatarStyled from './common/UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ListTable({
   data,
@@ -17,6 +18,7 @@ export default function ListTable({
   data: Array<Stream>
   showDid?: boolean
 }) {
+  const { network } = useCeramicCtx()
   return (
     <TableBox isMobile={isMobile}>
       <TableContainer isMobile={isMobile}>
@@ -41,13 +43,13 @@ export default function ListTable({
             let schemaOrModel = <div className="xxxx">-</div>
             if (item.schema) {
               schemaOrModel = (
-                <Link to={`/streams/stream/${item.schema}`}>
+                <Link to={`/streams/stream/${item.schema}?network=${network}`}>
                   {shortPubKey(item.schema, { len: 8, split: '-' })}
                 </Link>
               )
             } else if (item.model && (item.type === '0' || item.type === '3')) {
               schemaOrModel = (
-                <Link to={`/streams/stream/${item.model}`}>
+                <Link to={`/streams/stream/${item.model}?network=${network}`}>
                   {shortPubKey(item.model, { len: 8, split: '-' })}
                 </Link>
               )
@@ -56,7 +58,9 @@ export default function ListTable({
             return (
               <tr key={item.streamId + idx}>
                 <td>
-                  <Link to={`/streams/stream/${item.streamId}`}>
+                  <Link
+                    to={`/streams/stream/${item.streamId}?network=${network}`}
+                  >
                     {shortPubKey(item.streamId, { len: 8, split: '-' })}
                   </Link>
                 </td>
@@ -64,7 +68,9 @@ export default function ListTable({
                   <td>
                     <div className="did-container">
                       <Avatar did={item.did} />
-                      <Link to={`/streams/profile/${item.did}`}>
+                      <Link
+                        to={`/streams/profile/${item.did}?network=${network}`}
+                      >
                         <UserName did={item.did} />
                       </Link>
                     </div>
@@ -76,7 +82,7 @@ export default function ListTable({
                       <Link
                         to={`/streams/family/${encodeURIComponent(
                           item.domain
-                        )}`}
+                        )}?network=${network}`}
                       >
                         <div className="family">
                           {item.domain.length > 15
@@ -88,7 +94,9 @@ export default function ListTable({
                   )) || (
                     <div className="family-container">
                       {(item.familyOrApp && (
-                        <Link to={`/streams/family/${item.familyOrApp}`}>
+                        <Link
+                          to={`/streams/family/${item.familyOrApp}?network=${network}`}
+                        >
                           <div className="family">
                             {FamilyOrAppMapReverse[item.familyOrApp] ||
                             item.familyOrApp.length > 15

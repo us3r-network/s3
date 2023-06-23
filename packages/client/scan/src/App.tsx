@@ -76,14 +76,12 @@ export default function App() {
 
   useEffect(() => {
     const routerNet = searchParams.get('network')?.toUpperCase()
-    console.log('routerNet', routerNet)
+
     if (routerNet) {
       Object.values(Network).includes(routerNet as Network) &&
         setNetwork(routerNet as Network)
     }
   }, [searchParams, setSearchParams])
-
-  console.log('network', network)
 
   return (
     <Us3rAuthWithRainbowkitProvider>

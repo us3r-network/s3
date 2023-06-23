@@ -10,7 +10,7 @@ import DappMirror from '../icons/DappMirror'
 import DappMedium from '../icons/DappMedium'
 import DappGithub from '../icons/DappGithub'
 import Copy from '../icons/Copy'
-
+import { useCeramicCtx } from '../../context/CeramicCtx'
 
 export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
   const socialLink = dapp?.socialLink || []
@@ -21,7 +21,7 @@ export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
   const socialMedium = socialLink.find((item) => item.platform === 'medium')
 
   const [showCopyTint, setShowCopyTint] = useState(false)
-
+  const { network } = useCeramicCtx()
   const copyAppId = useCallback(async (appId: string) => {
     try {
       await navigator.clipboard.writeText(appId)
@@ -56,7 +56,7 @@ export default function BasicInfo({ dapp }: { dapp?: Dapp }) {
           </div>
         </div>
         <div className="edit">
-          <Link to={`/dapp/${dapp?.id}/edit`}>
+          <Link to={`/dapp/${dapp?.id}/edit?network=${network}`}>
             <button>
               <DappEdit />
             </button>
