@@ -8,17 +8,9 @@ import { Network } from './Selector/EnumSelect'
 import { ModelMid, ModelStream } from '../types'
 import { getModelMid, PageSize } from '../api'
 import ModelStreamList from './ModelStreamList'
-import {
-  Button,
-  Dialog,
-  DialogTrigger,
-  Heading,
-  Modal,
-  ModalOverlay,
-} from 'react-aria-components'
-import ModelInstanceForm from './ModelInstanceForm'
+import { Button } from 'react-aria-components'
 import PlusIcon from './Icons/PlusIcon'
-import CloseIcon from './Icons/CloseIcon'
+import ModelInstanceFormModal from './ModelInstanceFormModal'
 
 export default function Instance({
   streamId,
@@ -36,6 +28,7 @@ export default function Instance({
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [formData, setFormData] = useState({})
+  const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
@@ -91,34 +84,23 @@ export default function Instance({
 
   return (
     <PageBox>
+      <ModelInstanceFormModal
+        title="Create Stream"
+        isOpen={isOpenStreamForm}
+        onOpenChange={setIsOpenStreamForm}
+        schema={schema}
+        formData={formData}
+        onChange={(e) => setFormData(e.formData)}
+        onSubmit={() => setIsOpenStreamForm(false)}
+      />
       <ListHeading>
-        <DialogTrigger>
-          <PlusButton>
-            <PlusIcon />
-          </PlusButton>
-          <ModalOverlay>
-            <Modal>
-              <Dialog>
-                {({ close }) => (
-                  <FormContentBox>
-                    <Heading className="title">
-                      <span>Create Stream</span>
-                      <button onClick={close}>
-                        <CloseIcon />
-                      </button>
-                    </Heading>
-                    <ModelInstanceForm
-                      schema={schema}
-                      formData={formData}
-                      onChange={(e) => setFormData(e.formData)}
-                      onSubmit={() => close()}
-                    />
-                  </FormContentBox>
-                )}
-              </Dialog>
-            </Modal>
-          </ModalOverlay>
-        </DialogTrigger>
+        <PlusButton
+          onPress={() => {
+            setIsOpenStreamForm(true)
+          }}
+        >
+          <PlusIcon />
+        </PlusButton>
       </ListHeading>
       <InfiniteScroll
         dataLength={streams.length}
@@ -129,7 +111,16 @@ export default function Instance({
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
       >
-        {streamId && <ModelStreamList data={streams} modelId={streamId} />}
+        {streamId && (
+          <ModelStreamList
+            data={streams}
+            modelId={streamId}
+            editAction={(stream: any) => {
+              setFormData(stream?.streamContent)
+              setIsOpenStreamForm(true)
+            }}
+          />
+        )}
       </InfiniteScroll>
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
@@ -212,27 +203,4 @@ const PlusButton = styled(Button)`
   /* #718096 */
 
   color: #718096;
-`
-const FormContentBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  gap: 20px;
-
-  position: relative;
-  width: 800px;
-  margin: 0 auto;
-
-  /* #1B1E23 */
-
-  background: #1b1e23;
-  border-radius: 20px;
-
-  .title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    color: #ffffff;
-  }
 `

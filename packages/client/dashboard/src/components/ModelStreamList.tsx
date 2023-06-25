@@ -5,13 +5,17 @@ import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
 import UserAvatarStyled from './UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import EditIcon from './Icons/EditIcon'
+import { Button } from 'react-aria-components'
 
 export default function ModelStreamList({
   modelId,
   data,
+  editAction,
 }: {
   modelId: string
   data: ModelMid[]
+  editAction?: (stream: ModelMid) => void
 }) {
   return (
     <TableBox>
@@ -21,6 +25,7 @@ export default function ModelStreamList({
             <th>Stream ID</th>
             <th>DID</th>
             <th>Indexing Time</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +48,15 @@ export default function ModelStreamList({
                   <div>
                     <time>{dayjs(item.createdAt).fromNow()}</time>
                   </div>
+                </td>
+                <td className="td-action">
+                  <Button
+                    onPress={() => {
+                      if (editAction) editAction(item)
+                    }}
+                  >
+                    <EditIcon />
+                  </Button>
                 </td>
               </tr>
             )
