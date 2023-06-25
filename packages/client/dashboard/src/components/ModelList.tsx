@@ -5,7 +5,7 @@ import { MenuTrigger, Menu, Item } from 'react-aria-components'
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DappComposite, ModelStream } from '../types'
@@ -407,6 +407,12 @@ function Favorite() {
 }
 
 function CreateNew() {
+  const [searchParams] = useSearchParams()
+  useEffect(() => {
+    if (searchParams.get('create-new') === 'true') {
+      document.getElementById('create-new')?.click()
+    }
+  }, [searchParams])
   return (
     <DialogTrigger>
       <Button
