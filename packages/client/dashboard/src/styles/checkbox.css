@@ -19,7 +19,7 @@
     line-height: 19px;
   }
 
-  .items {
+  .merge-items {
     display: flex;
     flex-direction: row;
     align-items: flex-start;

@@ -114,7 +114,7 @@ export default function MergeModal({
           )) || (
             <>
               <Label>Models:</Label>
-              <div className="items">
+              <div className="merge-items">
                 {dappModels.map((item) => {
                   return (
                     <Checkbox value={item.stream_id} key={item.stream_id}>
@@ -146,7 +146,7 @@ export default function MergeModal({
           )) || (
             <>
               <Label>Composites:</Label>
-              <div className="items">
+              <div className="merge-items">
                 {composites.map((item) => {
                   return (
                     <Checkbox value={item.id + ''} key={item.id}>
