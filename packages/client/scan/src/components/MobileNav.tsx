@@ -13,10 +13,13 @@ import {
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import UserAvatarStyled from './common/UserAvatarStyled'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function Nav() {
   const { signIn, signOut } = useAuthentication()
   const session = useSession()
+  const { network } = useCeramicCtx()
+
   let location = useLocation()
   const navigate = useNavigate()
   const [openFilter, setOpenFilter] = useState(false)
@@ -33,7 +36,7 @@ export default function Nav() {
           <BackCircle />
         </span>
       ) : (
-        <Link to={'/'}>
+        <Link to={`/?network=${network}`}>
           <div className="logo-container">
             <Logo className="App-logo" alt="logo" />
             {/* <span>Alpha</span> */}
@@ -76,7 +79,10 @@ export default function Nav() {
           <FilterSelectWrapper>
             <FilterSelectInner>
               <div className="nav">
-                <Link to={'/'} onClick={() => setOpenFilter(!openFilter)}>
+                <Link
+                  to={`/?network=${network}`}
+                  onClick={() => setOpenFilter(!openFilter)}
+                >
                   <div
                     className={`nav-item ${
                       location.pathname === '/' ? 'active' : ''
@@ -89,7 +95,7 @@ export default function Nav() {
                   </div>
                 </Link>
                 <Link
-                  to={'/streams'}
+                  to={`/streams?network=${network}`}
                   onClick={() => setOpenFilter(!openFilter)}
                 >
                   <div
@@ -104,7 +110,10 @@ export default function Nav() {
                   </div>
                 </Link>
 
-                <Link to={'/models'} onClick={() => setOpenFilter(!openFilter)}>
+                <Link
+                  to={`/models?network=${network}`}
+                  onClick={() => setOpenFilter(!openFilter)}
+                >
                   <div
                     className={`nav-item ${
                       location.pathname === '/models' ? 'active' : ''

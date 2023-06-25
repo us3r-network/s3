@@ -53,11 +53,13 @@ function ListCard({
   count: number
   isIndexed?: boolean
 }) {
+  const { network } = useCeramicCtx()
+
   return (
     <CardBox className="models-box">
       <div className="name">
         {(isIndexed && (
-          <Link to={`/models/modelview/${stream_id}`}>
+          <Link to={`/models/modelview/${stream_id}?network=${network}`}>
             <h4>{name}</h4>
             <span>{shortPubKey(stream_id, { len: 8, split: '-' })}</span>
           </Link>
@@ -71,7 +73,9 @@ function ListCard({
       <div className="desc">{description}</div>
       <div className="count">
         {(isIndexed && (
-          <Link to={`/models/model/${stream_id}/mids`}>{count}</Link>
+          <Link to={`/models/model/${stream_id}/mids?network=${network}`}>
+            {count}
+          </Link>
         )) ||
           count}
       </div>
