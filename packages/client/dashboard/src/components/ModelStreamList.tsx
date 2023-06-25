@@ -5,6 +5,8 @@ import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
 import UserAvatarStyled from './UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import { S3_SCAN_URL } from '../constants'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 
 export default function ModelStreamList({
   modelId,
@@ -13,6 +15,7 @@ export default function ModelStreamList({
   modelId: string
   data: ModelMid[]
 }) {
+  const { selectedDapp } = useSelectedDapp()
   return (
     <TableBox>
       <TableContainer>
@@ -28,12 +31,20 @@ export default function ModelStreamList({
             return (
               <tr key={item.streamId}>
                 <td>
-                  <div className="stream-id">
-                    {shortPubKey(item.streamId, {
-                      len: 8,
-                      split: '-',
-                    })}
-                  </div>
+                  <a
+                    href={`${S3_SCAN_URL}/streams/stream/${
+                      item.streamId
+                    }?network=${selectedDapp?.network.toUpperCase()}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="stream-id">
+                      {shortPubKey(item.streamId, {
+                        len: 8,
+                        split: '-',
+                      })}
+                    </div>
+                  </a>
                 </td>
                 <td className="td-did">
                   <UserAvatarStyled did={item.controllerDid} />

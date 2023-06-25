@@ -23,10 +23,10 @@ export default function ModelTabs({
       </div>
       <TabPanels>
         <TabPanel id="Definition">
-          <Definition streamId={modelId} network={Network.TESTNET} />
+          <Definition streamId={modelId} />
         </TabPanel>
         <TabPanel id="Instance">
-          <Instance streamId={modelId} network={Network.TESTNET} />
+          <Instance streamId={modelId} />
         </TabPanel>
         <TabPanel id="Playground">
           <PlaygroundGraphiQL streamId={modelId} />
