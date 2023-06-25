@@ -54,7 +54,7 @@ export default function Nav() {
         </div>
 
         <div className="nav-bottom">
-          <LoginButton />
+          {/* <LoginButton /> */}
           <div className="github-star">
             <GitHubButton
               href="https://github.com/us3r-network/userscan"
