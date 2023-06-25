@@ -95,7 +95,9 @@ export default function ModelView() {
     async (dappId: string) => {
       const modelId = streamId
       if (!modelId) return
-      const dappItem = dapps?.find((item) => item.node && item.node.id === dappId)
+      const dappItem = dapps?.find(
+        (item) => item.node && item.node.id === dappId
+      )
       if (!dappItem) return
 
       if (!dappItem.node.models?.includes(modelId)) {
@@ -115,12 +117,14 @@ export default function ModelView() {
   }, [streamId, fetchModelInfo])
 
   let options = useMemo(() => {
-    return dapps?.filter(item => item.node).map((item) => {
-      return {
-        id: item.node.id,
-        name: item.node.name,
-      }
-    })
+    return dapps
+      ?.filter((item) => item.node)
+      .map((item) => {
+        return {
+          id: item.node.id,
+          name: item.node.name,
+        }
+      })
   }, [dapps])
 
   return (
@@ -128,7 +132,7 @@ export default function ModelView() {
       <div className="title-bar">
         <ToolsBox>
           <span>{modelStream?.streamContent?.name}</span>
-          <Select
+          {/* <Select
             onSelectionChange={(k) => {
               addToDappAction(k as string)
             }}
@@ -136,13 +140,14 @@ export default function ModelView() {
             <Label></Label>
             <Button className="add-to-dapp">
               <AddIcon stroke="#000" /> Add To Dapp
-            </Button>
+            </Button> 
             <Popover className={'modelview-popover'}>
               <ListBox items={options}>
                 {(item) => <Item id={item.id}>{item.name}</Item>}
               </ListBox>
             </Popover>
           </Select>
+          */}
         </ToolsBox>
         <TabList aria-label="History of Ancient Rome">
           <Tab id="Definition">Model Definition</Tab>

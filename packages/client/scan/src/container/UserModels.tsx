@@ -84,7 +84,7 @@ export default function UserModels() {
                       </div>
                     </td>
                     <td>
-                      <Link to={`/model/${item.stream_id}`}>
+                      <Link to={`/model/${item.stream_id}?network=${network}`}>
                         {shortPubKey(item.stream_id, { len: 8, split: '-' })}
                       </Link>
                     </td>
