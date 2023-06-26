@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import GitHubButton from 'react-github-btn'
 
 import Logo from './Logo'
-import LoginButton from './LoginButton'
 import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function Nav() {
