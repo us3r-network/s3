@@ -7,16 +7,25 @@ import UserAvatarStyled from './UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
 import EditIcon from './Icons/EditIcon'
 import { Button } from 'react-aria-components'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { useMemo } from 'react'
 
 export default function ModelStreamList({
   modelId,
   data,
+  editable,
   editAction,
 }: {
   modelId: string
   data: ModelMid[]
+  editable?: boolean
   editAction?: (stream: ModelMid) => void
 }) {
+  const session = useSession()
+  const showAction = useMemo(
+    () => session?.id && editable,
+    [editable, session?.id]
+  )
   return (
     <TableBox>
       <TableContainer>
@@ -25,7 +34,7 @@ export default function ModelStreamList({
             <th>Stream ID</th>
             <th>DID</th>
             <th>Indexing Time</th>
-            <th>Action</th>
+            {showAction && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
@@ -49,15 +58,21 @@ export default function ModelStreamList({
                     <time>{dayjs(item.createdAt).fromNow()}</time>
                   </div>
                 </td>
-                <td className="td-action">
-                  <Button
-                    onPress={() => {
-                      if (editAction) editAction(item)
-                    }}
-                  >
-                    <EditIcon />
-                  </Button>
-                </td>
+                {showAction && (
+                  <td className="td-action">
+                    {session?.id === item.controllerDid ? (
+                      <Button
+                        onPress={() => {
+                          if (editAction) editAction(item)
+                        }}
+                      >
+                        <EditIcon />
+                      </Button>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                )}
               </tr>
             )
           })}

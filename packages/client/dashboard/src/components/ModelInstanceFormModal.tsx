@@ -30,6 +30,6 @@ export default function ModelInstanceFormModal({
 
 const ModelInstanceFormStyled = styled(ModelInstanceForm)`
   width: 800px;
-  height: calc(100vh - 150px);
+  max-height: calc(100vh - 150px);
   overflow-y: auto;
 `

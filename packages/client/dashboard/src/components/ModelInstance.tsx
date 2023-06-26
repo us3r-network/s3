@@ -96,6 +96,7 @@ export default function Instance({
       <ListHeading>
         <PlusButton
           onPress={() => {
+            setFormData({})
             setIsOpenStreamForm(true)
           }}
         >
@@ -115,6 +116,7 @@ export default function Instance({
           <ModelStreamList
             data={streams}
             modelId={streamId}
+            editable={true}
             editAction={(stream: any) => {
               setFormData(stream?.streamContent)
               setIsOpenStreamForm(true)
