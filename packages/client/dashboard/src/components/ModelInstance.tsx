@@ -6,20 +6,24 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
 import { ModelMid, ModelStream } from '../types'
-import { getModelMid, PageSize } from '../api'
+import { getModelMid, PageSize, queryModelGraphql } from '../api'
 import ModelStreamList from './ModelStreamList'
 import { Button } from 'react-aria-components'
 import PlusIcon from './Icons/PlusIcon'
 import ModelInstanceFormModal from './ModelInstanceFormModal'
+import useSelectedDapp from '../hooks/useSelectedDapp'
+import { useComposeClient } from '../hooks/useComposeClient'
 
 export default function Instance({
   streamId,
   network,
   schema,
+  name,
 }: {
   streamId: string
   network: Network
   schema: ModelStream['stream_content']['schema']
+  name: string
 }) {
   const pageNum = useRef(1)
   // const { network } = useCeramicCtx()
@@ -27,10 +31,6 @@ export default function Instance({
   const [streams, setStreams] = useState<Array<ModelMid>>([])
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState('')
-  const [formData, setFormData] = useState({})
-  const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
-  const [formType, setFormType] = useState<'create' | 'update'>('create')
-  const [updateStreamId, setUpdateStreamId] = useState('')
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
@@ -67,13 +67,122 @@ export default function Instance({
     fetchModelMid()
   }, [fetchModelMid])
 
+  // stream form
+  // TODO alert error
+  const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
+  const [formType, setFormType] = useState<'create' | 'update'>('create')
+  const [formData, setFormData] = useState({})
+  const [formDisabled, setFormDisabled] = useState(false)
+  const [updateStreamId, setUpdateStreamId] = useState('')
+  const [definition, setDefinition] = useState<any>()
+  const { selectedDapp } = useSelectedDapp()
+  useEffect(() => {
+    ;(async () => {
+      if (!streamId || !selectedDapp) {
+        setDefinition(null)
+        return
+      }
+      try {
+        const resp = await queryModelGraphql(
+          streamId,
+          selectedDapp.network as Network
+        )
+        const { data } = resp.data
+        setDefinition(data.runtimeDefinition)
+      } catch (error) {
+        setDefinition(null)
+      }
+    })()
+  }, [streamId, selectedDapp])
+
+  const { composeClient, composeClientAuthenticated } =
+    useComposeClient(definition)
+
   const createStream = useCallback(async () => {
-    console.log({ formData })
-  }, [formData])
+    if (!composeClientAuthenticated || !composeClient) {
+      alert('composeClient not authenticated')
+      return
+    }
+    if (!name) {
+      alert('model name not found')
+      return
+    }
+    const mutation = `
+      mutation create${name}($input: Create${name}Input!) {
+        create${name}(input: $input) {
+          document {
+            id
+          }
+        }
+      }
+    `
+    setFormDisabled(true)
+    const res = await composeClient.executeQuery(mutation, {
+      input: {
+        content: { ...formData },
+      },
+    })
+    if (res?.errors && res?.errors.length > 0) {
+      alert(res?.errors[0]?.message)
+    } else {
+      alert('success')
+      setIsOpenStreamForm(false)
+      fetchModelMid()
+    }
+    setFormDisabled(false)
+  }, [formData, composeClientAuthenticated, composeClient, name, fetchModelMid])
 
   const updateStream = useCallback(async () => {
-    console.log({ updateStreamId, formData })
-  }, [updateStreamId, formData])
+    if (!composeClientAuthenticated || !composeClient) {
+      alert('composeClient not authenticated')
+      return
+    }
+    if (!name) {
+      alert('model name not found')
+      return
+    }
+    const mutation = `
+      mutation update${name}($input: Update${name}Input!) {
+        update${name}(input: $input) {
+          document {
+            id
+          }
+        }
+      }
+    `
+    setFormDisabled(true)
+    const res = await composeClient.executeQuery(mutation, {
+      input: {
+        id: updateStreamId,
+        content: { ...formData },
+      },
+    })
+    if (res?.errors && res?.errors.length > 0) {
+      alert(res?.errors[0]?.message)
+    } else {
+      alert('success')
+      setIsOpenStreamForm(false)
+      setStreams(
+        (streams) =>
+          streams?.map((stream: any) => {
+            if (stream.streamId === updateStreamId) {
+              return {
+                ...stream,
+                content: { ...(stream?.streamContent || {}), ...formData },
+              }
+            }
+            return stream
+          }) || []
+      )
+    }
+    setFormDisabled(false)
+  }, [
+    updateStreamId,
+    formData,
+    composeClientAuthenticated,
+    composeClient,
+    name,
+  ])
 
   const submitStream = useCallback(async () => {
     if (formType === 'create') {
@@ -106,22 +215,28 @@ export default function Instance({
       <ModelInstanceFormModal
         title="Create Stream"
         isOpen={isOpenStreamForm}
+        disabled={formDisabled}
         onOpenChange={setIsOpenStreamForm}
         schema={schema}
         formData={formData}
         onChange={(e) => setFormData(e.formData)}
         onSubmit={() => submitStream()}
       />
+
       <ListHeading>
-        <PlusButton
-          onPress={() => {
-            setFormType('create')
-            setFormData({})
-            setIsOpenStreamForm(true)
-          }}
-        >
-          <PlusIcon />
-        </PlusButton>
+        {composeClientAuthenticated ? (
+          <PlusButton
+            onPress={() => {
+              setFormType('create')
+              setFormData({})
+              setIsOpenStreamForm(true)
+            }}
+          >
+            <PlusIcon />
+          </PlusButton>
+        ) : (
+          "You don't have permission to create stream, please connect wallet."
+        )}
       </ListHeading>
       <InfiniteScroll
         dataLength={streams.length}
@@ -136,7 +251,7 @@ export default function Instance({
           <ModelStreamList
             data={streams}
             modelId={streamId}
-            editable={true}
+            editable={composeClientAuthenticated}
             editAction={(stream: any) => {
               setFormType('update')
               setUpdateStreamId(stream?.streamId)

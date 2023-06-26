@@ -7,13 +7,14 @@ interface ModelInstanceFormModalProps
   extends ModalBaseProps,
     Pick<
       ModelInstanceFormProps,
-      'schema' | 'formData' | 'onChange' | 'onSubmit'
+      'schema' | 'formData' | 'onChange' | 'onSubmit' | 'disabled'
     > {}
 export default function ModelInstanceFormModal({
   schema,
   formData,
   onChange,
   onSubmit,
+  disabled,
   ...props
 }: ModelInstanceFormModalProps) {
   return (
@@ -23,6 +24,7 @@ export default function ModelInstanceFormModal({
         formData={formData}
         onChange={onChange}
         onSubmit={onSubmit}
+        disabled={disabled}
       />
     </ModalBase>
   )
