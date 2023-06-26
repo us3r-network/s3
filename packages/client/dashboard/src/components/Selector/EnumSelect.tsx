@@ -36,11 +36,13 @@ export default function EnumSelector<T extends Stage | Network | AppType>({
   setValue,
   values,
   labelText = 'Selector:',
+  isDisabled = false,
 }: {
   value: T
   setValue: (s: T) => void
   values: any // TODO: fix this
   labelText?: string
+  isDisabled?: boolean
 }) {
   const [width, setWidth] = useState(0)
   let options = useMemo(() => {
@@ -53,6 +55,7 @@ export default function EnumSelector<T extends Stage | Network | AppType>({
   return (
     <SelectStyled
       selectedKey={value}
+      isDisabled={isDisabled}
       onSelectionChange={(k) => {
         setValue(k as T)
       }}
@@ -108,6 +111,9 @@ const ButtonStyled = styled(Button)`
     line-height: 24px;
 
     color: #ffffff;
+  }
+  &:disabled {
+    cursor: not-allowed;
   }
 `
 
