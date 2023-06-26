@@ -21,8 +21,11 @@ import ExploreModel from './container/ExploreModel'
 import DappModelEditor from './container/DappModelEditor'
 import DappModelPlayground from './container/DappModelPlayground'
 import DappDataStatistic from './container/DappDataStatistic'
+import Components from './container/Components'
+
 import { useState } from 'react'
 import ModelList from './components/ModelList'
+import { DappComposite, ModelStream } from './types'
 
 dayjs.extend(relativeTime)
 
@@ -42,6 +45,7 @@ function Routers() {
           <Route path="info" element={<DappInfo />} />
           <Route path="explore" element={<ExploreModel />} />
           <Route path="favorite" element={<ExploreModel />} />
+          <Route path="components" element={<Components />} />
         </Route>
       </Route>
       <Route path="*" element={<NoMatch />} />
@@ -97,22 +101,30 @@ function DappLayout() {
 }
 
 function ModelEditorLayout() {
-  const [selectModelId, setSelectModelId] = useState<string>('')
-  const [selectModelName, setSelectModelName] = useState<string>('')
+  const [selectModel, setSelectModel] = useState<ModelStream>()
+  const [selectComposite, setSelectComposite] = useState<DappComposite>()
 
   const { pathname } = useLocation()
 
   return (
     <EditorLayoutContainer>
       <ModelList
-        setSelectModelId={setSelectModelId}
-        setSelectModelName={setSelectModelName}
+        selectModel={selectModel}
+        setSelectModel={(data) => {
+          setSelectModel(data)
+          setSelectComposite(undefined)
+        }}
+        setSelectComposite={(data) => {
+          setSelectModel(undefined)
+          setSelectComposite(data)
+        }}
+        selectComposite={selectComposite}
         editable={pathname.includes('model-editor')}
       />
       <Outlet
         context={{
-          selectModelId,
-          selectModelName,
+          selectModel,
+          selectComposite,
         }}
       />
     </EditorLayoutContainer>

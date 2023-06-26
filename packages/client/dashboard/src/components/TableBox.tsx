@@ -63,6 +63,7 @@ export const TableContainer = styled.table<{ isMobile?: boolean }>`
     > div {
       padding-right: 20px;
       text-overflow: ellipsis;
+      white-space: nowrap;
       overflow: hidden;
       padding-right: 5px;
     }

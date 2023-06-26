@@ -9,6 +9,17 @@ body {
   color: #fff;
 }
 
+html,
+body,
+#root {
+  font-family: 'Rubik';
+}
+
+a,
+a:hover {
+  text-decoration: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -98,6 +109,7 @@ button {
   .react-aria-Button {
     margin-top: 20px;
   }
+
   .favorite {
     margin: 0;
   }
@@ -163,6 +175,7 @@ button {
   &[data-placement='bottom'] {
     margin-top: 6px;
     --origin: translateY(-8px);
+
     & .react-aria-OverlayArrow svg {
       transform: rotate(180deg);
     }
@@ -171,6 +184,7 @@ button {
   &[data-placement='right'] {
     margin-left: 6px;
     --origin: translateX(-8px);
+
     & .react-aria-OverlayArrow svg {
       transform: rotate(90deg);
     }
@@ -179,6 +193,7 @@ button {
   &[data-placement='left'] {
     margin-right: 6px;
     --origin: translateX(8px);
+
     & .react-aria-OverlayArrow svg {
       transform: rotate(-90deg);
     }
@@ -196,9 +211,11 @@ button {
 .react-aria-Popover a {
   text-decoration: none;
 }
+
 .react-aria-Popover .popover-item {
-  color: #718096; 
+  color: #718096;
 }
+
 .react-aria-Popover .popover-item button {
   font-weight: 400;
   font-size: 16px;
@@ -211,6 +228,7 @@ button {
   height: 100%;
   text-align: start;
 }
+
 .react-aria-Popover .popover-item:hover {
   color: #ffffff;
   background: #14171a;
@@ -264,6 +282,5 @@ button {
 }
 
 @media (forced-colors: active) {
-  .react-aria-Popover {
-  }
+  .react-aria-Popover {}
 }

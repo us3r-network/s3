@@ -12,12 +12,35 @@
       color: var(--spectrum-global-color-red-600);
     }
   }
+
+  .react-aria-Label {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px;
+  }
+
+  .merge-items {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    row-gap: 10px;
+    column-gap: 40px;
+    flex-wrap: wrap;
+    
+    .react-aria-Checkbox {
+      overflow: hidden;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
   
   .react-aria-Checkbox {
     --label-color: var(--spectrum-alias-text-color);
     --deselected-color: gray;
     --deselected-color-pressed: dimgray;
-    --selected-color: #14171a;
+    --selected-color: #2173DF;
     --selected-color-pressed: lch(from #14171a calc(l - 10%) c h);
     --checkmark-color: white;
     --invalid-color: var(--spectrum-global-color-static-red-600);
@@ -32,7 +55,7 @@
     .checkbox {
       width: 1.143rem;
       height: 1.143rem;
-      border: 2px solid var(--deselected-color);
+      border: 1px solid var(--deselected-color);
       border-radius: 4px;
       transition: all 200ms;
       display: flex;
@@ -41,8 +64,8 @@
     }
   
     & svg {
-      width: 1rem;
-      height: 1rem;
+      width: 13px;
+      height: 13px;
       fill: none;
       stroke: var(--checkmark-color);
       stroke-width: 3px;
@@ -58,7 +81,7 @@
     &[data-selected],
     &[data-indeterminate] {
       .checkbox {
-        /* border-color: var(--selected-color); */
+        border-color: #1B1E23;
         background: var(--selected-color);
       }
   
@@ -77,9 +100,9 @@
         border-color: var(--invalid-color);
       }
   
-      &[data-pressed] .checkbox {
-        border-color: var(--invalid-color-pressed);
-      }
+      /* &[data-pressed] .checkbox {
+        border-color: none;
+      } */
   
       &[data-selected],
       &[data-indeterminate] {
@@ -101,7 +124,7 @@
     }
   
     &[data-focus-visible] .checkbox {
-      box-shadow: 0 0 0 2px var(--spectrum-alias-background-color-default), 0 0 0 4px var(--selected-color);
+      /* box-shadow: 0 0 0 2px var(--spectrum-alias-background-color-default), 0 0 0 4px var(--selected-color); */
     }
   
     &[data-disabled] {
