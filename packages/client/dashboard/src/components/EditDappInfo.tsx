@@ -126,6 +126,7 @@ export default function EditDappInfo({
           setValue={setNetwork}
           labelText="Network:"
           values={Network}
+          isDisabled={true}
         />
       </div>
 
