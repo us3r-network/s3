@@ -1,21 +1,18 @@
 {
-  "name": "@us3r/userscan",
-  "version": "0.0.1",
-  "description": "a open source ceramic explorer",
-  "workspaces": [
-    "*"
-  ],
+  "name": "@us3r/s3",
+  "version": "0.1.0",
+  "description": "open source ceramic develop tools",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/us3r-network/userscan.git"
+    "url": "git+https://github.com/us3r-network/s3.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/us3r-network/userscan/issues"
+    "url": "https://github.com/us3r-network/s3/issues"
   },
-  "homepage": "https://github.com/us3r-network/userscan#readme"
+  "homepage": "https://github.com/us3r-network/s3#readme"
 }
