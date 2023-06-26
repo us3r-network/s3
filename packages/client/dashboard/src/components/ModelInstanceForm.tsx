@@ -1,7 +1,8 @@
+import { useMemo } from 'react'
 import styled, { css } from 'styled-components'
 import Form, { FormProps } from '@rjsf/core'
 import { RJSFSchema } from '@rjsf/utils'
-import validator from '@rjsf/validator-ajv8'
+import defaultValidator from '@rjsf/validator-ajv8'
 
 const formatSchema = (schema: RJSFSchema) => {
   const newSchema = { ...schema }
@@ -55,17 +56,23 @@ const formatSchema = (schema: RJSFSchema) => {
     }
   }
   formatDef(newSchema)
+  delete newSchema.$schema
   return newSchema
 }
 
 export interface ModelInstanceFormProps extends Omit<FormProps, 'validator'> {
   validator?: FormProps['validator']
 }
-export default function ModelInstanceForm(props: ModelInstanceFormProps) {
+export default function ModelInstanceForm({
+  validator,
+  schema,
+  ...props
+}: ModelInstanceFormProps) {
+  const newSchema = useMemo(() => formatSchema(schema), [schema])
   const newProps = {
     ...props,
-    validator: props.validator || validator,
-    schema: formatSchema(props.schema),
+    validator: validator || defaultValidator,
+    schema: newSchema,
   }
   return <FormBox {...newProps} />
 }

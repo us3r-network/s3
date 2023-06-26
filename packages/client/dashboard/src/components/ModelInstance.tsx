@@ -29,6 +29,8 @@ export default function Instance({
   const [errMsg, setErrMsg] = useState('')
   const [formData, setFormData] = useState({})
   const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
+  const [formType, setFormType] = useState<'create' | 'update'>('create')
+  const [updateStreamId, setUpdateStreamId] = useState('')
 
   const fetchMoreStreams = useCallback(
     async (pageNumber: number) => {
@@ -65,6 +67,23 @@ export default function Instance({
     fetchModelMid()
   }, [fetchModelMid])
 
+  const createStream = useCallback(async () => {
+    console.log({ formData })
+  }, [formData])
+
+  const updateStream = useCallback(async () => {
+    console.log({ updateStreamId, formData })
+  }, [updateStreamId, formData])
+
+  const submitStream = useCallback(async () => {
+    if (formType === 'create') {
+      await createStream()
+    }
+    if (formType === 'update') {
+      await updateStream()
+    }
+  }, [formType, createStream, updateStream])
+
   if (loading) {
     return (
       <PageBox>
@@ -91,11 +110,12 @@ export default function Instance({
         schema={schema}
         formData={formData}
         onChange={(e) => setFormData(e.formData)}
-        onSubmit={() => setIsOpenStreamForm(false)}
+        onSubmit={() => submitStream()}
       />
       <ListHeading>
         <PlusButton
           onPress={() => {
+            setFormType('create')
             setFormData({})
             setIsOpenStreamForm(true)
           }}
@@ -118,6 +138,8 @@ export default function Instance({
             modelId={streamId}
             editable={true}
             editAction={(stream: any) => {
+              setFormType('update')
+              setUpdateStreamId(stream?.streamId)
               setFormData(stream?.streamContent)
               setIsOpenStreamForm(true)
             }}
