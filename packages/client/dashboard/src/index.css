@@ -45,6 +45,14 @@ button {
   }
 }
 
+.confirm-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
 .react-aria-Modal {
   box-shadow: 0 8px 20px rgba(0 0 0 / 0.1);
   border-radius: 6px;

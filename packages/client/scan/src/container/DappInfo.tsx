@@ -135,7 +135,9 @@ function DappModels({
                   </button>
                 )}
               </div>
-              <Link to={`/models/model/create?dappId=${appId}`}>
+              <Link
+                to={`/models/model/create?dappId=${appId}?network=${network}`}
+              >
                 <div className="create">
                   <Add stroke="#fff" /> Create
                 </div>
@@ -155,7 +157,7 @@ function DappModels({
                 }}
               />
             </div>
-            <Link to={'/models'}>
+            <Link to={`/models?network=${network}`}>
               <div className="explore">
                 <ExploreAdd /> Explore More
               </div>

@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import ComposeDB from '../../icons/ComposeDB'
 import { Link } from 'react-router-dom'
+import { useCeramicCtx } from '../../../context/CeramicCtx'
 
 export default function Title({
   title,
@@ -9,6 +10,7 @@ export default function Title({
   title: string
   viewAll: string
 }) {
+  const { network } = useCeramicCtx()
   return (
     <Box>
       <div>
@@ -16,7 +18,7 @@ export default function Title({
         <h2>{title}</h2>
       </div>
       <div className="view-all">
-        <Link to={viewAll}>View All</Link>
+        <Link to={`${viewAll}?network=${network}`}>View All</Link>
       </div>
     </Box>
   )

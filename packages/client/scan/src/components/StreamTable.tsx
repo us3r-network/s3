@@ -35,7 +35,9 @@ export default function StreamTable({
         <div>
           <span className="name">Stream ID:</span>
           <div>
-            <Link to={`/streams/stream/${data.streamId}`}>{data.streamId}</Link>
+            <Link to={`/streams/stream/${data.streamId}?network=${network}`}>
+              {data.streamId}
+            </Link>
           </div>
         </div>
         <div className="network">
@@ -56,7 +58,9 @@ export default function StreamTable({
           <span className="name">Family or App:</span>
           {(data.familyOrApp && (
             <div>
-              <Link to={`/streams/family/${data.familyOrApp}`}>
+              <Link
+                to={`/streams/family/${data.familyOrApp}?network=${network}`}
+              >
                 <div className="family">
                   {FamilyOrAppMapReverse[data.familyOrApp] || data.familyOrApp}
                 </div>
@@ -71,7 +75,7 @@ export default function StreamTable({
         <div className="from">
           <span className="name">From:</span>
           <div>
-            <Link to={`/streams/profile/${data.did}`}>
+            <Link to={`/streams/profile/${data.did}?network=${network}`}>
               <UserAvatarStyled did={data.did} className="avatar" />
               <UserName did={data.did} />
             </Link>
@@ -90,7 +94,9 @@ export default function StreamTable({
             <span className="name">Model:</span>
             {(data.model !== 'kh4q0ozorrgaq2mezktnrmdwleo1d' && (
               <div>
-                <Link to={`/streams/stream/${data.model}`}>{data.model}</Link>
+                <Link to={`/streams/stream/${data.model}?network=${network}`}>
+                  {data.model}
+                </Link>
                 <div>
                   <Check />
                   <span>ComposeDB</span>
@@ -103,7 +109,9 @@ export default function StreamTable({
             <span className="name">Schema:</span>
             {(data.schema && (
               <div>
-                <Link to={`/streams/stream/${data.schema}`}>{data.schema}</Link>
+                <Link to={`/streams/stream/${data.schema}?network=${network}`}>
+                  {data.schema}
+                </Link>
               </div>
             )) ||
               '-'}
