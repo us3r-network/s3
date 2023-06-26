@@ -7,16 +7,11 @@ import ModelStreamList from './ModelStreamList'
 
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 
-export default function Instance({
-  streamId,
-  network,
-}: {
-  streamId: string
-  network: Network
-}) {
+export default function Instance({ streamId }: { streamId: string }) {
   const pageNum = useRef(1)
-
+  const { selectedDapp } = useSelectedDapp()
   const [hasMore, setHasMore] = useState(true)
   const [streams, setStreams] = useState<Array<ModelMid>>([])
   const [loading, setLoading] = useState(false)
@@ -26,7 +21,7 @@ export default function Instance({
     async (pageNumber: number) => {
       if (!streamId) return
       const resp = await getModelMid({
-        network,
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
         modelId: streamId,
         pageNumber,
       })
@@ -34,14 +29,17 @@ export default function Instance({
       setHasMore(list.length >= PageSize)
       setStreams([...streams, ...list])
     },
-    [streams, streamId, network]
+    [streams, streamId, selectedDapp]
   )
   const fetchModelMid = useCallback(async () => {
     if (!streamId) return
     try {
       setLoading(true)
       setErrMsg('')
-      const resp = await getModelMid({ network, modelId: streamId })
+      const resp = await getModelMid({
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
+        modelId: streamId,
+      })
       const list = resp.data.data
       setHasMore(list.length >= PageSize)
       setStreams(list)
@@ -51,7 +49,7 @@ export default function Instance({
     } finally {
       setLoading(false)
     }
-  }, [streamId, network])
+  }, [streamId, selectedDapp])
 
   useEffect(() => {
     fetchModelMid()

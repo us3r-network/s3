@@ -181,7 +181,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/models/modelview/${item.stream_id}`}
+                          href={`${S3_SCAN_URL}/models/modelview/${
+                            item.stream_id
+                          }?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -195,7 +197,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/streams/stream/${item.stream_id}`}
+                          href={`${S3_SCAN_URL}/streams/stream/${
+                            item.stream_id
+                          }?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -206,7 +210,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/models/model/${item.stream_id}/mids`}
+                          href={`${S3_SCAN_URL}/models/model/${
+                            item.stream_id
+                          }/mids?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >
