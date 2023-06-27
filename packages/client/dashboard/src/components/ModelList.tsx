@@ -5,7 +5,7 @@ import { MenuTrigger, Menu, Item } from 'react-aria-components'
 import { Modal, ModalOverlay } from 'react-aria-components'
 
 import PlusIcon from './Icons/PlusIcon'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DappComposite, ModelStream } from '../types'
@@ -42,6 +42,7 @@ export default function ModelList({
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const [composites, setComposites] = useState<DappComposite[]>([])
+  const location = useLocation()
 
   const loadModelsInfo = useCallback(async () => {
     if (selectedDapp?.models?.length === 0 || !selectedDapp) {
@@ -138,6 +139,8 @@ export default function ModelList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appId])
 
+  const isMetrics = location.pathname.endsWith('statistic')
+
   if (loading) {
     return (
       <ListBox>
@@ -203,21 +206,24 @@ export default function ModelList({
         }}
       />
 
-      <div className="title">
-        <h3>Composites</h3>
-        {editable && (
-          <CreateComposite loadDappComposites={loadDappComposites} />
-        )}
-      </div>
+      {!isMetrics && (
+        <>
+          <div className="title">
+            <h3>Composites</h3>
+            {editable && (
+              <CreateComposite loadDappComposites={loadDappComposites} />
+            )}
+          </div>
 
-      <DappCompositeList
-        composites={composites}
-        editable={editable}
-        selectComposite={selectComposite}
-        setSelectedComposite={setSelectComposite}
-        removeAction={delDappComposite}
-      />
-
+          <DappCompositeList
+            composites={composites}
+            editable={editable}
+            selectComposite={selectComposite}
+            setSelectedComposite={setSelectComposite}
+            removeAction={delDappComposite}
+          />
+        </>
+      )}
       {editable && (
         <MergeBox>
           <DialogTrigger>
@@ -401,6 +407,12 @@ function Favorite() {
 }
 
 function CreateNew() {
+  const [searchParams] = useSearchParams()
+  useEffect(() => {
+    if (searchParams.get('create-new') === 'true') {
+      document.getElementById('create-new')?.click()
+    }
+  }, [searchParams])
   return (
     <DialogTrigger>
       <Button

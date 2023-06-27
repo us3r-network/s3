@@ -7,14 +7,9 @@ import { ModeQueryResult, ModelStream } from '../types'
 import { schemas } from '../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 
-export default function Definition({
-  streamId,
-  network,
-}: {
-  streamId: string
-  network: Network
-}) {
+export default function Definition({ streamId }: { streamId: string }) {
   const [modelData, setModelData] = useState<ModeQueryResult>()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
@@ -22,15 +17,18 @@ export default function Definition({
   const [errMsg, setErrMsg] = useState('')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [modelStream, setModelStream] = useState<ModelStream>()
-
+  const { selectedDapp } = useSelectedDapp()
   const [loading, setLoading] = useState(false)
 
   const fetchModelInfo = useCallback(
     async (streamId: string) => {
-      const resp = await getModelInfo({ network, id: streamId })
+      const resp = await getModelInfo({
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
+        id: streamId,
+      })
       setModelStream(resp.data.data)
     },
-    [network]
+    [selectedDapp]
   )
 
   const fetchModelGraphql = useCallback(
@@ -38,7 +36,10 @@ export default function Definition({
       try {
         setLoading(true)
         setErrMsg('')
-        const resp = await queryModelGraphql(streamId, network)
+        const resp = await queryModelGraphql(
+          streamId,
+          (selectedDapp?.network as Network) || Network.TESTNET
+        )
         const { data } = resp.data
         setModelData(data)
         if (data.graphqlSchemaDefinition) {
@@ -58,7 +59,7 @@ export default function Definition({
         setLoading(false)
       }
     },
-    [network]
+    [selectedDapp]
   )
 
   const download = (text: string, filename: string) => {

@@ -9,6 +9,8 @@ import EditIcon from './Icons/EditIcon'
 import { Button } from 'react-aria-components'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { useMemo } from 'react'
+import { S3_SCAN_URL } from '../constants'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 
 export default function ModelStreamList({
   modelId,
@@ -26,6 +28,7 @@ export default function ModelStreamList({
     () => session?.id && editable,
     [editable, session?.id]
   )
+  const { selectedDapp } = useSelectedDapp()
   return (
     <TableBox>
       <TableContainer>
@@ -42,12 +45,20 @@ export default function ModelStreamList({
             return (
               <tr key={item.streamId}>
                 <td>
-                  <div className="stream-id">
-                    {shortPubKey(item.streamId, {
-                      len: 8,
-                      split: '-',
-                    })}
-                  </div>
+                  <a
+                    href={`${S3_SCAN_URL}/streams/stream/${
+                      item.streamId
+                    }?network=${selectedDapp?.network.toUpperCase()}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="stream-id">
+                      {shortPubKey(item.streamId, {
+                        len: 8,
+                        split: '-',
+                      })}
+                    </div>
+                  </a>
                 </td>
                 <td className="td-did">
                   <UserAvatarStyled did={item.controllerDid} />
