@@ -61,13 +61,13 @@ export default function ModelStreamList({
                 {showAction && (
                   <td className="td-action">
                     {session?.id === item.controllerDid ? (
-                      <Button
+                      <EditBtn
                         onPress={() => {
                           if (editAction) editAction(item)
                         }}
                       >
                         <EditIcon />
-                      </Button>
+                      </EditBtn>
                     ) : (
                       '-'
                     )}
@@ -165,4 +165,8 @@ const TableContainer = styled.table`
 
     color: #718096;
   }
+`
+const EditBtn = styled(Button)`
+  margin: 0;
+  padding: 0;
 `

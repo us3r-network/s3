@@ -223,8 +223,8 @@ export default function Instance({
         onSubmit={() => submitStream()}
       />
 
-      <ListHeading>
-        {composeClientAuthenticated ? (
+      {composeClientAuthenticated && (
+        <ListHeading>
           <PlusButton
             onPress={() => {
               setFormType('create')
@@ -234,10 +234,9 @@ export default function Instance({
           >
             <PlusIcon />
           </PlusButton>
-        ) : (
-          "You don't have permission to create stream, please connect wallet."
-        )}
-      </ListHeading>
+        </ListHeading>
+      )}
+
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
