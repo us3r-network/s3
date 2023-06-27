@@ -20,6 +20,8 @@ export default function DappDataStatistic() {
         <Instance
           streamId={selectModel.stream_id}
           network={(selectedDapp?.network as Network) || Network.TESTNET}
+          schema={selectModel?.stream_content?.schema || {}}
+          name={selectModel?.stream_content?.name}
         />
       </div>
     )
