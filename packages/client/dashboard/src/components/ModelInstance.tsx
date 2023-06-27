@@ -168,7 +168,10 @@ export default function Instance({
             if (stream.streamId === updateStreamId) {
               return {
                 ...stream,
-                content: { ...(stream?.streamContent || {}), ...formData },
+                streamContent: {
+                  ...(stream?.streamContent || {}),
+                  ...formData,
+                },
               }
             }
             return stream
