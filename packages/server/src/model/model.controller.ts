@@ -10,7 +10,6 @@ import {
   Post,
   Query,
   Req,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -21,11 +20,10 @@ import { Network } from 'src/entities/stream/stream.entity';
 import { CreateModelDto, ModelIdToGaphqlDto } from './dtos/model.dto';
 import {
   getCeramicNode,
-  getCeramicNodeAdminKey,
   importDynamic,
 } from 'src/common/utils';
 import { Cron } from '@nestjs/schedule';
-import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils/graphql/parser';
+import { CodegenConfig, generate } from '@graphql-codegen/cli';
 
 @ApiTags('/models')
 @Controller('/models')
@@ -241,7 +239,7 @@ export class ModelController {
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/graphql')
-  async ModelIdToGraphql(@Body() dto: ModelIdToGaphqlDto) {
+  async modelIdToGraphql(@Body() dto: ModelIdToGaphqlDto) {
     if (dto.models?.length != 1) {
       throw new BadRequestException("models' length is not 1.");
     }
@@ -348,6 +346,32 @@ export class ModelController {
     });
 
     return new BasicMessageDto('ok', 0, models);
+  }
+
+  @Get('/:modelStreamId/sdk')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string, @Query('network') network: Network = Network.TESTNET,
+  ): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching model(${modelStreamId}) type(${type}) sdk.`);
+    const graphqlInfo: any = await this.modelIdToGraphql({ network: network, models: [modelStreamId] });
+    const schema = graphqlInfo?.data.graphqlSchema;
+    if (!schema) {
+      throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0));
+    }
+    this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
+
+    const config: CodegenConfig = {
+      schema: schema,
+      documents: [],
+      generates: {
+        './src/gql/': {
+          preset: 'client'
+        }
+      }
+    }
+
+    const result = await generate(config, false);
+    return new BasicMessageDto('ok', 0, result);
   }
 
   @Get('/:modelStreamId')
