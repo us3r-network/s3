@@ -359,7 +359,8 @@ export class ModelController {
       throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0));
     }
     this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
-
+    // target output should be a directory, ex: "src/gql/". Make sure you add "/" at the end of the directory
+    const directoryPlaceholder = './src/gql/';
     const config: CodegenConfig = {
       schema: schema,
       documents: [],
@@ -371,7 +372,7 @@ export class ModelController {
     }
 
     const result = await generate(config, false);
-    return new BasicMessageDto('ok', 0, result);
+    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(directoryPlaceholder, ''), content: r.content }; }));
   }
 
   @Get('/:modelStreamId')
