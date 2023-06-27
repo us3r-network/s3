@@ -2,7 +2,6 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
 import Definition from './Definition'
 import Instance from './Instance'
 import PlaygroundGraphiQL from './Playground'
-import { Network } from './Selector/EnumSelect'
 
 export default function ModelTabs({
   name,
