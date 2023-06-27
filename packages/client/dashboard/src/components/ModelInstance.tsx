@@ -213,7 +213,7 @@ export default function Instance({
   return (
     <PageBox>
       <ModelInstanceFormModal
-        title="Create Stream"
+        title={formType === 'create' ? 'Create Stream' : 'Update Stream'}
         isOpen={isOpenStreamForm}
         disabled={formDisabled}
         onOpenChange={setIsOpenStreamForm}
