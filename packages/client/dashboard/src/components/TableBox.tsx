@@ -37,8 +37,8 @@ export const TableContainer = styled.table<{ isMobile?: boolean }>`
     }
 
     &:last-child {
-      padding-left: 20px;
-      padding-right: 0px;
+      padding-left: 0px;
+      padding-right: 10px;
       width: 70px !important;
     }
   }
@@ -56,8 +56,8 @@ export const TableContainer = styled.table<{ isMobile?: boolean }>`
     }
 
     &:last-child {
-      padding-left: 20px;
-      padding-right: 0px;
+      padding-left: 0px;
+      padding-right: 10px;
     }
 
     > div {
