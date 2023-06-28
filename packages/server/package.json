@@ -31,6 +31,8 @@
     "@didtools/cacao": "^2.0.0",
     "@didtools/pkh-ethereum": "^0.3.0",
     "@didtools/pkh-solana": "^0.1.1",
+    "@graphql-codegen/cli": "^4.0.1",
+    "@graphql-codegen/client-preset": "^4.0.1",
     "@liaoliaots/nestjs-redis": "^9.0.5",
     "@libp2p/bootstrap": "^6.0.0",
     "@libp2p/floodsub": "^6.0.0",

@@ -22,7 +22,6 @@ const env: string | undefined = process.env.NODE_ENV;
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
-      synchronize: true,
       logging: true,
       entities: ['dist/**/dapp.entity{.ts,.js}'],
       type: 'postgres',

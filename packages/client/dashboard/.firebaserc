@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "us3r-network"
+  },
+  "targets": {
+    "us3r-network": {
+      "hosting": {
+        "dashboard": [
+          "us3r-dashboard"
+        ],
+        "dashboard-dev": [
+          "us3r-dashboard-dev"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
