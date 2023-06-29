@@ -10,7 +10,7 @@ import { useAppCtx } from './context/AppCtx'
 import MyDapps from './container/MyDapps'
 import NoMatch from './container/NoMatch'
 import CeramicProvider from './context/AppCtx'
-import { CERAMIC_TESTNET_HOST } from './constants'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 import DappHome from './container/DappHome'
 import DappCreate from './container/DappCreate'
 import Header from './components/Header'
@@ -55,7 +55,10 @@ function Routers() {
 
 export default function App() {
   return (
-    <Us3rAuthWithRainbowkitProvider>
+    <Us3rAuthWithRainbowkitProvider
+      projectId={WALLET_CONNECT_PROJECT_ID}
+      appName="S3 Dashboard"
+    >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider>
           <Routers />
