@@ -5319,13 +5319,14 @@
     "@typescript-eslint/types" "5.59.8"
     eslint-visitor-keys "^3.3.0"
 
-"@us3r-network/auth-with-rainbowkit@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.1.7.tgz#e0b30f68d88096cc4e5cf9976da6dd6912dfbf0e"
-  integrity sha512-Uk5Qh00cNE3Czswf1eLhc2rpRb4xQdLh22W92j2GqzHEItHMpcNNdUskxaq71JY/fbwRgPXtoBEyZ18c1OFtmg==
+"@us3r-network/auth-with-rainbowkit@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.1.8.tgz#af2039e67c3426e052b7651b0fa6028b3fd0fc6c"
+  integrity sha512-k4zMN8XpHNANhqIk9s1xX5JYrF7vUxnvdWImGtOiWq5Z0iixtN7HY6tTiQhKM1C3W2hD/ZgsCUBKBso11Jdc2A==
   dependencies:
     "@rainbow-me/rainbowkit" "1.0.2"
     "@us3r-network/auth" "^0.2.2"
+    buffer "^6.0.3"
     viem "^0.3.37"
     wagmi "^1.0.7"
 
