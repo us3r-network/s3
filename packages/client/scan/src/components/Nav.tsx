@@ -4,6 +4,7 @@ import GitHubButton from 'react-github-btn'
 
 import Logo from './Logo'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import LoginButton from './LoginButton'
 
 export default function Nav() {
   let location = useLocation()
@@ -53,7 +54,7 @@ export default function Nav() {
         </div>
 
         <div className="nav-bottom">
-          {/* <LoginButton /> */}
+          <LoginButton />
           <div className="github-star">
             <GitHubButton
               href="https://github.com/us3r-network/userscan"

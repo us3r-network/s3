@@ -17,7 +17,7 @@ import Nav from './components/Nav'
 import MobileNav from './components/MobileNav'
 import NoMatch from './components/NoMatch'
 import { useGAPageView } from './hooks/useGoogleAnalytics'
-import { CERAMIC_TESTNET_HOST } from './constants'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 import Models from './container/Models'
 import ModelStream from './container/ModelStream'
 import ModelCreate from './container/ModelCreate'
@@ -84,7 +84,10 @@ export default function App() {
   }, [searchParams, setSearchParams])
 
   return (
-    <Us3rAuthWithRainbowkitProvider>
+    <Us3rAuthWithRainbowkitProvider
+      projectId={WALLET_CONNECT_PROJECT_ID}
+      appName="S3 Scan"
+    >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider
           network={network}
