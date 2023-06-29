@@ -370,10 +370,11 @@ export class ModelController {
     this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
 
     // Write model query to the file system for documents
-    const operationGraphql = `query GetLink($id: ID!) {
+    const model = Object.keys(graphqlInfo.data.runtimeDefinition.models)[0];
+    const operationGraphql = `query Get${model}($id: ID!) {
       node(id: $id) {
       id
-          ...on Link {
+          ...on ${model} {
           title
           url
           }
