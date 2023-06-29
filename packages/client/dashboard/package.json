@@ -24,7 +24,6 @@
     "@us3r-network/auth-with-rainbowkit": "^0.1.8",
     "@us3r-network/data-model": "^0.2.1",
     "@us3r-network/profile": "^0.4.11",
-    "buffer": "^6.0.3",
     "dayjs": "^1.11.7",
     "file-saver": "^2.0.5",
     "graphiql": "^2.4.7",
