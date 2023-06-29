@@ -31,7 +31,21 @@ export enum AppType {
   OTHER = 'Other',
 }
 
-export default function EnumSelector<T extends Stage | Network | AppType>({
+export enum GraphqlGenType {
+  CLIENT_PRESET = 'Client preset',
+  REACT_QUERY_HOOKS = 'React-Query Hooks',
+  REACT_APOLLO_HOOKS = 'React-Apollo Hooks',
+}
+
+export enum GraphqlGenTypeServer {
+  'Client preset' = 'ClientPreset',
+  'React-Query Hooks' = 'ReactQueryHooks',
+  'React-Apollo Hooks' = 'ReactApolloHooks',
+}
+
+export default function EnumSelector<
+  T extends Stage | Network | AppType | GraphqlGenType
+>({
   value,
   setValue,
   values,
