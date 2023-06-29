@@ -24,6 +24,15 @@ import {
 } from 'src/common/utils';
 import { Cron } from '@nestjs/schedule';
 import { CodegenConfig, generate } from '@graphql-codegen/cli';
+import * as path from 'path';
+import * as typescriptPlugin from '@graphql-codegen/typescript';
+import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations';
+import { CodegenPlugin } from '@graphql-codegen/plugin-helpers';
+import * as addPlugin from '@graphql-codegen/add';
+import * as typescriptValidationPlugin from 'graphql-codegen-typescript-validation-schema';
+import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query';
+import * as typescriptReactApolloPlugin from '@graphql-codegen/typescript-react-apollo';
+
 
 @ApiTags('/models')
 @Controller('/models')
@@ -350,7 +359,7 @@ export class ModelController {
 
   @Get('/:modelStreamId/sdk')
   @ApiOkResponse({ type: BasicMessageDto })
-  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string, @Query('network') network: Network = Network.TESTNET,
+  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string = 'ClientPreset', @Query('network') network: Network = Network.TESTNET,
   ): Promise<BasicMessageDto> {
     this.logger.log(`Seaching model(${modelStreamId}) type(${type}) sdk.`);
     const graphqlInfo: any = await this.modelIdToGraphql({ network: network, models: [modelStreamId] });
@@ -359,20 +368,139 @@ export class ModelController {
       throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0));
     }
     this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
-    // target output should be a directory, ex: "src/gql/". Make sure you add "/" at the end of the directory
-    const directoryPlaceholder = './src/gql/';
-    const config: CodegenConfig = {
-      schema: schema,
-      documents: [],
-      generates: {
-        './src/gql/': {
-          preset: 'client'
+
+    // Write model query to the file system for documents
+    const operationGraphql = `query GetLink($id: ID!) {
+      node(id: $id) {
+      id
+          ...on Link {
+          title
+          url
+          }
+      }
+  }`
+    // Generate the code
+    // target output should be a directory, ex: "generated/gql/". Make sure you add "/" at the end of the directory
+    const generatedDirectory = 'generated/gql/';
+    let config: CodegenConfig;
+    if (type == 'ClientPreset') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        generates: {
+          'generated/gql/': {
+            preset: 'client'
+          }
         }
       }
+    } else if (type == 'ReactQueryHooks') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        pluginLoader: (name: string): CodegenPlugin => {
+          switch (name) {
+            case '@graphql-codegen/typescript':
+              return typescriptPlugin
+            case '@graphql-codegen/typescript-operations':
+              return typescriptOperationsPlugin
+            case '@graphql-codegen/add':
+              return addPlugin
+            case '@graphql-codegen/typescript-validation-schema':
+              return typescriptValidationPlugin
+            case '@graphql-codegen/typescript-react-query':
+              return typescriptReactQueryPlugin
+            default:
+              throw Error(`couldn't find plugin ${name}`)
+          }
+        },
+        generates: {
+          [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
+            plugins: [
+              //             {
+              //               add: {
+              //                 content: `
+              // // THIS FILE IS GENERATED, DO NOT EDIT!
+              // import { DID } from 'dids'
+              //               `,
+              //               },
+              //             },
+              'typescript',
+              'typescript-operations',
+              'typescript-react-query',
+            ],
+            config: {
+              scalars: {
+                CeramicCommitID: 'string',
+                CeramicStreamID: 'string',
+                Date: 'string',
+                DateTime: 'string',
+                DID: 'any',
+                URI: 'string',
+              },
+              skipTypeName: true,
+              strictScalars: true,
+              declarationKind: 'interface',
+            },
+          },
+        }
+      }
+    } else if (type == 'ReactApolloHooks') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        pluginLoader: (name: string): CodegenPlugin => {
+          switch (name) {
+            case '@graphql-codegen/typescript':
+              return typescriptPlugin
+            case '@graphql-codegen/typescript-operations':
+              return typescriptOperationsPlugin
+            case '@graphql-codegen/add':
+              return addPlugin
+            case '@graphql-codegen/typescript-validation-schema':
+              return typescriptValidationPlugin
+            case '@graphql-codegen/typescript-react-apollo':
+              return typescriptReactApolloPlugin
+            default:
+              throw Error(`couldn't find plugin ${name}`)
+          }
+        },
+        generates: {
+          [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
+            plugins: [
+              //             {
+              //               add: {
+              //                 content: `
+              // // THIS FILE IS GENERATED, DO NOT EDIT!
+              // import { DID } from 'dids'
+              //               `,
+              //               },
+              //             },
+              'typescript',
+              'typescript-operations',
+              'typescript-react-apollo',
+            ],
+            config: {
+              scalars: {
+                CeramicCommitID: 'string',
+                CeramicStreamID: 'string',
+                Date: 'string',
+                DateTime: 'string',
+                DID: 'any',
+                URI: 'string',
+              },
+              skipTypeName: true,
+              strictScalars: true,
+              declarationKind: 'interface',
+            },
+          },
+        }
+      }
+    } else {
+      throw new NotFoundException(new BasicMessageDto(`type ${type} is not supported`, 0));
     }
 
     const result = await generate(config, false);
-    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(directoryPlaceholder, ''), content: r.content }; }));
+    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }));
   }
 
   @Get('/:modelStreamId')
