@@ -378,7 +378,22 @@ export class ModelController {
               id
           }
       }
-  }`
+    }
+    mutation Update${model}($input: Update${model}Input!) {
+      update${model}(input: $input) {
+      document {
+          id
+      }
+      }
+    }
+    mutation Create${model}($input: Create${model}Input!) {
+      create${model}(input: $input) {
+      document {
+          id
+      }
+      }
+    }
+  `
     // Generate the code
     // target output should be a directory, ex: "generated/gql/". Make sure you add "/" at the end of the directory
     const generatedDirectory = 'generated/gql/';
