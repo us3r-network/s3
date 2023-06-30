@@ -375,8 +375,7 @@ export class ModelController {
       node(id: $id) {
       id
           ...on ${model} {
-          title
-          url
+              id
           }
       }
   }`
