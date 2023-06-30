@@ -32,6 +32,7 @@ import {
 import { get } from 'http';
 import { CreateModelDto } from './dtos/model.dto';
 import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils/graphql/parser';
+import { type } from 'os';
 
 @Injectable()
 export default class ModelService {
@@ -261,6 +262,32 @@ export default class ModelService {
         `Getting ${network} model ${model} graph cache err ${error}`,
       );
     }
+  }
+
+  async findModelUseCount(
+    network: Network,
+    models: string[],
+  ): Promise<Map<string, number>> {
+    const useCountMap = new Map<string, number>();
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
+
+    try {
+      const modelUseCounts = await Promise.all(models.map(m => {
+        return ceramicEntityManager.query(`select count(*) from ${m}`)
+      }));
+
+      for (let i = 0; i < models.length; i++) {
+        useCountMap.set(models[i], modelUseCounts[i]);
+      }
+    } catch (error) {
+      this.logger.error(`querying model use count ${models} err: ${error}`);
+      throw new ServiceUnavailableException((error as Error).message);
+    }
+
+    return useCountMap;
   }
 
   async getStreams(

@@ -334,7 +334,7 @@ export class ModelController {
   async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
     const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
       this.modelService.findModelsByIds(dto.ids, dto.network),
-      this.streamService.findModelUseCount(dto.network, dto.ids),
+      this.modelService.findModelUseCount(dto.network, dto.ids),
       this.modelService.findIndexedModelIds(dto.network, dto.ids),
     ]);
     if (!models) {
