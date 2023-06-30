@@ -20,6 +20,7 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
     { id: number; title: string; content: string }[]
   >([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [errMsg, setErrMsg] = useState('')
   const [selectKey, setSelectKey] = useState<string>('0')
   const [genType, setGenType] = useState(GraphqlGenType.CLIENT_PRESET)
 
@@ -52,6 +53,7 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
   const fetchModelSDK = useCallback(async () => {
     try {
       setLoading(true)
+      setErrMsg('')
       const resp = await getModelSDK({
         network: selectedDapp?.network as Network,
         modelId: modelId,
@@ -71,6 +73,7 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
       )
     } catch (error) {
       console.error(error)
+      setErrMsg((error as any).message)
     } finally {
       setLoading(false)
     }
@@ -89,36 +92,45 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
         values={GraphqlGenType}
       />
 
-      {(loading && (
-        <SDKBoxLoading>
-          <Loading>Loading...</Loading>
-        </SDKBoxLoading>
+      {(errMsg && (
+        <div className="err-msg">
+          <p>An Error Occurred Please Try Again Later.</p>
+          <p className="info">{errMsg}</p>
+        </div>
       )) || (
-        <SDKBox>
-          <TabsStyle>
-            <TabBox>
-              <TabList
-                className={'code-tabs'}
-                aria-label="Dynamic tabs"
-                items={codes}
-                onSelectionChange={(key) => {
-                  setSelectKey(key.toString())
-                }}
-              >
-                {(item) => <Tab className={'code-tab'}>{item.title}</Tab>}
-              </TabList>
+        <>
+          {(loading && (
+            <SDKBoxLoading>
+              <Loading>Loading...</Loading>
+            </SDKBoxLoading>
+          )) || (
+            <SDKBox>
+              <TabsStyle>
+                <TabBox>
+                  <TabList
+                    className={'code-tabs'}
+                    aria-label="Dynamic tabs"
+                    items={codes}
+                    onSelectionChange={(key) => {
+                      setSelectKey(key.toString())
+                    }}
+                  >
+                    {(item) => <Tab className={'code-tab'}>{item.title}</Tab>}
+                  </TabList>
 
-              <button onClick={downloadCurr}>Download</button>
-            </TabBox>
-            <TabPanels items={codes}>
-              {(item) => (
-                <TabPanel>
-                  <Code name={item.title} content={item.content} />
-                </TabPanel>
-              )}
-            </TabPanels>
-          </TabsStyle>
-        </SDKBox>
+                  <button onClick={downloadCurr}>Download</button>
+                </TabBox>
+                <TabPanels items={codes}>
+                  {(item) => (
+                    <TabPanel>
+                      <Code name={item.title} content={item.content} />
+                    </TabPanel>
+                  )}
+                </TabPanels>
+              </TabsStyle>
+            </SDKBox>
+          )}
+        </>
       )}
     </SDKContainer>
   )
@@ -144,6 +156,18 @@ const SDKContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  .err-msg {
+    text-align: center;
+    margin-top: 20px;
+    color: #ff4d4f;
+    font-size: 16px;
+
+    .info {
+      font-size: 14px;
+      color: #718096;
+    }
+  }
 `
 
 const SDKBox = styled.div`
