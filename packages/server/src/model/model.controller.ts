@@ -371,45 +371,45 @@ export class ModelController {
 
     // Build model query for documents
     const model = Object.keys(graphqlInfo.data.runtimeDefinition.models)[0];
+    // query ${model}PersonalList($first: Int, $after: String) {
+    //   viewer {
+    //       ${model.toLowerCase()}List(first: $first, after: $after) {
+    //         edges {
+    //           node {
+    //             id
+    //           }
+    //         }
+    //         pageInfo {
+    //           hasNextPage
+    //           hasPreviousPage
+    //           startCursor
+    //           endCursor
+    //       }
+    //     }
+    //   }
+    // }
+
+    // query ${model}List($first: Int, $after: String) {
+    //     ${model.toLowerCase()}Index(first: $first, after: $after) {
+    //       edges {
+    //         node {
+    //           id
+    //         }
+    //       }
+    //       pageInfo {
+    //         hasNextPage
+    //         hasPreviousPage
+    //         startCursor
+    //         endCursor
+    //       }
+    //   }
+    // }
+
     const operationGraphql = `query Get${model}($id: ID!) {
       node(id: $id) {
       id
           ...on ${model} {
               id
-          }
-      }
-    }
-    
-    query ${model}PersonalList($first: Int, $after: String) {
-      viewer {
-          ${model.toLowerCase()}List(first: $first, after: $after) {
-            edges {
-              node {
-                id
-              }
-            }
-            pageInfo {
-              hasNextPage
-              hasPreviousPage
-              startCursor
-              endCursor
-          }
-        }
-      }
-    }
-
-    query ${model}List($first: Int, $after: String) {
-        ${model.toLowerCase()}Index(first: $first, after: $after) {
-          edges {
-            node {
-              id
-            }
-          }
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
           }
       }
     }
