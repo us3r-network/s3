@@ -26,6 +26,8 @@ import Components from './container/Components'
 import { useState } from 'react'
 import ModelList from './components/ModelList'
 import { DappComposite, ModelStream } from './types'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 dayjs.extend(relativeTime)
 
@@ -75,6 +77,18 @@ function Layout() {
       <AppContainer>
         <Outlet />
       </AppContainer>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </div>
   )
 }
