@@ -379,15 +379,51 @@ export class ModelController {
           }
       }
     }
-    mutation Update${model}($input: Update${model}Input!) {
-      update${model}(input: $input) {
+    
+    query ${model}PersonalList($first: Int, $after: String) {
+      viewer {
+          ${model.toLowerCase()}List(first: $first, after: $after) {
+            edges {
+              node {
+                id
+              }
+            }
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+          }
+        }
+      }
+    }
+
+    query ${model}List($first: Int, $after: String) {
+        ${model.toLowerCase()}Index(first: $first, after: $after) {
+          edges {
+            node {
+              id
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+          }
+      }
+    }
+
+    mutation Create${model}($input: Create${model}Input!) {
+      create${model}(input: $input) {
       document {
           id
       }
       }
     }
-    mutation Create${model}($input: Create${model}Input!) {
-      create${model}(input: $input) {
+
+    mutation Update${model}($input: Update${model}Input!) {
+      update${model}(input: $input) {
       document {
           id
       }
@@ -514,7 +550,7 @@ export class ModelController {
       throw new NotFoundException(new BasicMessageDto(`type ${type} is not supported`, 0));
     }
 
-    const result = await generate(config, false);
+    const result = await generate(config, true);
     return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }));
   }
 
