@@ -359,17 +359,17 @@ export class ModelController {
 
   @Get('/:modelStreamId/sdk')
   @ApiOkResponse({ type: BasicMessageDto })
-  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string = 'ClientPreset', @Query('network') network: Network = Network.TESTNET,
+  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string = 'ClientPreset', @Query('network') network: string = Network.TESTNET
   ): Promise<BasicMessageDto> {
     this.logger.log(`Seaching model(${modelStreamId}) type(${type}) sdk.`);
-    const graphqlInfo: any = await this.modelIdToGraphql({ network: network, models: [modelStreamId] });
+    const graphqlInfo: any = await this.modelIdToGraphql({ network: network.toUpperCase() as Network, models: [modelStreamId] });
     const schema = graphqlInfo?.data.graphqlSchema;
     if (!schema) {
       throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0));
     }
     this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
 
-    // Write model query to the file system for documents
+    // Build model query for documents
     const model = Object.keys(graphqlInfo.data.runtimeDefinition.models)[0];
     const operationGraphql = `query Get${model}($id: ID!) {
       node(id: $id) {
