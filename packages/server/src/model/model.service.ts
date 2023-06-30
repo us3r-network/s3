@@ -280,7 +280,7 @@ export default class ModelService {
       }));
 
       for (let i = 0; i < models.length; i++) {
-        useCountMap.set(models[i], modelUseCounts[i]);
+        useCountMap.set(models[i], +modelUseCounts[i][0].count);
       }
     } catch (error) {
       this.logger.error(`querying model use count ${models} err: ${error}`);
