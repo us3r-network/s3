@@ -104,10 +104,21 @@ const InputCss = css`
   flex-grow: 1;
   box-sizing: border-box;
   height: 48px;
+
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
 `
 
 const FormBox = styled(Form)`
-  & > div:first-child {
+  & > .errors {
+    display: none;
+  }
+  .text-danger {
+    font-size: 12px;
+    color: #aa4f4f;
+  }
+  & > .form-group:first-child {
     padding-bottom: 20px;
     border-bottom: 1px solid #39424c;
   }

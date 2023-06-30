@@ -13,6 +13,7 @@ import PlusIcon from './Icons/PlusIcon'
 import ModelInstanceFormModal from './ModelInstanceFormModal'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useComposeClient } from '../hooks/useComposeClient'
+import { toast } from 'react-toastify'
 
 export default function Instance({
   streamId,
@@ -68,7 +69,6 @@ export default function Instance({
   }, [fetchModelMid])
 
   // stream form
-  // TODO alert error
   const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
   const [formType, setFormType] = useState<'create' | 'update'>('create')
   const [formData, setFormData] = useState({})
@@ -100,11 +100,11 @@ export default function Instance({
 
   const createStream = useCallback(async () => {
     if (!composeClientAuthenticated || !composeClient) {
-      alert('composeClient not authenticated')
+      toast.error('composeClient not authenticated')
       return
     }
     if (!name) {
-      alert('model name not found')
+      toast.error('model name not found')
       return
     }
     const mutation = `
@@ -123,9 +123,9 @@ export default function Instance({
       },
     })
     if (res?.errors && res?.errors.length > 0) {
-      alert(res?.errors[0]?.message)
+      toast.error(res?.errors[0]?.message)
     } else {
-      alert('success')
+      toast.success('Submitted successfully!')
       setIsOpenStreamForm(false)
       fetchModelMid()
     }
@@ -134,11 +134,11 @@ export default function Instance({
 
   const updateStream = useCallback(async () => {
     if (!composeClientAuthenticated || !composeClient) {
-      alert('composeClient not authenticated')
+      toast.error('composeClient not authenticated')
       return
     }
     if (!name) {
-      alert('model name not found')
+      toast.error('model name not found')
       return
     }
     const mutation = `
@@ -158,10 +158,9 @@ export default function Instance({
       },
     })
     if (res?.errors && res?.errors.length > 0) {
-      alert(res?.errors[0]?.message)
+      toast.error(res?.errors[0]?.message)
     } else {
-      alert('success')
-      setIsOpenStreamForm(false)
+      toast.success('Submitted successfully!')
       setStreams(
         (streams) =>
           streams?.map((stream: any) => {
@@ -177,6 +176,7 @@ export default function Instance({
             return stream
           }) || []
       )
+      setIsOpenStreamForm(false)
     }
     setFormDisabled(false)
   }, [
