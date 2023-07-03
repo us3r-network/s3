@@ -1,7 +1,7 @@
 export function createGraphqlDefaultQuery(modelName: string, propertes: any[]) {
   return `
     {
-      ${modelName.charAt(0).toLowerCase() + modelName.slice(1)}Index(first: 5) {
+      ${modelName.charAt(0).toLowerCase() + modelName.slice(1)}Index(last: 5) {
         edges {
           node {
             id,${propertes.map((p) => {
