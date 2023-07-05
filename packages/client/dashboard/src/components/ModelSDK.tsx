@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import camelCase from 'camelcase'
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-typescript'
@@ -8,12 +9,19 @@ import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
 
 import { getModelSDK } from '../api'
 import useSelectedDapp from '../hooks/useSelectedDapp'
+import { sdkTemplate } from './sdkTemplate'
 
-import EnumSelect, { GraphqlGenType, Network } from './Selector/EnumSelect'
+import { GraphqlGenType, Network } from './Selector/EnumSelect'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'react-aria-components'
 import FileSaver from 'file-saver'
 
-export default function ModelSDK({ modelId }: { modelId: string }) {
+export default function ModelSDK({
+  modelId,
+  modelName,
+}: {
+  modelId: string
+  modelName: string
+}) {
   const { selectedDapp } = useSelectedDapp()
 
   const [codes, setCodes] = useState<
@@ -62,10 +70,25 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
       }
+
       const data: { filename: string; content: string }[] = resp.data.data
+      const graphql = data.find((item: any) => item.filename === 'graphql.ts')
+      if (!graphql) {
+        throw new Error('no graphql')
+      }
+
+      const sdkContent = sdkTemplate
+        .replaceAll('<%= modelName %>', modelName)
+        .replaceAll('<%= modelNameCamelcase %>', camelCase(modelName))
 
       setCodes(
-        data.map((item, i) => ({
+        [
+          graphql,
+          {
+            filename: `S3${modelName}Model.ts`,
+            content: sdkContent,
+          },
+        ].map((item, i) => ({
           title: item.filename,
           content: item.content,
           id: i,
@@ -77,7 +100,7 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
     } finally {
       setLoading(false)
     }
-  }, [selectedDapp, modelId, genType])
+  }, [selectedDapp?.network, modelId, genType, modelName])
 
   useEffect(() => {
     fetchModelSDK()
@@ -85,12 +108,12 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
 
   return (
     <SDKContainer>
-      <EnumSelect
+      {/* <EnumSelect
         value={genType}
         setValue={setGenType}
         labelText=""
         values={GraphqlGenType}
-      />
+      /> */}
 
       {(errMsg && (
         <div className="err-msg">
@@ -136,7 +159,7 @@ export default function ModelSDK({ modelId }: { modelId: string }) {
   )
 }
 
-function Code({ name, content }: { name: string; content: string }) {
+export function Code({ name, content }: { name: string; content: string }) {
   useEffect(() => {
     Prism.highlightAll()
   }, [content])
@@ -185,7 +208,7 @@ const CodeBox = styled.div`
   }
   > .line-numbers {
     overflow: scroll;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
   }
 `
 
