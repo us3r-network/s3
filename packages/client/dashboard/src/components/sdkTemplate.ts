@@ -1,9 +1,11 @@
-export const sdkTemplate = `
-/**
+export const sdkTemplate = `/**
  * How to use this model:
  * 
  * export const CERAMIC_TESTNET_HOST = "https://gcp-ceramic-testnet-dev.s3.xyz";
  * const <%= modelNameCamelcase %>Model = new S3<%= modelName %>Model(CERAMIC_TESTNET_HOST);
+ * 
+ * // auth with didSession
+ * <%= modelNameCamelcase %>Model.authComposeClient(didSession);
  * 
  * // createNew
  * const resp = await <%= modelNameCamelcase %>Model.create<%= modelName %>({...});

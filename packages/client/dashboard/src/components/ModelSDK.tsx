@@ -77,6 +77,22 @@ export default function ModelSDK({
         throw new Error('no graphql')
       }
 
+      const runtimeComposite = data.find(
+        (item) => item.filename === 'runtime-composite.ts'
+      )
+      if (!runtimeComposite) {
+        throw new Error('no runtime-composite')
+      }
+
+      runtimeComposite.content = `// This is an auto-generated file, do not edit manually
+
+export const definition = ${JSON.stringify(
+        JSON.parse(runtimeComposite.content),
+        null,
+        2
+      )}
+      `
+
       const sdkContent = sdkTemplate
         .replaceAll('<%= modelName %>', modelName)
         .replaceAll('<%= modelNameCamelcase %>', camelCase(modelName))
@@ -87,6 +103,7 @@ export default function ModelSDK({
             filename: `S3${modelName}Model.ts`,
             content: sdkContent,
           },
+          runtimeComposite,
           graphql,
         ].map((item, i) => ({
           title: item.filename,
