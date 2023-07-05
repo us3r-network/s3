@@ -539,11 +539,7 @@ export class ModelController {
       filename: 'runtime-composite.ts',
       content: JSON.stringify(graphqlInfo.data.runtimeDefinition)
     });
-    const data = {
-      ...result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }),
-
-    }
-    return new BasicMessageDto('ok', 0, data);
+    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }));
   }
 
   @Get('/:modelStreamId')
