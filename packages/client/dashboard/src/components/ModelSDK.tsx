@@ -83,11 +83,11 @@ export default function ModelSDK({
 
       setCodes(
         [
-          graphql,
           {
             filename: `S3${modelName}Model.ts`,
             content: sdkContent,
           },
+          graphql,
         ].map((item, i) => ({
           title: item.filename,
           content: item.content,

@@ -1,4 +1,24 @@
 export const sdkTemplate = `
+/**
+ * How to use this model:
+ * 
+ * export const CERAMIC_TESTNET_HOST = "https://gcp-ceramic-testnet-dev.s3.xyz";
+ * const <%= modelNameCamelcase %>Model = new S3<%= modelName %>Model(CERAMIC_TESTNET_HOST);
+ * 
+ * // createNew
+ * const resp = await <%= modelNameCamelcase %>Model.create<%= modelName %>({...});
+ * 
+ * // update
+ * const resp = await <%= modelNameCamelcase %>Model.update<%= modelName %>({...});
+ * 
+ * // queryList
+ * const resp = await <%= modelNameCamelcase %>Model.query<%= modelName %>Index({first: 100, after: ""});
+ *
+ * // queryWithId
+ * const resp = await <%= modelNameCamelcase %>Model.query<%= modelName %>WithId("...");
+ * 
+ */
+
 import { ComposeClient } from "@composedb/client";
 import { RuntimeCompositeDefinition } from "@composedb/types";
 import { DIDSession } from "did-session";
