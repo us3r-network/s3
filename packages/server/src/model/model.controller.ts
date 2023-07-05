@@ -467,14 +467,6 @@ export class ModelController {
         generates: {
           [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
             plugins: [
-              //             {
-              //               add: {
-              //                 content: `
-              // // THIS FILE IS GENERATED, DO NOT EDIT!
-              // import { DID } from 'dids'
-              //               `,
-              //               },
-              //             },
               'typescript',
               'typescript-operations',
               'typescript-react-query',
@@ -518,14 +510,6 @@ export class ModelController {
         generates: {
           [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
             plugins: [
-              //             {
-              //               add: {
-              //                 content: `
-              // // THIS FILE IS GENERATED, DO NOT EDIT!
-              // import { DID } from 'dids'
-              //               `,
-              //               },
-              //             },
               'typescript',
               'typescript-operations',
               'typescript-react-apollo',
@@ -550,8 +534,16 @@ export class ModelController {
       throw new NotFoundException(new BasicMessageDto(`type ${type} is not supported`, 0));
     }
 
-    const result = await generate(config, true);
-    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }));
+    const result = await generate(config, false);
+    result.push({
+      filename: 'runtime-composite.ts',
+      content: JSON.stringify(graphqlInfo.data.runtimeDefinition)
+    });
+    const data = {
+      ...result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }),
+
+    }
+    return new BasicMessageDto('ok', 0, data);
   }
 
   @Get('/:modelStreamId')
