@@ -50,14 +50,21 @@ export default function ModelList({
       return
     }
 
-    const resp = await getStarModels({
-      network: selectedDapp.network as Network,
-      ids: selectedDapp.models || [],
-    })
+    try {
+      const resp = await getStarModels({
+        network: selectedDapp.network as Network,
+        ids: selectedDapp.models || [],
+      })
 
-    const list = resp.data.data
-    setDappModels(list)
-  }, [selectedDapp])
+      const list = resp.data.data
+      setDappModels(list)
+      if (list.length > 0 && !selectModel) {
+        setSelectModel(list[0])
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }, [selectModel, selectedDapp, setSelectModel])
 
   const loadDappComposites = useCallback(async () => {
     if (!session) return
