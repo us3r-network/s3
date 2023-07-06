@@ -64,7 +64,7 @@ export default function DappInfo() {
               {showCopyTint && <span>Copied</span>}
             </div>
           </div>
-          <p>{selectedDapp.description}</p>
+          <p className="description">{selectedDapp.description}</p>
         </div>
       </div>
       <div className="links">
@@ -173,7 +173,7 @@ const DappInfoContainer = styled.div`
           }
         }
       }
-      > p {
+      > p.description {
         margin: 0;
         padding: 0;
         font-weight: 400;
@@ -181,6 +181,8 @@ const DappInfoContainer = styled.div`
         line-height: 19px;
 
         color: #718096;
+        max-width: 1141px;
+        word-break: break-all;
       }
     }
   }

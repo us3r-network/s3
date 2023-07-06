@@ -4,6 +4,7 @@ import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { DappComposite } from '../types'
 import { schemas } from '../utils/composedb-types/schemas'
+import { Code } from './ModelSDK'
 
 export default function CompositeDefinition({
   composite,
@@ -57,11 +58,14 @@ export default function CompositeDefinition({
               </button>
             </div>
             <div className="result-text">
-              <pre>
-                <code>
-                  {JSON.stringify(JSON.parse(composite.composite), null, 2)}
-                </code>
-              </pre>
+              <Code
+                name="composite"
+                content={JSON.stringify(
+                  JSON.parse(composite.composite),
+                  null,
+                  2
+                )}
+              />
             </div>
           </div>
         )}
@@ -82,15 +86,14 @@ export default function CompositeDefinition({
               </button>
             </div>
             <div className="result-text">
-              <pre>
-                <code>
-                  {JSON.stringify(
-                    JSON.parse(composite.runtimeDefinition),
-                    null,
-                    2
-                  )}
-                </code>
-              </pre>
+              <Code
+                name="runtimeDefinition"
+                content={JSON.stringify(
+                  JSON.parse(composite.runtimeDefinition),
+                  null,
+                  2
+                )}
+              />
             </div>
           </div>
         )}
@@ -134,6 +137,7 @@ const ResultBox = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  margin-top: 20px;
   > div {
     background: #1b1e23;
     border: 1px solid #39424c;
@@ -141,11 +145,10 @@ const ResultBox = styled.div`
     overflow: hidden;
   }
   div {
-    margin: 20px 0px;
-    padding: 10px;
     box-sizing: border-box;
     background-color: #1a1a1c;
     .title {
+      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -174,6 +177,10 @@ const ResultBox = styled.div`
     color: #718096;
     overflow: scroll;
     width: 100%;
+
+    > div {
+      width: fit-content;
+    }
   }
 
   button {

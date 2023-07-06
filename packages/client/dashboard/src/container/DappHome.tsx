@@ -252,6 +252,7 @@ const DappHomeContainer = styled.div`
     line-height: 47px;
     margin: 0;
     color: #ffffff;
+    word-break: break-all;
   }
 
   > div {
