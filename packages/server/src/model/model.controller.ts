@@ -242,7 +242,7 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/')
   async createAndDeployModel(@Req() req: Request, @Body() dto: CreateModelDto) {
-    const res = this.modelService.createAndDeployModel(dto, req.headers['did-session'] as string);
+    const res = await this.modelService.createAndDeployModel(dto, req.headers['did-session'] as string);
     return new BasicMessageDto('ok', 0, res);
   }
 
