@@ -84,7 +84,10 @@ export default function App() {
   }, [searchParams, setSearchParams])
 
   return (
-    <Us3rAuthWithRainbowkitProvider appName="S3 Scan">
+    <Us3rAuthWithRainbowkitProvider
+      projectId={WALLET_CONNECT_PROJECT_ID}
+      appName="S3 Scan"
+    >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider
           network={network}
