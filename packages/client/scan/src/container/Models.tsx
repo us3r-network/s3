@@ -167,19 +167,11 @@ export default function ModelsPage() {
                   <tr key={item.stream_id + idx}>
                     <td>
                       {!isMobile ? (
-                        <>
-                          {(item.isIndexed && (
-                            <Link
-                              to={`/models/modelview/${item.stream_id}?network=${network}`}
-                            >
-                              {item.stream_content.name}
-                            </Link>
-                          )) || (
-                            <div className="usage-count">
-                              {item.stream_content.name}
-                            </div>
-                          )}
-                        </>
+                        <Link
+                          to={`/models/modelview/${item.stream_id}?network=${network}`}
+                        >
+                          {item.stream_content.name}
+                        </Link>
                       ) : (
                         item.stream_content.name
                       )}
