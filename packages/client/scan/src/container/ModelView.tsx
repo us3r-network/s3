@@ -1,24 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
-import { getModelInfo } from '../api'
+import { Tabs, TabList, Tab, TabPanel } from 'react-aria-components'
+import { getModelInfo, startIndexModel } from '../api'
 import { ModelStream } from '../types'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import Definition from '../components/ModelView/Definition'
 import Instance from '../components/ModelView/Instance'
 import PlaygroundGraphiQL from '../components/ModelView/Playground'
 import styled from 'styled-components'
-import {
-  Button,
-  Item,
-  Label,
-  ListBox,
-  Popover,
-  Select,
-} from 'react-aria-components'
-import AddIcon from '../components/icons/Add'
+
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Dapp } from '@us3r-network/data-model'
+import { set } from 'lodash'
 
 export default function ModelView() {
   const { streamId } = useParams()
@@ -34,6 +27,7 @@ export default function ModelView() {
   const session = useSession()
 
   const [modelStream, setModelStream] = useState<ModelStream>()
+  const [indexing, setIndexing] = useState(false)
 
   const fetchModelInfo = useCallback(
     async (streamId: string) => {
@@ -111,6 +105,26 @@ export default function ModelView() {
     [streamId, dapps, addModelToDapp, addModelToCollection]
   )
 
+  const startIndex = useCallback(async () => {
+    if (!streamId) return
+    try {
+      const resp = await startIndexModel({
+        network,
+        modelId: streamId,
+        didSession: session?.serialize(),
+      })
+      console.log('startIndex', resp.data)
+      if (resp.data.code !== 0) {
+        throw new Error(resp.data.msg)
+      }
+      await fetchModelInfo(streamId)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIndexing(false)
+    }
+  }, [streamId, network, session, fetchModelInfo])
+
   useEffect(() => {
     if (!streamId) return
     fetchModelInfo(streamId)
@@ -127,27 +141,21 @@ export default function ModelView() {
       })
   }, [dapps])
 
+  const isIndexed = useMemo(() => {
+    return !!modelStream?.isIndexed
+  }, [modelStream])
+
+  const disabledKeys = useMemo(() => {
+    if (isIndexed) return []
+    return ['Instance', 'Playground']
+  }, [isIndexed])
+
   return (
-    <Tabs>
+    <Tabs disabledKeys={disabledKeys}>
       <div className="title-bar">
         <ToolsBox>
           <span>{modelStream?.streamContent?.name}</span>
-          {/* <Select
-            onSelectionChange={(k) => {
-              addToDappAction(k as string)
-            }}
-          >
-            <Label></Label>
-            <Button className="add-to-dapp">
-              <AddIcon stroke="#000" /> Add To Dapp
-            </Button> 
-            <Popover className={'modelview-popover'}>
-              <ListBox items={options}>
-                {(item) => <Item id={item.id}>{item.name}</Item>}
-              </ListBox>
-            </Popover>
-          </Select>
-          */}
+          {!isIndexed && <button onClick={startIndex}>Strat index</button>}
         </ToolsBox>
         <TabList aria-label="History of Ancient Rome">
           <Tab id="Definition">Model Definition</Tab>
@@ -155,17 +163,16 @@ export default function ModelView() {
           <Tab id="Playground">Model Playground</Tab>
         </TabList>
       </div>
-      <TabPanels>
-        <TabPanel id="Definition">
-          <Definition />
-        </TabPanel>
-        <TabPanel id="Instance">
-          <Instance />
-        </TabPanel>
-        <TabPanel id="Playground">
-          <PlaygroundGraphiQL />
-        </TabPanel>
-      </TabPanels>
+
+      <TabPanel id="Definition">
+        <Definition />
+      </TabPanel>
+      <TabPanel id="Instance">
+        <Instance />
+      </TabPanel>
+      <TabPanel id="Playground">
+        <PlaygroundGraphiQL />
+      </TabPanel>
     </Tabs>
   )
 }
@@ -175,7 +182,7 @@ const ToolsBox = styled.div`
   padding-right: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 20px;
 
   > span {
     font-style: italic;
@@ -183,6 +190,28 @@ const ToolsBox = styled.div`
     font-size: 24px;
     line-height: 28px;
     color: #ffffff;
+  }
+
+  > button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 0 15px;
+    height: 36px;
+    border-radius: 100px;
+    background: #14171a;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    color: #a0aec0;
+    text-transform: capitalize;
+    background: #718096;
+    color: #14171a;
+    background: #ffffff;
+    font-family: Rubik;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
   }
 
   .add-to-dapp {

@@ -211,3 +211,21 @@ export function uploadImage({ file }: { file: File }) {
     data: form,
   })
 }
+
+export function startIndexModel({
+  network,
+  modelId,
+  didSession,
+}: {
+  network: Network
+  modelId: string
+  didSession?: string
+}): AxiosPromise<ApiResp<null>> {
+  return axios({
+    url: `${API_BASE_URL}/models/indexing?network=${network.toUpperCase()}&model=${modelId}`,
+    method: 'post',
+    headers: {
+      'did-session': didSession || '',
+    },
+  })
+}
