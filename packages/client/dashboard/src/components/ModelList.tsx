@@ -58,13 +58,13 @@ export default function ModelList({
 
       const list = resp.data.data
       setDappModels(list)
-      if (list.length > 0 && !selectModel) {
+      if (list.length > 0 && !selectModel && !selectComposite) {
         setSelectModel(list[0])
       }
     } catch (error) {
       console.error(error)
     }
-  }, [selectModel, selectedDapp, setSelectModel])
+  }, [selectComposite, selectModel, selectedDapp, setSelectModel])
 
   const loadDappComposites = useCallback(async () => {
     if (!session) return
