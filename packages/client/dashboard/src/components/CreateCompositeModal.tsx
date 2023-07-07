@@ -84,6 +84,10 @@ export default function CreateCompositeModal({
             setGqlSchema(props)
           }}
           schema={gqlSchema}
+          sidebarExpanded={false}
+          routeState={{
+            code: 'on',
+          }}
         />
       </EditorBox>
       <div className="btns">
