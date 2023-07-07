@@ -520,11 +520,11 @@ export default class ModelService {
     let models: any[] = [];
     if (network == Network.MAINNET) {
       models = await this.ceramicModelMainNetRepository.find({
-        where: { model: In(modelStreamIds) },
+        where: { model: In(modelStreamIds), is_indexed: true },
       });
     } else if (network == Network.TESTNET) {
       models = await this.ceramicModelTestNetRepository.find({
-        where: { model: In(modelStreamIds) },
+        where: { model: In(modelStreamIds), is_indexed: true },
       });
     }
 
