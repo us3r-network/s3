@@ -155,7 +155,7 @@ export default function ModelView() {
       <div className="title-bar">
         <ToolsBox>
           <span>{modelStream?.streamContent?.name}</span>
-          {!isIndexed && <button onClick={startIndex}>Strat index</button>}
+          {!isIndexed && <button onClick={startIndex}>Start index</button>}
         </ToolsBox>
         <TabList aria-label="History of Ancient Rome">
           <Tab id="Definition">Model Definition</Tab>
