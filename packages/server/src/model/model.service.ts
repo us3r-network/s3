@@ -428,6 +428,7 @@ export default class ModelService {
       }
     } catch (error) {
       this.logger.error(`Add models index err: ${error}`);
+      throw new ServiceUnavailableException((error as Error).message);
     }
   }
 
