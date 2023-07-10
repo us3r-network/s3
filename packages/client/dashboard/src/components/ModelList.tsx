@@ -20,6 +20,8 @@ import MergeModal from './MergeModal'
 import CreateNewModel from './CreateNewModel'
 import CreateCompositeModal from './CreateCompositeModal'
 import MergeIcon from './Icons/MergeIcon'
+import { shortPubKey } from '../utils/shortPubKey'
+import CopyTint from './CopyTint'
 
 export default function ModelList({
   editable,
@@ -50,13 +52,21 @@ export default function ModelList({
       return
     }
 
-    const resp = await getStarModels({
-      network: selectedDapp.network as Network,
-      ids: selectedDapp.models || [],
-    })
+    try {
+      const resp = await getStarModels({
+        network: selectedDapp.network as Network,
+        ids: selectedDapp.models || [],
+      })
 
-    const list = resp.data.data
-    setDappModels(list)
+      const list = resp.data.data
+      setDappModels(list)
+      if (list.length > 0) {
+        setSelectModel(list[0])
+      }
+    } catch (error) {
+      console.error(error)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDapp])
 
   const loadDappComposites = useCallback(async () => {
@@ -211,7 +221,10 @@ export default function ModelList({
           <div className="title">
             <h3>Composites</h3>
             {editable && (
-              <CreateComposite loadDappComposites={loadDappComposites} />
+              <CreateComposite
+                loadDappComposites={loadDappComposites}
+                dappModels={dappModels || []}
+              />
             )}
           </div>
 
@@ -346,8 +359,16 @@ function DappModelList({
             {active && (
               <>
                 <hr />
+                <div className="id-copy">
+                  <p>ID: {shortPubKey(selected.stream_id, { len: 7 })}</p>
+                  <div>
+                    <CopyTint data={selected.stream_id} />
+                  </div>
+                </div>
                 <p>{selected.stream_content.description}</p>
-                <p>Streams:{selected.useCount}</p>
+                <p>
+                  Streams: <span>{selected.useCount}</span>
+                </p>
               </>
             )}
           </div>
@@ -436,8 +457,10 @@ function CreateNew() {
 
 function CreateComposite({
   loadDappComposites,
+  dappModels,
 }: {
   loadDappComposites: () => Promise<void>
+  dappModels: ModelStream[]
 }) {
   return (
     <DialogTrigger>
@@ -451,6 +474,7 @@ function CreateComposite({
               <CreateCompositeModal
                 closeModal={close}
                 loadDappComposites={loadDappComposites}
+                dappModels={dappModels}
               />
             )}
           </Dialog>
@@ -529,6 +553,16 @@ const DappModelsListBox = styled.div`
     background: rgba(113, 128, 150, 0.3);
     border: 1px solid #718096;
     border-radius: 12px;
+
+    .id-copy {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      > p {
+        margin: 0;
+      }
+    }
   }
 
   hr {
@@ -538,6 +572,14 @@ const DappModelsListBox = styled.div`
 
   p {
     color: #718096;
+    > span {
+      color: #ffffff;
+      font-size: 16px;
+      font-family: Rubik;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+    }
   }
 
   .removing {

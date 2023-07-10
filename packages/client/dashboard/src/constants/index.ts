@@ -20,3 +20,7 @@ export const DISCORD = 'discord'
 export const MEDIUM = 'medium'
 export const MIRROR = 'mirror'
 export const GITHUB = 'github'
+
+export const WALLET_CONNECT_PROJECT_ID =
+  process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID ||
+  'c652d0148879353d7e965d7f6f361e59'

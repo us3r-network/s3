@@ -24,7 +24,6 @@ export default function DappSelector({
       items={dappItems}
       selectedKey={Number(selected)}
       onSelectionChange={(k) => {
-        console.log({ k })
         if (k === 0) {
           navigate('/dapp/create')
           return
