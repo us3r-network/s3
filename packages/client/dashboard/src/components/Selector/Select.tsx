@@ -44,6 +44,16 @@ const Button = styled.button<ButtonProps>`
 const Value = styled.span`
   display: inline-flex;
   align-items: center;
+  width: 100%;
+  > div {
+    width: 100%;
+    > div {
+      width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
 `
 
 const StyledIcon = styled(SelectorIcon)``

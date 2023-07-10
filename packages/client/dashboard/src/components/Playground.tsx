@@ -11,11 +11,9 @@ import {
 } from 'graphiql'
 import { useUrlSearchParams } from 'use-url-search-params'
 
-import '@graphiql/plugin-explorer/dist/style.css'
 import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
 
-import 'graphiql/graphiql.css'
 import { AxiosError } from 'axios'
 import styled from 'styled-components'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
@@ -137,19 +135,13 @@ export default function PlaygroundGraphiQL(
       )
       const { data } = resp.data
       setDefinition(data.runtimeDefinition)
-      if (data.graphqlSchemaDefinition) {
-        setQuery(initialQuery + data.graphqlSchemaDefinition)
-      } else {
-        const definition = data.runtimeDefinition
-        const modelName = Object.keys(definition.models)[0]
-        const objValues: any[] = Object.values(definition.objects)
-        const modelProperties = Object.entries(objValues[0])
-        const defaultQuery = createGraphqlDefaultQuery(
-          modelName,
-          modelProperties
-        )
-        setQuery(initialQuery + defaultQuery)
-      }
+
+      const definition = data.runtimeDefinition
+      const modelName = Object.keys(definition.models)[0]
+      const objValues: any[] = Object.values(definition.objects)
+      const modelProperties = Object.entries(objValues[0])
+      const defaultQuery = createGraphqlDefaultQuery(modelName, modelProperties)
+      setQuery(initialQuery + defaultQuery)
     } catch (error) {
       const err = error as AxiosError
       setErrMsg((err.response?.data as any).message || err.message)

@@ -92,7 +92,7 @@ export default function EditDappInfo({
       </div>
 
       <div className="app-basic">
-        <AppIconInput icon={icon} setIcon={setIcon} />
+        <AppIconInput icon={icon} setIcon={setIcon} name={appName} />
         <div className="items">
           <InputItem
             label="App Name:"

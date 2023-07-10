@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom'
+import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import { isMobile } from 'react-device-detect'
@@ -17,14 +17,13 @@ import Nav from './components/Nav'
 import MobileNav from './components/MobileNav'
 import NoMatch from './components/NoMatch'
 import { useGAPageView } from './hooks/useGoogleAnalytics'
-import { CERAMIC_TESTNET_HOST } from './constants'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 import Models from './container/Models'
 import ModelStream from './container/ModelStream'
 import ModelCreate from './container/ModelCreate'
 import UserModels from './container/UserModels'
 import ModelView from './container/ModelView'
 import ModelMidInfo from './container/ModelMidInfo'
-import { useLocalStorage } from './hooks/useLocalStorage'
 import { Network } from './types'
 import CeramicProvider from './context/CeramicCtx'
 import Header from './components/Header'
@@ -32,6 +31,7 @@ import ModelStreams from './container/ModelStreams'
 import DappCreate from './container/DappCreate'
 import DappInfo from './container/DappInfo'
 import DappEdit from './container/DappEdit'
+import { useEffect, useState } from 'react'
 
 dayjs.extend(relativeTime)
 
@@ -70,15 +70,34 @@ function Routers() {
 }
 
 export default function App() {
-  const [network, setNetwork] = useLocalStorage(
-    'network-select',
-    Network.TESTNET
-  )
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const [network, setNetwork] = useState(Network.TESTNET)
+
+  useEffect(() => {
+    const routerNet = searchParams.get('network')?.toUpperCase()
+
+    if (routerNet) {
+      Object.values(Network).includes(routerNet as Network) &&
+        setNetwork(routerNet as Network)
+    }
+  }, [searchParams, setSearchParams])
 
   return (
-    <Us3rAuthWithRainbowkitProvider>
+    <Us3rAuthWithRainbowkitProvider
+      projectId={WALLET_CONNECT_PROJECT_ID}
+      appName="S3 Scan"
+    >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
-        <CeramicProvider network={network} setNetwork={setNetwork}>
+        <CeramicProvider
+          network={network}
+          setNetwork={(n) => {
+            searchParams.delete('network')
+            searchParams.append('network', n)
+            setSearchParams(searchParams)
+            setNetwork(n)
+          }}
+        >
           <Routers />
         </CeramicProvider>
       </ProfileStateProvider>

@@ -45,16 +45,17 @@ function ListCard({
   did: string
   indexingTime: number
 }) {
+  const { network } = useCeramicCtx()
   return (
     <CardBox className="streams-box">
       <div className="short-key">
-        <Link to={`/streams/stream/${streamId}`}>
+        <Link to={`/streams/stream/${streamId}?network=${network}`}>
           {shortPubKey(streamId, { len: 8, split: '-' })}
         </Link>{' '}
       </div>
       <div className="avatar">
         <Avatar did={did} />
-        <Link to={`/streams/profile/${did}`}>
+        <Link to={`/streams/profile/${did}?network=${network}`}>
           <UserName did={did} />
         </Link>
       </div>
