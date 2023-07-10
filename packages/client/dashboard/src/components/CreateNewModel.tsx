@@ -68,6 +68,10 @@ export default function CreateNewModel({
             setGqlSchema(props)
           }}
           schema={gqlSchema}
+          sidebarExpanded={false}
+          routeState={{
+            code: 'on',
+          }}
         />
       </EditorBox>
       <div className="btns">

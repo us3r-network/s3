@@ -61,6 +61,7 @@
       border-right: 3px solid var(--border-color, transparent);
     }
   }
+  
 }
 
 .dapp-title-bar .react-aria-TabList {
@@ -93,13 +94,16 @@
     color: var(--text-color-hover);
   }
 
+
+
   &[aria-selected='true'] {
     --border-color: var(--highlight-color);
     color: var(--text-color-selected);
   }
 
   &[aria-disabled] {
-    color: var(--text-color-disabled);
+    cursor: not-allowed;
+    color: #718096;
     &[aria-selected='true'] {
       --border-color: var(--text-color-disabled);
     }

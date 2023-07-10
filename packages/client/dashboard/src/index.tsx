@@ -10,6 +10,7 @@ import './styles/tab.css'
 import './styles/playground.css'
 import './styles/menu.css'
 import './styles/checkbox.css'
+import './styles/prism-vsc-dark-plus.css'
 
 import '@graphiql/plugin-explorer/dist/style.css'
 import 'graphiql/graphiql.css'

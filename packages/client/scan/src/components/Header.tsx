@@ -48,7 +48,7 @@ export default function Header() {
   return (
     <Box>
       <div>
-        {(showBack && (
+        {(showBack && window.history.length > 1 && (
           <BackBtn
             backAction={() => {
               if (location.pathname.startsWith('/models/modelview')) {
