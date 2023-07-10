@@ -1,18 +1,28 @@
 import PlaygroundGraphiQL from '../components/Playground'
 import { useOutletContext } from 'react-router-dom'
+import { DappComposite, ModelStream } from '../types'
+import CompositePlaygroundGraphiQL from '../components/CompositePlaygroundGraphiQL'
 
 export default function DappModelPlayground() {
-  const { selectModelId } = useOutletContext<{
-    selectModelId: string
-    selectModelName: string
+  const { selectModel, selectComposite } = useOutletContext<{
+    selectModel: ModelStream
+    selectComposite: DappComposite
   }>()
-  return (
-    <>
-      {selectModelId && (
-        <div className="playground-ops">
-          <PlaygroundGraphiQL streamId={selectModelId} />
-        </div>
-      )}
-    </>
-  )
+  if (selectModel) {
+    return (
+      <div className="playground-ops">
+        <PlaygroundGraphiQL streamId={selectModel.stream_id} />
+      </div>
+    )
+  }
+  if (selectComposite) {
+    return (
+      <div className="playground-ops">
+        <CompositePlaygroundGraphiQL
+          definition={selectComposite.runtimeDefinition}
+        />
+      </div>
+    )
+  }
+  return null
 }

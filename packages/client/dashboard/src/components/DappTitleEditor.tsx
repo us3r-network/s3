@@ -58,6 +58,9 @@ const TitleBox = styled.div`
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      max-width: 800px;
+
+      padding: 0 5px 0 0;
     }
     > span {
       border-radius: 10px;

@@ -27,10 +27,10 @@ export default function ExploreModelTabs({
       </ModelModalBox>
       <TabPanels>
         <TabPanel id="Definition">
-          <Definition streamId={modelId} network={Network.TESTNET} />
+          <Definition streamId={modelId} />
         </TabPanel>
         <TabPanel id="Instance">
-          <ExploreInstance streamId={modelId} network={Network.TESTNET} />
+          <ExploreInstance streamId={modelId} />
         </TabPanel>
         <TabPanel id="Playground">
           <PlaygroundGraphiQL streamId={modelId} />
