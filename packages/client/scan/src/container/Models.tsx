@@ -20,8 +20,12 @@ import { useCeramicCtx } from '../context/CeramicCtx'
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
   const { signIn } = useAuthentication()
-  const { network, fetchPersonalCollections, personalCollections, personalCollectionsWithoutFilter } =
-    useCeramicCtx()
+  const {
+    network,
+    fetchPersonalCollections,
+    personalCollections,
+    personalCollectionsWithoutFilter,
+  } = useCeramicCtx()
   const session = useSession()
   const sessId = session?.id
   const [models, setModels] = useState<Array<ModelStream>>([])
@@ -163,17 +167,11 @@ export default function ModelsPage() {
                   <tr key={item.stream_id + idx}>
                     <td>
                       {!isMobile ? (
-                        <>
-                          {(item.isIndexed && (
-                            <Link to={`/models/modelview/${item.stream_id}`}>
-                              {item.stream_content.name}
-                            </Link>
-                          )) || (
-                            <div className="usage-count">
-                              {item.stream_content.name}
-                            </div>
-                          )}
-                        </>
+                        <Link
+                          to={`/models/modelview/${item.stream_id}?network=${network}`}
+                        >
+                          {item.stream_content.name}
+                        </Link>
                       ) : (
                         item.stream_content.name
                       )}
@@ -198,7 +196,9 @@ export default function ModelsPage() {
                         <div className="usage-count">{item.useCount}</div>
                       )) || (
                         <div>
-                          <Link to={`/models/model/${item.stream_id}/mids`}>
+                          <Link
+                            to={`/models/model/${item.stream_id}/mids?network=${network}`}
+                          >
                             {item.useCount}
                           </Link>
                         </div>
@@ -301,7 +301,7 @@ function ModelStarItem({
         await starModelAction(stream_id, hasStarItem?.id, !!hasStarItem?.revoke)
       }}
     >
-      {(hasStarItem && hasStarItem.revoke === false) ? <Star /> : <StarEmpty />}
+      {hasStarItem && hasStarItem.revoke === false ? <Star /> : <StarEmpty />}
     </div>
   )
 }

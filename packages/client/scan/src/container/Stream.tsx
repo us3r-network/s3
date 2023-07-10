@@ -49,7 +49,7 @@ export default function StreamPage() {
         <div className="err">
           <p>{unknownErr}</p>
           <p>
-            <Link to="/">Go to the home page</Link>
+            <Link to={`/?network=${network}`}>Go to the home page</Link>
           </p>
         </div>
       </PageBox>
@@ -64,7 +64,7 @@ export default function StreamPage() {
 
           <p className="msg">{serverErrMsg.msg}</p>
           <p>
-            <Link to="/">Go to the home page</Link>
+            <Link to={`/?network=${network}`}>Go to the home page</Link>
           </p>
         </div>
       </PageBox>
