@@ -9,20 +9,39 @@ import { schemas } from '../utils/composedb-types/schemas'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { createDappComposites } from '../api'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { ModelStream } from '../types'
+
+const TINT_WORD = `# Edit the model's relation based on your business needs.
+# See Example below
+# https://composedb.js.org/docs/0.4.x/guides/data-modeling/relations-container-of-items
+
+`
 
 export default function CreateCompositeModal({
   closeModal,
   loadDappComposites,
+  dappModels,
 }: {
   closeModal: () => void
   loadDappComposites: () => Promise<void>
+  dappModels: ModelStream[]
 }) {
   const { selectedDapp } = useSelectedDapp()
   const session = useSession()
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState('')
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
-    code: schemas.code,
+    code:
+      TINT_WORD +
+      dappModels
+        .map((item) => {
+          return `
+type ${item.stream_content.name} @loadModel(id: "${item.stream_id}") {
+  id: ID!
+}
+`
+        })
+        .join('\n'),
     libraries: schemas.library,
   })
 
@@ -84,6 +103,10 @@ export default function CreateCompositeModal({
             setGqlSchema(props)
           }}
           schema={gqlSchema}
+          sidebarExpanded={false}
+          routeState={{
+            code: 'on',
+          }}
         />
       </EditorBox>
       <div className="btns">
