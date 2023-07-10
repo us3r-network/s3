@@ -5,42 +5,42 @@ module.exports = function (app) {
     .use(
       '/api',
       createProxyMiddleware({
-        target: 'https://ceramic-private-clay.3boxlabs.com',
+        target: 'https://gcp-ceramic-testnet-dev.s3.xyz',
         changeOrigin: true,
       })
     )
     .use(
       '/streams',
       createProxyMiddleware({
-        target: 'https://cscan.onrender.com/',
+        target: 'https://api-dev.s3.xyz/',
         changeOrigin: true,
       })
     )
     .use(
       '/models',
       createProxyMiddleware({
-        target: 'https://cscan.onrender.com/',
+        target: 'https://api-dev.s3.xyz/',
         changeOrigin: true,
       })
     )
     .use(
       '/testnet',
       createProxyMiddleware({
-        target: 'https://cscan.onrender.com/',
+        target: 'https://api-dev.s3.xyz/',
         changeOrigin: true,
       })
     )
     .use(
       '/MAINNET',
       createProxyMiddleware({
-        target: 'https://cscan.onrender.com/',
+        target: 'https://api-dev.s3.xyz/',
         changeOrigin: true,
       })
     )
   // .use(
   //   "/model",
   //   createProxyMiddleware({
-  //     target: "https://ceramic-private-clay.3boxlabs.com",
+  //     target: "https://gcp-ceramic-testnet-dev.s3.xyz",
   //     changeOrigin: true,
   //   })
   // );

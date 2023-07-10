@@ -1,4 +1,4 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
+import { Tabs, TabList, Tab, TabPanel } from 'react-aria-components'
 import Definition from './Definition'
 import Instance from './Instance'
 import PlaygroundGraphiQL from './Playground'
@@ -20,17 +20,16 @@ export default function ModelTabs({
           <Tab id="Playground">Model Playground</Tab>
         </TabList>
       </div>
-      <TabPanels>
-        <TabPanel id="Definition">
-          <Definition streamId={modelId} />
-        </TabPanel>
-        <TabPanel id="Instance">
-          <Instance streamId={modelId}/>
-        </TabPanel>
-        <TabPanel id="Playground">
-          <PlaygroundGraphiQL streamId={modelId}/>
-        </TabPanel>
-      </TabPanels>
+
+      <TabPanel id="Definition">
+        <Definition streamId={modelId} />
+      </TabPanel>
+      <TabPanel id="Instance">
+        <Instance streamId={modelId} />
+      </TabPanel>
+      <TabPanel id="Playground">
+        <PlaygroundGraphiQL streamId={modelId} />
+      </TabPanel>
     </Tabs>
   )
 }
