@@ -21,7 +21,6 @@ import CreateNewModel from './CreateNewModel'
 import CreateCompositeModal from './CreateCompositeModal'
 import MergeIcon from './Icons/MergeIcon'
 import { shortPubKey } from '../utils/shortPubKey'
-import CopyIcon from './Icons/CopyIcon'
 import CopyTint from './CopyTint'
 
 export default function ModelList({
