@@ -73,16 +73,20 @@ export default function ExploreModel() {
       return
     }
 
-    const resp = await getStarModels({
-      network: (selectedDapp?.network as Network) || Network.TESTNET,
-      ids,
-    })
-    if (resp.data.code !== 0) {
-      throw new Error(resp.data.msg)
-    }
+    try {
+      const resp = await getStarModels({
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
+        ids,
+      })
+      if (resp.data.code !== 0) {
+        throw new Error(resp.data.msg)
+      }
 
-    const list = resp.data.data
-    setStarModels([...list])
+      const list = resp.data.data
+      setStarModels([...list])
+    } catch (error) {
+      console.error(error)
+    }
   }, [personalCollections, selectedDapp?.network])
 
   const fetchModel = useCallback(async () => {
@@ -181,7 +185,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/models/modelview/${item.stream_id}`}
+                          href={`${S3_SCAN_URL}/models/modelview/${
+                            item.stream_id
+                          }?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -195,7 +201,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/streams/stream/${item.stream_id}`}
+                          href={`${S3_SCAN_URL}/streams/stream/${
+                            item.stream_id
+                          }?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -206,7 +214,9 @@ export default function ExploreModel() {
                     <td>
                       <div>
                         <a
-                          href={`${S3_SCAN_URL}/models/model/${item.stream_id}/mids`}
+                          href={`${S3_SCAN_URL}/models/model/${
+                            item.stream_id
+                          }/mids?network=${selectedDapp?.network.toUpperCase()}`}
                           target="_blank"
                           rel="noreferrer"
                         >

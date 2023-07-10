@@ -5,14 +5,30 @@ import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
 import UserAvatarStyled from './UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import EditIcon from './Icons/EditIcon'
+import { Button } from 'react-aria-components'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { useMemo } from 'react'
+import { S3_SCAN_URL } from '../constants'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 
 export default function ModelStreamList({
   modelId,
   data,
+  editable,
+  editAction,
 }: {
   modelId: string
   data: ModelMid[]
+  editable?: boolean
+  editAction?: (stream: ModelMid) => void
 }) {
+  const session = useSession()
+  const showAction = useMemo(
+    () => session?.id && editable,
+    [editable, session?.id]
+  )
+  const { selectedDapp } = useSelectedDapp()
   return (
     <TableBox>
       <TableContainer>
@@ -20,7 +36,8 @@ export default function ModelStreamList({
           <tr>
             <th>Stream ID</th>
             <th>DID</th>
-            <th>Indexing Time</th>
+            <th>Update Time</th>
+            {showAction && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
@@ -28,12 +45,20 @@ export default function ModelStreamList({
             return (
               <tr key={item.streamId}>
                 <td>
-                  <div className="stream-id">
-                    {shortPubKey(item.streamId, {
-                      len: 8,
-                      split: '-',
-                    })}
-                  </div>
+                  <a
+                    href={`${S3_SCAN_URL}/streams/stream/${
+                      item.streamId
+                    }?network=${selectedDapp?.network.toUpperCase()}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="stream-id">
+                      {shortPubKey(item.streamId, {
+                        len: 8,
+                        split: '-',
+                      })}
+                    </div>
+                  </a>
                 </td>
                 <td className="td-did">
                   <UserAvatarStyled did={item.controllerDid} />
@@ -41,9 +66,24 @@ export default function ModelStreamList({
                 </td>
                 <td className="index-time">
                   <div>
-                    <time>{dayjs(item.createdAt).fromNow()}</time>
+                    <time>{dayjs(item.updatedAt).fromNow()}</time>
                   </div>
                 </td>
+                {showAction && (
+                  <td className="td-action">
+                    {session?.id === item.controllerDid ? (
+                      <EditBtn
+                        onPress={() => {
+                          if (editAction) editAction(item)
+                        }}
+                      >
+                        <EditIcon />
+                      </EditBtn>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                )}
               </tr>
             )
           })}
@@ -119,6 +159,7 @@ const TableContainer = styled.table`
 
     > div {
       text-overflow: ellipsis;
+      white-space: nowrap;
       overflow: hidden;
       padding-right: 5px;
     }
@@ -135,4 +176,8 @@ const TableContainer = styled.table`
 
     color: #718096;
   }
+`
+const EditBtn = styled(Button)`
+  margin: 0;
+  padding: 0;
 `

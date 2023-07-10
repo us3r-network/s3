@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import Prism from 'prismjs'
 import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { getModelInfo, queryModelGraphql } from '../../api'
@@ -8,6 +9,10 @@ import { ModeQueryResult, ModelStream } from '../../types'
 import { schemas } from '../../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { useCeramicCtx } from '../../context/CeramicCtx'
+
+import 'prismjs/components/prism-typescript'
+import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
 
 export default function Definition() {
   const { streamId } = useParams()
@@ -116,9 +121,10 @@ export default function Definition() {
               </button>
             </div>
             <div className="result-text">
-              <pre>
-                <code>{JSON.stringify(modelData.composite, null, 2)}</code>
-              </pre>
+              <Code
+                name="composite"
+                content={JSON.stringify(modelData.composite, null, 2)}
+              />
             </div>
           </div>
         )}
@@ -139,11 +145,10 @@ export default function Definition() {
               </button>
             </div>
             <div className="result-text">
-              <pre>
-                <code>
-                  {JSON.stringify(modelData.runtimeDefinition, null, 2)}
-                </code>
-              </pre>
+              <Code
+                name="runtimeDefinition"
+                content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
+              />
             </div>
           </div>
         )}
@@ -151,6 +156,34 @@ export default function Definition() {
     </div>
   )
 }
+
+export function Code({ name, content }: { name: string; content: string }) {
+  useEffect(() => {
+    Prism.highlightAll()
+  }, [content])
+
+  const preCode = `<pre class="line-numbers"><code class="language-typescript">${content}</code></pre>`
+  return (
+    <CodeBox>
+      <div
+        className="line-numbers"
+        dangerouslySetInnerHTML={{ __html: preCode }}
+      ></div>
+    </CodeBox>
+  )
+}
+
+const CodeBox = styled.div`
+  > .name {
+    border-bottom: none;
+    display: inline-block;
+    padding: 10px 20px;
+  }
+  > .line-numbers {
+    overflow: scroll;
+    /* margin-bottom: 20px; */
+  }
+`
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
@@ -175,10 +208,10 @@ const ResultBox = styled.div`
     border: 1px solid #39424c;
     border-radius: 20px;
   }
-  div {
+  > div {
     width: calc(50% - 10px);
     margin: 20px 0px;
-    padding: 10px;
+    /* padding: 10px; */
     box-sizing: border-box;
     background-color: #1a1a1c;
     .title {
@@ -192,7 +225,8 @@ const ResultBox = styled.div`
       line-height: 28px;
       font-style: italic;
       color: #ffffff;
-
+      padding: 10px;
+      box-sizing: border-box;
       button {
         background: #ffffff;
       }
@@ -204,10 +238,14 @@ const ResultBox = styled.div`
     }
   }
   .result-text {
-    width: 100%;
     word-wrap: break-word;
     color: #718096;
     overflow: scroll;
+    width: 100%;
+    margin-top: 0;
+    > div {
+      width: fit-content;
+    }
   }
 
   button {
