@@ -44,7 +44,7 @@ export type YogaGraphiQLProps = Omit<
   | 'onEditQuery'
 > &
   Partial<Omit<LoadFromUrlOptions, 'headers'>> & {
-    streamId: string;
+    streamId: string
     title?: string
     additionalHeaders?: LoadFromUrlOptions['headers']
   }
@@ -134,6 +134,7 @@ export default function PlaygroundGraphiQL(
       const resp = await queryModelGraphql(streamId, network)
       const { data } = resp.data
       setDefinition(data.runtimeDefinition)
+
       const definition = data.runtimeDefinition
       const modelName = Object.keys(definition.models)[0]
       const objValues: any[] = Object.values(definition.objects)

@@ -6,6 +6,7 @@ import { shortPubKey } from '../utils/shortPubKey'
 import { Link } from 'react-router-dom'
 import UserAvatarStyled from './common/UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import { useCeramicCtx } from '../context/CeramicCtx'
 
 export default function ModelStreamList({
   modelId,
@@ -14,6 +15,8 @@ export default function ModelStreamList({
   modelId: string
   data: ModelMid[]
 }) {
+  const { network } = useCeramicCtx()
+
   return (
     <TableBox>
       <TableContainer>
@@ -30,7 +33,9 @@ export default function ModelStreamList({
               <tr key={item.streamId}>
                 <td>
                   <div className="stream-id">
-                    <Link to={`/streams/stream/${item.streamId}`}>
+                    <Link
+                      to={`/streams/stream/${item.streamId}?network=${network}`}
+                    >
                       {shortPubKey(item.streamId, {
                         len: 8,
                         split: '-',
