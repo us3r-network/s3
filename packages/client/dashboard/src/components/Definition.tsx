@@ -98,7 +98,7 @@ export default function Definition({ streamId }: { streamId: string }) {
       <ResultBox>
         {modelData?.composite && (
           <CodeDownload
-            title="Model's composite"
+            title="Composite"
             downloadContent={JSON.stringify(modelData.composite)}
             downloadFileName="composite.json"
             content={JSON.stringify(modelData.composite, null, 2)}
@@ -106,7 +106,7 @@ export default function Definition({ streamId }: { streamId: string }) {
         )}
         {modelData?.runtimeDefinition && (
           <CodeDownload
-            title="Model's runtime definition"
+            title="Runtime Definition"
             downloadContent={`// This is an auto-generated file, do not edit manually
 export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
             downloadFileName="runtime-composite.js"
@@ -119,7 +119,7 @@ export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
 }
 
 const EditorBox = styled.div`
-  height: calc(100vh - 100px);
+  height: calc(100vh - 300px);
   max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
