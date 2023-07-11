@@ -119,7 +119,7 @@ export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
 }
 
 const EditorBox = styled.div`
-  height: calc(100vh - 300px);
+  height: calc(100vh - 100px);
   max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
