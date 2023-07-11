@@ -39,7 +39,7 @@ export default function CompositeDefinition({
       <ResultBox>
         {composite.composite && (
           <CodeDownload
-            title="Model's composite"
+            title="Composite"
             downloadContent={composite.composite}
             downloadFileName="composite.json"
             content={JSON.stringify(JSON.parse(composite.composite), null, 2)}
@@ -47,7 +47,7 @@ export default function CompositeDefinition({
         )}
         {composite.runtimeDefinition && (
           <CodeDownload
-            title="Model's runtime definition"
+            title="Runtime Definition"
             downloadContent={`// This is an auto-generated file, do not edit manually
 export const definition = ${composite.runtimeDefinition}`}
             downloadFileName="runtime-composite.js"
@@ -87,7 +87,7 @@ const DefinitionBox = styled.div`
 `
 
 const EditorBox = styled.div`
-  height: calc(100vh - 100px);
+  height: calc(100vh - 300px);
   max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
