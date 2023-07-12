@@ -278,3 +278,21 @@ export function getModelSDK({
     method: 'GET',
   })
 }
+
+export function startIndexModel({
+  network,
+  modelId,
+  didSession,
+}: {
+  network: Network
+  modelId: string
+  didSession?: string
+}): AxiosPromise<ApiResp<null>> {
+  return axios({
+    url: `${APP_API_URL}/models/indexing?network=${network.toUpperCase()}&model=${modelId}`,
+    method: 'post',
+    headers: {
+      'did-session': didSession || '',
+    },
+  })
+}
