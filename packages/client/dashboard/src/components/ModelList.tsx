@@ -150,6 +150,7 @@ export default function ModelList({
   }, [appId])
 
   const isMetrics = location.pathname.endsWith('statistic')
+  const isSdk = location.pathname.endsWith('sdk')
 
   if (loading) {
     return (
@@ -216,7 +217,7 @@ export default function ModelList({
         }}
       />
 
-      {!isMetrics && (
+      {!(isMetrics || isSdk) && (
         <>
           <div className="title">
             <h3>Composites</h3>
