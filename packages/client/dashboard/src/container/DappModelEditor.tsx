@@ -1,9 +1,7 @@
-import ModelTabs from '../components/ModelTabs'
 import { useOutletContext } from 'react-router-dom'
 import { DappComposite, ModelStream } from '../types'
 import CompositeDefinition from '../components/CompositeDefinition'
 import styled from 'styled-components'
-import ModelSDK from '../components/ModelSDK'
 import Definition from '../components/Definition'
 
 export default function DappModelEditor() {
