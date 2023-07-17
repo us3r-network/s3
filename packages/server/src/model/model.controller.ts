@@ -120,8 +120,8 @@ export class ModelController {
           .map((m) => {
             const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
             const useCount = isIndexed
-              ? dbUseCountMap[m.getStreamId]
-              : dbUseCountMap?.get(m.getStreamId) ?? 0;
+              ? dbUseCountMap.get(m.getStreamId)
+              : useCountMap?.get(m.getStreamId) ?? 0;
             return {
               ...m,
               useCount,
