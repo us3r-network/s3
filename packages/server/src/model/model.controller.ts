@@ -101,21 +101,33 @@ export class ModelController {
 
       if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
       const modelStreamIds = metaModels.map((m) => m.getStreamId);
+
       const indexedModelStreamIds = await this.modelService.findIndexedModelIds(
         network,
         modelStreamIds,
       );
       const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
+      const dbUseCountMap = await this.modelService.findModelUseCount(
+        network,
+        indexedModelStreamIds,
+      );
+
       return new BasicMessageDto(
         'ok',
         0,
         metaModels
-          .map((m) => ({
-            ...m,
-            useCount: useCountMap?.get(m.getStreamId) ?? 0,
-            isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
-          }))
+          .map((m) => {
+            const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
+            const useCount = isIndexed
+              ? dbUseCountMap[m.getStreamId]
+              : dbUseCountMap?.get(m.getStreamId) ?? 0;
+            return {
+              ...m,
+              useCount,
+              isIndexed,
+            };
+          })
           .sort((a, b) => b.useCount - a.useCount),
       );
     }
