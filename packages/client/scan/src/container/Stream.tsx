@@ -21,6 +21,8 @@ export default function StreamPage() {
 
   const loadStreamInfo = async (network: Network, streamId: string) => {
     try {
+      setServerErrMsg(undefined)
+      setUnknownErr(undefined)
       const resp = await getStreamInfo(network, streamId)
       setStream(resp.data.data)
     } catch (error) {
@@ -38,8 +40,6 @@ export default function StreamPage() {
 
   useEffect(() => {
     if (!streamId || !network) return
-    setServerErrMsg(undefined)
-    setUnknownErr(undefined)
     loadStreamInfo(network as Network, streamId)
   }, [streamId, network])
 
