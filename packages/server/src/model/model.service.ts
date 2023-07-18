@@ -272,6 +272,7 @@ export default class ModelService {
   async findModelUseCount(
     network: Network,
     models: string[],
+    recentlyUsed = false,
   ): Promise<Map<string, number>> {
     const useCountMap = new Map<string, number>();
     let ceramicEntityManager: EntityManager;
@@ -280,9 +281,15 @@ export default class ModelService {
       : (ceramicEntityManager = this.testnetCeramicEntityManager);
 
     try {
-      const modelUseCounts = await Promise.all(models.map(m => {
-        return ceramicEntityManager.query(`select count(*) from ${m}`)
-      }));
+      const modelUseCounts = await Promise.all(
+        models.map((m) => {
+          return ceramicEntityManager.query(
+            recentlyUsed
+              ? `select count(*) from ${m} where created_at > now() - interval '7 day'`
+              : `select count(*) from ${m}`,
+          );
+        }),
+      );
 
       for (let i = 0; i < models.length; i++) {
         useCountMap.set(models[i], +modelUseCounts[i][0].count);
