@@ -305,7 +305,9 @@ export default class ModelService {
     try {
       const firstRecords = await Promise.all(
         models.map((m) => {
-          return ceramicEntityManager.query(`select * from ${m} limit 1`);
+          return ceramicEntityManager.query(
+            `select * from ${m} order by created_at ASC limit 1`,
+          );
         }),
       );
 
