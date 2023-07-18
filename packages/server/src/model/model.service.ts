@@ -285,7 +285,7 @@ export default class ModelService {
         models.map((m) => {
           return ceramicEntityManager.query(
             recentlyUsed
-              ? `select count(*) from ${m} where created_at > now() - interval '7 day'`
+              ? `select count(*) from ${m} where updated_at > now() - interval '7 day'`
               : `select count(*) from ${m}`,
           );
         }),
