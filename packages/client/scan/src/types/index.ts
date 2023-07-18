@@ -59,6 +59,7 @@ export type ModelStream = {
   updated_at: string
   useCount: number
   isIndexed?: boolean
+  firstRecordTime?: string
 }
 
 export type ModelStreamInfo = {
