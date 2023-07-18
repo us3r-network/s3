@@ -193,9 +193,24 @@ export default function ModelsPage() {
                     </td>
                     <td>
                       {(!item.isIndexed && (
-                        <div className="usage-count">{item.useCount}</div>
+                        <div
+                          className="usage-count"
+                          title={`from(${dayjs(item.created_at).format(
+                            'YYYY-MM-DD HH:mm:ss'
+                          )})`}
+                        >
+                          {item.useCount}
+                        </div>
                       )) || (
-                        <div>
+                        <div
+                          title={
+                            item.firstRecordTime
+                              ? `from(${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD HH:mm:ss'
+                                )})`
+                              : ''
+                          }
+                        >
                           <Link
                             to={`/models/model/${item.stream_id}/mids?network=${network}`}
                           >
