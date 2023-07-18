@@ -112,6 +112,10 @@ export class ModelController {
         network,
         indexedModelStreamIds,
       );
+      const firstRecordMap = await this.modelService.findModelFirstRecord(
+        network,
+        indexedModelStreamIds,
+      );
 
       return new BasicMessageDto(
         'ok',
@@ -122,10 +126,15 @@ export class ModelController {
             const useCount = isIndexed
               ? dbUseCountMap.get(m.getStreamId)
               : useCountMap?.get(m.getStreamId) ?? 0;
+
+            const firstRecord = firstRecordMap.get(m.getStreamId);
+            const firstRecordTime = isIndexed && firstRecord?.created_at;
+
             return {
               ...m,
               useCount,
               isIndexed,
+              firstRecordTime,
             };
           })
           .sort((a, b) => b.useCount - a.useCount),

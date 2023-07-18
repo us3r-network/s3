@@ -295,6 +295,33 @@ export default class ModelService {
     return useCountMap;
   }
 
+  async findModelFirstRecord(network: Network, models: string[]) {
+    const firstRecordMap = new Map<string, any>();
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
+
+    try {
+      const firstRecords = await Promise.all(
+        models.map((m) => {
+          return ceramicEntityManager.query(
+            `select * from ${m} order by created_at ASC limit 1`,
+          );
+        }),
+      );
+
+      for (let i = 0; i < models.length; i++) {
+        firstRecordMap.set(models[i], firstRecords[i][0]);
+      }
+    } catch (error) {
+      this.logger.error(`querying model first record ${models} err: ${error}`);
+      throw new ServiceUnavailableException((error as Error).message);
+    }
+
+    return firstRecordMap;
+  }
+
   async getStreams(
     network: Network,
     modelStreamId: string,
