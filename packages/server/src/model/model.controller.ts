@@ -378,7 +378,7 @@ export class ModelController {
       );
     }
 
-    const useCountMap = await this.modelService.findIndexedModelUseCount(dto.network, dto.ids);
+    const useCountMap = await this.modelService.findIndexedModelUseCount(dto.network, indexedModelStreamIds);
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
       (e.useCount = useCountMap?.get(e.getStreamId) ?? 0),
