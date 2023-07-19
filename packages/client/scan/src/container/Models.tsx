@@ -196,9 +196,9 @@ export default function ModelsPage() {
                       {(!item.isIndexed && (
                         <div
                           className="usage-count"
-                          title={`from(${dayjs(item.created_at).format(
-                            'YYYY-MM-DD HH:mm:ss'
-                          )})`}
+                          title={`from ${dayjs(item.created_at).format(
+                            'YYYY-MM-DD'
+                          )}`}
                         >
                           {item.useCount}
                         </div>
@@ -206,9 +206,9 @@ export default function ModelsPage() {
                         <div
                           title={
                             item.firstRecordTime
-                              ? `from(${dayjs(item.firstRecordTime).format(
-                                  'YYYY-MM-DD HH:mm:ss'
-                                )})`
+                              ? `from ${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD'
+                                )}`
                               : ''
                           }
                         >
