@@ -296,7 +296,7 @@ export default class ModelService {
       }
     } catch (error) {
       this.logger.error(`querying model use count ${models} err: ${error}`);
-      throw new ServiceUnavailableException((error as Error).message);
+      // throw new ServiceUnavailableException((error as Error).message);
     }
 
     return useCountMap;
