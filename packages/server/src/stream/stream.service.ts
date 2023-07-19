@@ -81,7 +81,7 @@ export default class StreamService {
     return relationModelStreamIds;
   }
 
-  async findModelUseCount(
+  async findIndexedModelUseCount(
     network: Network,
     models: string[],
   ): Promise<Map<string, number>> {
@@ -103,7 +103,7 @@ export default class StreamService {
     return useCountMap;
   }
 
-  async findModelUseCountOrderByUseCount(
+  async findIndexedModelUseCountOrderByUseCount(
     network: Network,
     models: string[],
     pageSize?: number,

@@ -108,7 +108,7 @@ export class ModelController {
       );
       const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
-      const dbUseCountMap = await this.modelService.findModelUseCount(
+      const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
         network,
         indexedModelStreamIds,
       );
@@ -117,7 +117,7 @@ export class ModelController {
         indexedModelStreamIds,
       );
 
-      const dbUseCountMapRecently = await this.modelService.findModelUseCount(
+      const dbUseCountMapRecently = await this.modelService.findIndexedModelUseCount(
         network,
         indexedModelStreamIds,
         true,
@@ -163,7 +163,7 @@ export class ModelController {
     if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
 
     const modelStreamIds = metaModels.map((m) => m.getStreamId);
-    const useCountMap = await this.streamService.findModelUseCount(
+    const useCountMap = await this.streamService.findIndexedModelUseCount(
       network,
       modelStreamIds,
     );
@@ -363,11 +363,14 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/ids')
   async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
-    const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
+    const [models, indexedModelStreamIds] = await Promise.all([
       this.modelService.findModelsByIds(dto.ids, dto.network),
-      this.modelService.findModelUseCount(dto.network, dto.ids),
       this.modelService.findIndexedModelIds(dto.network, dto.ids),
     ]);
+    const useCountMap = await this.modelService.findIndexedModelUseCount(
+      dto.network,
+      indexedModelStreamIds,
+    );
     if (!models) {
       throw new NotFoundException(
         new BasicMessageDto(`no models found for ids ${dto.ids}`, 0),

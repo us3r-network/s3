@@ -269,7 +269,7 @@ export default class ModelService {
     }
   }
 
-  async findModelUseCount(
+  async findIndexedModelUseCount(
     network: Network,
     models: string[],
     recentlyUsed = false,
