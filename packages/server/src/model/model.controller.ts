@@ -108,7 +108,7 @@ export class ModelController {
       );
       const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
-      const dbUseCountMap = await this.modelService.findModelUseCount(
+      const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
         network,
         indexedModelStreamIds,
       );
@@ -117,7 +117,7 @@ export class ModelController {
         indexedModelStreamIds,
       );
 
-      const dbUseCountMapRecently = await this.modelService.findModelUseCount(
+      const dbUseCountMapRecently = await this.modelService.findIndexedModelUseCount(
         network,
         indexedModelStreamIds,
         true,
@@ -363,9 +363,8 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/ids')
   async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
-    const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
+    const [models, indexedModelStreamIds] = await Promise.all([
       this.modelService.findModelsByIds(dto.ids, dto.network),
-      this.modelService.findModelUseCount(dto.network, dto.ids),
       this.modelService.findIndexedModelIds(dto.network, dto.ids),
     ]);
     if (!models) {
@@ -378,8 +377,9 @@ export class ModelController {
         new BasicMessageDto(`no indexed models found for ids ${dto.ids}`, 0),
       );
     }
-    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
+    const useCountMap = await this.modelService.findIndexedModelUseCount(dto.network, dto.ids);
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
       (e.useCount = useCountMap?.get(e.getStreamId) ?? 0),
         (e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId));
