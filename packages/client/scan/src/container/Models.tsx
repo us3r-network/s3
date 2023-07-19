@@ -9,13 +9,14 @@ import {
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import { getModelStreamList, getStarModels, PageSize } from '../api'
-import { ModelStream } from '../types'
+import { ModelStream, Network } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import Search from '../components/Search'
 import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import { debounce } from 'lodash'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
@@ -48,7 +49,7 @@ export default function ModelsPage() {
     setStarModels([...list])
   }, [personalCollections, network])
 
-  const fetchModel = useCallback(async () => {
+  const fetchModelWithDebounce = async (network: Network) => {
     setModels([])
     setHasMore(true)
     const resp = await getModelStreamList({
@@ -59,7 +60,11 @@ export default function ModelsPage() {
     setModels(list)
     setHasMore(list.length >= PageSize)
     pageNum.current = 1
-  }, [network])
+  }
+
+  const fetchModel = useCallback(debounce(fetchModelWithDebounce, 200), [
+    network,
+  ])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
@@ -83,9 +88,12 @@ export default function ModelsPage() {
   )
 
   useEffect(() => {
-    fetchModel()
+    fetchModel(network)
+  }, [network, fetchModel])
+
+  useEffect(() => {
     fetchPersonalCollections()
-  }, [fetchModel, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
 
   const lists = useMemo(() => {
     if (!filterStar) return models
@@ -105,7 +113,7 @@ export default function ModelsPage() {
                 searchAction={(text) => {
                   searchText.current = text
                   setModels([])
-                  fetchModel()
+                  fetchModel(network)
                 }}
                 placeholder={'Search by model name'}
               />
