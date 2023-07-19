@@ -154,6 +154,7 @@ export default function ModelsPage() {
                 <th>Description</th>
                 <th>ID</th>
                 <th>Usage Count</th>
+                <th>7 Days Usage</th>
                 <th>Release Date</th>
                 <th></th>
               </tr>
@@ -219,6 +220,7 @@ export default function ModelsPage() {
                         </div>
                       )}
                     </td>
+                    <td>{item.recentlyUseCount || '-'}</td>
                     <td>
                       <div className="release-date">
                         {(item.last_anchored_at &&
