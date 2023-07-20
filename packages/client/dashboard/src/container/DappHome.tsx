@@ -133,7 +133,7 @@ export default function DappHome() {
             <span>2b. Coding and testing query and mutation</span>
             <Link to={`/dapp/${selectedDapp?.id}/model-playground`}>
               <button>
-                Explore models <ChevronRightDoubleWhite />
+                Model Playground <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
@@ -194,7 +194,7 @@ export default function DappHome() {
             </span>
             <Link to={`/dapp/${selectedDapp?.id}/components`}>
               <button>
-                Components <ChevronRightDoubleWhite />
+                S3 Component <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
@@ -419,8 +419,6 @@ const StepSubitem = styled.div`
       color: #ffffff;
       gap: 10px;
       background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%);
-      width: 200px;
-      height: 48px;
       padding: 12px 24px 12px 24px;
       border-radius: 24px;
 
@@ -431,6 +429,7 @@ const StepSubitem = styled.div`
       line-height: 24px;
       letter-spacing: 0em;
       text-align: center;
+      white-space: nowrap;
     }
     .coming-soon {
       display: flex;
