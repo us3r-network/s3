@@ -52,6 +52,7 @@ export default function ModelsPage() {
   const fetchModelWithDebounce = async (network: Network) => {
     setModels([])
     setHasMore(true)
+    setFilterStar(false)
     const resp = await getModelStreamList({
       name: searchText.current,
       network,
