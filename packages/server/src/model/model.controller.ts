@@ -378,11 +378,22 @@ export class ModelController {
       );
     }
 
-    const useCountMap = await this.modelService.findIndexedModelUseCount(dto.network, indexedModelStreamIds);
+    const useCountMap = await this.modelService.findModelUseCount(
+      dto.network,
+      dto.ids,
+    );
+    const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+      dto.network,
+      indexedModelStreamIds,
+    );
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
-      (e.useCount = useCountMap?.get(e.getStreamId) ?? 0),
-        (e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId));
+      const isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
+      const useCount = isIndexed
+        ? dbUseCountMap.get(e.getStreamId) ?? 0
+        : useCountMap?.get(e.getStreamId) ?? 0;
+      e.useCount = useCount;
+      e.isIndexed = isIndexed;
     });
 
     return new BasicMessageDto('ok', 0, models);

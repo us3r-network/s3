@@ -269,6 +269,19 @@ export default class ModelService {
     }
   }
 
+  async findModelUseCount(network: Network, models: string[]) {
+    const useCountMap = new Map<string, number>();
+    const key =
+      network == Network.MAINNET
+        ? S3_MAINNET_MODELS_USE_COUNT_ZSET
+        : S3_TESTNET_MODELS_USE_COUNT_ZSET;
+    const scores = await this.redis.zmscore(key, ...models);
+    for (let index = 0; index < models.length; index++) {
+      useCountMap.set(models[index], +scores[index]);
+    }
+    return useCountMap;
+  }
+
   async findIndexedModelUseCount(
     network: Network,
     models: string[],
