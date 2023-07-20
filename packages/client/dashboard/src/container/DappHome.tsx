@@ -351,7 +351,7 @@ const AccordionBody = styled.div<{ isOpen: boolean }>`
   width: 100%;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
-  max-height: ${(props) => (props.isOpen ? '10000px' : '0px')};
+  max-height: ${(props) => (props.isOpen ? '2000px' : '0px')};
   padding-left: 44px;
   box-sizing: border-box;
 `
