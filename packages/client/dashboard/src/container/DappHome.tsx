@@ -17,7 +17,6 @@ export default function DappHome() {
     s4: false,
     s5: false,
   })
-
   const completeSteps = {
     s1: false,
     s2: false,
@@ -46,18 +45,18 @@ export default function DappHome() {
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step1-a.png" alt="" />
             <div>
               <LightbulbIcon />
               <div>Submit your model schema to create new model</div>
+              <a
+                href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://composedb.js.org/docs/0.4.x/guides/composedb-client
+              </a>
             </div>
-            <a
-              href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
-              target="_blank"
-              rel="noreferrer"
-            >
-              https://composedb.js.org/docs/0.4.x/guides/composedb-client
-            </a>
           </div>
         </StepSubitem>
 
@@ -78,7 +77,7 @@ export default function DappHome() {
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step1-b.png" alt="" />
             <div>
               <LightbulbIcon />
               <div>
@@ -110,7 +109,7 @@ export default function DappHome() {
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step2-a.png" alt="" />
             <div>
               <LightbulbIcon />
               <div>
@@ -132,14 +131,14 @@ export default function DappHome() {
         <StepSubitem>
           <div className="header">
             <span>2b. Coding and testing query and mutation</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor`}>
+            <Link to={`/dapp/${selectedDapp?.id}/model-playground`}>
               <button>
                 Explore models <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step2-b.png" alt="" />
           </div>
         </StepSubitem>
 
@@ -147,14 +146,14 @@ export default function DappHome() {
         <StepSubitem>
           <div className="header">
             <span>2c. Viewing and adding data to the model</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor`}>
+            <Link to={`/dapp/${selectedDapp?.id}/statistic`}>
               <button>
                 Model Metrics <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step2-c.png" alt="" />
             <div>
               <LightbulbIcon />
               <div>Fill in the corresponding form to add data</div>
@@ -166,14 +165,14 @@ export default function DappHome() {
         <StepSubitem>
           <div className="header">
             <span>2d. Download the SDK of the model</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor`}>
+            <Link to={`/dapp/${selectedDapp?.id}/model-sdk`}>
               <button>
                 Model SDK <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step2-d.png" alt="" />
           </div>
         </StepSubitem>
       </StepAccordionItem>
@@ -193,14 +192,14 @@ export default function DappHome() {
               developers quickly and easily build decentralised user systems and
               social systems
             </span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor?create-new=true`}>
+            <Link to={`/dapp/${selectedDapp?.id}/components`}>
               <button>
                 Components <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
           <div className="content">
-            <img src="/dapp-home/step1-0.png" alt="" />
+            <img src="/dapp-home/step3.png" alt="" />
           </div>
         </StepSubitem>
       </StepAccordionItem>
@@ -282,6 +281,81 @@ const DappHomeContainer = styled.div`
   }
 `
 
+const StepAccordionItem = ({
+  stepNum,
+  title,
+  isCompleted,
+  isOpen,
+  onChangeOpen,
+  children,
+}: {
+  stepNum: number
+  title: string
+  isCompleted: boolean
+  isOpen: boolean
+  onChangeOpen: (isOpen: boolean) => void
+  children?: React.ReactNode
+}) => {
+  return (
+    <AccordionItem>
+      <AccordionHeader>
+        <StepTitle>
+          <StepCompleteCheckbox isSelected={isCompleted}>
+            <CheckCircleIcon bgc="#2173DF" />
+          </StepCompleteCheckbox>
+          <span>Step {stepNum}</span>
+          {title}
+        </StepTitle>
+        <AccordionToggleButton isSelected={isOpen} onChange={onChangeOpen}>
+          <ChevronDown />
+        </AccordionToggleButton>
+      </AccordionHeader>
+      <AccordionBody isOpen={isOpen}>{children}</AccordionBody>
+    </AccordionItem>
+  )
+}
+const AccordionItem = styled.div`
+  background: #1b1e23;
+  border: 1px solid #39424c;
+  border-radius: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+`
+const AccordionHeader = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+const AccordionToggleButton = styled(ToggleButton)`
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: var(--14171-a, #14171a);
+
+  &[aria-pressed='true'] {
+    > svg {
+      transform: rotate(180deg);
+      transition: all 0.3s ease-in-out;
+    }
+  }
+  &[aria-pressed='false'] {
+    > svg {
+      transform: rotate(0deg);
+      transition: all 0.3s ease-in-out;
+    }
+  }
+`
+const AccordionBody = styled.div<{ isOpen: boolean }>`
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  max-height: ${(props) => (props.isOpen ? '10000px' : '0px')};
+  padding-left: 44px;
+  box-sizing: border-box;
+`
+
 const StepCompleteCheckbox = styled(Checkbox)`
   display: flex;
   align-items: center;
@@ -300,6 +374,28 @@ const StepCompleteCheckbox = styled(Checkbox)`
       width: 24px;
       height: 24px;
     }
+  }
+`
+const StepTitle = styled.h3`
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 0px;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  span {
+    background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%),
+      linear-gradient(0deg, #ffffff, #ffffff);
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+    padding-right: 5px;
   }
 `
 
@@ -381,95 +477,5 @@ const StepSubitem = styled.div`
     img {
       max-width: 100%;
     }
-  }
-`
-
-const StepAccordionItem = ({
-  stepNum,
-  title,
-  isCompleted,
-  isOpen,
-  onChangeOpen,
-  children,
-}: {
-  stepNum: number
-  title: string
-  isCompleted: boolean
-  isOpen: boolean
-  onChangeOpen: (isOpen: boolean) => void
-  children?: React.ReactNode
-}) => {
-  return (
-    <AccordionItem>
-      <AccordionHeader>
-        <StepTitle>
-          <StepCompleteCheckbox isSelected={isCompleted}>
-            <CheckCircleIcon bgc="#2173DF" />
-          </StepCompleteCheckbox>
-          <span>Step {stepNum}</span>
-          {title}
-        </StepTitle>
-        <AccordionToggleButton isSelected={isOpen} onChange={onChangeOpen}>
-          <ChevronDown />
-        </AccordionToggleButton>
-      </AccordionHeader>
-      <AccordionBody isOpen={isOpen}>{children}</AccordionBody>
-    </AccordionItem>
-  )
-}
-const AccordionItem = styled.div`
-  background: #1b1e23;
-  border: 1px solid #39424c;
-  border-radius: 20px;
-  padding: 20px;
-  box-sizing: border-box;
-`
-const AccordionHeader = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
-const AccordionToggleButton = styled(ToggleButton)`
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 20px;
-  background: var(--14171-a, #14171a);
-
-  &[aria-pressed='true'] {
-    > svg {
-      transform: rotate(180deg);
-    }
-  }
-`
-const AccordionBody = styled.div<{ isOpen: boolean }>`
-  width: 100%;
-  transition: all 0.3s ease-in-out;
-  overflow: hidden;
-  max-height: ${(props) => (props.isOpen ? '1000px' : '0px')};
-  padding-left: 44px;
-  box-sizing: border-box;
-`
-const StepTitle = styled.h3`
-  font-family: Rubik;
-  font-size: 24px;
-  font-style: italic;
-  font-weight: 700;
-  line-height: 28px;
-  letter-spacing: 0px;
-  text-align: left;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-
-  span {
-    background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%),
-      linear-gradient(0deg, #ffffff, #ffffff);
-    -webkit-background-clip: text;
-    color: transparent;
-    display: inline-block;
   }
 `
