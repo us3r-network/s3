@@ -37,7 +37,7 @@ export default function DappHome() {
         <hr />
         <StepSubitem>
           <div className="header">
-            <span>1a. create your own model or composite</span>
+            <span>1a. Create your own model or composite</span>
             <Link to={`/dapp/${selectedDapp?.id}/model-editor?create-new=true`}>
               <button>
                 Create Model <ChevronRightDoubleWhite />
@@ -46,9 +46,9 @@ export default function DappHome() {
           </div>
           <div className="content">
             <img src="/dapp-home/step1-a.png" alt="" />
-            <div>
+            <div className="tip">
               <LightbulbIcon />
-              <div>Submit your model schema to create new model</div>
+              <span>Submit your model schema to create new model</span>
               <a
                 href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
                 target="_blank"
@@ -64,7 +64,7 @@ export default function DappHome() {
         <StepSubitem>
           <div className="header">
             <span>
-              1b. Explore the existing models, , and add the model which suits
+              1b. Explore the existing models, and add the model which suits
               your Dapp.
               <br />
               When in doubt, you can mark it to your favorite models first and
@@ -78,12 +78,12 @@ export default function DappHome() {
           </div>
           <div className="content">
             <img src="/dapp-home/step1-b.png" alt="" />
-            <div>
+            <div className="tip">
               <LightbulbIcon />
-              <div>
-                Click the "Add" button,It will be added to your model list, or
-                add to "My Favorite Model" first.
-              </div>
+              <span>
+                Click the "Add" button. It will be added to your model list, or
+                add it to "My Favorite Model" first.
+              </span>
             </div>
           </div>
         </StepSubitem>
@@ -110,12 +110,13 @@ export default function DappHome() {
           </div>
           <div className="content">
             <img src="/dapp-home/step2-a.png" alt="" />
-            <div>
+            <div className="tip">
               <LightbulbIcon />
-              <div>
-                Click the "Download" button.Please refer to the website for
-                coding guides:
-              </div>
+              <span>
+                Click the "Download" button.
+                <br />
+                Please refer to the website for coding guides:
+              </span>
               <a
                 href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
                 target="_blank"
@@ -154,9 +155,9 @@ export default function DappHome() {
           </div>
           <div className="content">
             <img src="/dapp-home/step2-c.png" alt="" />
-            <div>
+            <div className="tip">
               <LightbulbIcon />
-              <div>Fill in the corresponding form to add data</div>
+              <span>Fill in the corresponding form to add data</span>
             </div>
           </div>
         </StepSubitem>
@@ -179,7 +180,7 @@ export default function DappHome() {
 
       <StepAccordionItem
         stepNum={3}
-        title={'S3 Component'}
+        title={'S3 Components'}
         isCompleted={completeSteps.s3}
         isOpen={openSteps.s3}
         onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s3: isOpen })}
@@ -194,7 +195,7 @@ export default function DappHome() {
             </span>
             <Link to={`/dapp/${selectedDapp?.id}/components`}>
               <button>
-                S3 Component <ChevronRightDoubleWhite />
+                S3 Components <ChevronRightDoubleWhite />
               </button>
             </Link>
           </div>
@@ -455,8 +456,13 @@ const StepSubitem = styled.div`
     display: flex;
     align-items: flex-start;
     gap: 20px;
-
-    > div {
+    img {
+      height: auto;
+      width: 0px;
+      flex: 1;
+      max-width: 854px;
+    }
+    .tip {
       width: 340px;
       display: flex;
       padding: 20px;
@@ -466,15 +472,11 @@ const StepSubitem = styled.div`
       gap: 10px;
       border-radius: 20px;
       background: var(--718096, #718096);
-    }
 
-    a {
-      color: var(--1-b-1-e-23, #1b1e23);
-      word-break: break-all;
-    }
-
-    img {
-      max-width: 100%;
+      a {
+        color: var(--1-b-1-e-23, #1b1e23);
+        word-break: break-all;
+      }
     }
   }
 `

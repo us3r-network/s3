@@ -56,7 +56,7 @@ export default function Nav({ appId }: { appId: string }) {
             },
             {
               path: `/dapp/${appId}/components`,
-              name: 'S3 Component',
+              name: 'S3 Components',
               icon: ComponentIcon,
             },
             {
