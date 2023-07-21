@@ -386,14 +386,35 @@ export class ModelController {
       dto.network,
       indexedModelStreamIds,
     );
+    const firstRecordMap = await this.modelService.findModelFirstRecord(
+      dto.network,
+      indexedModelStreamIds,
+    );
+
+    const dbUseCountMapRecently =
+      await this.modelService.findIndexedModelUseCount(
+        dto.network,
+        indexedModelStreamIds,
+        true,
+      );
+
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
       const isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
       const useCount = isIndexed
         ? dbUseCountMap.get(e.getStreamId) ?? 0
         : useCountMap?.get(e.getStreamId) ?? 0;
+
+      const firstRecord = firstRecordMap.get(e.getStreamId);
+      const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+      const recentlyUseCount =
+        isIndexed && dbUseCountMapRecently.get(e.getStreamId);
+
       e.useCount = useCount;
       e.isIndexed = isIndexed;
+      e.firstRecordTime = firstRecordTime;
+      e.recentlyUseCount = recentlyUseCount;
     });
 
     return new BasicMessageDto('ok', 0, models);
