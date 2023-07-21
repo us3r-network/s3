@@ -28,7 +28,7 @@ export default function MyDapps() {
       <div className="more">
         <div className="description">
           <h1>
-            S3 Dashboard helps developers manage your Dapp's models, monitor
+            S3 Console helps developers manage your Dapp's models, monitor
             real-time data
           </h1>
           <ul>

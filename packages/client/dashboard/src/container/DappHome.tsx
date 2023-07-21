@@ -51,7 +51,7 @@ export default function DappHome() {
 
   return (
     <DappHomeContainer>
-      <h1>{selectedDapp?.name}, welcome to S3 Dashboard</h1>
+      <h1>{selectedDapp?.name}, welcome to S3 Console</h1>
       <StepAccordionItem
         stepNum={1}
         title={'Data model design'}
