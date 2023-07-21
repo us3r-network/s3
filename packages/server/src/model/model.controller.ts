@@ -173,14 +173,46 @@ export class ModelController {
       modelStreamIds,
     );
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
+
+    const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+      network,
+      indexedModelStreamIds,
+    );
+    const firstRecordMap = await this.modelService.findModelFirstRecord(
+      network,
+      indexedModelStreamIds,
+    );
+
+    const dbUseCountMapRecently =
+      await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+        true,
+      );
+
     return new BasicMessageDto(
       'ok',
       0,
-      metaModels.map((m) => ({
-        ...m,
-        useCount: useCountMap?.get(m.getStreamId) ?? 0,
-        isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
-      })),
+      metaModels.map((m) => {
+        const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
+        const useCount = isIndexed
+          ? dbUseCountMap.get(m.getStreamId)
+          : useCountMap?.get(m.getStreamId) ?? 0;
+
+        const firstRecord = firstRecordMap.get(m.getStreamId);
+        const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+        const recentlyUseCount =
+          isIndexed && dbUseCountMapRecently.get(m.getStreamId);
+
+        return {
+          ...m,
+          useCount,
+          isIndexed,
+          firstRecordTime,
+          recentlyUseCount,
+        };
+      }),
     );
   }
 
