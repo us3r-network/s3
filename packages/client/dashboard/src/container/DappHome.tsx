@@ -8,6 +8,7 @@ import ChevronDown from '../components/Icons/CheckronDown'
 import { Checkbox, ToggleButton } from 'react-aria-components'
 import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
 import { useAppCtx } from '../context/AppCtx'
+import DisabledIcon from '../components/Icons/DisabledIcon'
 
 export default function DappHome() {
   const { guideSteps } = useAppCtx()
@@ -233,6 +234,7 @@ export default function DappHome() {
       <StepAccordionItem
         stepNum={4}
         title={'Release App'}
+        isDisabled={true}
         isCompleted={completeSteps.s4}
         isOpen={openSteps.s4}
         onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s4: isOpen })}
@@ -258,6 +260,7 @@ export default function DappHome() {
       <StepAccordionItem
         stepNum={5}
         title={'Monitor data and operation'}
+        isDisabled={true}
         isCompleted={completeSteps.s5}
         isOpen={openSteps.s5}
         onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s5: isOpen })}
@@ -310,6 +313,7 @@ const DappHomeContainer = styled.div`
 const StepAccordionItem = ({
   stepNum,
   title,
+  isDisabled,
   isCompleted,
   isOpen,
   onChangeOpen,
@@ -317,6 +321,7 @@ const StepAccordionItem = ({
 }: {
   stepNum: number
   title: string
+  isDisabled?: boolean
   isCompleted: boolean
   isOpen: boolean
   onChangeOpen: (isOpen: boolean) => void
@@ -326,9 +331,14 @@ const StepAccordionItem = ({
     <AccordionItem>
       <AccordionHeader>
         <StepTitle>
-          <StepCompleteCheckbox isSelected={isCompleted}>
-            <CheckCircleIcon bgc="#2173DF" />
-          </StepCompleteCheckbox>
+          {isDisabled ? (
+            <DisabledIcon />
+          ) : (
+            <StepCompleteCheckbox isSelected={isCompleted}>
+              <CheckCircleIcon bgc="#2173DF" />
+            </StepCompleteCheckbox>
+          )}
+
           <span>Step {stepNum}</span>
           {title}
         </StepTitle>
