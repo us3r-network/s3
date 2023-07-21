@@ -61,7 +61,7 @@ export default function App() {
   return (
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
-      appName="S3 Dashboard"
+      appName="S3 Console"
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider>
