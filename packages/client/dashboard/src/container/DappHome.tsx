@@ -3,13 +3,18 @@ import useSelectedDapp from '../hooks/useSelectedDapp'
 import { ChevronRightDoubleWhite } from '../components/Icons/ChevronRightDouble'
 import { Link } from 'react-router-dom'
 import LightbulbIcon from '../components/Icons/LightbulbIcon'
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ChevronDown from '../components/Icons/CheckronDown'
 import { Checkbox, ToggleButton } from 'react-aria-components'
 import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
+import { useAppCtx } from '../context/AppCtx'
 
 export default function DappHome() {
+  const { guideSteps } = useAppCtx()
+  const { steps } = guideSteps
   const { selectedDapp } = useSelectedDapp()
+
+  const isInitOpenSteps = useRef(false)
   const [openSteps, setOpenSteps] = useState({
     s1: false,
     s2: false,
@@ -17,13 +22,33 @@ export default function DappHome() {
     s4: false,
     s5: false,
   })
-  const completeSteps = {
-    s1: false,
-    s2: false,
-    s3: false,
-    s4: false,
-    s5: false,
-  }
+  const completeSteps = useMemo(() => {
+    return {
+      s1: steps[0],
+      s2: steps[1],
+      s3: steps[2],
+      s4: steps[3],
+      s5: steps[4],
+    }
+  }, [steps])
+
+  useEffect(() => {
+    if (isInitOpenSteps.current) return
+    isInitOpenSteps.current = true
+    for (const key in completeSteps) {
+      const isCompleted = (completeSteps as any)[key]
+      if (!isCompleted) {
+        setOpenSteps((openSteps) => {
+          return {
+            ...openSteps,
+            [key]: true,
+          }
+        })
+        return
+      }
+    }
+  }, [completeSteps])
+
   return (
     <DappHomeContainer>
       <h1>{selectedDapp?.name}, welcome to S3 Dashboard</h1>

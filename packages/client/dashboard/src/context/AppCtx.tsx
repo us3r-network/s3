@@ -9,6 +9,7 @@ import React, {
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { ClientDApp } from '../types'
 import { getDappWithDid } from '../api'
+import { GuideStepsState, useGuideStepsState } from '../hooks/useGuideSteps'
 
 export type PersonalCollection = {
   modelId: string
@@ -19,6 +20,7 @@ export interface AppContextData {
   loadingDApps: boolean
   dapps: ClientDApp[]
   loadDapps: () => Promise<void>
+  guideSteps: GuideStepsState
 }
 
 const AppContext = createContext<AppContextData | null>(null)
@@ -60,12 +62,15 @@ export default function AppProvider({
     }
   }, [session])
 
+  const guideSteps = useGuideStepsState(dapps, loadingDApps)
+
   return (
     <AppContext.Provider
       value={{
         dapps,
         loadDapps,
         loadingDApps,
+        guideSteps,
       }}
     >
       {children}
