@@ -9,7 +9,7 @@ import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { PersonalCollection, useAppCtx } from '../context/AppCtx'
 import { Network } from './Selector/EnumSelect'
-import { getStarModels, updateDapp } from '../api'
+import { getStarModels, startIndexModel, updateDapp } from '../api'
 import { ModelStream } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
@@ -176,7 +176,10 @@ function ModelList() {
                   </td>
 
                   <td>
-                    <OpsBtns modelId={item.stream_id} />
+                    <OpsBtns
+                      modelId={item.stream_id}
+                      hasIndexed={!!item.isIndexed}
+                    />
                   </td>
                 </tr>
               )
@@ -188,7 +191,13 @@ function ModelList() {
   )
 }
 
-export function OpsBtns({ modelId }: { modelId: string }) {
+export function OpsBtns({
+  modelId,
+  hasIndexed,
+}: {
+  modelId: string
+  hasIndexed: boolean
+}) {
   const { loadDapps } = useAppCtx()
   const session = useSession()
   const { selectedDapp } = useSelectedDapp()
@@ -196,6 +205,13 @@ export function OpsBtns({ modelId }: { modelId: string }) {
   const addToModelList = useCallback(
     async (modelId: string) => {
       if (!session || !selectedDapp) return
+      if (!hasIndexed) {
+        startIndexModel({
+          modelId,
+          network: selectedDapp.network as Network,
+          didSession: session.serialize(),
+        }).catch(console.error)
+      }
       try {
         setAdding(true)
         const models = selectedDapp.models || []
@@ -208,7 +224,7 @@ export function OpsBtns({ modelId }: { modelId: string }) {
         setAdding(false)
       }
     },
-    [loadDapps, selectedDapp, session, setAdding]
+    [hasIndexed, loadDapps, selectedDapp, session]
   )
   return (
     <div className="btns">

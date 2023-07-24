@@ -225,9 +225,9 @@ export default function Instance({
         onChange={(e) => setFormData(e.formData)}
         onSubmit={() => submitStream()}
       />
-
-      {composeClientAuthenticated && (
-        <ListHeading>
+      <ListHeading>
+        <h3>{name}</h3>
+        {composeClientAuthenticated && (
           <PlusButton
             onPress={() => {
               setFormType('create')
@@ -237,9 +237,8 @@ export default function Instance({
           >
             <PlusIcon />
           </PlusButton>
-        </ListHeading>
-      )}
-
+        )}
+      </ListHeading>
       <InfiniteScroll
         dataLength={streams.length}
         next={() => {
@@ -309,8 +308,12 @@ const PageBox = styled.div`
 const ListHeading = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+  }
 `
 const PlusButton = styled(Button)`
   box-sizing: border-box;

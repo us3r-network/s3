@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { getModelInfo, queryModelGraphql } from '../api'
 import { ModeQueryResult, ModelStream } from '../types'
@@ -8,7 +7,7 @@ import { schemas } from '../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { Code } from './ModelSDK'
+import CodeDownload from './CodeDownload'
 
 export default function Definition({ streamId }: { streamId: string }) {
   const [modelData, setModelData] = useState<ModeQueryResult>()
@@ -63,14 +62,6 @@ export default function Definition({ streamId }: { streamId: string }) {
     [selectedDapp]
   )
 
-  const download = (text: string, filename: string) => {
-    const blob = new Blob([text], {
-      type: 'text/plain;charset=utf-8',
-    })
-
-    FileSaver.saveAs(blob, filename)
-  }
-
   useEffect(() => {
     if (!streamId) return
     fetchModelGraphql(streamId)
@@ -106,51 +97,21 @@ export default function Definition({ streamId }: { streamId: string }) {
       </EditorBox>
       <ResultBox>
         {modelData?.composite && (
-          <div>
-            <div className="title">
-              <h3>Model's composite</h3>
-              <button
-                onClick={() => {
-                  download(
-                    JSON.stringify(modelData.composite),
-                    'composite.json'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="composite"
-                content={JSON.stringify(modelData.composite, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Composite"
+            downloadContent={JSON.stringify(modelData.composite)}
+            downloadFileName="composite.json"
+            content={JSON.stringify(modelData.composite, null, 2)}
+          />
         )}
         {modelData?.runtimeDefinition && (
-          <div>
-            <div className="title">
-              <h3>Model's runtime definition</h3>
-              <button
-                onClick={() => {
-                  download(
-                    `// This is an auto-generated file, do not edit manually
-  export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
-                    'runtime-composite.js'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="runtimeDefinition"
-                content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Runtime Definition"
+            downloadContent={`// This is an auto-generated file, do not edit manually
+export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
+            downloadFileName="runtime-composite.js"
+            content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
+          />
         )}
       </ResultBox>
     </div>
@@ -197,7 +158,7 @@ const ResultBox = styled.div`
       color: #ffffff;
 
       button {
-        background: #ffffff;
+        background: inherit;
       }
 
       h3 {
