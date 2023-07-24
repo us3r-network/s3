@@ -40,3 +40,7 @@ export const Types: { [key: string]: string } = {
 export const TypesReverse = Object.fromEntries(
   Object.entries(Types).map(([key, value]) => [value, key])
 )
+
+export const WALLET_CONNECT_PROJECT_ID =
+  process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID ||
+  'c652d0148879353d7e965d7f6f361e59'

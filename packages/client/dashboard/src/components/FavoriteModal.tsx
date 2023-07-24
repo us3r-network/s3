@@ -81,16 +81,20 @@ function ModelList() {
       return
     }
 
-    const resp = await getStarModels({
-      network: (selectedDapp?.network as Network) || Network.TESTNET,
-      ids,
-    })
-    if (resp.data.code !== 0) {
-      throw new Error(resp.data.msg)
-    }
+    try {
+      const resp = await getStarModels({
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
+        ids,
+      })
+      if (resp.data.code !== 0) {
+        throw new Error(resp.data.msg)
+      }
 
-    const list = resp.data.data
-    setStarModels([...list])
+      const list = resp.data.data
+      setStarModels([...list])
+    } catch (error) {
+      console.error(error)
+    }
   }, [personalCollections, selectedDapp?.network])
 
   useEffect(() => {

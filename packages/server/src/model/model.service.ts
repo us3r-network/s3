@@ -269,9 +269,23 @@ export default class ModelService {
     }
   }
 
-  async findModelUseCount(
+  async findModelUseCount(network: Network, models: string[]) {
+    const useCountMap = new Map<string, number>();
+    const key =
+      network == Network.MAINNET
+        ? S3_MAINNET_MODELS_USE_COUNT_ZSET
+        : S3_TESTNET_MODELS_USE_COUNT_ZSET;
+    const scores = await this.redis.zmscore(key, ...models);
+    for (let index = 0; index < models.length; index++) {
+      useCountMap.set(models[index], +scores[index]);
+    }
+    return useCountMap;
+  }
+
+  async findIndexedModelUseCount(
     network: Network,
     models: string[],
+    recentlyUsed = false,
   ): Promise<Map<string, number>> {
     const useCountMap = new Map<string, number>();
     let ceramicEntityManager: EntityManager;
@@ -280,19 +294,52 @@ export default class ModelService {
       : (ceramicEntityManager = this.testnetCeramicEntityManager);
 
     try {
-      const modelUseCounts = await Promise.all(models.map(m => {
-        return ceramicEntityManager.query(`select count(*) from ${m}`)
-      }));
+      const modelUseCounts = await Promise.all(
+        models.map((m) => {
+          return ceramicEntityManager.query(
+            recentlyUsed
+              ? `select count(*) from ${m} where updated_at > now() - interval '7 day'`
+              : `select count(*) from ${m}`,
+          );
+        }),
+      );
 
       for (let i = 0; i < models.length; i++) {
         useCountMap.set(models[i], +modelUseCounts[i][0].count);
       }
     } catch (error) {
       this.logger.error(`querying model use count ${models} err: ${error}`);
-      throw new ServiceUnavailableException((error as Error).message);
+      // throw new ServiceUnavailableException((error as Error).message);
     }
 
     return useCountMap;
+  }
+
+  async findModelFirstRecord(network: Network, models: string[]) {
+    const firstRecordMap = new Map<string, any>();
+    let ceramicEntityManager: EntityManager;
+    network == Network.MAINNET
+      ? (ceramicEntityManager = this.mainnetCeramicEntityManager)
+      : (ceramicEntityManager = this.testnetCeramicEntityManager);
+
+    try {
+      const firstRecords = await Promise.all(
+        models.map((m) => {
+          return ceramicEntityManager.query(
+            `select * from ${m} order by created_at ASC limit 1`,
+          );
+        }),
+      );
+
+      for (let i = 0; i < models.length; i++) {
+        firstRecordMap.set(models[i], firstRecords[i][0]);
+      }
+    } catch (error) {
+      this.logger.error(`querying model first record ${models} err: ${error}`);
+      throw new ServiceUnavailableException((error as Error).message);
+    }
+
+    return firstRecordMap;
   }
 
   async getStreams(

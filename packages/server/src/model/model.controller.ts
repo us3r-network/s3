@@ -101,21 +101,52 @@ export class ModelController {
 
       if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
       const modelStreamIds = metaModels.map((m) => m.getStreamId);
+
       const indexedModelStreamIds = await this.modelService.findIndexedModelIds(
         network,
         modelStreamIds,
       );
       const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
+      const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+      );
+      const firstRecordMap = await this.modelService.findModelFirstRecord(
+        network,
+        indexedModelStreamIds,
+      );
+
+      const dbUseCountMapRecently = await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+        true,
+      );
+
       return new BasicMessageDto(
         'ok',
         0,
         metaModels
-          .map((m) => ({
-            ...m,
-            useCount: useCountMap?.get(m.getStreamId) ?? 0,
-            isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
-          }))
+          .map((m) => {
+            const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
+            const useCount = isIndexed
+              ? dbUseCountMap.get(m.getStreamId)
+              : useCountMap?.get(m.getStreamId) ?? 0;
+
+            const firstRecord = firstRecordMap.get(m.getStreamId);
+            const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+            const recentlyUseCount =
+              isIndexed && dbUseCountMapRecently.get(m.getStreamId);
+
+            return {
+              ...m,
+              useCount,
+              isIndexed,
+              firstRecordTime,
+              recentlyUseCount,
+            };
+          })
           .sort((a, b) => b.useCount - a.useCount),
       );
     }
@@ -142,14 +173,46 @@ export class ModelController {
       modelStreamIds,
     );
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
+
+    const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+      network,
+      indexedModelStreamIds,
+    );
+    const firstRecordMap = await this.modelService.findModelFirstRecord(
+      network,
+      indexedModelStreamIds,
+    );
+
+    const dbUseCountMapRecently =
+      await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+        true,
+      );
+
     return new BasicMessageDto(
       'ok',
       0,
-      metaModels.map((m) => ({
-        ...m,
-        useCount: useCountMap?.get(m.getStreamId) ?? 0,
-        isIndexed: indexedModelStreamIdSet.has(m.getStreamId),
-      })),
+      metaModels.map((m) => {
+        const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
+        const useCount = isIndexed
+          ? dbUseCountMap.get(m.getStreamId)
+          : useCountMap?.get(m.getStreamId) ?? 0;
+
+        const firstRecord = firstRecordMap.get(m.getStreamId);
+        const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+        const recentlyUseCount =
+          isIndexed && dbUseCountMapRecently.get(m.getStreamId);
+
+        return {
+          ...m,
+          useCount,
+          isIndexed,
+          firstRecordTime,
+          recentlyUseCount,
+        };
+      }),
     );
   }
 
@@ -332,9 +395,8 @@ export class ModelController {
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/ids')
   async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
-    const [models, useCountMap, indexedModelStreamIds] = await Promise.all([
+    const [models, indexedModelStreamIds] = await Promise.all([
       this.modelService.findModelsByIds(dto.ids, dto.network),
-      this.modelService.findModelUseCount(dto.network, dto.ids),
       this.modelService.findIndexedModelIds(dto.network, dto.ids),
     ]);
     if (!models) {
@@ -347,11 +409,44 @@ export class ModelController {
         new BasicMessageDto(`no indexed models found for ids ${dto.ids}`, 0),
       );
     }
-    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
 
+    const useCountMap = await this.modelService.findModelUseCount(
+      dto.network,
+      dto.ids,
+    );
+    const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+      dto.network,
+      indexedModelStreamIds,
+    );
+    const firstRecordMap = await this.modelService.findModelFirstRecord(
+      dto.network,
+      indexedModelStreamIds,
+    );
+
+    const dbUseCountMapRecently =
+      await this.modelService.findIndexedModelUseCount(
+        dto.network,
+        indexedModelStreamIds,
+        true,
+      );
+
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
-      (e.useCount = useCountMap?.get(e.getStreamId) ?? 0),
-        (e.isIndexed = indexedModelStreamIdSet.has(e.getStreamId));
+      const isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
+      const useCount = isIndexed
+        ? dbUseCountMap.get(e.getStreamId) ?? 0
+        : useCountMap?.get(e.getStreamId) ?? 0;
+
+      const firstRecord = firstRecordMap.get(e.getStreamId);
+      const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+      const recentlyUseCount =
+        isIndexed && dbUseCountMapRecently.get(e.getStreamId);
+
+      e.useCount = useCount;
+      e.isIndexed = isIndexed;
+      e.firstRecordTime = firstRecordTime;
+      e.recentlyUseCount = recentlyUseCount;
     });
 
     return new BasicMessageDto('ok', 0, models);

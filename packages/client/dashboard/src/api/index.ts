@@ -8,7 +8,11 @@ import {
   ModelMid,
   ModelStream,
 } from '../types'
-import { Network } from '../components/Selector/EnumSelect'
+import {
+  GraphqlGenType,
+  GraphqlGenTypeServer,
+  Network,
+} from '../components/Selector/EnumSelect'
 
 export const PageSize = 50
 
@@ -255,5 +259,22 @@ export function deleteDappComposites({
     headers: {
       'did-session': didSession,
     },
+  })
+}
+
+export function getModelSDK({
+  network,
+  modelId,
+  type,
+}: {
+  network: Network
+  modelId: string
+  type: GraphqlGenType
+}): AxiosPromise<ApiResp<any>> {
+  let host = APP_API_URL
+  const serverType = GraphqlGenTypeServer[type]
+  return axios({
+    url: host + `/models/${modelId}/sdk?network=${network}&type=${serverType}`,
+    method: 'GET',
   })
 }
