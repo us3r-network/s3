@@ -9,13 +9,14 @@ import {
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import { getModelStreamList, getStarModels, PageSize } from '../api'
-import { ModelStream } from '../types'
+import { ModelStream, Network } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import Search from '../components/Search'
 import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import { debounce } from 'lodash'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
@@ -48,9 +49,10 @@ export default function ModelsPage() {
     setStarModels([...list])
   }, [personalCollections, network])
 
-  const fetchModel = useCallback(async () => {
+  const fetchModelWithDebounce = async (network: Network) => {
     setModels([])
     setHasMore(true)
+    setFilterStar(false)
     const resp = await getModelStreamList({
       name: searchText.current,
       network,
@@ -59,7 +61,11 @@ export default function ModelsPage() {
     setModels(list)
     setHasMore(list.length >= PageSize)
     pageNum.current = 1
-  }, [network])
+  }
+
+  const fetchModel = useCallback(debounce(fetchModelWithDebounce, 200), [
+    network,
+  ])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
@@ -83,9 +89,12 @@ export default function ModelsPage() {
   )
 
   useEffect(() => {
-    fetchModel()
+    fetchModel(network)
+  }, [network, fetchModel])
+
+  useEffect(() => {
     fetchPersonalCollections()
-  }, [fetchModel, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
 
   const lists = useMemo(() => {
     if (!filterStar) return models
@@ -105,7 +114,7 @@ export default function ModelsPage() {
                 searchAction={(text) => {
                   searchText.current = text
                   setModels([])
-                  fetchModel()
+                  fetchModel(network)
                 }}
                 placeholder={'Search by model name'}
               />
@@ -154,6 +163,7 @@ export default function ModelsPage() {
                 <th>Description</th>
                 <th>ID</th>
                 <th>Usage Count</th>
+                <th>7 Days Usage</th>
                 <th>Release Date</th>
                 <th></th>
               </tr>
@@ -193,9 +203,24 @@ export default function ModelsPage() {
                     </td>
                     <td>
                       {(!item.isIndexed && (
-                        <div className="usage-count">{item.useCount}</div>
+                        <div
+                          className="usage-count"
+                          title={`from ${dayjs(item.created_at).format(
+                            'YYYY-MM-DD'
+                          )}`}
+                        >
+                          {item.useCount}
+                        </div>
                       )) || (
-                        <div>
+                        <div
+                          title={
+                            item.firstRecordTime
+                              ? `from ${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD'
+                                )}`
+                              : ''
+                          }
+                        >
                           <Link
                             to={`/models/model/${item.stream_id}/mids?network=${network}`}
                           >
@@ -204,6 +229,7 @@ export default function ModelsPage() {
                         </div>
                       )}
                     </td>
+                    <td>{item.recentlyUseCount || '-'}</td>
                     <td>
                       <div className="release-date">
                         {(item.last_anchored_at &&

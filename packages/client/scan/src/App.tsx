@@ -72,7 +72,12 @@ function Routers() {
 export default function App() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [network, setNetwork] = useState(Network.TESTNET)
+  const routerNet = searchParams.get('network')?.toUpperCase()
+  const [network, setNetwork] = useState(
+    Object.values(Network).includes(routerNet as Network)
+      ? (routerNet as Network)
+      : Network.TESTNET
+  )
 
   useEffect(() => {
     const routerNet = searchParams.get('network')?.toUpperCase()
@@ -81,7 +86,7 @@ export default function App() {
       Object.values(Network).includes(routerNet as Network) &&
         setNetwork(routerNet as Network)
     }
-  }, [searchParams, setSearchParams])
+  }, [searchParams, network])
 
   return (
     <Us3rAuthWithRainbowkitProvider
