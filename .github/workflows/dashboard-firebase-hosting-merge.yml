@@ -2,7 +2,7 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy Dashboard to Firebase Hosting on merge
-'on':
+"on":
   push:
     branches:
       - dashboard
@@ -11,14 +11,14 @@ jobs:
   prod_build_and_deploy:
     if: github.ref == 'refs/heads/dashboard'
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: production
       url: https://dashboard.s3.xyz
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
       - run: |
           cd packages/client/dashboard
           yarn 
@@ -26,51 +26,51 @@ jobs:
         env:
           CI: false
           GENERATE_SOURCEMAP: false
-          REACT_APP_NAME: 'US3R DASHBOARD'
-          REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
-          REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
-          REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
-          REACT_APP_CERAMIC_TESTNET_HOST: '${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}'
-          REACT_APP_S3_SCAN_URL: '${{ vars.REACT_APP_S3_SCAN_URL }}'
-          REACT_APP_DOCS_URL: '${{ vars.REACT_APP_DOCS_URL }}'
+          REACT_APP_NAME: "US3R CONSOLE"
+          REACT_APP_API_BASE_URL: "${{ vars.REACT_APP_API_BASE_URL }}"
+          REACT_APP_UPLOAD_API_URL: "${{ vars.REACT_APP_UPLOAD_API_URL }}"
+          REACT_APP_CERAMIC_MAINNET_HOST: "${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}"
+          REACT_APP_CERAMIC_TESTNET_HOST: "${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}"
+          REACT_APP_S3_SCAN_URL: "${{ vars.REACT_APP_S3_SCAN_URL }}"
+          REACT_APP_DOCS_URL: "${{ vars.REACT_APP_DOCS_URL }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_US3R_NETWORK }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_US3R_NETWORK }}"
           channelId: live
           projectId: us3r-network
           target: dashboard
-          entryPoint: './packages/client/dashboard/' 
+          entryPoint: "./packages/client/dashboard/"
   dev_build_and_deploy:
     if: github.ref == 'refs/heads/dashboard-dev'
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: development
       url: https://dashboard-dev.s3.xyz
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
       - run: |
           cd packages/client/dashboard
           yarn 
           yarn build
         env:
           CI: false
-          NODE_OPTIONS: '--max-old-space-size=8192'
-          REACT_APP_NAME: 'US3R DASHBOARD DEV'
-          REACT_APP_API_BASE_URL: '${{ vars.REACT_APP_API_BASE_URL }}'
-          REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
-          REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
-          REACT_APP_CERAMIC_TESTNET_HOST: '${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}'
-          REACT_APP_S3_SCAN_URL: '${{ vars.REACT_APP_S3_SCAN_URL }}'
-          REACT_APP_DOCS_URL: '${{ vars.REACT_APP_DOCS_URL }}'
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          REACT_APP_NAME: "US3R CONSOLE DEV"
+          REACT_APP_API_BASE_URL: "${{ vars.REACT_APP_API_BASE_URL }}"
+          REACT_APP_UPLOAD_API_URL: "${{ vars.REACT_APP_UPLOAD_API_URL }}"
+          REACT_APP_CERAMIC_MAINNET_HOST: "${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}"
+          REACT_APP_CERAMIC_TESTNET_HOST: "${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}"
+          REACT_APP_S3_SCAN_URL: "${{ vars.REACT_APP_S3_SCAN_URL }}"
+          REACT_APP_DOCS_URL: "${{ vars.REACT_APP_DOCS_URL }}"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_US3R_NETWORK }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_US3R_NETWORK }}"
           channelId: live
           projectId: us3r-network
           target: dashboard-dev
-          entryPoint: './packages/client/dashboard/'
+          entryPoint: "./packages/client/dashboard/"
