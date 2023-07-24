@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import Prism from 'prismjs'
+
 import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { getModelInfo, queryModelGraphql } from '../../api'
@@ -9,10 +9,7 @@ import { ModeQueryResult, ModelStream } from '../../types'
 import { schemas } from '../../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { useCeramicCtx } from '../../context/CeramicCtx'
-
-import 'prismjs/components/prism-typescript'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
+import CodeDownload from '../CodeDownload'
 
 export default function Definition() {
   const { streamId } = useParams()
@@ -106,84 +103,26 @@ export default function Definition() {
       </EditorBox>
       <ResultBox>
         {modelData?.composite && (
-          <div>
-            <div className="title">
-              <h3>Model's composite</h3>
-              <button
-                onClick={() => {
-                  download(
-                    JSON.stringify(modelData.composite),
-                    'composite.json'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="composite"
-                content={JSON.stringify(modelData.composite, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Composite"
+            downloadContent={JSON.stringify(modelData.composite)}
+            downloadFileName={'composite.json'}
+            content={JSON.stringify(modelData.composite, null, 2)}
+          />
         )}
         {modelData?.runtimeDefinition && (
-          <div>
-            <div className="title">
-              <h3>Model's runtime definition</h3>
-              <button
-                onClick={() => {
-                  download(
-                    `// This is an auto-generated file, do not edit manually
-  export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
-                    'runtime-composite.js'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="runtimeDefinition"
-                content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title={'Runtime Definition'}
+            downloadFileName={'runtime-composite.js'}
+            downloadContent={`// This is an auto-generated file, do not edit manually
+export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
+            content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
+          />
         )}
       </ResultBox>
     </div>
   )
 }
-
-export function Code({ name, content }: { name: string; content: string }) {
-  useEffect(() => {
-    Prism.highlightAll()
-  }, [content])
-
-  const preCode = `<pre class="line-numbers"><code class="language-typescript">${content}</code></pre>`
-  return (
-    <CodeBox>
-      <div
-        className="line-numbers"
-        dangerouslySetInnerHTML={{ __html: preCode }}
-      ></div>
-    </CodeBox>
-  )
-}
-
-const CodeBox = styled.div`
-  > .name {
-    border-bottom: none;
-    display: inline-block;
-    padding: 10px 20px;
-  }
-  > .line-numbers {
-    overflow: scroll;
-    /* margin-bottom: 20px; */
-  }
-`
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
@@ -228,7 +167,7 @@ const ResultBox = styled.div`
       padding: 10px;
       box-sizing: border-box;
       button {
-        background: #ffffff;
+        background: inherit;
       }
 
       h3 {
