@@ -9,6 +9,7 @@ import { Checkbox, ToggleButton } from 'react-aria-components'
 import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
 import { useAppCtx } from '../context/AppCtx'
 import DisabledIcon from '../components/Icons/DisabledIcon'
+import Header from '../components/dapp-home/Header'
 
 export default function DappHome() {
   const { guideSteps } = useAppCtx()
@@ -52,7 +53,7 @@ export default function DappHome() {
 
   return (
     <DappHomeContainer>
-      <h1>{selectedDapp?.name}, welcome to S3 Console</h1>
+      <Header icon={selectedDapp?.icon} name={selectedDapp?.name || ''} />
       <StepAccordionItem
         stepNum={1}
         title={'Data model design'}
@@ -290,16 +291,6 @@ const DappHomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 40px;
-
-  > h1 {
-    font-style: italic;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 47px;
-    margin: 0;
-    color: #ffffff;
-    word-break: break-all;
-  }
 
   hr {
     width: 100%;
