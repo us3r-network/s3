@@ -176,6 +176,7 @@ export default function ExploreModel() {
                 <th>Description</th>
                 <th>ID</th>
                 <th>Usage Count</th>
+                <th>7 Days Usage</th>
                 <th>Release Date</th>
                 <th></th>
               </tr>
@@ -218,7 +219,19 @@ export default function ExploreModel() {
                       </div>
                     </td>
                     <td>
-                      <div>
+                      <div
+                        title={
+                          item.isIndexed
+                            ? item.firstRecordTime
+                              ? `from ${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD'
+                                )}`
+                              : ''
+                            : `from ${dayjs(item.created_at).format(
+                                'YYYY-MM-DD'
+                              )}`
+                        }
+                      >
                         <a
                           href={`${S3_SCAN_URL}/models/model/${
                             item.stream_id
@@ -230,6 +243,7 @@ export default function ExploreModel() {
                         </a>
                       </div>
                     </td>
+                    <td>{item.recentlyUseCount || '-'}</td>
                     <td>
                       <div>
                         {(item.last_anchored_at &&
