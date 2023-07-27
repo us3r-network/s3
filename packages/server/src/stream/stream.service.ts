@@ -68,6 +68,21 @@ export default class StreamService {
       .getMany();
   }
 
+  async getStreamsCount(network: Network, modelStreamId: string) {
+    if (!modelStreamId || modelStreamId.trim().length == 0) return 0;
+    const ids = modelStreamId.split(',').map((id) => id.trim());
+    if (ids.length == 0) return 0;
+    const whereSql = `network=:network AND model IN (:...ids)`;
+    const count = await this.streamRepository
+      .createQueryBuilder()
+      .where(whereSql, {
+        network: network,
+        ids: ids,
+      })
+      .getCount();
+    return count;
+  }
+
   async getRelationStreamIds(
     ceramic: any,
     modelStreamId: string,
@@ -261,7 +276,7 @@ export default class StreamService {
           .orderBy('created_at', 'DESC')
           .getMany(),
         this.modelService.getModelStatistics(network),
-        this.streamRepository.count( {where: { network: network} } )
+        this.streamRepository.count({ where: { network: network } }),
       ]);
 
       console.timeEnd(`${network}-getStats`);
