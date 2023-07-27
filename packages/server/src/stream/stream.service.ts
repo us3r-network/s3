@@ -68,9 +68,9 @@ export default class StreamService {
       .getMany();
   }
 
-  async getStreamsCount(network: Network, modelStreamId: string) {
-    if (!modelStreamId || modelStreamId.trim().length == 0) return 0;
-    const ids = modelStreamId.split(',').map((id) => id.trim());
+  async getStreamsCount(network: Network, modelStreamIds: string) {
+    if (!modelStreamIds || modelStreamIds.trim().length == 0) return 0;
+    const ids = modelStreamIds.split(',').map((id) => id.trim());
     if (ids.length == 0) return 0;
     const whereSql = `network=:network AND model IN (:...ids)`;
     const count = await this.streamRepository

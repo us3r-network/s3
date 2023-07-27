@@ -85,11 +85,11 @@ export class StreamController {
   @ApiOkResponse({ type: BasicMessageDto })
   async getStreamsCount(
     @Param('network') network: Network,
-    @Query('modelStreamId') modelStreamId: string,
+    @Query('modelStreamIds') modelStreamIds: string,
   ): Promise<BasicMessageDto> {
     const count = await this.streamService.getStreamsCount(
       network,
-      modelStreamId,
+      modelStreamIds,
     );
     return new BasicMessageDto('ok', 0, count);
   }
