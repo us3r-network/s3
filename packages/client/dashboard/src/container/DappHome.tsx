@@ -10,6 +10,7 @@ import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
 import { useAppCtx } from '../context/AppCtx'
 import DisabledIcon from '../components/Icons/DisabledIcon'
 import Header from '../components/dapp-home/Header'
+import Dashboard from '../components/dapp-home/Dashboard'
 
 export default function DappHome() {
   const { guideSteps } = useAppCtx()
@@ -54,6 +55,8 @@ export default function DappHome() {
   return (
     <DappHomeContainer>
       <Header icon={selectedDapp?.icon} name={selectedDapp?.name || ''} />
+      {!!selectedDapp?.models?.length && <Dashboard />}
+
       <StepAccordionItem
         stepNum={1}
         title={'Data model design'}

@@ -296,3 +296,20 @@ export function startIndexModel({
     },
   })
 }
+
+export function getStreamsCountWithModels({
+  network,
+  modelStreamIds,
+}: {
+  network: Network
+  modelStreamIds: string
+}): AxiosPromise<ApiResp<number>> {
+  let host = APP_API_URL
+  let net = network === Network.MAINNET ? Network.MAINNET : Network.TESTNET
+  return axios({
+    url:
+      host +
+      `/${net.toUpperCase()}/streams/count?modelStreamIds=${modelStreamIds}`,
+    method: 'GET',
+  })
+}
