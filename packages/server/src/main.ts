@@ -37,7 +37,7 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/20000/ws'],
       '/ceramic/testnet-clay',
-      'https://gcp-ceramic-testnet.s3.xyz/',
+      'http://10.170.0.26:7007/',
     );
   
     // Sub ceramic main network.
@@ -49,7 +49,7 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/30000/ws'],
       '/ceramic/mainnet',
-      process.env.CERAMIC_NODE_MAINNET,
+      'http://10.170.0.23:7007/',
     );
   }
 }
