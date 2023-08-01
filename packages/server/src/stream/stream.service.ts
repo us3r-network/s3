@@ -115,6 +115,13 @@ export default class StreamService {
     useCountResult?.forEach((r) => {
       useCountMap.set(r['model'], Number(r['count']));
     });
+
+    // set model use count to 0 if not exist
+    models.forEach((model) => {
+      if (!useCountMap.has(model)) {
+        useCountMap.set(model, 0);
+      }
+    });
     return useCountMap;
   }
 
