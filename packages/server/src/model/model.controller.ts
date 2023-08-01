@@ -280,12 +280,10 @@ export class ModelController {
     const networks = [Network.TESTNET, Network.MAINNET];
     for await (const network of networks) {
       const models = await this.modelService.findAllModelIds(network);
-      // console.time(`${network} model count cost`);
       this.logger.log(`All ${network} model count: ${models?.length}`);
-      const useCountMap = await this.streamService.findAllModelUseCount(
-        network,
+      const useCountMap = await this.streamService.findModelUseCount(
+        network, models
       );
-      // console.timeEnd(`${network} model count cost`);
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
       await this.modelService.updateModelUseCount(network, useCountMap);
     }

@@ -17,7 +17,7 @@ export default class StreamService {
     private readonly streamRepository: StreamRepository,
     private readonly modelService: ModelService,
     @InjectRedis() private readonly redis: Redis,
-  ) {}
+  ) { }
 
   async findByStreamId(network: Network, streamId: string): Promise<Stream> {
     return await this.streamRepository.findOne({
@@ -139,25 +139,6 @@ export default class StreamService {
       .limit(pageSize)
       .offset(pageSize * (pageNumber - 1))
       .orderBy('count', 'DESC')
-      .getRawMany();
-
-    useCountResult?.forEach((r) => {
-      useCountMap.set(r['model'], Number(r['count']));
-    });
-    return useCountMap;
-  }
-
-  async findAllModelUseCount(network: Network): Promise<Map<string, number>> {
-    const useCountMap = new Map<string, number>();
-
-    const useCountResult = await this.streamRepository
-      .createQueryBuilder('streams')
-      .select(['streams.model, count(streams.stream_id) as count'])
-      .where('network=:network', {
-        network: network,
-      })
-      .andWhere('model IS NOT NULL')
-      .groupBy('streams.model')
       .getRawMany();
 
     useCountResult?.forEach((r) => {
