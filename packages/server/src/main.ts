@@ -49,7 +49,7 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/30000/ws'],
       '/ceramic/mainnet',
-      'https://gcp-ceramic-mainnet.s3.xyz/',
+      process.env.CERAMIC_NODE_MAINNET,
     );
   }
 }
