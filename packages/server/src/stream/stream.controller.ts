@@ -81,6 +81,19 @@ export class StreamController {
     );
   }
 
+  @Get('/:network/streams/count')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getStreamsCount(
+    @Param('network') network: Network,
+    @Query('modelStreamIds') modelStreamIds: string,
+  ): Promise<BasicMessageDto> {
+    const count = await this.streamService.getStreamsCount(
+      network,
+      modelStreamIds,
+    );
+    return new BasicMessageDto('ok', 0, count);
+  }
+
   @Get('/:network/streams/topics')
   @ApiOkResponse({ type: BasicMessageDto })
   async getStreamTopics(

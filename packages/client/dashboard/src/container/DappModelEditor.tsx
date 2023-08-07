@@ -1,7 +1,8 @@
-import ModelTabs from '../components/ModelTabs'
 import { useOutletContext } from 'react-router-dom'
 import { DappComposite, ModelStream } from '../types'
 import CompositeDefinition from '../components/CompositeDefinition'
+import styled from 'styled-components'
+import Definition from '../components/Definition'
 
 export default function DappModelEditor() {
   const { selectModel, selectComposite } = useOutletContext<{
@@ -10,12 +11,17 @@ export default function DappModelEditor() {
   }>()
 
   if (selectModel) {
+    const name = selectModel.stream_content.name
+    const modelId = selectModel.stream_id
+
     return (
       <div className="ops">
-        <ModelTabs
-          name={selectModel.stream_content.name}
-          modelId={selectModel.stream_id}
-        />
+        <EditorContainer>
+          <div className="dapp-title-bar">
+            <span>{name}</span>
+          </div>
+          <Definition streamId={modelId} />
+        </EditorContainer>
       </div>
     )
   }
@@ -28,3 +34,9 @@ export default function DappModelEditor() {
   }
   return null
 }
+
+const EditorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`

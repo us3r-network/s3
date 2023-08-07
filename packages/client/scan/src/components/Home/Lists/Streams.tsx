@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
-import multiavatar from '@multiavatar/multiavatar'
+import { useCallback, useEffect } from 'react'
 
 import Title from './Title'
 import useListData from '../../../hooks/useListData'
@@ -10,12 +9,16 @@ import { useCeramicCtx } from '../../../context/CeramicCtx'
 import { Link } from 'react-router-dom'
 import UserAvatarStyled from '../../common/UserAvatarStyled'
 import { UserName } from '@us3r-network/profile'
+import { debounce } from 'lodash'
 
 export default function Streams() {
   const { network } = useCeramicCtx()
   const { data, loadData } = useListData({ network })
+
+  const fetchModelWithDebounce = useCallback(debounce(loadData, 200), [])
+
   useEffect(() => {
-    loadData({ network })
+    fetchModelWithDebounce({ network })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network])
 

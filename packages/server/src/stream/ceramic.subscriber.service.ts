@@ -11,7 +11,7 @@ export default class CeramicSubscriberService {
   constructor(
     @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
-  ) {}
+  ) { }
   async subCeramic(
     network: Network,
     bootstrapMultiaddrs: string[],
@@ -118,9 +118,24 @@ export default class CeramicSubscriberService {
     return new CeramicClient.CeramicClient(ceramicNetworkUrl);
   }
 
+  async loadStream(ceramic: any, streamId: string) {
+    let remainRetires = 3;
+    while (remainRetires > 0) {
+      try {
+        const stream = await ceramic.loadStream(streamId);
+        return stream;
+      } catch (error) {
+        remainRetires--;
+        this.logger.error(
+          `load stream err, remainRetires:${remainRetires} streamId:${streamId} error:${error}`,
+        );
+      }
+    }
+  }
+
   // Store all streams.
   async store(ceramic: any, network: Network, streamId: string) {
-    const stream = await ceramic.loadStream(streamId);
+    const stream = await this.loadStream(ceramic, streamId);
     await this.storeStream(
       network,
       streamId,
@@ -131,7 +146,7 @@ export default class CeramicSubscriberService {
     // save schema stream
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
-      const schemaStream = await ceramic.loadStream(schemaStreamId);
+      const schemaStream = await this.loadStream(ceramic, schemaStreamId);
       await this.storeStream(
         network,
         schemaStreamId,
@@ -142,7 +157,7 @@ export default class CeramicSubscriberService {
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
-      const modelStream = await ceramic.loadStream(modelStreamId);
+      const modelStream = await this.loadStream(ceramic, modelStreamId);
       await this.storeStream(
         network,
         modelStreamId,

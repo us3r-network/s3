@@ -91,13 +91,13 @@ export class ModelController {
         pageNumber,
       );
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
-      this.logger.log(`${network} model usecount ${useCountMap}`);
+      this.logger.log(`${network} model usecount ${JSON.stringify(useCountMap)}`);
 
       const metaModels = await this.modelService.findModelsByIds(
         Array.from(useCountMap.keys()),
         network,
       );
-      this.logger.log(`${network} model ${metaModels}`);
+      this.logger.log(`${network} model ${JSON.stringify(metaModels)}`);
 
       if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
       const modelStreamIds = metaModels.map((m) => m.getStreamId);
@@ -280,13 +280,12 @@ export class ModelController {
     const networks = [Network.TESTNET, Network.MAINNET];
     for await (const network of networks) {
       const models = await this.modelService.findAllModelIds(network);
-      // console.time(`${network} model count cost`);
       this.logger.log(`All ${network} model count: ${models?.length}`);
-      const useCountMap = await this.streamService.findAllModelUseCount(
-        network,
+      const useCountMap = await this.streamService.findModelUseCount(
+        network, models
       );
-      // console.timeEnd(`${network} model count cost`);
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
+      this.logger.log(`${network} model usecount ${JSON.stringify(useCountMap)}`);
       await this.modelService.updateModelUseCount(network, useCountMap);
     }
     return new BasicMessageDto('ok', 0);

@@ -78,7 +78,7 @@ export default function CeramicProvider({
     if (!session) return
     s3Dapp.authComposeClient(session)
     const resp = await s3Dapp.queryPersonalDapps({ first: 100 })
-    const nodes = resp.data?.viewer.dappList?.edges;
+    const nodes = resp.data?.viewer.dappList?.edges
     setDapps(nodes)
   }, [session, s3Dapp])
 
@@ -103,21 +103,26 @@ export default function CeramicProvider({
           })
       )
       setPersonalCollectionsWithoutFilter(
-        collected?.edges.filter(item => item.node).map((item) => {
-          return {
-            modelId: item.node.modelID,
-            id: item.node.id!,
-            revoke: !!item.node.revoke,
-          }
-        })
+        collected?.edges
+          .filter((item) => item.node)
+          .map((item) => {
+            return {
+              modelId: item.node.modelID,
+              id: item.node.id!,
+              revoke: !!item.node.revoke,
+            }
+          })
       )
     }
   }, [s3ModelCollection, session])
 
   useEffect(() => {
-    loadDapps()
     fetchPersonalCollections()
-  }, [loadDapps, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
+
+  useEffect(() => {
+    loadDapps()
+  }, [loadDapps])
 
   useEffect(() => {
     if (!session) {

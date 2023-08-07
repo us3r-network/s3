@@ -17,7 +17,7 @@ export default class StreamService {
     private readonly streamRepository: StreamRepository,
     private readonly modelService: ModelService,
     @InjectRedis() private readonly redis: Redis,
-  ) {}
+  ) { }
 
   async findByStreamId(network: Network, streamId: string): Promise<Stream> {
     return await this.streamRepository.findOne({
@@ -68,6 +68,21 @@ export default class StreamService {
       .getMany();
   }
 
+  async getStreamsCount(network: Network, modelStreamIds: string) {
+    if (!modelStreamIds || modelStreamIds.trim().length == 0) return 0;
+    const ids = modelStreamIds.split(',').map((id) => id.trim());
+    if (ids.length == 0) return 0;
+    const whereSql = `network=:network AND model IN (:...ids)`;
+    const count = await this.streamRepository
+      .createQueryBuilder()
+      .where(whereSql, {
+        network: network,
+        ids: ids,
+      })
+      .getCount();
+    return count;
+  }
+
   async getRelationStreamIds(
     ceramic: any,
     modelStreamId: string,
@@ -100,6 +115,13 @@ export default class StreamService {
     useCountResult?.forEach((r) => {
       useCountMap.set(r['model'], Number(r['count']));
     });
+
+    // set model use count to 0 if not exist
+    models.forEach((model) => {
+      if (!useCountMap.has(model)) {
+        useCountMap.set(model, 0);
+      }
+    });
     return useCountMap;
   }
 
@@ -124,25 +146,6 @@ export default class StreamService {
       .limit(pageSize)
       .offset(pageSize * (pageNumber - 1))
       .orderBy('count', 'DESC')
-      .getRawMany();
-
-    useCountResult?.forEach((r) => {
-      useCountMap.set(r['model'], Number(r['count']));
-    });
-    return useCountMap;
-  }
-
-  async findAllModelUseCount(network: Network): Promise<Map<string, number>> {
-    const useCountMap = new Map<string, number>();
-
-    const useCountResult = await this.streamRepository
-      .createQueryBuilder('streams')
-      .select(['streams.model, count(streams.stream_id) as count'])
-      .where('network=:network', {
-        network: network,
-      })
-      .andWhere('model IS NOT NULL')
-      .groupBy('streams.model')
       .getRawMany();
 
     useCountResult?.forEach((r) => {
@@ -261,7 +264,7 @@ export default class StreamService {
           .orderBy('created_at', 'DESC')
           .getMany(),
         this.modelService.getModelStatistics(network),
-        this.streamRepository.count( {where: { network: network} } )
+        this.streamRepository.count({ where: { network: network } }),
       ]);
 
       console.timeEnd(`${network}-getStats`);
