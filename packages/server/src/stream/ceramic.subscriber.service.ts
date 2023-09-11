@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Network, Status, Stream } from '../entities/stream/stream.entity';
 import { StreamRepository } from '../entities/stream/stream.repository';
+import e from 'express';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -68,7 +69,7 @@ export default class CeramicSubscriberService {
       );
       this.logger.log(`Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
-      if (!genesisDag.value || !genesisDag.value.signatures){
+      if (!genesisDag.value || !genesisDag.value.signatures) {
         return;
       }
       const decodedProtectedHeader = base64urlToJSON(
@@ -84,7 +85,12 @@ export default class CeramicSubscriberService {
 
       cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
+      const ipfsErr = 'Error 500 (Internal server error) when trying to fetch content from the IPFS network.';
+      if (error.toString().includes(ipfsErr)) {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${ipfsErr}`);
+      } else {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
+      }
     }
 
     return cacaoDag;
@@ -184,11 +190,11 @@ export default class CeramicSubscriberService {
       let domain: string;
       if (genesisCid) {
         this.logger.log(`Getting cacao stream(${streamId})  network:${network}`);
-        
+
         const cacao = await this.getCacao(genesisCid);
         this.logger.log(`Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
 
-        domain = cacao?.value?.p?.domain;   
+        domain = cacao?.value?.p?.domain;
         this.logger.log(`Getting domain(${domain}) stream(${streamId})  network:${network}`);
       }
 
