@@ -78,7 +78,7 @@ export default class CeramicSubscriberService {
 
       cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      // this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
+      this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
     }
 
     return cacaoDag;
@@ -175,19 +175,22 @@ export default class CeramicSubscriberService {
     genesisCid?: any,
   ) {
     try {
-      let domian: string;
-      // if (genesisCid) {
-      //   // this.logger.log(`To store stream(${streamId})  network:${network}`);
-      //   const cacao = await this.getCacao(genesisCid);
-      //   domian = cacao?.value?.p?.domain;
-      // }
+      let domain: string;
+      if (genesisCid) {
+        this.logger.log(`Getting cacao stream(${streamId})  network:${network}`);
+        
+        const cacao = await this.getCacao(genesisCid);
+        domain = cacao?.value?.p?.domain;
+        
+        this.logger.log(`Getting domain(${domain}) stream(${streamId})  network:${network}`);
+      }
 
       const stream = this.convertToStreamEntity(
         network,
         streamId,
         commitIds,
         streamState,
-        domian,
+        domain,
       );
       if (!stream) return;
 
