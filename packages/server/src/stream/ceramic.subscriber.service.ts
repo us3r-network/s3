@@ -84,7 +84,7 @@ export default class CeramicSubscriberService {
 
       cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      this.logger.warn(`Getting cacao err, cid:${cid} error:${error}`);
+      this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
     }
 
     return cacaoDag;
@@ -188,8 +188,7 @@ export default class CeramicSubscriberService {
         const cacao = await this.getCacao(genesisCid);
         this.logger.log(`Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
 
-        domain = cacao?.value?.p?.domain;
-        
+        domain = cacao?.value?.p?.domain;   
         this.logger.log(`Getting domain(${domain}) stream(${streamId})  network:${network}`);
       }
 
