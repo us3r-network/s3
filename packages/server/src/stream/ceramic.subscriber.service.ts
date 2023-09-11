@@ -68,6 +68,9 @@ export default class CeramicSubscriberService {
       );
       this.logger.log(`Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
+      if (!genesisDag.value || !genesisDag.value.signatures){
+        return;
+      }
       const decodedProtectedHeader = base64urlToJSON(
         genesisDag.value.signatures[0].protected,
       );
