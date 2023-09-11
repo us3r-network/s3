@@ -57,7 +57,7 @@ export default class CeramicSubscriberService {
     try {
       const ipfsHttpClient = await _importDynamic('ipfs-http-client');
       const ipfs = await ipfsHttpClient.create({
-        url: 'https://ipfs.io',
+        url: 'https://gateway.ipfs.io',
       });
 
       const genesisDag = await ipfs.dag.get(cid, { timeout: 6000 });
