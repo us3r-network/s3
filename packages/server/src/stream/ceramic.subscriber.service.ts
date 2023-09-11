@@ -186,6 +186,8 @@ export default class CeramicSubscriberService {
         this.logger.log(`Getting cacao stream(${streamId})  network:${network}`);
         
         const cacao = await this.getCacao(genesisCid);
+        this.logger.log(`Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
+
         domain = cacao?.value?.p?.domain;
         
         this.logger.log(`Getting domain(${domain}) stream(${streamId})  network:${network}`);
