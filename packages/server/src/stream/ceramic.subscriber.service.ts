@@ -66,10 +66,13 @@ export default class CeramicSubscriberService {
       const { base64urlToJSON } = await _importDynamic(
         '@ceramicnetwork/common',
       );
+      this.logger.log(`Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
+
       const decodedProtectedHeader = base64urlToJSON(
         genesisDag.value.signatures[0].protected,
       );
       const capIPFSUri = decodedProtectedHeader.cap;
+      this.logger.log(`Getting capIPFSUri:${capIPFSUri} cid:${cid}`);
       if (!capIPFSUri) return;
 
       const { CID } = await _importDynamic('multiformats/cid');
@@ -78,7 +81,7 @@ export default class CeramicSubscriberService {
 
       cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
+      this.logger.warn(`Getting cacao err, cid:${cid} error:${error}`);
     }
 
     return cacaoDag;
