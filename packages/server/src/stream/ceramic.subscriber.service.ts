@@ -188,7 +188,7 @@ export default class CeramicSubscriberService {
   ) {
     try {
       let domain: string;
-      if (genesisCid) {
+      if (genesisCid && streamState?.metadata?.model) {
         this.logger.log(`Getting cacao stream(${streamId})  network:${network}`);
 
         const cacao = await this.getCacao(genesisCid);
