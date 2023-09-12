@@ -67,7 +67,7 @@ export default class CeramicSubscriberService {
       const { base64urlToJSON } = await _importDynamic(
         '@ceramicnetwork/common',
       );
-      this.logger.log(`Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
+      this.logger.log(`[CACAO] Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
       if (!genesisDag.value || !genesisDag.value.signatures) {
         return;
@@ -76,7 +76,7 @@ export default class CeramicSubscriberService {
         genesisDag.value.signatures[0].protected,
       );
       const capIPFSUri = decodedProtectedHeader.cap;
-      this.logger.log(`Getting capIPFSUri:${capIPFSUri} cid:${cid}`);
+      this.logger.log(`[CACAO] Getting capIPFSUri:${capIPFSUri} cid:${cid}`);
       if (!capIPFSUri) return;
 
       const { CID } = await _importDynamic('multiformats/cid');
@@ -189,13 +189,13 @@ export default class CeramicSubscriberService {
     try {
       let domain: string;
       if (genesisCid && streamState?.metadata?.model) {
-        this.logger.log(`Getting cacao stream(${streamId})  network:${network}`);
+        this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
 
         const cacao = await this.getCacao(genesisCid);
-        this.logger.log(`Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
+        this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
 
         domain = cacao?.value?.p?.domain;
-        this.logger.log(`Getting domain(${domain}) stream(${streamId})  network:${network}`);
+        this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
       }
 
       const stream = this.convertToStreamEntity(
