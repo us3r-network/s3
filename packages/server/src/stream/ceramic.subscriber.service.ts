@@ -62,16 +62,14 @@ export default class CeramicSubscriberService {
       });
 
       const genesisDag = await ipfs.dag.get(cid, { timeout: 6000 });
-      if (!genesisDag?.value) return;
+      if (!genesisDag.value || !genesisDag.value.signatures) {
+        return;
+      }
+      this.logger.log(`[CACAO] Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
       const { base64urlToJSON } = await _importDynamic(
         '@ceramicnetwork/common',
       );
-      this.logger.log(`[CACAO] Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
-
-      if (!genesisDag.value || !genesisDag.value.signatures) {
-        return;
-      }
       const decodedProtectedHeader = base64urlToJSON(
         genesisDag.value.signatures[0].protected,
       );
