@@ -20,11 +20,12 @@ import {
   StreamDto,
 } from './dtos/stream.dto';
 import { createGraphqlDefaultQuery, importDynamic } from 'src/common/utils';
+import { count } from 'console';
 @ApiTags('/')
 @Controller('/')
 export class StreamController {
   private readonly logger = new Logger(StreamController.name);
-  constructor(private readonly streamService: StreamService) {}
+  constructor(private readonly streamService: StreamService) { }
 
   @Get('/streams')
   @ApiQuery({
@@ -158,6 +159,16 @@ export class StreamController {
       });
     }
     return new BasicMessageDto('ok', 0, {});
+  }
+
+  @Get('/:network/streams/monitor')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async monitor(
+    @Param('network') network: Network,
+    @Query('durationSecond') durationSecond: number = 60 * 10,
+  ): Promise<BasicMessageDto> {
+    const count = await this.streamService.findStreamCountByDuration(network, durationSecond);
+    return new BasicMessageDto('ok', 0, { count: count });
   }
 
   @All('/:network/:modelStreamId/graphql')

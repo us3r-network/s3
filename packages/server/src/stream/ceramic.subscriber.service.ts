@@ -146,6 +146,8 @@ export default class CeramicSubscriberService {
   // Store all streams.
   async store(ceramic: any, network: Network, streamId: string) {
     const stream = await this.loadStream(ceramic, streamId);
+    if (!stream) return;
+
     await this.storeStream(
       network,
       streamId,
@@ -157,23 +159,27 @@ export default class CeramicSubscriberService {
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
       const schemaStream = await this.loadStream(ceramic, schemaStreamId);
-      await this.storeStream(
-        network,
-        schemaStreamId,
-        schemaStream.allCommitIds,
-        schemaStream.state,
-      );
+      if (schemaStream) {
+        await this.storeStream(
+          network,
+          schemaStreamId,
+          schemaStream.allCommitIds,
+          schemaStream.state,
+        );
+      }
     }
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
       const modelStream = await this.loadStream(ceramic, modelStreamId);
-      await this.storeStream(
-        network,
-        modelStreamId,
-        modelStream.allCommitIds,
-        modelStream.state,
-      );
+      if (modelStream) {
+        await this.storeStream(
+          network,
+          modelStreamId,
+          modelStream.allCommitIds,
+          modelStream.state,
+        );
+      }
     }
   }
 
