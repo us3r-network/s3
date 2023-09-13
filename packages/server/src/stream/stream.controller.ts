@@ -92,6 +92,7 @@ export class StreamController {
       network,
       modelStreamIds,
     );
+    if(count == 0) throw new NotFoundException(); 
     return new BasicMessageDto('ok', 0, count);
   }
 
