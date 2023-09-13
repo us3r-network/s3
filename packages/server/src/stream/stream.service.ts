@@ -7,6 +7,8 @@ import { StatsDto } from './dtos/common.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { Cron } from '@nestjs/schedule';
+import { number } from 'joi';
+import { MoreThan } from 'typeorm';
 
 @Injectable()
 export default class StreamService {
@@ -24,6 +26,13 @@ export default class StreamService {
       where: { network: network, stream_id: streamId },
     });
   }
+  async findStreamCountByDuration(
+    network: Network,
+    durationSecond: number
+  ): Promise<number> {
+    return await this.streamRepository.count({ where: { network: network, last_modified_at: MoreThan(new Date(new Date().getTime() - durationSecond * 1000)) } });
+  }
+
 
   async findStreams(
     network: Network,

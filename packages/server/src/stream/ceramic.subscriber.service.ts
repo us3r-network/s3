@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Network, Status, Stream } from '../entities/stream/stream.entity';
 import { StreamRepository } from '../entities/stream/stream.repository';
+import e from 'express';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -57,11 +58,14 @@ export default class CeramicSubscriberService {
     try {
       const ipfsHttpClient = await _importDynamic('ipfs-http-client');
       const ipfs = await ipfsHttpClient.create({
-        url: 'https://ipfs.io',
+        url: 'https://gateway.ipfs.io',
       });
 
       const genesisDag = await ipfs.dag.get(cid, { timeout: 6000 });
-      if (!genesisDag?.value) return;
+      if (!genesisDag.value || !genesisDag.value.signatures) {
+        return;
+      }
+      this.logger.log(`[CACAO] Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
       const { base64urlToJSON } = await _importDynamic(
         '@ceramicnetwork/common',
@@ -70,6 +74,7 @@ export default class CeramicSubscriberService {
         genesisDag.value.signatures[0].protected,
       );
       const capIPFSUri = decodedProtectedHeader.cap;
+      this.logger.log(`[CACAO] Getting capIPFSUri:${capIPFSUri} cid:${cid}`);
       if (!capIPFSUri) return;
 
       const { CID } = await _importDynamic('multiformats/cid');
@@ -78,7 +83,12 @@ export default class CeramicSubscriberService {
 
       cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      // this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
+      const ipfsErr = 'Error 500 (Internal server error) when trying to fetch content from the IPFS network.';
+      if (error.toString().includes(ipfsErr)) {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${ipfsErr}`);
+      } else {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
+      }
     }
 
     return cacaoDag;
@@ -136,6 +146,8 @@ export default class CeramicSubscriberService {
   // Store all streams.
   async store(ceramic: any, network: Network, streamId: string) {
     const stream = await this.loadStream(ceramic, streamId);
+    if (!stream) return;
+
     await this.storeStream(
       network,
       streamId,
@@ -147,23 +159,27 @@ export default class CeramicSubscriberService {
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
       const schemaStream = await this.loadStream(ceramic, schemaStreamId);
-      await this.storeStream(
-        network,
-        schemaStreamId,
-        schemaStream.allCommitIds,
-        schemaStream.state,
-      );
+      if (schemaStream) {
+        await this.storeStream(
+          network,
+          schemaStreamId,
+          schemaStream.allCommitIds,
+          schemaStream.state,
+        );
+      }
     }
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
       const modelStream = await this.loadStream(ceramic, modelStreamId);
-      await this.storeStream(
-        network,
-        modelStreamId,
-        modelStream.allCommitIds,
-        modelStream.state,
-      );
+      if (modelStream) {
+        await this.storeStream(
+          network,
+          modelStreamId,
+          modelStream.allCommitIds,
+          modelStream.state,
+        );
+      }
     }
   }
 
@@ -175,19 +191,23 @@ export default class CeramicSubscriberService {
     genesisCid?: any,
   ) {
     try {
-      let domian: string;
-      // if (genesisCid) {
-      //   // this.logger.log(`To store stream(${streamId})  network:${network}`);
-      //   const cacao = await this.getCacao(genesisCid);
-      //   domian = cacao?.value?.p?.domain;
-      // }
+      let domain: string;
+      if (genesisCid && streamState?.metadata?.model) {
+        this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
+
+        const cacao = await this.getCacao(genesisCid);
+        this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
+
+        domain = cacao?.value?.p?.domain;
+        this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
+      }
 
       const stream = this.convertToStreamEntity(
         network,
         streamId,
         commitIds,
         streamState,
-        domian,
+        domain,
       );
       if (!stream) return;
 
