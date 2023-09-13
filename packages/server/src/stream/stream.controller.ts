@@ -111,6 +111,17 @@ export class StreamController {
     return new BasicMessageDto('ok', 0, stats);
   }
 
+
+  @Get('/:network/streams/monitor')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async monitor(
+    @Param('network') network: Network,
+    @Query('durationSecond') durationSecond: number = 60 * 10,
+  ): Promise<BasicMessageDto> {
+    const count = await this.streamService.findStreamCountByDuration(network, durationSecond);
+    return new BasicMessageDto('ok', 0, { count: count });
+  }
+
   @Get('/:network/streams/:streamId')
   @ApiOkResponse({ type: BasicMessageDto })
   async getStream(
@@ -159,16 +170,6 @@ export class StreamController {
       });
     }
     return new BasicMessageDto('ok', 0, {});
-  }
-
-  @Get('/:network/streams/monitor')
-  @ApiOkResponse({ type: BasicMessageDto })
-  async monitor(
-    @Param('network') network: Network,
-    @Query('durationSecond') durationSecond: number = 60 * 10,
-  ): Promise<BasicMessageDto> {
-    const count = await this.streamService.findStreamCountByDuration(network, durationSecond);
-    return new BasicMessageDto('ok', 0, { count: count });
   }
 
   @All('/:network/:modelStreamId/graphql')
