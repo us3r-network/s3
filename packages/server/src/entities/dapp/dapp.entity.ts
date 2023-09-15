@@ -276,3 +276,57 @@ export class DappComposite extends BaseEntity {
     this.last_modified_at = LastModifiedAt;
   }
 }
+
+@Entity({ name: 'dapp_domains' })
+export class DappDomain extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Index()
+  @Column({ nullable: true })
+  dapp_id: number;
+
+  @Column({ nullable: true })
+  domain: string;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  last_modified_at: Date;
+
+  get getId(): number {
+    return this.id;
+  }
+  set setId(id: number) {
+    this.id = id;
+  }
+
+  get getDappId(): number {
+    return this.dapp_id;
+  }
+  set setDappId(dappId: number) {
+    this.dapp_id = dappId;
+  }
+
+  get getDomain(): string {
+    return this.domain;
+  }
+  set setDomain(domain: string) {
+    this.domain = domain;
+  }
+
+  get getCreatedAt(): Date {
+    return this.created_at;
+  }
+  set setCreatedAt(createdAt: Date) {
+    this.created_at = createdAt;
+  }
+
+  get getLastModifiedAt(): Date {
+    return this.last_modified_at;
+  }
+  set setLastModifiedAt(LastModifiedAt: Date) {
+    this.last_modified_at = LastModifiedAt;
+  }
+}
