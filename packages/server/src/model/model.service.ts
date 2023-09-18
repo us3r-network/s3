@@ -33,6 +33,10 @@ import { get } from 'http';
 import { CreateModelDto } from './dtos/model.dto';
 import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils/graphql/parser';
 import { type } from 'os';
+import { StreamRepository } from 'src/entities/stream/stream.repository';
+import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
+import { DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import { string } from 'joi';
 
 @Injectable()
 export default class ModelService {
@@ -56,6 +60,15 @@ export default class ModelService {
 
     @InjectEntityManager('mainnet')
     private mainnetCeramicEntityManager: EntityManager,
+
+    @InjectRepository(Stream, 'testnet')
+    private readonly streamRepository: StreamRepository,
+
+    @InjectRepository(DappDomain, 's3-server-db')
+    private readonly dappDomainRepository: DappDomainRepository,
+
+    @InjectRepository(Dapp, 's3-server-db')
+    private readonly dappRepository: DappRepository,
 
     @InjectRedis() private readonly redis: Redis,
   ) { }
@@ -690,5 +703,54 @@ export default class ModelService {
       }
     }
     return { totalModels: models.length, todayModels: i + 1 };
+  }
+
+  async getDappsByModels(network: Network, modelIds: string[]): Promise<Map<string, Dapp[]>> {
+    const modelDappsMap = new Map<string, Dapp[]>();
+    // find domain by modelIds from `streams` 
+    const streams = await this.streamRepository
+      .createQueryBuilder()
+      .select(['model, domain'])
+      .where('network=:network', {
+        network: network,
+      })
+      .andWhere('model IN (:...modelIds)', { modelIds: modelIds })
+      .andWhere('domain is not null')
+      .groupBy('network, model, domain')
+      .getRawMany();
+
+    // find dapp id list by domain from `dapp_domains`
+    const domains = streams.map(s => s.domain);
+    const dappDomains = await this.dappDomainRepository.find({ where: { domain: In(domains) } });
+
+    // find dapps by dapp id list from `dapps`
+    const dappIds = dappDomains.map(d => d.getDappId);
+    const dapps = await this.dappRepository.find({ where: { id: In(dappIds) } });
+
+    // map model id to dapps
+    const modelDomainMap = new Map<string, string>();
+    streams.forEach(s => { if (s.domain) modelDomainMap.set(s.model, s.domain) });
+    const domainDappIdMap = new Map<string, number>();
+    dappDomains.forEach(d => domainDappIdMap.set(d.getDomain, d.getDappId));
+    const dappIdDappMap = new Map<number, Dapp>();
+    dapps.forEach(d => dappIdDappMap.set(d.getId, d));
+    modelIds.forEach(m => {
+      const domain = modelDomainMap.get(m);
+      if (domain) {
+        const dappId = domainDappIdMap.get(domain);
+        if (dappId) {
+          const dapp = dappIdDappMap.get(dappId);
+          if (dapp) {
+            if (modelDappsMap.has(m)) {
+              modelDappsMap.get(m).push(dapp);
+            } else {
+              modelDappsMap.set(m, [dapp]);
+            }
+          }
+        }
+      }
+    });
+
+    return modelDappsMap;
   }
 }
