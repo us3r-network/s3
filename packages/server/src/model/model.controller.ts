@@ -91,7 +91,7 @@ export class ModelController {
         pageSize,
         pageNumber,
       );
-      this.logger.log(`${network} model usecount ${JSON.stringify(useCountMap)}`);
+      this.logger.log(`${network} model entity count ${JSON.stringify(useCountMap?.size)}`);
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
 
       metaModels = await this.modelService.findModelsByIds(
@@ -120,7 +120,7 @@ export class ModelController {
       network,
       modelStreamIds,
     ), await this.modelService.getDappsByModels(network,
-      modelStreamIds,)]);
+      modelStreamIds)]);
     const [dbUseCountMap, firstRecordMap, dbUseCountMapRecently] = await Promise.all([
       await this.modelService.findIndexedModelUseCount(
         network,
@@ -160,7 +160,7 @@ export class ModelController {
           isIndexed,
           firstRecordTime,
           recentlyUseCount,
-          dapps,
+          dapps:dapps??[],
         };
       }),
     );

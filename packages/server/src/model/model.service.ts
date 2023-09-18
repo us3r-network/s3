@@ -708,12 +708,19 @@ export default class ModelService {
   async getDappsByModels(network: Network, modelIds: string[]): Promise<Map<string, Dapp[]>> {
     const modelDappsMap = new Map<string, Dapp[]>();
     // find domain by modelIds from `streams` 
-    const streams = await this.streamRepository.find({ where: { network: network, model: In(modelIds) } });
+    const streams = await this.streamRepository
+      .createQueryBuilder()
+      .select(['model, domain'])
+      .where('network=:network', {
+        network: network,
+      })
+      .andWhere('model IN (:...modelIds)', { modelIds: modelIds })
+      .andWhere('domain is not null')
+      .groupBy('network, model, domain')
+      .getRawMany();
 
     // find dapp id list by domain from `dapp_domains`
-    const domains = streams.map(s => {
-      if (s.getDomain) return s.getDomain;
-    });
+    const domains = streams.map(s => s.domain);
     const dappDomains = await this.dappDomainRepository.find({ where: { domain: In(domains) } });
 
     // find dapps by dapp id list from `dapps`
@@ -722,7 +729,7 @@ export default class ModelService {
 
     // map model id to dapps
     const modelDomainMap = new Map<string, string>();
-    streams.forEach(s => {  if (s.getDomain) modelDomainMap.set(s.getModel, s.getDomain) });
+    streams.forEach(s => { if (s.domain) modelDomainMap.set(s.model, s.domain) });
     const domainDappIdMap = new Map<string, number>();
     dappDomains.forEach(d => domainDappIdMap.set(d.getDomain, d.getDappId));
     const dappIdDappMap = new Map<number, Dapp>();
@@ -743,6 +750,7 @@ export default class ModelService {
         }
       }
     });
+
     return modelDappsMap;
   }
 }
