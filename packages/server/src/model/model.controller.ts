@@ -162,7 +162,7 @@ export class ModelController {
           recentlyUseCount,
           dapps:dapps??[],
         };
-      }),
+      }).sort((a, b) => b.useCount - a.useCount),
     );
   }
 
