@@ -721,9 +721,12 @@ export default class ModelService {
     const dapps = await this.dappRepository.find({ where: { id: In(dappIds) } });
 
     // map model id to dapps
-    const modelDomainMap = new Map(streams.map(item => { if (item.getDomain) return [item.getModel, item.getDomain] }));
-    const domainDappIdMap = new Map(dappDomains.map(item => { if (item.getDomain) return [item.getDomain, item.getDappId] }));
-    const dappIdDappMap = new Map(dapps.map(item => { return [item.getId, item] }));
+    const modelDomainMap = new Map<string, string>();
+    streams.forEach(s => {  if (s.getDomain) modelDomainMap.set(s.getModel, s.getDomain) });
+    const domainDappIdMap = new Map<string, number>();
+    dappDomains.forEach(d => domainDappIdMap.set(d.getDomain, d.getDappId));
+    const dappIdDappMap = new Map<number, Dapp>();
+    dapps.forEach(d => dappIdDappMap.set(d.getId, d));
     modelIds.forEach(m => {
       const domain = modelDomainMap.get(m);
       if (domain) {

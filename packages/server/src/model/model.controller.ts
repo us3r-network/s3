@@ -91,8 +91,8 @@ export class ModelController {
         pageSize,
         pageNumber,
       );
-      if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
       this.logger.log(`${network} model usecount ${JSON.stringify(useCountMap)}`);
+      if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
 
       metaModels = await this.modelService.findModelsByIds(
         Array.from(useCountMap.keys()),
