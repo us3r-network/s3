@@ -61,6 +61,7 @@ export type ModelStream = {
   recentlyUseCount?: number
   isIndexed?: boolean
   firstRecordTime?: string
+  dapps?: { name: string; description: string }[]
 }
 
 export type ModelStreamInfo = {

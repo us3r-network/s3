@@ -165,11 +165,13 @@ export default function ModelsPage() {
                 <th>Usage Count</th>
                 <th>7 Days Usage</th>
                 <th>Release Date</th>
+                <th>Dapps</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {lists.map((item, idx) => {
+                const dapps = item.dapps || []
                 const hasStarItem = personalCollectionsWithoutFilter.find(
                   (starItem) => starItem.modelId === item.stream_id
                 )
@@ -233,11 +235,12 @@ export default function ModelsPage() {
                     <td>
                       <div className="release-date">
                         {(item.last_anchored_at &&
-                          dayjs(item.created_at).format(
-                            'YYYY-MM-DD HH:mm:ss'
-                          )) ||
+                          dayjs(item.created_at).format('YYYY-MM-DD')) ||
                           '-'}
                       </div>
+                    </td>
+                    <td>
+                      <Dapps dapps={dapps} />
                     </td>
                     <td>
                       <ModelStarItem
@@ -258,6 +261,49 @@ export default function ModelsPage() {
     </PageBox>
   )
 }
+
+function Dapps({
+  dapps,
+}: {
+  dapps: Array<{ name: string; description: string }>
+}) {
+  return (
+    <DappBox>
+      {dapps.length > 0
+        ? dapps.map((item, idx) => {
+            return (
+              <span key={item.name} title={item.description}>
+                {item.name}
+              </span>
+            )
+          })
+        : 'None'}
+    </DappBox>
+  )
+}
+
+const DappBox = styled.div`
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+  color: #fff;
+  font-family: Rubik;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  > span {
+    color: #fff;
+    font-family: Rubik;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    border-radius: 4px;
+    border: 1px solid #fff;
+    padding: 2px 6px;
+  }
+`
 
 function ModelStarItem({
   signIn,
@@ -417,6 +463,10 @@ const PageBox = styled.div<{ isMobile: boolean }>`
     font-style: italic;
 
     color: #ffffff;
+  }
+
+  a {
+    word-break: break-word;
   }
 `
 
