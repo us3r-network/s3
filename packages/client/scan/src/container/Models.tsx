@@ -265,26 +265,61 @@ export default function ModelsPage() {
 function Dapps({
   dapps,
 }: {
-  dapps: Array<{ name: string; description: string }>
+  dapps: Array<{ name: string; description: string; icon: string }>
 }) {
+  const apps = useMemo(() => {
+    const data = [...dapps]
+    if (data.length > 3)
+      return { data: data.slice(0, 3), left: data.length - 3 }
+    return { data, left: 0 }
+  }, [dapps])
+
   return (
-    <DappBox>
-      {dapps.length > 0
-        ? dapps.map((item, idx) => {
+    <DappBox className="cc">
+      {apps.data.length > 0
+        ? apps.data.map((item, idx) => {
             return (
-              <span key={item.name} title={item.description}>
-                {item.name}
-              </span>
+              <ImgOrName key={item.name} name={item.name} imgUrl={item.icon} />
             )
           })
         : 'None'}
+      {apps.left > 0 && <span className="left">{apps.left}+</span>}
     </DappBox>
+  )
+}
+
+function ImgOrName({ imgUrl, name }: { imgUrl: string; name: string }) {
+  const [showName, setShowName] = useState(true)
+  if (showName) {
+    return (
+      <>
+        <span title={name} className="name">
+          {name.slice(0, 1).toUpperCase()}
+        </span>
+        <img
+          style={{ display: 'none' }}
+          src={imgUrl}
+          alt=""
+          onLoad={() => {
+            setShowName(false)
+          }}
+          onError={() => {
+            setShowName(true)
+          }}
+        />
+      </>
+    )
+  }
+  return (
+    <span title={name}>
+      <img src={imgUrl} alt="" />
+    </span>
   )
 }
 
 const DappBox = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 5px;
   overflow: hidden;
   color: #fff;
   font-family: Rubik;
@@ -294,14 +329,35 @@ const DappBox = styled.div`
   line-height: normal;
   > span {
     color: #fff;
-    font-family: Rubik;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    border-radius: 4px;
-    border: 1px solid #fff;
-    padding: 2px 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #718096;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    &.name {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    &.left {
+      border: none;
+      color: #fff;
+      justify-content: start;
+      font-family: Rubik;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
+    > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
   }
 `
 
