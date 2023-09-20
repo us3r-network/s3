@@ -17,11 +17,10 @@ export class DappModule implements NestModule {
     consumer
       .apply(UserAuthMiddleware)
       .exclude({
-        path: '/dapps/:dappId/composites',
-        method: RequestMethod.GET,
-      })
-      .exclude({
         path: '/dapps/:id',
+        method: RequestMethod.GET,
+      }, {
+        path: '/dapps/:dappId/composites',
         method: RequestMethod.GET,
       })
       .forRoutes(DappController);
