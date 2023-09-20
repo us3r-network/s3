@@ -20,6 +20,10 @@ export class DappModule implements NestModule {
         path: '/dapps/:dappId/composites',
         method: RequestMethod.GET,
       })
+      .exclude({
+        path: '/dapps/:id',
+        method: RequestMethod.GET,
+      })
       .forRoutes(DappController);
   }
 }

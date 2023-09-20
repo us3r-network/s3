@@ -51,6 +51,19 @@ export class DappController {
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/:id')
+  async findDapp(@Req() req: IUserRequest, @Param('id') id: number) {
+    this.logger.log(`Find the dapp by id ${id}`);
+    const dapp = await this.dappService.findDappById(+id);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${id}`);
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      convertToDappDto(dapp),
+    );
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
   @Delete('/:id')
   async deleteDappById(@Req() req: IUserRequest, @Param('id') id: string) {
     this.logger.log(`Delete dapp by id ${id}`);
