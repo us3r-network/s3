@@ -37,6 +37,14 @@ export function uploadImage({ file }: { file: File }) {
   })
 }
 
+export function getDapp(appId: string) {
+  let host = APP_API_URL
+  return axios({
+    url: host + `/dapps/${appId}`,
+    method: 'GET',
+  })
+}
+
 export function createDapp(
   dapp: ClientDApp,
   didSession: string
@@ -206,7 +214,7 @@ export function getDappComposites({
   didSession,
 }: {
   dapp: ClientDApp
-  didSession: string
+  didSession?: string
 }): AxiosPromise<ApiResp<DappComposite[]>> {
   let host = APP_API_URL
 
@@ -214,7 +222,7 @@ export function getDappComposites({
     url: host + `/dapps/${id}/composites`,
     method: 'GET',
     headers: {
-      'did-session': didSession,
+      'did-session': didSession || '',
     },
   })
 }

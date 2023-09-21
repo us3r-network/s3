@@ -11,11 +11,15 @@ import { useAppCtx } from '../context/AppCtx'
 import DisabledIcon from '../components/Icons/DisabledIcon'
 import Header from '../components/dapp-home/Header'
 import Dashboard from '../components/dapp-home/Dashboard'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import useIsOwner from '../hooks/useIsOwner'
 
 export default function DappHome() {
-  const { guideSteps } = useAppCtx()
+  const { guideSteps, currDapp } = useAppCtx()
   const { steps } = guideSteps
   const { selectedDapp } = useSelectedDapp()
+  const session = useSession()
+  const { isOwner } = useIsOwner()
 
   const isInitOpenSteps = useRef(false)
   const [openSteps, setOpenSteps] = useState({
@@ -52,238 +56,257 @@ export default function DappHome() {
     }
   }, [completeSteps])
 
+  const dapp = useMemo(() => {
+    return selectedDapp || currDapp
+  }, [selectedDapp, currDapp])
+
   return (
     <DappHomeContainer>
-      <Header icon={selectedDapp?.icon} name={selectedDapp?.name || ''} />
-      {!!selectedDapp?.models?.length && <Dashboard />}
+      <Header icon={dapp?.icon} name={dapp?.name || ''} />
 
-      <StepAccordionItem
-        stepNum={1}
-        title={'Data model design'}
-        isCompleted={completeSteps.s1}
-        isOpen={openSteps.s1}
-        onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s1: isOpen })}
-      >
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>1a. Create your own model or composite</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor?create-new=true`}>
-              <button>
-                Create Model <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step1-a.png" alt="" />
-            <div className="tip">
-              <LightbulbIcon />
-              <span>Submit your model schema to create new model</span>
-              <a
-                href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
-                target="_blank"
-                rel="noreferrer"
-              >
-                https://composedb.js.org/docs/0.4.x/guides/composedb-client
-              </a>
-            </div>
-          </div>
-        </StepSubitem>
+      {!!dapp?.models?.length && <Dashboard dapp={dapp} />}
 
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>
-              1b. Explore the existing models, and add the model which suits
-              your Dapp.
-              <br />
-              When in doubt, you can mark it to your favorite models first and
-              choose from the list in Model Editor.
-            </span>
-            <Link to={`/dapp/${selectedDapp?.id}/explore`}>
-              <button>
-                Explore Models <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step1-b.png" alt="" />
-            <div className="tip">
-              <LightbulbIcon />
-              <span>
-                Click the "Add" button. It will be added to your model list, or
-                add it to "My Favorite Model" first.
-              </span>
-            </div>
-          </div>
-        </StepSubitem>
-      </StepAccordionItem>
+      {session?.id && isOwner && (
+        <>
+          <StepAccordionItem
+            stepNum={1}
+            title={'Data model design'}
+            isCompleted={completeSteps.s1}
+            isOpen={openSteps.s1}
+            onChangeOpen={(isOpen) =>
+              setOpenSteps({ ...openSteps, s1: isOpen })
+            }
+          >
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>1a. Create your own model or composite</span>
+                <Link to={`/dapp/${dapp?.id}/model-editor?create-new=true`}>
+                  <button>
+                    Create Model <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step1-a.png" alt="" />
+                <div className="tip">
+                  <LightbulbIcon />
+                  <span>Submit your model schema to create new model</span>
+                  <a
+                    href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    https://composedb.js.org/docs/0.4.x/guides/composedb-client
+                  </a>
+                </div>
+              </div>
+            </StepSubitem>
 
-      <StepAccordionItem
-        stepNum={2}
-        title={'Coding with models'}
-        isCompleted={completeSteps.s2}
-        isOpen={openSteps.s2}
-        onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s2: isOpen })}
-      >
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>
-              2a. Download runtime definitions of models or composites
-            </span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-editor`}>
-              <button>
-                Model Editor <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step2-a.png" alt="" />
-            <div className="tip">
-              <LightbulbIcon />
-              <span>
-                Click the "Download" button.
-                <br />
-                Please refer to the website for coding guides:
-              </span>
-              <a
-                href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
-                target="_blank"
-                rel="noreferrer"
-              >
-                https://composedb.js.org/docs/0.4.x/guides/composedb-client
-              </a>
-            </div>
-          </div>
-        </StepSubitem>
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>
+                  1b. Explore the existing models, and add the model which suits
+                  your Dapp.
+                  <br />
+                  When in doubt, you can mark it to your favorite models first
+                  and choose from the list in Model Editor.
+                </span>
+                <Link to={`/dapp/${dapp?.id}/explore`}>
+                  <button>
+                    Explore Models <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step1-b.png" alt="" />
+                <div className="tip">
+                  <LightbulbIcon />
+                  <span>
+                    Click the "Add" button. It will be added to your model list,
+                    or add it to "My Favorite Model" first.
+                  </span>
+                </div>
+              </div>
+            </StepSubitem>
+          </StepAccordionItem>
 
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>2b. Coding and testing query and mutation</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-playground`}>
-              <button>
-                Model Playground <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step2-b.png" alt="" />
-          </div>
-        </StepSubitem>
+          <StepAccordionItem
+            stepNum={2}
+            title={'Coding with models'}
+            isCompleted={completeSteps.s2}
+            isOpen={openSteps.s2}
+            onChangeOpen={(isOpen) =>
+              setOpenSteps({ ...openSteps, s2: isOpen })
+            }
+          >
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>
+                  2a. Download runtime definitions of models or composites
+                </span>
+                <Link to={`/dapp/${dapp?.id}/model-editor`}>
+                  <button>
+                    Model Editor <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step2-a.png" alt="" />
+                <div className="tip">
+                  <LightbulbIcon />
+                  <span>
+                    Click the "Download" button.
+                    <br />
+                    Please refer to the website for coding guides:
+                  </span>
+                  <a
+                    href="https://composedb.js.org/docs/0.4.x/guides/composedb-client"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    https://composedb.js.org/docs/0.4.x/guides/composedb-client
+                  </a>
+                </div>
+              </div>
+            </StepSubitem>
 
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>2c. Viewing and adding data to the model</span>
-            <Link to={`/dapp/${selectedDapp?.id}/statistic`}>
-              <button>
-                Model Metrics <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step2-c.png" alt="" />
-            <div className="tip">
-              <LightbulbIcon />
-              <span>Fill in the corresponding form to add data</span>
-            </div>
-          </div>
-        </StepSubitem>
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>2b. Coding and testing query and mutation</span>
+                <Link to={`/dapp/${dapp?.id}/model-playground`}>
+                  <button>
+                    Model Playground <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step2-b.png" alt="" />
+              </div>
+            </StepSubitem>
 
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>2d. Download the SDK of the model</span>
-            <Link to={`/dapp/${selectedDapp?.id}/model-sdk`}>
-              <button>
-                Model SDK <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step2-d.png" alt="" />
-          </div>
-        </StepSubitem>
-      </StepAccordionItem>
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>2c. Viewing and adding data to the model</span>
+                <Link to={`/dapp/${selectedDapp?.id}/statistic`}>
+                  <button>
+                    Model Metrics <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step2-c.png" alt="" />
+                <div className="tip">
+                  <LightbulbIcon />
+                  <span>Fill in the corresponding form to add data</span>
+                </div>
+              </div>
+            </StepSubitem>
 
-      <StepAccordionItem
-        stepNum={3}
-        title={'S3 Components'}
-        isCompleted={completeSteps.s3}
-        isOpen={openSteps.s3}
-        onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s3: isOpen })}
-      >
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>
-              We also provide two components (profile and link) to help
-              developers quickly and easily build decentralised user systems and
-              social systems
-            </span>
-            <Link to={`/dapp/${selectedDapp?.id}/components`}>
-              <button>
-                S3 Components <ChevronRightDoubleWhite />
-              </button>
-            </Link>
-          </div>
-          <div className="content">
-            <img src="/dapp-home/step3.png" alt="" />
-          </div>
-        </StepSubitem>
-      </StepAccordionItem>
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>2d. Download the SDK of the model</span>
+                <Link to={`/dapp/${dapp?.id}/model-sdk`}>
+                  <button>
+                    Model SDK <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step2-d.png" alt="" />
+              </div>
+            </StepSubitem>
+          </StepAccordionItem>
 
-      <StepAccordionItem
-        stepNum={4}
-        title={'Release App'}
-        isDisabled={true}
-        isCompleted={completeSteps.s4}
-        isOpen={openSteps.s4}
-        onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s4: isOpen })}
-      >
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>4a. Release the Dapp's data model to mainnet</span>
-            <div className="coming-soon">Coming Soon</div>
-          </div>
-        </StepSubitem>
+          <StepAccordionItem
+            stepNum={3}
+            title={'S3 Components'}
+            isCompleted={completeSteps.s3}
+            isOpen={openSteps.s3}
+            onChangeOpen={(isOpen) =>
+              setOpenSteps({ ...openSteps, s3: isOpen })
+            }
+          >
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>
+                  We also provide two components (profile and link) to help
+                  developers quickly and easily build decentralised user systems
+                  and social systems
+                </span>
+                <Link to={`/dapp/${dapp?.id}/components`}>
+                  <button>
+                    S3 Components <ChevronRightDoubleWhite />
+                  </button>
+                </Link>
+              </div>
+              <div className="content">
+                <img src="/dapp-home/step3.png" alt="" />
+              </div>
+            </StepSubitem>
+          </StepAccordionItem>
 
-        <StepSubitem>
-          <div className="header">
-            <span>
-              4b. Improve more information about Dapp and publish to U3
-            </span>
-            <div className="coming-soon">Coming Soon</div>
-          </div>
-        </StepSubitem>
-      </StepAccordionItem>
+          <StepAccordionItem
+            stepNum={4}
+            title={'Release App'}
+            isDisabled={true}
+            isCompleted={completeSteps.s4}
+            isOpen={openSteps.s4}
+            onChangeOpen={(isOpen) =>
+              setOpenSteps({ ...openSteps, s4: isOpen })
+            }
+          >
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>4a. Release the Dapp's data model to mainnet</span>
+                <div className="coming-soon">Coming Soon</div>
+              </div>
+            </StepSubitem>
 
-      <StepAccordionItem
-        stepNum={5}
-        title={'Monitor data and operation'}
-        isDisabled={true}
-        isCompleted={completeSteps.s5}
-        isOpen={openSteps.s5}
-        onChangeOpen={(isOpen) => setOpenSteps({ ...openSteps, s5: isOpen })}
-      >
-        <hr />
-        <StepSubitem>
-          <div className="header">
-            <span>5a. View detailed visual data analysis</span>
-            <div className="coming-soon">Coming Soon</div>
-          </div>
-        </StepSubitem>
+            <StepSubitem>
+              <div className="header">
+                <span>
+                  4b. Improve more information about Dapp and publish to U3
+                </span>
+                <div className="coming-soon">Coming Soon</div>
+              </div>
+            </StepSubitem>
+          </StepAccordionItem>
 
-        <StepSubitem>
-          <div className="header">
-            <span>5b. View independent stream</span>
-            <div className="coming-soon">Coming Soon</div>
-          </div>
-        </StepSubitem>
-      </StepAccordionItem>
+          <StepAccordionItem
+            stepNum={5}
+            title={'Monitor data and operation'}
+            isDisabled={true}
+            isCompleted={completeSteps.s5}
+            isOpen={openSteps.s5}
+            onChangeOpen={(isOpen) =>
+              setOpenSteps({ ...openSteps, s5: isOpen })
+            }
+          >
+            <hr />
+            <StepSubitem>
+              <div className="header">
+                <span>5a. View detailed visual data analysis</span>
+                <div className="coming-soon">Coming Soon</div>
+              </div>
+            </StepSubitem>
+
+            <StepSubitem>
+              <div className="header">
+                <span>5b. View independent stream</span>
+                <div className="coming-soon">Coming Soon</div>
+              </div>
+            </StepSubitem>
+          </StepAccordionItem>
+        </>
+      )}
     </DappHomeContainer>
   )
 }
