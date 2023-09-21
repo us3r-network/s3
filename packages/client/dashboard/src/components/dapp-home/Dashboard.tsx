@@ -3,32 +3,25 @@ import modelsIconUrl from './imgs/models.svg'
 import compositesIconUrl from './imgs/composites.svg'
 import streamsIconUrl from './imgs/streams.svg'
 import { useEffect, useState, useMemo } from 'react'
-import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { getDappComposites, getStreamsCountWithModels } from '../../api'
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Network } from '../Selector/EnumSelect'
+import { ClientDApp } from '../../types'
 
-export default function Dashboard() {
-  const session = useSession()
-  const { selectedDapp } = useSelectedDapp()
-  const models = useMemo(() => selectedDapp?.models || [], [selectedDapp])
-  const network = useMemo(
-    () => selectedDapp?.network as Network,
-    [selectedDapp]
-  )
+export default function Dashboard({ dapp }: { dapp: ClientDApp }) {
+  const models = useMemo(() => dapp?.models || [], [dapp])
+  const network = useMemo(() => dapp?.network as Network, [dapp])
   const [compositesCount, setCompositesCount] = useState(0)
   const [streamsCount, setStreamsCount] = useState(0)
 
   useEffect(() => {
-    if (!session || !selectedDapp) {
+    if (!dapp) {
       setCompositesCount(0)
       return
     }
     ;(async () => {
       try {
         const resp = await getDappComposites({
-          dapp: selectedDapp,
-          didSession: session.serialize(),
+          dapp: dapp,
         })
         if (resp.data.code !== 0) throw new Error(resp.data.msg)
         setCompositesCount(resp.data?.data?.length || 0)
@@ -37,7 +30,7 @@ export default function Dashboard() {
         setCompositesCount(0)
       }
     })()
-  }, [selectedDapp, session])
+  }, [dapp])
 
   useEffect(() => {
     if (!network || !models.length) {
