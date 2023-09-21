@@ -27,10 +27,30 @@ export enum Network {
 
 export type ModelStream = {
   stream_id: string
+  streamId: string
   controller_did: string
+  controllerDid: string
   tip: string
   streamContent: {
     name: string
+    description: string | null
+    schema: {
+      type: 'object'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required: ['myData']
+      properties: {
+        myData: {
+          type: 'integer'
+          maximum: 10000
+          minimum: 0
+        }
+      }
+      additionalProperties: false
+    }
+    version: '1.0'
+    accountRelation: {
+      type: 'list'
+    }
   }
   stream_content: {
     name: string
@@ -56,6 +76,7 @@ export type ModelStream = {
   last_anchored_at: null
   first_anchored_at: null
   created_at: string
+  createdAt: string
   updated_at: string
   useCount: number
   recentlyUseCount?: number
