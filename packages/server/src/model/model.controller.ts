@@ -598,8 +598,8 @@ export class ModelController {
   ): Promise<BasicMessageDto> {
     this.logger.log(`Seaching model(${modelStreamId}) on network ${network}.`);
 
-    const mid = await this.modelService.getModel(network, modelStreamId);
-    if (!mid) {
+    const model = await this.modelService.getModel(network, modelStreamId);
+    if (!model) {
       throw new NotFoundException(
         new BasicMessageDto(
           `modelStreamId ${modelStreamId} does not exist on network ${network}`,
@@ -607,6 +607,17 @@ export class ModelController {
         ),
       );
     }
-    return new BasicMessageDto('ok', 0, mid);
+
+    const [modelDappsMap, useCountMap] = await Promise.all([await this.modelService.getDappsByModels(network,
+      [modelStreamId]), await this.streamService.findModelUseCount(
+        network,
+        [modelStreamId],
+      )]);
+
+    return new BasicMessageDto('ok', 0, {
+      ...model,
+      useCount: useCountMap?.get(modelStreamId) ?? 0,
+      dapps: modelDappsMap?.get(modelStreamId) ?? [],
+    });
   }
 }
