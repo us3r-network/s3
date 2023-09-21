@@ -17,6 +17,7 @@ import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import { debounce } from 'lodash'
+import { ImgOrName } from '../components/ImgOrName'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
@@ -285,35 +286,6 @@ function Dapps({
         : 'None'}
       {apps.left > 0 && <span className="left">{apps.left}+</span>}
     </DappBox>
-  )
-}
-
-function ImgOrName({ imgUrl, name }: { imgUrl: string; name: string }) {
-  const [showName, setShowName] = useState(true)
-  if (showName) {
-    return (
-      <>
-        <span title={name} className="name">
-          {name.slice(0, 1).toUpperCase()}
-        </span>
-        <img
-          style={{ display: 'none' }}
-          src={imgUrl}
-          alt=""
-          onLoad={() => {
-            setShowName(false)
-          }}
-          onError={() => {
-            setShowName(true)
-          }}
-        />
-      </>
-    )
-  }
-  return (
-    <span title={name}>
-      <img src={imgUrl} alt="" />
-    </span>
   )
 }
 
