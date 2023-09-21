@@ -85,8 +85,9 @@ export class ModelController {
 
     // hard code for searching name
     let metaModels;
+    let useCountMap: Map<string, number>;
     if (!name && !did) {
-      const useCountMap = await this.modelService.getModelsByDecsPagination(
+      useCountMap = await this.modelService.getModelsByDecsPagination(
         network,
         pageSize,
         pageNumber,
@@ -113,14 +114,17 @@ export class ModelController {
 
     const modelStreamIds = metaModels.map((m) => m.getStreamId);
     // Buid response data
-    const [useCountMap, indexedModelStreamIds, modelDappsMap] = await Promise.all([await this.streamService.findModelUseCount(
-      network,
-      modelStreamIds,
-    ), await this.modelService.findIndexedModelIds(
+    const [indexedModelStreamIds, modelDappsMap] = await Promise.all([await this.modelService.findIndexedModelIds(
       network,
       modelStreamIds,
     ), await this.modelService.getDappsByModels(network,
       modelStreamIds)]);
+    if (!useCountMap) {
+      useCountMap = await this.streamService.findModelUseCount(
+        network,
+        modelStreamIds,
+      )
+    }
     const [dbUseCountMap, firstRecordMap, dbUseCountMapRecently] = await Promise.all([
       await this.modelService.findIndexedModelUseCount(
         network,
@@ -160,7 +164,7 @@ export class ModelController {
           isIndexed,
           firstRecordTime,
           recentlyUseCount,
-          dapps:dapps??[],
+          dapps: dapps ?? [],
         };
       }).sort((a, b) => b.useCount - a.useCount),
     );
