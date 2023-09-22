@@ -14,6 +14,7 @@ export class SocialLink {
 export enum Network {
   MAINNET = 'Mainnet',
   TESTNET = 'Testnet',
+  ALL = 'All',
 }
 @Entity({ name: 'dapps' })
 export class Dapp extends BaseEntity {

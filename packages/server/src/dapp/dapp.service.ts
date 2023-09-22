@@ -1,7 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Dapp, DappComposite } from 'src/entities/dapp/dapp.entity';
+import { Dapp, DappComposite, Network } from 'src/entities/dapp/dapp.entity';
 import { DappCompositeRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export default class DappService {
@@ -12,14 +13,52 @@ export default class DappService {
     private readonly dappRepository: DappRepository,
     @InjectRepository(DappComposite, 's3-server-db')
     private readonly dappCompositeRepository: DappCompositeRepository,
-  ) {}
+  ) { }
 
-  async findDappsByDid(did: string): Promise<Dapp[]> {
+  async findDappsByDid(did: string, pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
     return await this.dappRepository.find({
-      where: { created_by_did: did, is_deleted: false },
+      where: {
+        created_by_did: did, 
+        name: ILike(`%${name || ''}%`), 
+        is_deleted: false
+      },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
     });
   }
 
+  async findDappsByDidAndNetwork(did: string, network: Network, pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
+    return await this.dappRepository.find({
+      where: {
+        created_by_did: did,
+        network: network,
+        name: ILike(`%${name || ''}%`),
+        is_deleted: false
+      },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
+    });
+  }
+
+  async findDappsByNetwork(network: Network, pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
+    return await this.dappRepository.find({
+      where: {
+        network: network,
+        name: ILike(`%${name || ''}%`),
+        is_deleted: false
+      },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
+    });
+  }
+
+  async findDapps(pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
+    return await this.dappRepository.find({
+      where: { name: ILike(`%${name || ''}%`), is_deleted: false },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
+    });
+  }
   async save(dapp: Dapp): Promise<Dapp> {
     return await this.dappRepository.save(dapp);
   }
@@ -40,7 +79,7 @@ export default class DappService {
   }
 
   async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {
-    return await this.dappCompositeRepository.find({dapp_id: dappId, is_deleted: false});
+    return await this.dappCompositeRepository.find({ dapp_id: dappId, is_deleted: false });
   }
 
   async deleteCompositeById(id: number): Promise<void> {

@@ -18,8 +18,9 @@ import { BasicMessageDto } from '../common/dto';
 import DappService from './dapp.service';
 import { DappCompositeDto, DappDto, convertToCompositeDto, convertToDapp, convertToDappDto } from './dtos/dapp.dto';
 import IUserRequest from 'src/interfaces/user-request';
-import { DappComposite } from 'src/entities/dapp/dapp.entity';
+import { Dapp, DappComposite, Network } from 'src/entities/dapp/dapp.entity';
 import ModelService from 'src/model/model.service';
+import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 
 @ApiTags('/dapps')
 @Controller('/dapps')
@@ -40,13 +41,64 @@ export class DappController {
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Get('/')
-  async findDappsByDid(@Req() req: IUserRequest) {
-    this.logger.log(`Find dapps by did ${req.did}`);
-    const dapps = await this.dappService.findDappsByDid(req.did);
+  async findDappsByDid(@Req() req: IUserRequest, @Query('pageSize') pageSize: number,
+    @Query('pageNumber') pageNumber: number,
+    @Query('network') network: Network = Network.ALL,
+    @Query('name') name: string) {
+    if (!pageSize || pageSize == 0) pageSize = 50;
+    if (!pageNumber || pageNumber == 0) pageNumber = 1;
+    this.logger.log(`Find dapps, pageSize ${pageSize} pageNumber ${pageNumber} did ${req.did} name ${name}`);
+
+    let dapps: Dapp[];
+    if (req.did) {
+      if (network != Network.ALL) {
+        dapps = await this.dappService.findDappsByDidAndNetwork(req.did, network, pageSize, pageNumber, name);
+      } else {
+        dapps = await this.dappService.findDappsByDid(req.did, pageSize, pageNumber, name);
+      }
+    } else {
+      if (network != Network.ALL) {
+        dapps = await this.dappService.findDappsByNetwork(network, pageSize, pageNumber, name);
+      } else {
+        dapps = await this.dappService.findDapps(pageSize, pageNumber, name);
+      }
+    }
+
+    if (!dapps || dapps.length == 0) {
+      return new BasicMessageDto(
+        'OK.',
+        0,
+        []
+      );
+    }
+
+    const modelDetailsMap = new Map<number, any[]>();
+    if (network != Network.ALL) {
+      const modelIds = new Set<string>();
+      dapps.forEach(dapp => dapp.getModels.forEach(m => modelIds.add(m)));
+      const modelDetails = await this.modelService.findModelsByIds(Array.from(modelIds), network == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET);
+      const modelMap = new Map<string, any>();
+      modelDetails?.forEach(modelDetail => {
+        modelMap.set(modelDetail.getStreamId, modelDetail);
+      });
+      dapps.forEach(dapp => {
+        const modelDetails = modelDetailsMap.get(dapp.getId)??[];
+        dapp.getModels.forEach(m => {
+          const modelDetail = modelMap.get(m);
+          if (modelDetail) {
+            modelDetails.push(modelDetail);
+          }
+        });
+        modelDetailsMap.set(dapp.getId, modelDetails);
+      });
+
+      console.log('modelDetailsMap', modelDetailsMap)
+    }
+
     return new BasicMessageDto(
       'OK.',
       0,
-      dapps?.map((dapp) => convertToDappDto(dapp)),
+      dapps?.map((dapp) => convertToDappDto(dapp, modelDetailsMap)),
     );
   }
 
@@ -86,7 +138,7 @@ export class DappController {
     );
     const dapp = await this.dappService.findDappById(+dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
-    const compositeInfo = await this.modelService.createAndDeployModel({network: dapp.getNetwork, graphql: dto.graphql})
+    const compositeInfo = await this.modelService.createAndDeployModel({ network: dapp.getNetwork, graphql: dto.graphql })
 
     const dappComposite = new DappComposite();
     dappComposite.setComposite = compositeInfo.composite;

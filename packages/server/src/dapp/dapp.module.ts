@@ -17,6 +17,9 @@ export class DappModule implements NestModule {
     consumer
       .apply(UserAuthMiddleware)
       .exclude({
+        path: '/dapps',
+        method: RequestMethod.GET,
+      }, {
         path: '/dapps/:id',
         method: RequestMethod.GET,
       }, {
