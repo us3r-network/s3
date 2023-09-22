@@ -21,6 +21,7 @@ import IUserRequest from 'src/interfaces/user-request';
 import { Dapp, DappComposite, Network } from 'src/entities/dapp/dapp.entity';
 import ModelService from 'src/model/model.service';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
+import { getDidStrFromDidSession } from 'src/utils/user/user-util';
 
 @ApiTags('/dapps')
 @Controller('/dapps')
@@ -47,14 +48,20 @@ export class DappController {
     @Query('name') name: string) {
     if (!pageSize || pageSize == 0) pageSize = 50;
     if (!pageNumber || pageNumber == 0) pageNumber = 1;
-    this.logger.log(`Find dapps, pageSize ${pageSize} pageNumber ${pageNumber} did ${req.did} name ${name}`);
+    let did: string;
+
+    const didSession = req.headers['did-session']
+    if (didSession) {
+      did = await getDidStrFromDidSession(didSession);
+    }
+    this.logger.log(`Find dapps, pageSize ${pageSize} pageNumber ${pageNumber} did ${did} dapp name ${name}`);
 
     let dapps: Dapp[];
-    if (req.did) {
+    if (did) {
       if (network != Network.ALL) {
-        dapps = await this.dappService.findDappsByDidAndNetwork(req.did, network, pageSize, pageNumber, name);
+        dapps = await this.dappService.findDappsByDidAndNetwork(did, network, pageSize, pageNumber, name);
       } else {
-        dapps = await this.dappService.findDappsByDid(req.did, pageSize, pageNumber, name);
+        dapps = await this.dappService.findDappsByDid(did, pageSize, pageNumber, name);
       }
     } else {
       if (network != Network.ALL) {
@@ -82,7 +89,7 @@ export class DappController {
         modelMap.set(modelDetail.getStreamId, modelDetail);
       });
       dapps.forEach(dapp => {
-        const modelDetails = modelDetailsMap.get(dapp.getId)??[];
+        const modelDetails = modelDetailsMap.get(dapp.getId) ?? [];
         dapp.getModels.forEach(m => {
           const modelDetail = modelMap.get(m);
           if (modelDetail) {
@@ -91,8 +98,6 @@ export class DappController {
         });
         modelDetailsMap.set(dapp.getId, modelDetails);
       });
-
-      console.log('modelDetailsMap', modelDetailsMap)
     }
 
     return new BasicMessageDto(
