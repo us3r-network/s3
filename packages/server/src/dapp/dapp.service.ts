@@ -19,7 +19,13 @@ export default class DappService {
       where: { created_by_did: did, is_deleted: false },
     });
   }
-
+  async findDapps(pageSize: number, pageNumber: number): Promise<Dapp[]> {
+    return await this.dappRepository.find({
+      where: {is_deleted: false },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
+    });
+  }
   async save(dapp: Dapp): Promise<Dapp> {
     return await this.dappRepository.save(dapp);
   }
