@@ -116,4 +116,47 @@ export type ModelMid = {
   controllerDid: string
   createdAt: number
   updatedAt: number
+  streamContent: StreamContent
+}
+
+export interface Dapp {
+  id: number
+  name: string
+  description: string
+  icon: string
+  url: string
+  socialLinks: SocialLink[]
+  tags: any[]
+  models: string[]
+  modelDetals: ModelDetal[]
+  stage: string
+  type: string
+  network: string
+  createdAt: number
+  lastModifiedAt: number
+}
+
+export interface SocialLink {
+  url: string
+  platform: string
+}
+
+export interface ModelDetal {
+  stream_id: string
+  controller_did: string
+  tip: string
+  stream_content: StreamContent
+  last_anchored_at: string
+  first_anchored_at: string
+  created_at: string
+  updated_at: string
+}
+
+export interface StreamContent {
+  name: string
+  version: string
+  description: string
+  date: string
+  type: string
+  url: string
 }

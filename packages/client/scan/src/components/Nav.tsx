@@ -13,6 +13,7 @@ export default function Nav() {
   const homeActive = location.pathname === '/'
   const modelActive = location.pathname.startsWith('/models')
   const streamActive = location.pathname.startsWith('/streams')
+  const dappActive = location.pathname.startsWith('/dapps')
 
   return (
     <NavContainer>
@@ -46,6 +47,14 @@ export default function Nav() {
           <Link to={`/models?network=${network}`}>
             <div className={`nav-item ${modelActive ? 'active' : ''}`}>
               <ModelIcon stroke={modelActive ? 'white' : '#718096'} />
+              <div className="tint-c">
+                <div className="tint">ComposeDB Models</div>
+              </div>
+            </div>
+          </Link>
+          <Link to={`/dapps?network=${network}`}>
+            <div className={`nav-item ${dappActive ? 'active' : ''}`}>
+              {(dappActive && <DappIconActive />) || <DappIcon />}
               <div className="tint-c">
                 <div className="tint">ComposeDB Models</div>
               </div>
@@ -124,6 +133,68 @@ function ModelIcon({ stroke = '#718096' }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  )
+}
+
+function DappIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
+    >
+      <rect width="16" height="16" fill="url(#pattern0)" />
+      <defs>
+        <pattern
+          id="pattern0"
+          patternContentUnits="objectBoundingBox"
+          width="1"
+          height="1"
+        >
+          <use xlinkHref="#image0_111_1177" transform="scale(0.0111111)" />
+        </pattern>
+        <image
+          id="image0_111_1177"
+          width="90"
+          height="90"
+          xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB2klEQVR4nO3a3UoCQRTA8X2DCqqHqKfp4zXEGTfQu1mDqLsIdsbs5azHyBvjOBf2IbTaEduz/x8seCHHAcf9kH9RAAAAAAAAAPsyuk9HLtTXgxAHrqq9vO6Hx0PmKylDOnUhvfgQ575Kiy9HiHMX4nPv7umkq/NVuNv63Ffx7ccCvx0upFd5b9fmq5Cd0GSRnxfb22BntH2+muXPreEi/eqYdGW+2oVv7Tntt11Rxffhw/TA+nw1ckexxW5YyNEP8dL6fDUuxJttF+qrVFqfr0Y+bNuFuqr21uer8eN0tfWOGE8urM9XI098u7yY9Fs+X5U8MW2+0BS7Ml+N3LzLTXzzhcbZIEyPuzJflTyWNltsnJVhcta1+arkW5YnJjl/rTunuRDTX3ZC2+erk4uE3Mwv/yKtai+vNS8cw5bPBwAAALBHdB071vbuoqTrKOg6LHQXJV1HRtdhoLsY0XVkdB1GugtH15HRdRjpLjxdR0bXYai7cHQdGV2Hoe7C0XWs0HUY6y6GdB0AAACAXXQdO9b27qKk6yjoOix0FyVdR0bXYaC7GNF1ZHQdRroLR9eR0XUY6S48XUdG12Gou3B0HRldh6HuwtF1rNB1GOsuhnQdAAAAAAAAKP6ZD86SUkZBPMKrAAAAAElFTkSuQmCC"
+        />
+      </defs>
+    </svg>
+  )
+}
+
+function DappIconActive() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
+    >
+      <rect width="16" height="16" fill="url(#pattern0)" />
+      <defs>
+        <pattern
+          id="pattern0"
+          patternContentUnits="objectBoundingBox"
+          width="1"
+          height="1"
+        >
+          <use xlinkHref="#image0_2_3366" transform="scale(0.0111111)" />
+        </pattern>
+        <image
+          id="image0_2_3366"
+          width="90"
+          height="90"
+          xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAABi0lEQVR4nO3aa0rDQBRA4ezACtZF6Gp8bKTWrfjAzVmXoX+ODDNQUaGpuaXmzvl+hVJuB5pmknKGQZIkSZIkSToW4BS4Be6AVTteOD8IcA68AB/8VF57Bpa9zg8BXAJv7LYp7+1tfoh2JoxZ5NfFLnuZH6b93Pb11Mv8yI3vt2vaLu/ASfb5YdodxV9dZ58fBrifsNB19vlhyodNWOgq+/wwwM2EhV5lnx+mPPEdeLNazHl+qPbEtK+HXuaHKTfv7SZ+rFfgrJf5odoj7GbkIi96mx+qfMvlialdv74rrz1OORPmPj9c2STKzXz7i3TVjsM2DmY+X5IkSdIR2XUc2Ny7C+w6BruODN0Fdh2VXUeC7gK7jsquI0l3gV1HZdeRpLvArqOy60jUXWDXUdl1JOousOvYsutI1l1g1yFJkiTlZddxYHPvLrDrGOw6MnQX2HVUdh0JugvsOiq7jiTdBXYdlV1Hku4Cu47KriNRd4FdR2XXkai7wK5jy64jWXeBXYckSZIkSZKGf+YT9fQB+MUko2oAAAAASUVORK5CYII="
+        />
+      </defs>
     </svg>
   )
 }
