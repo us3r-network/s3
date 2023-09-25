@@ -328,7 +328,6 @@ const DappBox = styled.div`
       height: 100%;
       object-fit: cover;
       flex-shrink: 0;
-      border-radius: 50%;
     }
   }
 `
