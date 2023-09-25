@@ -108,6 +108,8 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     }
     > :nth-child(3) {
       width: calc(100% - 650px);
+      max-width: 600px;
+      overflow: hidden;
     }
   }
 
@@ -214,7 +216,12 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     display: flex;
     align-items: center;
     gap: 10px;
+    max-width: 550px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 5px;
+    white-space: nowrap;
   }
 `
 
