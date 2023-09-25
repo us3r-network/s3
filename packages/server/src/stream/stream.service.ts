@@ -8,7 +8,7 @@ import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { Cron } from '@nestjs/schedule';
 import { number } from 'joi';
-import { MoreThan } from 'typeorm';
+import { IsNull, MoreThan, Not } from 'typeorm';
 
 @Injectable()
 export default class StreamService {
@@ -245,6 +245,16 @@ export default class StreamService {
       return new StatsDto();
     }
     return JSON.parse(val);
+  }
+
+  // Calculate all model domain data for all streams
+  async getModelDomainMap(network: Network): Promise<Map<string, string>> {
+    const modelDomainMap = new Map<string, string>();
+    const streams = await this.streamRepository.query(`select distinct  model, domain  from streams where network='${network}' and domain not in ('localhost','127.0.0.1') and domain is not null and model is not null and model != '' and domain like '%.%' group by network,model,domain;`);
+    streams.forEach((stream) => {
+      modelDomainMap.set(stream.model, stream.domain);
+    });
+    return modelDomainMap;
   }
 
   @Cron('*/2 * * * *')
