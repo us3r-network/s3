@@ -56,7 +56,7 @@ export default function Nav() {
             <div className={`nav-item ${dappActive ? 'active' : ''}`}>
               {(dappActive && <DappIconActive />) || <DappIcon />}
               <div className="tint-c">
-                <div className="tint">ComposeDB Models</div>
+                <div className="tint">Dapps</div>
               </div>
             </div>
           </Link>
