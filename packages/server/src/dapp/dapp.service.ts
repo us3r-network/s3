@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Dapp, DappComposite, Network } from 'src/entities/dapp/dapp.entity';
-import { DappCompositeRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import { Dapp, DappComposite, DappDomain, Network } from 'src/entities/dapp/dapp.entity';
+import { DappCompositeRepository, DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
 import { ILike } from 'typeorm';
 
 @Injectable()
@@ -13,14 +13,27 @@ export default class DappService {
     private readonly dappRepository: DappRepository,
     @InjectRepository(DappComposite, 's3-server-db')
     private readonly dappCompositeRepository: DappCompositeRepository,
+    @InjectRepository(DappDomain, 's3-server-db')
+    private readonly dappDomainRepository: DappDomainRepository,
   ) { }
+
+  async getDappDomain(dappId: number, domain: string): Promise<DappDomain> {
+    return await this.dappDomainRepository.findOne({ where: { dapp_id: dappId, domain: domain } });
+  }
+
+  async saveDappDomain(dappDomain: DappDomain): Promise<DappDomain> {
+    return await this.dappDomainRepository.save(dappDomain);
+  }
 
   async findDappsByDid(did: string, pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
     return await this.dappRepository.find({
       where: {
-        created_by_did: did, 
-        name: ILike(`%${name || ''}%`), 
+        created_by_did: did,
+        name: ILike(`%${name || ''}%`),
         is_deleted: false
+      },
+      order: {
+        created_at: "DESC"
       },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
@@ -35,6 +48,9 @@ export default class DappService {
         name: ILike(`%${name || ''}%`),
         is_deleted: false
       },
+      order: {
+        created_at: "DESC"
+      },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
     });
@@ -47,6 +63,9 @@ export default class DappService {
         name: ILike(`%${name || ''}%`),
         is_deleted: false
       },
+      order: {
+        created_at: "DESC"
+      },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
     });
@@ -55,10 +74,14 @@ export default class DappService {
   async findDapps(pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
     return await this.dappRepository.find({
       where: { name: ILike(`%${name || ''}%`), is_deleted: false },
+      order: {
+        created_at: "DESC"
+      },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
     });
   }
+
   async save(dapp: Dapp): Promise<Dapp> {
     return await this.dappRepository.save(dapp);
   }

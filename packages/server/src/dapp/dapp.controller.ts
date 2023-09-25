@@ -18,16 +18,17 @@ import { BasicMessageDto } from '../common/dto';
 import DappService from './dapp.service';
 import { DappCompositeDto, DappDto, convertToCompositeDto, convertToDapp, convertToDappDto } from './dtos/dapp.dto';
 import IUserRequest from 'src/interfaces/user-request';
-import { Dapp, DappComposite, Network } from 'src/entities/dapp/dapp.entity';
+import { Dapp, DappComposite, DappDomain, Network } from 'src/entities/dapp/dapp.entity';
 import ModelService from 'src/model/model.service';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 import { getDidStrFromDidSession } from 'src/utils/user/user-util';
+import StreamService from '../stream/stream.service';
 
 @ApiTags('/dapps')
 @Controller('/dapps')
 export class DappController {
   private readonly logger = new Logger(DappController.name);
-  constructor(private readonly dappService: DappService, private readonly modelService: ModelService) { }
+  constructor(private readonly dappService: DappService, private readonly modelService: ModelService, private readonly streamService: StreamService) { }
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/')
@@ -38,6 +39,65 @@ export class DappController {
     const dapp = convertToDapp(dto, req.did);
     const savedDapp = await this.dappService.save(dapp);
     return new BasicMessageDto('OK.', 0, convertToDappDto(savedDapp));
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/newdata')
+  async updateDappData(@Req() req: IUserRequest) {
+    this.logger.log(
+      `update dapp data req did ${req.did} dapp.`,
+    );
+
+    const networks = [StreamNetwork.TESTNET, StreamNetwork.MAINNET];
+    for await (const network of networks) {
+      const modelDomainMap = await this.streamService.getModelDomainMap(network);
+      const dappModels = new Map<string, string[]>();
+      const domains = new Set<string>();
+      modelDomainMap.forEach((domain, model) => {
+        // buid dapp models
+        const paths = domain.split('.');
+        if (paths.length > 1) {
+          const dapp = paths[paths.length - 2] + '.' + paths[paths.length - 1];
+          if (!dappModels.has(dapp)) {
+            dappModels.set(dapp, [model]);
+          } else {
+            dappModels.get(dapp).push(model);
+          }
+        }
+        // buid dapp domains
+        domains.add(domain);
+      });
+
+      // find dapp if existed by dapp
+      for await (const dappModel of dappModels) {
+        let dapp: Dapp;
+        const dapps = await this.dappService.findDappsByNetwork(network==StreamNetwork.MAINNET? Network.MAINNET: Network.TESTNET, 1, 1, dappModel[0]);
+        if (dapps.length > 0) {
+          dapp = dapps[0];
+          dapp.setModels = Array.from(new Set(dappModel[1].concat(dapp.getModels)));
+        } else {
+          dapp = new Dapp();
+          dapp.setName = dappModel[0];
+          dapp.setNetwork = network==StreamNetwork.MAINNET? Network.MAINNET: Network.TESTNET;
+          dapp.setModels = Array.from(dappModel[1]);
+        }
+        console.log('Saving dapp',dapp);
+        dapp = await this.dappService.save(dapp);
+        // Save dapp domain
+        for await (const domain of domains) {
+          const dappDomain = await this.dappService.getDappDomain(dapp.getId, domain);
+          if (!dappDomain) {
+            const dappDomain = new DappDomain();
+            dappDomain.setDappId = dapp.getId;
+            dappDomain.setDomain = domain;
+            await this.dappService.saveDappDomain(dappDomain);
+            console.log('Saving dapp domain', dappDomain);
+          }
+        }
+      }
+    }
+
+    return new BasicMessageDto('OK.', 0);
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
