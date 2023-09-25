@@ -17,6 +17,7 @@ import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import { debounce } from 'lodash'
+import { ImgOrName } from '../components/ImgOrName'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
@@ -165,11 +166,13 @@ export default function ModelsPage() {
                 <th>Usage Count</th>
                 <th>7 Days Usage</th>
                 <th>Release Date</th>
+                <th>Dapps</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {lists.map((item, idx) => {
+                const dapps = item.dapps || []
                 const hasStarItem = personalCollectionsWithoutFilter.find(
                   (starItem) => starItem.modelId === item.stream_id
                 )
@@ -233,11 +236,12 @@ export default function ModelsPage() {
                     <td>
                       <div className="release-date">
                         {(item.last_anchored_at &&
-                          dayjs(item.created_at).format(
-                            'YYYY-MM-DD HH:mm:ss'
-                          )) ||
+                          dayjs(item.created_at).format('YYYY-MM-DD')) ||
                           '-'}
                       </div>
+                    </td>
+                    <td>
+                      <Dapps dapps={dapps} />
                     </td>
                     <td>
                       <ModelStarItem
@@ -258,6 +262,76 @@ export default function ModelsPage() {
     </PageBox>
   )
 }
+
+function Dapps({
+  dapps,
+}: {
+  dapps: Array<{ name: string; description: string; icon: string }>
+}) {
+  const apps = useMemo(() => {
+    const data = [...dapps]
+    if (data.length > 3)
+      return { data: data.slice(0, 3), left: data.length - 3 }
+    return { data, left: 0 }
+  }, [dapps])
+
+  return (
+    <DappBox className="cc">
+      {apps.data.length > 0
+        ? apps.data.map((item, idx) => {
+            return (
+              <ImgOrName key={item.name} name={item.name} imgUrl={item.icon} />
+            )
+          })
+        : 'None'}
+      {apps.left > 0 && <span className="left">{apps.left}+</span>}
+    </DappBox>
+  )
+}
+
+const DappBox = styled.div`
+  display: flex;
+  gap: 5px;
+  overflow: hidden;
+  color: #fff;
+  font-family: Rubik;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  > span {
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #718096;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    &.name {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    &.left {
+      border: none;
+      color: #fff;
+      justify-content: start;
+      font-family: Rubik;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
+    > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
+  }
+`
 
 function ModelStarItem({
   signIn,
@@ -417,6 +491,10 @@ const PageBox = styled.div<{ isMobile: boolean }>`
     font-style: italic;
 
     color: #ffffff;
+  }
+
+  a {
+    word-break: break-word;
   }
 `
 

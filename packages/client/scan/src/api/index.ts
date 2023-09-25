@@ -9,6 +9,7 @@ import {
   Network,
   Stats,
   Stream,
+  Dapp,
 } from '../types'
 
 enum ApiRespCode {
@@ -142,7 +143,7 @@ export function getHomeStats({
 export function getModelMid({
   network,
   modelId,
-  pageSize = 50,
+  pageSize = PageSize,
   pageNumber = 1,
 }: {
   network: Network
@@ -226,6 +227,60 @@ export function startIndexModel({
     method: 'post',
     headers: {
       'did-session': didSession || '',
+    },
+  })
+}
+
+export function getModelStreams({
+  network,
+  ids,
+}: {
+  network: Network
+  ids: string[]
+}): AxiosPromise<ApiResp<Array<ModelStream>>> {
+  return axios.post(`${API_BASE_URL}/models/ids`, {
+    network: network.toUpperCase(),
+    ids,
+  })
+}
+
+export function getDapps({
+  pageNumber,
+  network,
+  name,
+}: {
+  pageNumber?: number
+  network: Network
+  name?: string
+}): AxiosPromise<ApiResp<Dapp[]>> {
+  const net = network.toLowerCase()
+  const n = net.charAt(0).toUpperCase() + net.slice(1)
+  return axios({
+    url: `${API_BASE_URL}/dapps`,
+    method: 'get',
+    params: {
+      network: n,
+      pageSize: PageSize,
+      pageNumber: pageNumber || 1,
+      name,
+    },
+  })
+}
+
+export function getDappInfo({
+  network,
+  appId,
+}: {
+  network: Network
+  appId: string
+}): AxiosPromise<ApiResp<Dapp>> {
+  const net = network.toLowerCase()
+  const n = net.charAt(0).toUpperCase() + net.slice(1)
+  return axios({
+    url: `${API_BASE_URL}/dapps/${appId}`,
+    method: 'get',
+    params: {
+      network: n,
     },
   })
 }
