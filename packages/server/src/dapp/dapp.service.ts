@@ -2,8 +2,10 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Dapp, DappComposite, DappDomain, Network } from 'src/entities/dapp/dapp.entity';
 import { DappCompositeRepository, DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import StreamService from 'src/stream/stream.service';
 import { ILike } from 'typeorm';
-
+import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
+import ModelService from 'src/model/model.service';
 @Injectable()
 export default class DappService {
   private readonly logger = new Logger(DappService.name);
@@ -15,6 +17,8 @@ export default class DappService {
     private readonly dappCompositeRepository: DappCompositeRepository,
     @InjectRepository(DappDomain, 's3-server-db')
     private readonly dappDomainRepository: DappDomainRepository,
+    private readonly streamService: StreamService,
+    private readonly modelService: ModelService,
   ) { }
 
   async getDappDomain(dappId: number, domain: string): Promise<DappDomain> {
@@ -57,18 +61,46 @@ export default class DappService {
   }
 
   async findDappsByNetwork(network: Network, pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {
-    return await this.dappRepository.find({
+    const allMatchedDapps = await this.dappRepository.find({
       where: {
         network: network,
         name: ILike(`%${name || ''}%`),
         is_deleted: false
       },
-      order: {
-        created_at: "DESC"
-      },
-      take: pageSize,
-      skip: (pageNumber - 1) * pageSize,
     });
+    if (allMatchedDapps.length == 0 || allMatchedDapps.length < (pageNumber-1)*pageSize) return [];
+
+    const models = new Set<string>();
+    allMatchedDapps.forEach(dapp => {
+      dapp.getModels?.forEach(m => {
+        models.add(m)
+      });
+    });
+
+    const modelUseCount = await this.modelService.findModelUseCount(StreamNetwork[network.toUpperCase()], Array.from(models));
+
+    const dappUseCount = new Map<number, number>();
+    allMatchedDapps.forEach(dapp => {
+      if (dapp.getModels?.length > 0) {
+        dapp.getModels.forEach(m => {
+          dappUseCount.set(dapp.getId, (dappUseCount.get(dapp.getId) || 0) + modelUseCount.get(m));
+        });
+      } else {
+        dappUseCount.set(dapp.getId, 0);
+      }
+    });
+    const orderedDapps = [...dappUseCount.entries()].sort((a, b) => b[1] - a[1]);
+
+    const dappIds = orderedDapps.slice((pageNumber-1)*pageSize, pageNumber*pageSize).map(d => d[0]);
+    const dapps: Dapp[] = [];
+    const dappMap = new Map<number, Dapp>();
+    allMatchedDapps.forEach(dapp => {
+      dappMap.set(dapp.getId, dapp);
+    });
+    dappIds.forEach(id => {
+      dapps.push(dappMap.get(id));
+    });
+    return dapps;
   }
 
   async findDapps(pageSize: number, pageNumber: number, name?: string): Promise<Dapp[]> {

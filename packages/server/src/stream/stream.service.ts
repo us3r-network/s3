@@ -133,6 +133,30 @@ export default class StreamService {
     });
     return useCountMap;
   }
+  async findModelUseCountByModels(
+    models: string[],
+  ): Promise<Map<string, number>> {
+    const useCountMap = new Map<string, number>();
+
+    const useCountResult = await this.streamRepository
+      .createQueryBuilder('streams')
+      .select(['streams.model, count(streams.stream_id) as count'])
+      .where('streams.model IN (:...models)', { models: models })
+      .groupBy('streams.model')
+      .getRawMany();
+
+    useCountResult?.forEach((r) => {
+      useCountMap.set(r['model'], Number(r['count']));
+    });
+
+    // set model use count to 0 if not exist
+    models.forEach((model) => {
+      if (!useCountMap.has(model)) {
+        useCountMap.set(model, 0);
+      }
+    });
+    return useCountMap;
+  }
 
   async findModelUseCountOrderByUseCount(
     network: Network,
