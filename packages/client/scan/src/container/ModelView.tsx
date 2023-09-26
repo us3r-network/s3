@@ -160,20 +160,22 @@ export default function ModelView() {
   return (
     <Tabs disabledKeys={disabledKeys}>
       <div className="title-bar">
-        <ToolsBox>
-          <span>{modelStream?.streamContent?.name}</span>
-          {isAdmin && !isIndexed && (
-            <>
-              {indexing ? (
-                <button>
-                  <Spinner />
-                </button>
-              ) : (
-                <button onClick={startIndex}>Start index</button>
-              )}
-            </>
-          )}
-        </ToolsBox>
+        {(modelStream?.streamContent?.name && (
+          <ToolsBox>
+            <span>{modelStream?.streamContent?.name}</span>
+            {isAdmin && !isIndexed && (
+              <>
+                {indexing ? (
+                  <button>
+                    <Spinner />
+                  </button>
+                ) : (
+                  <button onClick={startIndex}>Start index</button>
+                )}
+              </>
+            )}
+          </ToolsBox>
+        )) || <div></div>}
         <TabList aria-label="History of Ancient Rome">
           <Tab id="Definition">Model Definition</Tab>
           <Tab id="Instance">Model Instance Documents</Tab>

@@ -70,7 +70,13 @@ export default function DappsList() {
                         {(item.modelDetals.length > 0 &&
                           item.modelDetals.map((item, idx) => {
                             return (
-                              <span key={idx}>{item.stream_content.name}</span>
+                              <span key={idx}>
+                                <Link
+                                  to={`/models/modelview/${item.stream_id}?network=${network}`}
+                                >
+                                  {item.stream_content.name}
+                                </Link>
+                              </span>
                             )
                           })) ||
                           '-'}
@@ -217,9 +223,8 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     align-items: center;
     gap: 10px;
     max-width: 550px;
-    overflow: hidden;
     text-overflow: ellipsis;
-    overflow: hidden;
+    overflow: scroll;
     padding-right: 5px;
     white-space: nowrap;
   }

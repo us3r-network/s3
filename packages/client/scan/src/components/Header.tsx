@@ -51,11 +51,12 @@ export default function Header() {
         {(showBack && window.history.length > 1 && (
           <BackBtn
             backAction={() => {
-              if (location.pathname.startsWith('/models/modelview')) {
-                navigate('/models')
-              } else {
-                navigate(-1)
-              }
+              navigate(-1)
+              // if (location.pathname.startsWith('/models/modelview')) {
+              //   navigate('/models')
+              // } else {
+              //   navigate(-1)
+              // }
             }}
           />
         )) || <div></div>}
