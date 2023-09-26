@@ -299,12 +299,12 @@ export default class StreamService {
       let [streams, modelStatistics, totalCount] = await Promise.all([
         this.streamRepository
           .createQueryBuilder('streams')
-          .select(['streams.id', 'streams.network', 'streams.created_at'])
-          .where('created_at BETWEEN :start AND :end', {
+          .select(['streams.id', 'streams.network', 'streams.last_modified_at'])
+          .where('last_modified_at BETWEEN :start AND :end', {
             start: weekAgo,
             end: new Date(),
           })
-          .orderBy('created_at', 'DESC')
+          .orderBy('last_modified_at', 'DESC')
           .getMany(),
         this.modelService.getModelStatistics(network),
         this.streamRepository.count({ where: { network: network } }),
@@ -313,20 +313,19 @@ export default class StreamService {
       console.timeEnd(`${network}-getStats`);
 
       streams = streams.filter((e) => e.getNetwork == network);
-
       if (!streams || streams.length == 0) {
         console.log('getStatsJob found no streams');
         return dto;
       }
 
-      const t1 = Math.floor(streams[0].getCreatedAt.getTime() / 1000);
+      const t1 = Math.floor(streams[0].getLastModifiedAt.getTime() / 1000);
       const t2 = Math.floor(
-        streams[streams.length - 1].getCreatedAt.getTime() / 1000,
+        streams[streams.length - 1].getLastModifiedAt.getTime() / 1000,
       );
 
       const weeks = [0, 0, 0, 0, 0, 0, 0];
       for (let i = 0; i < streams.length; ++i) {
-        const t = Math.floor(streams[i].getCreatedAt.getTime() / 1000);
+        const t = Math.floor(streams[i].getLastModifiedAt.getTime() / 1000);
         if (t > now) {
           continue;
         }
