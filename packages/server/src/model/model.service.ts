@@ -285,6 +285,7 @@ export default class ModelService {
 
   async findModelUseCount(network: Network, models: string[]) {
     const useCountMap = new Map<string, number>();
+    if (models?.length == 0) return useCountMap;
     const key =
       network == Network.MAINNET
         ? S3_MAINNET_MODELS_USE_COUNT_ZSET
