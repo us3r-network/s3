@@ -708,7 +708,7 @@ export default class ModelService {
 
   async getDappsByModels(network: Network, modelIds: string[]): Promise<Map<string, Dapp[]>> {
     const modelDappsMap = new Map<string, Dapp[]>();
-    const dapps = await this.dappRepository.createQueryBuilder().where('models && :modelIds', { modelIds: modelIds }).andWhere('network=:network', { network: network == Network.MAINNET ? DappNetwork.MAINNET : DappNetwork.TESTNET }).getMany();
+    const dapps = await this.dappRepository.createQueryBuilder().where('models && :modelIds', { modelIds: modelIds }).andWhere('network=:network', { network: network == Network.MAINNET ? DappNetwork.MAINNET : DappNetwork.TESTNET }).andWhere('is_deleted=false').getMany();
     dapps?.forEach(dapp => {
       dapp.getModels.forEach(model => {
         if (modelDappsMap.has(model)) {
