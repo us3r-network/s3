@@ -266,8 +266,9 @@ export default function ModelsPage() {
 function Dapps({
   dapps,
 }: {
-  dapps: Array<{ name: string; description: string; icon: string }>
+  dapps: Array<{ name: string; description: string; icon: string; id: number }>
 }) {
+  const { network } = useCeramicCtx()
   const apps = useMemo(() => {
     const data = [...dapps]
     if (data.length > 3)
@@ -280,7 +281,13 @@ function Dapps({
       {apps.data.length > 0
         ? apps.data.map((item, idx) => {
             return (
-              <ImgOrName key={item.name} name={item.name} imgUrl={item.icon} />
+              <Link to={`/dapps/${item.id}?network=${network}`}>
+                <ImgOrName
+                  key={item.name}
+                  name={item.name}
+                  imgUrl={item.icon}
+                />
+              </Link>
             )
           })
         : 'None'}
@@ -299,35 +306,37 @@ const DappBox = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  > span {
-    color: #fff;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid #718096;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    &.name {
-      font-size: 20px;
-      font-weight: 500;
-    }
-    &.left {
-      border: none;
+  a {
+    > span {
       color: #fff;
-      justify-content: start;
-      font-family: Rubik;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: normal;
-    }
-    > img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #718096;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      &.name {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      &.left {
+        border: none;
+        color: #fff;
+        justify-content: start;
+        font-family: Rubik;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
     }
   }
 `

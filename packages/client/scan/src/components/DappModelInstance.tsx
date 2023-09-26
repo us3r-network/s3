@@ -7,6 +7,7 @@ import { ModelMid } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import { UserAvatar } from '@us3r-network/profile'
 import dayjs from 'dayjs'
+import { Link } from 'react-router-dom'
 
 export default function DappModelInstance({ modelId }: { modelId: string }) {
   const { network } = useCeramicCtx()
@@ -69,7 +70,13 @@ export default function DappModelInstance({ modelId }: { modelId: string }) {
               console.log(item)
               return (
                 <tr key={item.streamId}>
-                  <td>{shortPubKey(item.streamId, { len: 8 })}</td>
+                  <td>
+                    <Link
+                      to={`/streams/stream/${item.streamId}?network=${network}`}
+                    >
+                      {shortPubKey(item.streamId, { len: 8 })}
+                    </Link>
+                  </td>
                   <td>
                     <ControllerBox>
                       <UserAvatar did={item.controllerDid} />
