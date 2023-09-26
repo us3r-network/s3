@@ -44,3 +44,5 @@ export const TypesReverse = Object.fromEntries(
 export const WALLET_CONNECT_PROJECT_ID =
   process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID ||
   'c652d0148879353d7e965d7f6f361e59'
+
+export const ADMIN_ADDRESS = process.env.REACT_APP_ADMIN_ADDRESS
