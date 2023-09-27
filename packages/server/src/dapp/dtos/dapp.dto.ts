@@ -61,6 +61,9 @@ export class DappDto {
   schemas: string[];
   @ApiProperty()
   modelDetails: any[];
+  // TODO Delete the property
+  @ApiProperty()
+  modelDetals: any[];
   @ApiProperty()
   schemaDetails: any[];
   @ApiProperty()
@@ -81,6 +84,7 @@ export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]
   dto.models = dapp.getModels;
   dto.schemas = dapp.getSchemas;
   dto.modelDetails = modelDetailsMap?.get(dapp.getId)??[];
+  dto.modelDetals = modelDetailsMap?.get(dapp.getId)??[];
   dto.schemaDetails = schemaDetails?.get(dapp.getId)??[];
   dto.stage = dapp.getStage;
   dto.type = dapp.getType;
