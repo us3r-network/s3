@@ -21,13 +21,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles  --runInBand --forceExit"
   },
   "dependencies": {
-    "@ceramicnetwork/common": "^2.23.0",
-    "@ceramicnetwork/http-client": "^2.20.0",
+    "@ceramicnetwork/common": "^2.35.0",
+    "@ceramicnetwork/http-client": "^2.32.0",
     "@chainsafe/libp2p-gossipsub": "^6.1.0",
     "@chainsafe/libp2p-noise": "^11.0.0",
     "@composedb/devtools": "^0.5.0",
-    "@composedb/runtime": "^0.4.1",
-    "@composedb/server": "^0.4.1",
+    "@composedb/runtime": "^0.5.1",
+    "@composedb/server": "^0.5.1",
     "@didtools/cacao": "^2.0.0",
     "@didtools/pkh-ethereum": "^0.3.0",
     "@didtools/pkh-solana": "^0.1.1",
