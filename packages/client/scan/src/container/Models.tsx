@@ -281,12 +281,8 @@ function Dapps({
       {apps.data.length > 0
         ? apps.data.map((item, idx) => {
             return (
-              <Link to={`/dapps/${item.id}?network=${network}`}>
-                <ImgOrName
-                  key={item.name}
-                  name={item.name}
-                  imgUrl={item.icon}
-                />
+              <Link to={`/dapps/${item.id}?network=${network}`} key={item.name}>
+                <ImgOrName name={item.name} imgUrl={item.icon} />
               </Link>
             )
           })
@@ -581,6 +577,7 @@ const TableContainer = styled.table<{ isMobile: boolean }>`
     font-size: 16px;
     line-height: 19px;
     color: #718096;
+    white-space: nowrap;
   }
 
   .did-container {
