@@ -54,7 +54,9 @@ export default function DappsInfo() {
 
       <DappModels
         models={dapp?.models || []}
-        modelsDetail={dapp?.modelDetals || []}
+        modelsDetail={dapp?.modelDetails || []}
+        schemas={dapp?.schemas || []}
+        schemasDetail={dapp?.schemaDetails || []}
       />
     </DappInfoContainer>
   )
