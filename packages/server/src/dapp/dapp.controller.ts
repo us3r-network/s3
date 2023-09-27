@@ -72,17 +72,17 @@ export class DappController {
       // find dapp if existed by dapp
       for await (const dappModel of dappModels) {
         let dapp: Dapp;
-        const dapps = await this.dappService.findDappsByNetwork(network==StreamNetwork.MAINNET? Network.MAINNET: Network.TESTNET, 1, 1, dappModel[0]);
+        const dapps = await this.dappService.findDappsByNetwork(network == StreamNetwork.MAINNET ? Network.MAINNET : Network.TESTNET, 1, 1, dappModel[0]);
         if (dapps.length > 0) {
           dapp = dapps[0];
           dapp.setModels = Array.from(new Set(dappModel[1].concat(dapp.getModels)));
         } else {
           dapp = new Dapp();
           dapp.setName = dappModel[0];
-          dapp.setNetwork = network==StreamNetwork.MAINNET? Network.MAINNET: Network.TESTNET;
+          dapp.setNetwork = network == StreamNetwork.MAINNET ? Network.MAINNET : Network.TESTNET;
           dapp.setModels = Array.from(dappModel[1]);
         }
-        console.log('Saving dapp',dapp);
+        console.log('Saving dapp', dapp);
         dapp = await this.dappService.save(dapp);
         // Save dapp domain
         for await (const domain of domains) {
@@ -197,10 +197,18 @@ export class DappController {
     this.logger.log(`Find the dapp by id ${id}`);
     const dapp = await this.dappService.findDappById(+id);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${id}`);
+    // build model details
+    const modelDetails = await this.modelService.findModelsByIds(dapp.getModels, dapp.getNetwork == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET);
+    const modelDetailsMap = new Map<number, any[]>();
+    modelDetailsMap.set(dapp.getId, modelDetails);
+    // build schema details
+    const schemaDetails = await this.streamService.findStreamsByStreamIds(dapp.getNetwork == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET, dapp.getSchemas);
+    const schemaDetailsMap = new Map<number, any[]>();
+    schemaDetailsMap.set(dapp.getId, schemaDetails?.map(schemaDetail => ConvertToStream(schemaDetail)) ?? []);
     return new BasicMessageDto(
       'OK.',
       0,
-      convertToDappDto(dapp),
+      convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap),
     );
   }
 
