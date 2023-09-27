@@ -1,18 +1,24 @@
 import styled from 'styled-components'
-import { Dapp, ModelStream } from '../types'
+import { Dapp, ModelStream, SchemaDetail } from '../types'
 import { useCallback, useEffect, useState } from 'react'
 import { getModelStreams } from '../api'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import DappModelInstance from './DappModelInstance'
+import { Link } from 'react-router-dom'
+import DappSchemaInfo from './DappSchemaInfo'
 
 export default function DappModels({
   models,
-  modelsDetail,
+  schemas,
+  schemasDetail,
 }: {
   models: Dapp['models']
-  modelsDetail: Dapp['modelDetals']
+  modelsDetail: Dapp['modelDetails']
+  schemas: Dapp['schemas']
+  schemasDetail: Dapp['schemaDetails']
 }) {
   const [selected, setSelected] = useState<ModelStream>()
+  const [selectedSchema, setSelectedSchema] = useState<SchemaDetail>()
   const [modelStreams, setModelStreams] = useState<ModelStream[]>([])
   const { network } = useCeramicCtx()
   const loadModelStreams = useCallback(async () => {
@@ -20,26 +26,103 @@ export default function DappModels({
       const resp = await getModelStreams({ ids: models, network })
       const modelStreams = resp.data.data
       setModelStreams(modelStreams)
-      if (modelStreams.length > 0) setSelected(resp.data.data[0])
-    } catch (error) {}
-  }, [models, network])
+      if (modelStreams.length > 0 && models.length > schemas.length)
+        setSelected(resp.data.data[0])
+    } catch (error) {
+      console.error(error)
+    }
+  }, [models, network, schemas])
+
+  useEffect(() => {
+    if (schemasDetail.length > 0 && schemasDetail.length > models.length)
+      setSelectedSchema(schemasDetail[0])
+  }, [schemasDetail, models])
 
   useEffect(() => {
     loadModelStreams()
   }, [loadModelStreams])
+
   return (
     <DappInfoContainer>
       <ListBox>
-        <div className="title">
-          <h3>Models List ({models.length})</h3>
-        </div>
-        <DappModelList
-          modelStreams={modelStreams || []}
-          {...{ selected, setSelected }}
-        />
+        {[
+          <>
+            <div className="title">
+              <h3>Models List ({models.length})</h3>
+            </div>
+            <DappModelList
+              modelStreams={modelStreams || []}
+              selected={selected}
+              setSelected={(data) => {
+                setSelectedSchema(undefined)
+                setSelected(data)
+              }}
+            />
+          </>,
+          <>
+            <div className="title">
+              <h3>Schemas List ({schemas.length})</h3>
+            </div>
+            <DappSchemaList
+              schemasDetail={schemasDetail || []}
+              selected={selectedSchema}
+              setSelected={(data) => {
+                setSelected(undefined)
+                setSelectedSchema(data)
+              }}
+            />
+          </>,
+        ].sort(() => models.length - schemas.length)}
       </ListBox>
-      <DappModelInstance modelId={selected?.stream_id || ''} />
+      {[
+        selected?.stream_id && (
+          <DappModelInstance modelId={selected?.stream_id || ''} />
+        ),
+        selectedSchema && <DappSchemaInfo schema={selectedSchema.streamId} />,
+      ]
+        .sort(() => models.length - schemas.length)
+        .shift()}
+      {!selected?.stream_id && !selectedSchema && (
+        <div>There is no data to view</div>
+      )}
     </DappInfoContainer>
+  )
+}
+
+function DappSchemaList({
+  schemasDetail,
+  setSelected,
+  selected,
+}: {
+  schemasDetail: SchemaDetail[]
+  selected?: SchemaDetail
+  setSelected: (ms: SchemaDetail) => void
+}) {
+  if (schemasDetail.length === 0) {
+    return (
+      <DappModelsListBox>
+        <p>There is no schema in this dapp.</p>
+      </DappModelsListBox>
+    )
+  }
+  return (
+    <DappModelsListBox>
+      {schemasDetail?.map((item) => {
+        const active = selected === item
+        return (
+          <div key={item.streamId} className={active ? 'active' : ''}>
+            <div
+              className="title"
+              onClick={() => {
+                setSelected(item)
+              }}
+            >
+              <div>{item.content.title}</div>
+            </div>
+          </div>
+        )
+      })}
+    </DappModelsListBox>
   )
 }
 
@@ -52,6 +135,7 @@ function DappModelList({
   selected?: ModelStream
   setSelected: (ms: ModelStream) => void
 }) {
+  const { network } = useCeramicCtx()
   if (modelStreams.length === 0) {
     return (
       <DappModelsListBox>
@@ -72,6 +156,13 @@ function DappModelList({
               }}
             >
               <div>{item.stream_content.name}</div>
+              {active && (
+                <Link
+                  to={`/models/modelview/${item.stream_id}?network=${network}`}
+                >
+                  details
+                </Link>
+              )}
             </div>
             {active && (
               <>

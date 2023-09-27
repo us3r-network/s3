@@ -128,7 +128,9 @@ export interface Dapp {
   socialLinks: SocialLink[]
   tags: any[]
   models: string[]
-  modelDetals: ModelDetal[]
+  modelDetails: ModelDetail[]
+  schemas: string[]
+  schemaDetails: SchemaDetail[]
   stage: string
   type: string
   network: string
@@ -141,7 +143,7 @@ export interface SocialLink {
   platform: string
 }
 
-export interface ModelDetal {
+export interface ModelDetail {
   stream_id: string
   controller_did: string
   tip: string
@@ -159,4 +161,80 @@ export interface StreamContent {
   date: string
   type: string
   url: string
+}
+
+export interface SchemaDetail {
+  streamId: string
+  network: string
+  indexingTime: number
+  familyOrApp: string
+  type: string
+  did: string
+  tags: string[]
+  anchorStatus: string
+  anchorHash: string
+  anchorDate: number
+  schema: any
+  commitIds: string[]
+  content: Content
+  model: string
+  metadata: Metadata
+  domain: any
+}
+
+export interface Content {
+  type: string
+  title: string
+  $schema: string
+  required: string[]
+  properties: Properties
+}
+
+export interface Properties {
+  master: Master
+  reply_to: ReplyTo
+  conversation_id: ConversationId
+  encryptedMessage: EncryptedMessage
+}
+
+export interface Master {
+  type: string[]
+}
+
+export interface ReplyTo {
+  type: string[]
+}
+
+export interface ConversationId {
+  type: string
+}
+
+export interface EncryptedMessage {
+  type: string
+  properties: Properties2
+}
+
+export interface Properties2 {
+  encryptedString: EncryptedString
+  encryptedSymmetricKey: EncryptedSymmetricKey
+  accessControlConditions: AccessControlConditions
+}
+
+export interface EncryptedString {
+  type: string
+}
+
+export interface EncryptedSymmetricKey {
+  type: string
+}
+
+export interface AccessControlConditions {
+  type: string
+}
+
+export interface Metadata {
+  tags: string[]
+  family: string
+  unique: string
+  controllers: string[]
 }

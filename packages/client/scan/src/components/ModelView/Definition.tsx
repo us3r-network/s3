@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import FileSaver from 'file-saver'
@@ -180,15 +180,18 @@ function Info({ modelStream }: { modelStream: ModelStream | undefined }) {
 function Dapps({
   dapps,
 }: {
-  dapps: Array<{ name: string; description: string; icon: string }>
+  dapps: Array<{ name: string; description: string; icon: string; id: number }>
 }) {
+  const { network } = useCeramicCtx()
   return (
     <>
       {[...dapps].map((item, idx) => {
         return (
           <div key={item.name} className="dapp">
-            <ImgOrName name={item.name} imgUrl={item.icon} />
-            {item.name}
+            <Link to={`/dapps/${item.id}?network=${network}`}>
+              <ImgOrName name={item.name} imgUrl={item.icon} />
+              {item.name}
+            </Link>
           </div>
         )
       })}
@@ -242,12 +245,12 @@ const InfoBox = styled.div`
     }
   }
 
-  .dapp {
+  .dapp a {
     margin-top: 10px;
     display: flex;
     gap: 10px;
     align-items: center;
-    > span {
+    span {
       color: #fff;
       width: 36px;
       height: 36px;
