@@ -25,7 +25,7 @@
     "@ceramicnetwork/http-client": "^2.20.0",
     "@chainsafe/libp2p-gossipsub": "^6.1.0",
     "@chainsafe/libp2p-noise": "^11.0.0",
-    "@composedb/devtools": "^0.4.3",
+    "@composedb/devtools": "^0.5.0",
     "@composedb/runtime": "^0.4.1",
     "@composedb/server": "^0.4.1",
     "@didtools/cacao": "^2.0.0",

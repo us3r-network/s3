@@ -24,20 +24,16 @@ import {
   S3_MODEL_GRAPHQL_RUNTIMEDEFINITION_CACHE_PREFIX,
   S3_TESTNET_MODELS_USE_COUNT_ZSET,
 } from 'src/common/constants';
-import { Cron } from '@nestjs/schedule';
 import {
   getCeramicNode,
   getCeramicNodeAdminKey,
   importDynamic,
 } from 'src/common/utils';
-import { get } from 'http';
 import { CreateModelDto } from './dtos/model.dto';
 import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils/graphql/parser';
-import { type } from 'os';
 import { StreamRepository } from 'src/entities/stream/stream.repository';
 import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
 import { DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
-import { string } from 'joi';
 
 @Injectable()
 export default class ModelService {

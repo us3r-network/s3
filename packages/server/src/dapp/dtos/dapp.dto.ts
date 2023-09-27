@@ -60,14 +60,19 @@ export class DappDto {
   @ApiProperty()
   schemas: string[];
   @ApiProperty()
+  modelDetails: any[];
+  // TODO Delete the property
+  @ApiProperty()
   modelDetals: any[];
+  @ApiProperty()
+  schemaDetails: any[];
   @ApiProperty()
   createdAt: number;
   @ApiProperty()
   lastModifiedAt: number;
 }
 
-export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>): DappDto {
+export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>, schemaDetails?: Map<number, any[]>): DappDto {
   const dto = new DappDto();
   dto.id = dapp.getId;
   dto.name = dapp.getName;
@@ -78,7 +83,9 @@ export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]
   dto.tags = dapp.getTags;
   dto.models = dapp.getModels;
   dto.schemas = dapp.getSchemas;
+  dto.modelDetails = modelDetailsMap?.get(dapp.getId)??[];
   dto.modelDetals = modelDetailsMap?.get(dapp.getId)??[];
+  dto.schemaDetails = schemaDetails?.get(dapp.getId)??[];
   dto.stage = dapp.getStage;
   dto.type = dapp.getType;
   dto.network = dapp.getNetwork;
