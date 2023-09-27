@@ -9,13 +9,15 @@ import {
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
 import { getModelStreamList, getStarModels, PageSize } from '../api'
-import { ModelStream } from '../types'
+import { ModelStream, Network } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import Search from '../components/Search'
 import Star from '../components/icons/Star'
 import StarEmpty from '../components/icons/StarEmpty'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import { debounce } from 'lodash'
+import { ImgOrName } from '../components/ImgOrName'
 
 export default function ModelsPage() {
   const [searchParams] = useSearchParams()
@@ -48,9 +50,10 @@ export default function ModelsPage() {
     setStarModels([...list])
   }, [personalCollections, network])
 
-  const fetchModel = useCallback(async () => {
+  const fetchModelWithDebounce = async (network: Network) => {
     setModels([])
     setHasMore(true)
+    setFilterStar(false)
     const resp = await getModelStreamList({
       name: searchText.current,
       network,
@@ -59,7 +62,11 @@ export default function ModelsPage() {
     setModels(list)
     setHasMore(list.length >= PageSize)
     pageNum.current = 1
-  }, [network])
+  }
+
+  const fetchModel = useCallback(debounce(fetchModelWithDebounce, 200), [
+    network,
+  ])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
@@ -83,9 +90,12 @@ export default function ModelsPage() {
   )
 
   useEffect(() => {
-    fetchModel()
+    fetchModel(network)
+  }, [network, fetchModel])
+
+  useEffect(() => {
     fetchPersonalCollections()
-  }, [fetchModel, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
 
   const lists = useMemo(() => {
     if (!filterStar) return models
@@ -105,7 +115,7 @@ export default function ModelsPage() {
                 searchAction={(text) => {
                   searchText.current = text
                   setModels([])
-                  fetchModel()
+                  fetchModel(network)
                 }}
                 placeholder={'Search by model name'}
               />
@@ -154,12 +164,15 @@ export default function ModelsPage() {
                 <th>Description</th>
                 <th>ID</th>
                 <th>Usage Count</th>
+                <th>7 Days Usage</th>
                 <th>Release Date</th>
+                <th>Dapps</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {lists.map((item, idx) => {
+                const dapps = item.dapps || []
                 const hasStarItem = personalCollectionsWithoutFilter.find(
                   (starItem) => starItem.modelId === item.stream_id
                 )
@@ -193,9 +206,24 @@ export default function ModelsPage() {
                     </td>
                     <td>
                       {(!item.isIndexed && (
-                        <div className="usage-count">{item.useCount}</div>
+                        <div
+                          className="usage-count"
+                          title={`from ${dayjs(item.created_at).format(
+                            'YYYY-MM-DD'
+                          )}`}
+                        >
+                          {item.useCount}
+                        </div>
                       )) || (
-                        <div>
+                        <div
+                          title={
+                            item.firstRecordTime
+                              ? `from ${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD'
+                                )}`
+                              : ''
+                          }
+                        >
                           <Link
                             to={`/models/model/${item.stream_id}/mids?network=${network}`}
                           >
@@ -204,14 +232,16 @@ export default function ModelsPage() {
                         </div>
                       )}
                     </td>
+                    <td>{item.recentlyUseCount || '-'}</td>
                     <td>
                       <div className="release-date">
                         {(item.last_anchored_at &&
-                          dayjs(item.created_at).format(
-                            'YYYY-MM-DD HH:mm:ss'
-                          )) ||
+                          dayjs(item.created_at).format('YYYY-MM-DD')) ||
                           '-'}
                       </div>
+                    </td>
+                    <td>
+                      <Dapps dapps={dapps} />
                     </td>
                     <td>
                       <ModelStarItem
@@ -232,6 +262,84 @@ export default function ModelsPage() {
     </PageBox>
   )
 }
+
+function Dapps({
+  dapps,
+}: {
+  dapps: Array<{ name: string; description: string; icon: string; id: number }>
+}) {
+  const { network } = useCeramicCtx()
+  const apps = useMemo(() => {
+    const data = [...dapps]
+    if (data.length > 3)
+      return { data: data.slice(0, 3), left: data.length - 3 }
+    return { data, left: 0 }
+  }, [dapps])
+
+  return (
+    <DappBox className="cc">
+      {apps.data.length > 0
+        ? apps.data.map((item, idx) => {
+            return (
+              <Link to={`/dapps/${item.id}?network=${network}`}>
+                <ImgOrName
+                  key={item.name}
+                  name={item.name}
+                  imgUrl={item.icon}
+                />
+              </Link>
+            )
+          })
+        : 'None'}
+      {apps.left > 0 && <span className="left">{apps.left}+</span>}
+    </DappBox>
+  )
+}
+
+const DappBox = styled.div`
+  display: flex;
+  gap: 5px;
+  overflow: hidden;
+  color: #fff;
+  font-family: Rubik;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  a {
+    > span {
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #718096;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      &.name {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      &.left {
+        border: none;
+        color: #fff;
+        justify-content: start;
+        font-family: Rubik;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+    }
+  }
+`
 
 function ModelStarItem({
   signIn,
@@ -391,6 +499,10 @@ const PageBox = styled.div<{ isMobile: boolean }>`
     font-style: italic;
 
     color: #ffffff;
+  }
+
+  a {
+    word-break: break-word;
   }
 `
 

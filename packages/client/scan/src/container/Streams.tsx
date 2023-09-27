@@ -12,6 +12,7 @@ import FeedsFilterBox from '../components/FeedsFilterBox'
 import { getStreamTopics } from '../api'
 import Filter from '../components/Filter'
 import { useCeramicCtx } from '../context/CeramicCtx'
+import { debounce } from 'lodash'
 
 export default function Streams() {
   const { network } = useCeramicCtx()
@@ -42,9 +43,12 @@ export default function Streams() {
     setFamilies(resp.data.data.familys)
   }, [network])
 
+  const loadDataWithDebounce = useCallback(debounce(loadData, 200), [])
+  const loadTopicWithDebounce = useCallback(debounce(loadTopics, 200), [])
+
   useEffect(() => {
-    loadData({ network })
-    loadTopics()
+    loadDataWithDebounce({ network })
+    loadTopicWithDebounce()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [network])
 

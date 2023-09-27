@@ -1,8 +1,9 @@
 import { AxiosError, isAxiosError } from 'axios'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
+import { debounce } from 'lodash'
 
 import { getStreamInfo } from '../api'
 import StreamTable from '../components/StreamTable'
@@ -23,6 +24,8 @@ export default function StreamPage() {
     try {
       const resp = await getStreamInfo(network, streamId)
       setStream(resp.data.data)
+      setServerErrMsg(undefined)
+      setUnknownErr(undefined)
     } catch (error) {
       const err = error as Error | AxiosError
       if (isAxiosError(err) && err.response) {
@@ -36,12 +39,17 @@ export default function StreamPage() {
     }
   }
 
+  const loadStreamInfoWithDebounce = useCallback(
+    debounce(loadStreamInfo, 200),
+    []
+  )
+
   useEffect(() => {
     if (!streamId || !network) return
     setServerErrMsg(undefined)
     setUnknownErr(undefined)
-    loadStreamInfo(network as Network, streamId)
-  }, [streamId, network])
+    loadStreamInfoWithDebounce(network as Network, streamId)
+  }, [streamId, network, loadStreamInfoWithDebounce])
 
   if (unknownErr) {
     return (

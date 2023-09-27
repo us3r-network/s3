@@ -2,23 +2,27 @@ import styled from 'styled-components'
 import Title from './Title'
 import { useCallback, useEffect, useState } from 'react'
 import { getModelStreamList } from '../../../api'
-import { ModelStream } from '../../../types'
+import { ModelStream, Network } from '../../../types'
 import { shortPubKey } from '../../../utils/shortPubKey'
 import { useCeramicCtx } from '../../../context/CeramicCtx'
 import { Link } from 'react-router-dom'
+import { debounce } from 'lodash'
 
 export default function Models() {
   const [list, setList] = useState<Array<ModelStream>>([])
   const { network } = useCeramicCtx()
-  const fetchModel = useCallback(async () => {
+  const fetchModel = async (network: Network) => {
     const resp = await getModelStreamList({ network })
     const list = resp.data.data
     setList(list)
-  }, [network])
+  }
+
+  const fetchModelWithDebounce = useCallback(debounce(fetchModel, 200), [])
 
   useEffect(() => {
-    fetchModel()
-  }, [fetchModel])
+    fetchModelWithDebounce(network)
+  }, [fetchModelWithDebounce, network])
+
   return (
     <Box>
       <Title title="Total Models" viewAll="/models" />

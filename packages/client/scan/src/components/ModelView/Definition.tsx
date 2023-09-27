@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import Prism from 'prismjs'
+
 import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { getModelInfo, queryModelGraphql } from '../../api'
@@ -9,10 +9,11 @@ import { ModeQueryResult, ModelStream } from '../../types'
 import { schemas } from '../../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { useCeramicCtx } from '../../context/CeramicCtx'
-
-import 'prismjs/components/prism-typescript'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
-import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
+import CodeDownload from '../CodeDownload'
+import { UserAvatar } from '@us3r-network/profile'
+import dayjs from 'dayjs'
+import { shortPubKey } from '../../utils/shortPubKey'
+import { ImgOrName } from '../ImgOrName'
 
 export default function Definition() {
   const { streamId } = useParams()
@@ -105,83 +106,179 @@ export default function Definition() {
         />
       </EditorBox>
       <ResultBox>
+        <Info modelStream={modelStream} />
         {modelData?.composite && (
-          <div>
-            <div className="title">
-              <h3>Model's composite</h3>
-              <button
-                onClick={() => {
-                  download(
-                    JSON.stringify(modelData.composite),
-                    'composite.json'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="composite"
-                content={JSON.stringify(modelData.composite, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Composite"
+            downloadContent={JSON.stringify(modelData.composite)}
+            downloadFileName={'composite.json'}
+            content={JSON.stringify(modelData.composite, null, 2)}
+          />
         )}
         {modelData?.runtimeDefinition && (
-          <div>
-            <div className="title">
-              <h3>Model's runtime definition</h3>
-              <button
-                onClick={() => {
-                  download(
-                    `// This is an auto-generated file, do not edit manually
-  export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`,
-                    'runtime-composite.js'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="runtimeDefinition"
-                content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title={'Runtime Definition'}
+            downloadFileName={'runtime-composite.js'}
+            downloadContent={`// This is an auto-generated file, do not edit manually
+export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
+            content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
+          />
         )}
       </ResultBox>
     </div>
   )
 }
 
-export function Code({ name, content }: { name: string; content: string }) {
-  useEffect(() => {
-    Prism.highlightAll()
-  }, [content])
-
-  const preCode = `<pre class="line-numbers"><code class="language-typescript">${content}</code></pre>`
+function Info({ modelStream }: { modelStream: ModelStream | undefined }) {
   return (
-    <CodeBox>
-      <div
-        className="line-numbers"
-        dangerouslySetInnerHTML={{ __html: preCode }}
-      ></div>
-    </CodeBox>
+    <InfoBox>
+      <div className="title">
+        <div>
+          <h3>Model‘s Information</h3>
+        </div>
+        <button></button>
+      </div>
+      {modelStream && (
+        <div className="info">
+          <div>
+            <span>Model name:</span>
+            {modelStream.streamContent.name}
+          </div>
+          <div>
+            <span>Description:</span>
+            {modelStream.streamContent.description || ''}
+          </div>
+          <div>
+            <span>Model ID:</span>
+            {shortPubKey(modelStream.streamId, { len: 10 })}
+          </div>
+          <div>
+            <span>Usage count:</span>
+            {modelStream.useCount || 0}
+          </div>
+          <div>
+            <span>Creator:</span>
+            <div className="avatar">
+              <UserAvatar did={modelStream.controllerDid} />
+              <span>{shortPubKey(modelStream.controllerDid, { len: 10 })}</span>
+            </div>
+          </div>
+          <div>
+            <span>Release date:</span>
+            {dayjs(modelStream.createdAt).format('YYYY-MM-DD')}
+          </div>
+          <div>
+            <span>Dapps:</span>
+            {modelStream.dapps && <Dapps dapps={modelStream.dapps} />}
+          </div>
+        </div>
+      )}
+    </InfoBox>
   )
 }
 
-const CodeBox = styled.div`
-  > .name {
-    border-bottom: none;
-    display: inline-block;
-    padding: 10px 20px;
+function Dapps({
+  dapps,
+}: {
+  dapps: Array<{ name: string; description: string; icon: string }>
+}) {
+  return (
+    <>
+      {[...dapps].map((item, idx) => {
+        return (
+          <div key={item.name} className="dapp">
+            <ImgOrName name={item.name} imgUrl={item.icon} />
+            {item.name}
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+const InfoBox = styled.div`
+  box-sizing: border-box;
+  background-color: #1a1a1c;
+  height: fit-content;
+  overflow: hidden;
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
+    color: #ffffff;
+
+    h3 {
+      margin: 0;
+      padding: 0;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 24px;
+    }
   }
-  > .line-numbers {
-    overflow: scroll;
-    /* margin-bottom: 20px; */
+
+  .info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    > div {
+      word-wrap: break-word;
+      > span {
+        margin-right: 5px;
+        color: #718096;
+      }
+    }
+
+    .avatar {
+      display: flex;
+      margin-top: 5px;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+
+  .dapp {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    > span {
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #718096;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      &.name {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      &.left {
+        border: none;
+        color: #fff;
+        justify-content: start;
+        font-family: Rubik;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border-radius: 50%;
+      }
+    }
   }
 `
 
@@ -207,9 +304,10 @@ const ResultBox = styled.div`
     background: #1b1e23;
     border: 1px solid #39424c;
     border-radius: 20px;
+    flex-shrink: 0;
   }
   > div {
-    width: calc(50% - 10px);
+    width: calc(33% - 8px);
     margin: 20px 0px;
     /* padding: 10px; */
     box-sizing: border-box;
@@ -228,7 +326,7 @@ const ResultBox = styled.div`
       padding: 10px;
       box-sizing: border-box;
       button {
-        background: #ffffff;
+        background: inherit;
       }
 
       h3 {
