@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import camelCase from 'camelcase'
+import JSZip from 'jszip'
 
 import Prism from 'prismjs'
 import 'prismjs/components/prism-typescript'
@@ -29,34 +30,24 @@ export default function ModelSDK({
   >([])
   const [loading, setLoading] = useState<boolean>(false)
   const [errMsg, setErrMsg] = useState('')
-  const [selectKey, setSelectKey] = useState<string>('0')
-  const [genType, setGenType] = useState(GraphqlGenType.CLIENT_PRESET)
-
-  const download = (text: string, filename: string) => {
-    const blob = new Blob([text], {
-      type: 'text/plain;charset=utf-8',
-    })
-
-    FileSaver.saveAs(blob, filename)
-  }
+  const [genType] = useState(GraphqlGenType.CLIENT_PRESET)
 
   const downloadCurr = useCallback(() => {
     if (codes.length === 0) {
       return
     }
-    let curr
-    if (selectKey) {
-      curr = codes.find((item) => `${item.id}` === selectKey)
-    } else {
-      curr = codes[0]
-    }
-    if (!curr) {
-      console.error('no curr')
-      return
-    }
+    const zip = new JSZip()
 
-    download(curr.content, curr.title)
-  }, [selectKey, codes])
+    codes.forEach((item) => {
+      zip.file(item.title, item.content)
+    })
+    zip
+      .generateAsync({ type: 'blob' })
+      .then(function (content) {
+        FileSaver.saveAs(content, `${camelCase(modelName)}SDK.zip`)
+      })
+      .catch(console.error)
+  }, [codes, modelName])
 
   const fetchModelSDK = useCallback(async () => {
     try {
@@ -152,7 +143,7 @@ export const definition = ${JSON.stringify(
                     aria-label="Dynamic tabs"
                     items={codes}
                     onSelectionChange={(key) => {
-                      setSelectKey(key.toString())
+                      // setSelectKey(key.toString())
                     }}
                   >
                     {(item) => <Tab className={'code-tab'}>{item.title}</Tab>}

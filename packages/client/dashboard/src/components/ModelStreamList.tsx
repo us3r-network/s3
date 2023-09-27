@@ -36,6 +36,7 @@ export default function ModelStreamList({
           <tr>
             <th>Stream ID</th>
             <th>DID</th>
+            <th>Create Time</th>
             <th>Update Time</th>
             {showAction && <th>Action</th>}
           </tr>
@@ -63,6 +64,11 @@ export default function ModelStreamList({
                 <td className="td-did">
                   <UserAvatarStyled did={item.controllerDid} />
                   <UserName did={item.controllerDid} />
+                </td>
+                <td className="index-time">
+                  <div>
+                    <time>{dayjs(item.createdAt).fromNow()}</time>
+                  </div>
                 </td>
                 <td className="index-time">
                   <div>
