@@ -204,7 +204,7 @@ export class DappController {
     // build schema details
     const schemaDetails = await this.streamService.findStreamsByStreamIds(dapp.getNetwork == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET, dapp.getSchemas);
     const schemaDetailsMap = new Map<number, any[]>();
-    schemaDetailsMap.set(dapp.getId, schemaDetails);
+    schemaDetailsMap.set(dapp.getId, schemaDetails?.map(schemaDetail => ConvertToStream(schemaDetail)) ?? []);
     return new BasicMessageDto(
       'OK.',
       0,
