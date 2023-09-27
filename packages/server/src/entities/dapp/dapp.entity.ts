@@ -71,6 +71,13 @@ export class Dapp extends BaseEntity {
   })
   models: string[];
 
+  @Column({
+    type: 'text',
+    array: true,
+    default: [],
+  })
+  schemas: string[];
+
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
@@ -167,6 +174,13 @@ export class Dapp extends BaseEntity {
   }
   set setModels(models: string[]) {
     this.models = models;
+  }
+
+  get getSchemas(): string[] {
+    return this.schemas;
+  }
+  set setSchemas(schemas: string[]) {
+    this.schemas = schemas;
   }
 
   get getCreatedAt(): Date {
