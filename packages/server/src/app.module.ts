@@ -24,7 +24,6 @@ const env: string | undefined = process.env.NODE_ENV;
       database: process.env.DATABASE,
       logging: false,
       entities: ['dist/**/dapp.entity{.ts,.js}'],
-      synchronize: true,
       type: 'postgres',
       pool: {
         max: 70,
