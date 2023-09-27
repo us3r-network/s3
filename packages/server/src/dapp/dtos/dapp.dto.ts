@@ -58,6 +58,8 @@ export class DappDto {
   @ApiProperty()
   models: string[];
   @ApiProperty()
+  schemas: string[];
+  @ApiProperty()
   modelDetals: any[];
   @ApiProperty()
   createdAt: number;
@@ -75,6 +77,7 @@ export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]
   dto.socialLinks = dapp.getSocialLinks;
   dto.tags = dapp.getTags;
   dto.models = dapp.getModels;
+  dto.schemas = dapp.getSchemas;
   dto.modelDetals = modelDetailsMap?.get(dapp.getId)??[];
   dto.stage = dapp.getStage;
   dto.type = dapp.getType;
