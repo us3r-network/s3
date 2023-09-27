@@ -23,6 +23,7 @@ import ModelService from 'src/model/model.service';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 import { getDidStrFromDidSession } from 'src/utils/user/user-util';
 import StreamService from '../stream/stream.service';
+import { ConvertToStream } from 'src/stream/dtos/stream.dto';
 
 @ApiTags('/dapps')
 @Controller('/dapps')
@@ -139,6 +140,7 @@ export class DappController {
       );
     }
 
+    // build model details map
     const modelDetailsMap = new Map<number, any[]>();
     if (network != Network.ALL) {
       const modelIds = new Set<string>();
@@ -160,10 +162,32 @@ export class DappController {
       });
     }
 
+    // build schema details map
+    const schemaDetailsMap = new Map<number, any[]>();
+    if (network != Network.ALL) {
+      const schemaIds = new Set<string>();
+      dapps.forEach(dapp => dapp.getSchemas.forEach(m => schemaIds.add(m)));
+      const schemaDetails = await this.streamService.findStreamsByStreamIds(network == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET, Array.from(schemaIds));
+      const schemaMap = new Map<string, any>();
+      schemaDetails?.forEach(schemaDetail => {
+        schemaMap.set(schemaDetail.getStreamId, ConvertToStream(schemaDetail));
+      });
+      dapps.forEach(dapp => {
+        const schemaDetails = schemaDetailsMap.get(dapp.getId) ?? [];
+        dapp.getSchemas.forEach(m => {
+          const schemaDetail = schemaMap.get(m);
+          if (schemaDetail) {
+            schemaDetails.push(schemaDetail);
+          }
+        });
+        schemaDetailsMap.set(dapp.getId, schemaDetails);
+      });
+    }
+
     return new BasicMessageDto(
       'OK.',
       0,
-      dapps?.map((dapp) => convertToDappDto(dapp, modelDetailsMap)),
+      dapps?.map((dapp) => convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap)),
     );
   }
 
