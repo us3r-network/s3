@@ -44,13 +44,15 @@ export default function ListTable({
             if (item.schema) {
               schemaOrModel = (
                 <Link to={`/streams/stream/${item.schema}?network=${network}`}>
-                  {shortPubKey(item.schema, { len: 8, split: '-' })}
+                  {item.modelOrSchemaName ||
+                    shortPubKey(item.schema, { len: 8, split: '-' })}
                 </Link>
               )
             } else if (item.model && (item.type === '0' || item.type === '3')) {
               schemaOrModel = (
                 <Link to={`/streams/stream/${item.model}?network=${network}`}>
-                  {shortPubKey(item.model, { len: 8, split: '-' })}
+                  {item.modelOrSchemaName ||
+                    shortPubKey(item.model, { len: 8, split: '-' })}
                 </Link>
               )
             }
