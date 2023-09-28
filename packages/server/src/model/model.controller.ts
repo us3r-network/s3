@@ -235,11 +235,18 @@ export class ModelController {
     for await (const network of networks) {
       const models = await this.modelService.findAllModelIds(network);
       this.logger.log(`All ${network} model count: ${models?.length}`);
+      if (!models || models.length == 0) continue;
       const useCountMap = await this.streamService.findModelUseCount(
         network, models
       );
-      if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
-      this.logger.log(`${network} model usecount ${JSON.stringify(useCountMap)}`);
+      models.forEach((m) => {
+        const useCount = useCountMap.get(m);
+        if (!useCount) {
+          useCountMap.set(m, 0);
+        }
+        this.logger.log(`model ${m} usecount: ${useCountMap.get(m)}`);
+      });
+      this.logger.log(`${network} model usecount size: ${useCountMap.size}`);
       await this.modelService.updateModelUseCount(network, useCountMap);
     }
     return new BasicMessageDto('ok', 0);
