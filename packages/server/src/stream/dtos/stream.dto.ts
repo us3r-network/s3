@@ -16,19 +16,21 @@ export function ConvertToStreamsReponseDto(
   streams: Stream[],
   streamCount: number,
   didCount: number,
+  modelOrSchemaNameMap?: Map<string, string>,
+
 ): StreamsReponseDto {
   const streamsReponseDto = new StreamsReponseDto();
-  streamsReponseDto.streams = streams.map((s) => ConvertToStream(s));
+  streamsReponseDto.streams = streams.map((s) => ConvertToStream(s, modelOrSchemaNameMap?.get(s.getStreamId)));
   streamsReponseDto.streamCount = streamCount;
   streamsReponseDto.didCount = didCount;
   return streamsReponseDto;
 }
 
-export function ConvertToStream(stream: Stream): StreamDto {
+export function ConvertToStream(stream: Stream, modelOrSchemaName?:string): StreamDto {
   const streamDto = new StreamDto();
   streamDto.streamId = stream.getStreamId;
   streamDto.network = stream.getNetwork;
-  streamDto.indexingTime = stream.getLastModifiedAt.getTime();
+  streamDto.indexingTime = stream.getLastModifiedAt?.getTime();
   streamDto.familyOrApp = stream.getFamily;
   streamDto.type = stream.getType;
   streamDto.did = stream.getDid;
@@ -40,6 +42,7 @@ export function ConvertToStream(stream: Stream): StreamDto {
   streamDto.commitIds = stream.getCommitIds;
   streamDto.content = stream.getContent;
   streamDto.model = stream.getModel;
+  streamDto.modelOrSchemaName = modelOrSchemaName;
   streamDto.metadata = stream.getMetadata;
   streamDto.domain = stream.getDomain;
   return streamDto;
@@ -70,6 +73,8 @@ export class StreamDto {
   schema: string;
   @ApiProperty()
   model: string;
+  @ApiProperty()
+  modelOrSchemaName: string
   @ApiProperty()
   commitIds: string[];
   @ApiProperty()
