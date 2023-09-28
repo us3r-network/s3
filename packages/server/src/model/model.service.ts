@@ -677,6 +677,7 @@ export default class ModelService {
       members.push(useCount);
       members.push(modelId);
     });
+    await this.redis.del(key);
     await this.redis.zadd(key, ...members);
   }
 
