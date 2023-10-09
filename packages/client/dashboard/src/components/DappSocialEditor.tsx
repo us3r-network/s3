@@ -27,30 +27,34 @@ const IconMap: { [key: string]: () => JSX.Element } = {
 
 export default function DappSocialEditor({
   selectedDapp,
+  isOwner,
 }: {
   selectedDapp: ClientDApp
+  isOwner: boolean
 }) {
   return (
     <DappSocialEditorBox className="items">
       <div className="title">
         <h3>Social Links</h3>
-        <DialogTrigger>
-          <Button>
-            <EditIcon />
-          </Button>
-          <ModalOverlay>
-            <Modal>
-              <Dialog>
-                {({ close }) => (
-                  <EditDappSocial
-                    closeModal={close}
-                    selectedDapp={selectedDapp}
-                  />
-                )}
-              </Dialog>
-            </Modal>
-          </ModalOverlay>
-        </DialogTrigger>
+        {isOwner && (
+          <DialogTrigger>
+            <Button>
+              <EditIcon />
+            </Button>
+            <ModalOverlay>
+              <Modal>
+                <Dialog>
+                  {({ close }) => (
+                    <EditDappSocial
+                      closeModal={close}
+                      selectedDapp={selectedDapp}
+                    />
+                  )}
+                </Dialog>
+              </Modal>
+            </ModalOverlay>
+          </DialogTrigger>
+        )}
       </div>
       <div>
         {selectedDapp.socialLinks?.map((item) => {

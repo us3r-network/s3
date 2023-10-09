@@ -13,8 +13,10 @@ import { Network } from './Selector/EnumSelect'
 
 export default function DappTitleEditor({
   selectedDapp,
+  isOwner,
 }: {
   selectedDapp: ClientDApp
+  isOwner: boolean
 }) {
   return (
     <TitleBox>
@@ -23,20 +25,25 @@ export default function DappTitleEditor({
         <span className="net">{selectedDapp.network || Network.TESTNET}</span>
         <span>{selectedDapp.stage || 'Under Development'}</span>
       </div>
-      <DialogTrigger>
-        <Button>
-          <EditIcon />
-        </Button>
-        <ModalOverlay>
-          <Modal>
-            <Dialog>
-              {({ close }) => (
-                <EditDappInfo closeModal={close} selectedDapp={selectedDapp} />
-              )}
-            </Dialog>
-          </Modal>
-        </ModalOverlay>
-      </DialogTrigger>
+      {isOwner && (
+        <DialogTrigger>
+          <Button>
+            <EditIcon />
+          </Button>
+          <ModalOverlay>
+            <Modal>
+              <Dialog>
+                {({ close }) => (
+                  <EditDappInfo
+                    closeModal={close}
+                    selectedDapp={selectedDapp}
+                  />
+                )}
+              </Dialog>
+            </Modal>
+          </ModalOverlay>
+        </DialogTrigger>
+      )}
     </TitleBox>
   )
 }

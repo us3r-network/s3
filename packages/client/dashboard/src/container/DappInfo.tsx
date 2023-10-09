@@ -5,18 +5,21 @@ import useSelectedDapp from '../hooks/useSelectedDapp'
 
 import DappTitleEditor from '../components/DappTitleEditor'
 import DappSocialEditor from '../components/DappSocialEditor'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import CopyIcon from '../components/Icons/CopyIcon'
 
 import DelConfirmModal from '../components/DelDappConfirmModal'
 import { useNavigate } from 'react-router-dom'
 import { createImageFromInitials } from '../utils/createImage'
 import { getRandomColor } from '../utils/randomColor'
+import { useAppCtx } from '../context/AppCtx'
+import useIsOwner from '../hooks/useIsOwner'
 
 export default function DappInfo() {
   const { selectedDapp } = useSelectedDapp()
   const navigate = useNavigate()
   const [showCopyTint, setShowCopyTint] = useState(false)
+  const { currDapp } = useAppCtx()
 
   const copyAppId = useCallback(async (appId: string) => {
     try {
@@ -30,7 +33,13 @@ export default function DappInfo() {
     }
   }, [])
 
-  if (!selectedDapp) {
+  const { isOwner } = useIsOwner()
+
+  const dapp = useMemo(() => {
+    return selectedDapp || currDapp
+  }, [selectedDapp, currDapp])
+
+  if (!dapp) {
     return null
   }
 
@@ -39,19 +48,19 @@ export default function DappInfo() {
       <div className="info items">
         <img
           src={
-            selectedDapp.icon ||
+            dapp.icon ||
             createImageFromInitials(
               120,
-              selectedDapp.name.slice(0, 1),
+              dapp.name.slice(0, 1),
               getRandomColor()
             )
           }
           alt="icon"
         />
         <div>
-          <DappTitleEditor selectedDapp={selectedDapp} />
+          <DappTitleEditor selectedDapp={dapp} isOwner={isOwner} />
           <div className="appid">
-            APP ID: {selectedDapp.id}
+            APP ID: {dapp.id}
             <div>
               <button
                 onClick={() => {
@@ -64,51 +73,54 @@ export default function DappInfo() {
               {showCopyTint && <span>Copied</span>}
             </div>
           </div>
-          <p className="description">{selectedDapp.description}</p>
+          <p className="description">{dapp.description}</p>
         </div>
       </div>
       <div className="links">
-        <DappSocialEditor selectedDapp={selectedDapp} />
-        <div className="ops">
-          <div className="items">
-            <h3>Release to Mainnet</h3>
-            <p>Create the same Dapp at Mainnet.</p>
-            <div className="btns">
-              <button className="soon">Coming Soon</button>
+        <DappSocialEditor selectedDapp={dapp} isOwner={isOwner} />
+
+        {isOwner && (
+          <div className="ops">
+            <div className="items">
+              <h3>Release to Mainnet</h3>
+              <p>Create the same Dapp at Mainnet.</p>
+              <div className="btns">
+                <button className="soon">Coming Soon</button>
+              </div>
+            </div>
+            <div className="items">
+              <h3>Sync to U3</h3>
+              <p>Sync the information of the Dapp to U3.xyz.</p>
+              <div className="btns">
+                <button className="soon">Coming Soon</button>
+              </div>
+            </div>
+            <div className="items">
+              <h3>Delete</h3>
+              <p>Delete the Dapp will also remove your data.</p>
+              <div className="btns">
+                <DialogTrigger>
+                  <Button className="del">Delete</Button>
+                  <Modal className={'confirm-modal'}>
+                    <Dialog>
+                      {({ close }) => (
+                        <DelConfirmModal
+                          closeModal={(del) => {
+                            close()
+                            if (!del) return
+                            setTimeout(() => {
+                              navigate('/')
+                            }, 1)
+                          }}
+                        />
+                      )}
+                    </Dialog>
+                  </Modal>
+                </DialogTrigger>
+              </div>
             </div>
           </div>
-          <div className="items">
-            <h3>Sync to U3</h3>
-            <p>Sync the information of the Dapp to U3.xyz.</p>
-            <div className="btns">
-              <button className="soon">Coming Soon</button>
-            </div>
-          </div>
-          <div className="items">
-            <h3>Delete</h3>
-            <p>Delete the Dapp will also remove your data.</p>
-            <div className="btns">
-              <DialogTrigger>
-                <Button className="del">Delete</Button>
-                <Modal className={'confirm-modal'}>
-                  <Dialog>
-                    {({ close }) => (
-                      <DelConfirmModal
-                        closeModal={(del) => {
-                          close()
-                          if (!del) return
-                          setTimeout(() => {
-                            navigate('/')
-                          }, 1)
-                        }}
-                      />
-                    )}
-                  </Dialog>
-                </Modal>
-              </DialogTrigger>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </DappInfoContainer>
   )
