@@ -4,7 +4,13 @@ import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { ModelStream } from '../types'
-import { PageSize, getModelStreamList, getStarModels, updateDapp } from '../api'
+import {
+  PageSize,
+  getModelStreamList,
+  getStarModels,
+  startIndexModel,
+  updateDapp,
+} from '../api'
 import { TableBox, TableContainer } from '../components/TableBox'
 import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
@@ -170,6 +176,7 @@ export default function ExploreModel() {
                 <th>Description</th>
                 <th>ID</th>
                 <th>Usage Count</th>
+                <th>7 Days Usage</th>
                 <th>Release Date</th>
                 <th></th>
               </tr>
@@ -212,7 +219,19 @@ export default function ExploreModel() {
                       </div>
                     </td>
                     <td>
-                      <div>
+                      <div
+                        title={
+                          item.isIndexed
+                            ? item.firstRecordTime
+                              ? `from ${dayjs(item.firstRecordTime).format(
+                                  'YYYY-MM-DD'
+                                )}`
+                              : ''
+                            : `from ${dayjs(item.created_at).format(
+                                'YYYY-MM-DD'
+                              )}`
+                        }
+                      >
                         <a
                           href={`${S3_SCAN_URL}/models/model/${
                             item.stream_id
@@ -224,6 +243,7 @@ export default function ExploreModel() {
                         </a>
                       </div>
                     </td>
+                    <td>{item.recentlyUseCount || '-'}</td>
                     <td>
                       <div>
                         {(item.last_anchored_at &&
@@ -237,6 +257,7 @@ export default function ExploreModel() {
                       {/* <OpsBtns modelId={item.stream_id} /> */}
                       <ModelStarItem
                         stream_id={item.stream_id}
+                        hasIndexed={!!item.isIndexed}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
                       />
@@ -257,7 +278,9 @@ function ModelStarItem({
   hasStarItem,
   fetchPersonal,
   stream_id,
+  hasIndexed,
 }: {
+  hasIndexed: boolean
   stream_id: string
   hasStarItem:
     | {
@@ -278,6 +301,13 @@ function ModelStarItem({
   const addToModelList = useCallback(
     async (modelId: string) => {
       if (!session || !selectedDapp) return
+      if (!hasIndexed) {
+        startIndexModel({
+          modelId,
+          network: selectedDapp.network as Network,
+          didSession: session.serialize(),
+        }).catch(console.error)
+      }
       try {
         setAdding(true)
         const models = selectedDapp.models || []
@@ -290,7 +320,7 @@ function ModelStarItem({
         setAdding(false)
       }
     },
-    [loadDapps, selectedDapp, session, setAdding]
+    [loadDapps, selectedDapp, session, setAdding, hasIndexed]
   )
 
   const starModelAction = useCallback(

@@ -8,7 +8,8 @@ import React, {
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { ClientDApp } from '../types'
-import { getDappWithDid } from '../api'
+import { getDapp, getDappWithDid } from '../api'
+import { useGuideStepsState } from '../hooks/useGuideSteps'
 
 export type PersonalCollection = {
   modelId: string
@@ -18,7 +19,11 @@ export type PersonalCollection = {
 export interface AppContextData {
   loadingDApps: boolean
   dapps: ClientDApp[]
+  currDapp: ClientDApp | undefined
+  currAppId: string
+  setCurrAppId: React.Dispatch<React.SetStateAction<string>>
   loadDapps: () => Promise<void>
+  guideSteps: ReturnType<typeof useGuideStepsState>
 }
 
 const AppContext = createContext<AppContextData | null>(null)
@@ -28,8 +33,11 @@ export default function AppProvider({
 }: {
   children: React.ReactNode
 }) {
+  const [currDapp, setCurrDapp] = useState<ClientDApp>()
   const [dapps, setDapps] = useState<ClientDApp[]>([])
   const [loadingDApps, setLoadingDApps] = useState(false)
+  const [loadingDApp, setLoadingDApp] = useState(false)
+  const [currAppId, setCurrAppId] = useState('')
 
   const session = useSession()
 
@@ -44,6 +52,22 @@ export default function AppProvider({
     }
     setDapps(resp.data.data)
   }, [session])
+
+  const loadCurrDapp = useCallback(async () => {
+    setCurrDapp(undefined)
+    if (!currAppId) return
+    const resp = await getDapp(currAppId)
+    setCurrDapp(resp.data.data)
+  }, [currAppId])
+
+  useEffect(() => {
+    setLoadingDApp(true)
+    loadCurrDapp()
+      .catch(console.error)
+      .finally(() => {
+        setLoadingDApp(false)
+      })
+  }, [loadCurrDapp])
 
   useEffect(() => {
     setLoadingDApps(true)
@@ -60,12 +84,18 @@ export default function AppProvider({
     }
   }, [session])
 
+  const guideSteps = useGuideStepsState(dapps, loadingDApps)
+
   return (
     <AppContext.Provider
       value={{
         dapps,
+        currDapp,
+        currAppId,
+        setCurrAppId,
         loadDapps,
-        loadingDApps,
+        loadingDApps: loadingDApps || loadingDApp,
+        guideSteps,
       }}
     >
       {children}

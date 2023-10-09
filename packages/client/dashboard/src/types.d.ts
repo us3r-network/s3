@@ -48,6 +48,8 @@ export type ModelStream = {
   created_at: string
   updated_at: string
   useCount: number
+  recentlyUseCount?: number
+  firstRecordTime?: string
   isIndexed?: boolean
 }
 

@@ -13,6 +13,7 @@ export type Stream = {
   hash: string
   schema: string
   model?: string
+  modelOrSchemaName?: string
   anchorStatus: string
   commitIds: string[]
   content: Json

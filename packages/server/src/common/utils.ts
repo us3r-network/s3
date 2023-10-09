@@ -7,7 +7,7 @@ export const importDynamic = new Function(
 
 export function getCeramicNode(network: Network) {
   return network == Network.MAINNET
-    ? process.env.CERAMIC_NODE_MAINET
+    ? process.env.CERAMIC_NODE_MAINNET
     : process.env.CERAMIC_NODE;
 }
 
