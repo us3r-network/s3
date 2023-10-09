@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import FileSaver from 'file-saver'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { DappComposite } from '../types'
 import { schemas } from '../utils/composedb-types/schemas'
-import { Code } from './ModelSDK'
+
+import CodeDownload from './CodeDownload'
 
 export default function CompositeDefinition({
   composite,
@@ -23,14 +23,6 @@ export default function CompositeDefinition({
     })
   }, [composite])
 
-  const download = (text: string, filename: string) => {
-    const blob = new Blob([text], {
-      type: 'text/plain;charset=utf-8',
-    })
-
-    FileSaver.saveAs(blob, filename)
-  }
-
   return (
     <DefinitionBox>
       <div className="title">
@@ -46,56 +38,25 @@ export default function CompositeDefinition({
       </EditorBox>
       <ResultBox>
         {composite.composite && (
-          <div>
-            <div className="title">
-              <h3>Model's composite</h3>
-              <button
-                onClick={() => {
-                  download(composite.composite, 'composite.json')
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="composite"
-                content={JSON.stringify(
-                  JSON.parse(composite.composite),
-                  null,
-                  2
-                )}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Composite"
+            downloadContent={composite.composite}
+            downloadFileName="composite.json"
+            content={JSON.stringify(JSON.parse(composite.composite), null, 2)}
+          />
         )}
         {composite.runtimeDefinition && (
-          <div>
-            <div className="title">
-              <h3>Model's runtime definition</h3>
-              <button
-                onClick={() => {
-                  download(
-                    `// This is an auto-generated file, do not edit manually
-  export const definition = ${composite.runtimeDefinition}`,
-                    'runtime-composite.js'
-                  )
-                }}
-              >
-                Download
-              </button>
-            </div>
-            <div className="result-text">
-              <Code
-                name="runtimeDefinition"
-                content={JSON.stringify(
-                  JSON.parse(composite.runtimeDefinition),
-                  null,
-                  2
-                )}
-              />
-            </div>
-          </div>
+          <CodeDownload
+            title="Runtime Definition"
+            downloadContent={`// This is an auto-generated file, do not edit manually
+export const definition = ${composite.runtimeDefinition}`}
+            downloadFileName="runtime-composite.js"
+            content={JSON.stringify(
+              JSON.parse(composite.runtimeDefinition),
+              null,
+              2
+            )}
+          />
         )}
       </ResultBox>
     </DefinitionBox>
@@ -109,6 +70,11 @@ const DefinitionBox = styled.div`
     justify-content: space-between;
     background-color: #14171a;
     margin-bottom: 20px;
+
+    > div {
+      display: flex;
+      align-items: center;
+    }
 
     > span {
       font-style: italic;
@@ -160,7 +126,7 @@ const ResultBox = styled.div`
       color: #ffffff;
 
       button {
-        background: #ffffff;
+        background: inherit;
       }
 
       h3 {

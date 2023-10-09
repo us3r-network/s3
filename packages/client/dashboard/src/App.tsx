@@ -28,6 +28,7 @@ import ModelList from './components/ModelList'
 import { DappComposite, ModelStream } from './types'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
+import DappModelSdk from './container/DappModelSdk'
 
 dayjs.extend(relativeTime)
 
@@ -42,6 +43,7 @@ function Routers() {
           <Route element={<ModelEditorLayout />}>
             <Route path="model-editor" element={<DappModelEditor />} />
             <Route path="model-playground" element={<DappModelPlayground />} />
+            <Route path="model-sdk" element={<DappModelSdk />} />
             <Route path="statistic" element={<DappDataStatistic />} />
           </Route>
           <Route path="info" element={<DappInfo />} />
@@ -59,7 +61,7 @@ export default function App() {
   return (
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
-      appName="S3 Dashboard"
+      appName="S3 Console"
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider>

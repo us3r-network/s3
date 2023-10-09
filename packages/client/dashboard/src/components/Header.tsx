@@ -16,7 +16,7 @@ export default function Header() {
       <div className="left">
         <Link to={'/'}>
           <LogoWhite />
-          <h2>DASHBOARD</h2>
+          <h2>CONSOLE</h2>
         </Link>
         {session?.id && appId && (
           <DappSelector selected={appId} dapps={selectDapps} />

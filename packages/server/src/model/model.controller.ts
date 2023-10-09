@@ -5,10 +5,11 @@ import {
   Get,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
+  Param,
   Post,
   Query,
   Req,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -19,10 +20,19 @@ import { Network } from 'src/entities/stream/stream.entity';
 import { CreateModelDto, ModelIdToGaphqlDto } from './dtos/model.dto';
 import {
   getCeramicNode,
-  getCeramicNodeAdminKey,
   importDynamic,
 } from 'src/common/utils';
 import { Cron } from '@nestjs/schedule';
+import { CodegenConfig, generate } from '@graphql-codegen/cli';
+import * as path from 'path';
+import * as typescriptPlugin from '@graphql-codegen/typescript';
+import * as typescriptOperationsPlugin from '@graphql-codegen/typescript-operations';
+import { CodegenPlugin } from '@graphql-codegen/plugin-helpers';
+import * as addPlugin from '@graphql-codegen/add';
+import * as typescriptValidationPlugin from 'graphql-codegen-typescript-validation-schema';
+import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query';
+import * as typescriptReactApolloPlugin from '@graphql-codegen/typescript-react-apollo';
+
 
 @ApiTags('/models')
 @Controller('/models')
@@ -59,7 +69,7 @@ export class ModelController {
     required: false,
   })
   @ApiOkResponse({ type: BasicMessageDto })
-  async getStreams(
+  async getModels(
     @Query('name') name?: string,
     @Query('did') did?: string,
     @Query('description') description?: string,
@@ -74,222 +84,547 @@ export class ModelController {
     this.logger.log(`Seaching models: useCounting: ${useCounting}`);
 
     // hard code for searching name
+    let metaModels;
+    let useCountMap: Map<string, number>;
     if (!name && !did) {
-      const useCountMap = await this.modelService.getModelsByDecsPagination(
+      useCountMap = await this.modelService.getModelsByDecsPagination(
         network,
         pageSize,
         pageNumber,
       );
+      this.logger.log(`${network} model entity count ${JSON.stringify(useCountMap?.size)}`);
       if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, []);
 
-      const metaModels = await this.modelService.findModelsByIds(
+      metaModels = await this.modelService.findModelsByIds(
         Array.from(useCountMap.keys()),
         network,
       );
-      if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
-      return new BasicMessageDto(
-        'ok',
-        0,
-        metaModels
-          .map((m) => ({
-            ...m,
-            useCount: useCountMap?.get(m.getStreamId) ?? 0,
-          }))
-          .sort((a, b) => b.useCount - a.useCount),
+    } else {
+      metaModels = await this.modelService.findModels(
+        pageSize,
+        pageNumber,
+        name,
+        did,
+        description,
+        startTimeMs,
+        network,
       );
     }
-
-    const metaModels = await this.modelService.findModels(
-      pageSize,
-      pageNumber,
-      name,
-      did,
-      description,
-      startTimeMs,
-      network,
-    );
     if (metaModels?.length == 0) return new BasicMessageDto('ok', 0, []);
 
-    const models = metaModels.map((m) => m.getStreamId);
-    const useCountMap = await this.streamService.findModelUseCount(
+    const modelStreamIds = metaModels.map((m) => m.getStreamId);
+    // Buid response data
+    const [indexedModelStreamIds, modelDappsMap] = await Promise.all([await this.modelService.findIndexedModelIds(
       network,
-      models,
-    );
+      modelStreamIds,
+    ), await this.modelService.getDappsByModels(network,
+      modelStreamIds)]);
+    if (!useCountMap) {
+      useCountMap = await this.streamService.findModelUseCount(
+        network,
+        modelStreamIds,
+      )
+    }
+    const [dbUseCountMap, firstRecordMap, dbUseCountMapRecently] = await Promise.all([
+      await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+      ),
+      await this.modelService.findModelFirstRecord(
+        network,
+        indexedModelStreamIds,
+      ),
+      await this.modelService.findIndexedModelUseCount(
+        network,
+        indexedModelStreamIds,
+        true,
+      )
+    ]);
 
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     return new BasicMessageDto(
       'ok',
       0,
-      metaModels.map((m) => ({
-        ...m,
-        useCount: useCountMap?.get(m.getStreamId) ?? 0,
-      })),
+      metaModels.map((m) => {
+        const isIndexed = indexedModelStreamIdSet.has(m.getStreamId);
+        const useCount = isIndexed
+          ? dbUseCountMap.get(m.getStreamId)
+          : useCountMap?.get(m.getStreamId) ?? 0;
+
+        const firstRecord = firstRecordMap.get(m.getStreamId);
+        const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+        const recentlyUseCount =
+          isIndexed && dbUseCountMapRecently.get(m.getStreamId);
+
+        const dapps = modelDappsMap.get(m.getStreamId);
+        return {
+          ...m,
+          useCount,
+          isIndexed,
+          firstRecordTime,
+          recentlyUseCount,
+          dapps: dapps ?? [],
+        };
+      }).sort((a, b) => b.useCount - a.useCount),
     );
+  }
+
+  @Get('/:modelStreamId/mids')
+  @ApiQuery({
+    name: 'pageNumber',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'network',
+    required: false,
+  })
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModelStreams(
+    @Query('pageSize') pageSize: number,
+    @Query('pageNumber') pageNumber: number,
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
+    if (!pageSize || pageSize == 0) pageSize = 50;
+    if (!pageNumber || pageNumber == 0) pageNumber = 1;
+    this.logger.log(`Seaching model(${modelStreamId})'s streams`);
+
+    const streams = await this.modelService.getStreams(
+      network,
+      modelStreamId,
+      pageSize,
+      pageNumber,
+    );
+    return new BasicMessageDto('ok', 0, streams);
+  }
+
+  @Get('/:modelStreamId/mids/:midStreamId')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getMid(
+    @Param('midStreamId') midStreamId: string,
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching mid(${midStreamId}) on network ${network}.`);
+
+    const mid = await this.modelService.getMid(
+      network,
+      modelStreamId,
+      midStreamId,
+    );
+    if (!mid) {
+      throw new NotFoundException(
+        new BasicMessageDto(
+          `midStreamId ${midStreamId} does not exist on network ${network}`,
+          0,
+        ),
+      );
+    }
+    return new BasicMessageDto('ok', 0, mid);
   }
 
   @Cron('0/10 * * * *')
   @Post('/usecount/build')
-  async buildUseCount(
-    @Query('network') network: Network = Network.TESTNET,
-  ): Promise<BasicMessageDto> {
-    const models = await this.modelService.findAllModelIds(network);
-    this.logger.log(`All ${network} model count: ${models?.length}`);
-    const useCountMap = await this.streamService.findAllModelUseCount(
-      network,
-      models,
-    );
-    if (useCountMap?.size == 0) return new BasicMessageDto('ok', 0, {});
-    await this.modelService.updateModelUseCount(network, useCountMap);
-    return new BasicMessageDto('ok', 0, {
-      'useCountMap.size': useCountMap.size,
-    });
+  async buildUseCount(): Promise<BasicMessageDto> {
+    const networks = [Network.TESTNET, Network.MAINNET];
+    for await (const network of networks) {
+      const models = await this.modelService.findAllModelIds(network);
+      this.logger.log(`All ${network} model count: ${models?.length}`);
+      if (!models || models.length == 0) continue;
+      const useCountMap = await this.streamService.findModelUseCount(
+        network, models
+      );
+      models.forEach((m) => {
+        const useCount = useCountMap.get(m);
+        if (!useCount) {
+          useCountMap.set(m, 0);
+        }
+        this.logger.log(`model ${m} usecount: ${useCountMap.get(m)}`);
+      });
+      this.logger.log(`${network} model usecount size: ${useCountMap.size}`);
+      await this.modelService.updateModelUseCount(network, useCountMap);
+    }
+    return new BasicMessageDto('ok', 0);
   }
 
   @Post('/indexing')
   async indexModels(
-    @Query('num') num: number = 20000,
+    @Query('model') model: string,
+    @Query('network') network: Network = Network.TESTNET,
   ): Promise<BasicMessageDto> {
-    this.logger.log(`Staring index ${num} models on testnet.`);
-    await this.modelService.indexTopModelsForTestNet(num);
+    this.logger.log(`Starting index ${network} models ${model}.`);
+    await this.modelService.indexModels([model], network);
     return new BasicMessageDto('ok', 0);
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/')
-  async CreateAndDeployModel(@Req() req: Request, @Body() dto: CreateModelDto) {
-    const ceramic_node = getCeramicNode(dto.network);
-    const ceramic_node_admin_key = getCeramicNodeAdminKey(dto.network);
-
-    const { CeramicClient } = await importDynamic(
-      '@ceramicnetwork/http-client',
-    );
-    const { Composite } = await importDynamic('@composedb/devtools');
-    const { DID } = await importDynamic('dids');
-    const { Ed25519Provider } = await importDynamic('key-did-provider-ed25519');
-    const { getResolver } = await importDynamic('key-did-resolver');
-    const { fromString } = await importDynamic('uint8arrays/from-string');
-    // TODO  verify the syntax of the graphql paramter.
-    this.logger.log(`Create and deploy model, graphql: ${dto.graphql}`);
-    if (!dto.graphql || dto.graphql.length == 0) {
-      this.logger.error('Graphql paramter is empty.');
-      throw new BadRequestException('Graphql paramter is empty.');
-    }
-
-    // 0 Login
-    this.logger.log('Connecting to the our ceramic node...');
-    const ceramic = new CeramicClient(ceramic_node);
-    try {
-      const didSession = req.headers['did-session'];
-      if (didSession) {
-        const { DIDSession } = await importDynamic('did-session');
-        const session = await DIDSession.fromSession(didSession);
-        ceramic.did = session.did;
-      } else {
-        // Hexadecimal-encoded private key for a DID having admin access to the target Ceramic node
-        // Replace the example key here by your admin private key
-        const privateKey = fromString(ceramic_node_admin_key, 'base16');
-        const did = new DID({
-          resolver: getResolver(),
-          provider: new Ed25519Provider(privateKey),
-        });
-        await did.authenticate();
-        // An authenticated DID with admin access must be set on the Ceramic instance
-        ceramic.did = did;
-      }
-      this.logger.log('Connected to the our ceramic node!');
-    } catch (e) {
-      this.logger.error((e as Error).message);
-      throw new ServiceUnavailableException((e as Error).message);
-    }
-
-    //1 Create My Composite
-    let composite;
-    let doRetryTimes = 2;
-    do {
-      try {
-        this.logger.log('Creating the composite...');
-        composite = await Composite.create({
-          ceramic: ceramic,
-          schema: dto.graphql,
-        });
-        doRetryTimes = 0;
-        this.logger.log(
-          `Creating the composite... Done! The encoded representation:`,
-        );
-        this.logger.log(composite);
-      } catch (e) {
-        this.logger.error((e as Error).message);
-        this.logger.log(
-          `Creating the composite... retry ${doRetryTimes} times`,
-        );
-        doRetryTimes--;
-      }
-    } while (doRetryTimes > 0);
-
-    //2 Deploy My Composite
-    try {
-      this.logger.log('Deploying the composite...');
-      // Notify the Ceramic node to index the models present in the composite
-      await composite.startIndexingOn(ceramic);
-      // Logging the model stream IDs to stdout, so that they can be piped using standard I/O or redirected to a file
-      this.logger.log(
-        JSON.stringify(Object.keys(composite.toParams().definition.models)),
-      );
-      this.logger.log(`Deploying the composite... Done!`);
-    } catch (e) {
-      this.logger.error((e as Error).message);
-      throw new ServiceUnavailableException((e as Error).message);
-    }
-
-    //3 Compile My Composite
-    let runtimeDefinition;
-    try {
-      this.logger.log('Compiling the composite...');
-      runtimeDefinition = composite.toRuntime();
-      this.logger.log(JSON.stringify(runtimeDefinition));
-      this.logger.log(`Compiling the composite... Done!`);
-    } catch (e) {
-      this.logger.error((e as Error).message);
-      throw new ServiceUnavailableException((e as Error).message);
-    }
-
-    return new BasicMessageDto('ok', 0, {
-      composite: composite,
-      runtimeDefinition: runtimeDefinition,
-    });
+  async createAndDeployModel(@Req() req: Request, @Body() dto: CreateModelDto) {
+    const res = await this.modelService.createAndDeployModel(dto, req.headers['did-session'] as string);
+    return new BasicMessageDto('ok', 0, res);
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Post('/graphql')
-  async ModelIdToGraphql(@Body() dto: ModelIdToGaphqlDto) {
-    const { CeramicClient } = await importDynamic(
-      '@ceramicnetwork/http-client',
-    );
-    const { Composite } = await importDynamic('@composedb/devtools');
-    const { printGraphQLSchema } = await importDynamic('@composedb/runtime');
-
-    try {
-      const ceramic = new CeramicClient(getCeramicNode(dto.network));
-      // build all model stream ids for the model
-      const allModelStreamIds = [];
-      for await (const streamId of dto.models) {
-        const relationModelStreamIds =
-          await this.streamService.getRelationStreamIds(ceramic, streamId);
-        allModelStreamIds.push(...relationModelStreamIds);
-      }
-      // buid composite
-      const composite = await Composite.fromModels({
-        ceramic: ceramic,
-        models: [...dto.models, ...allModelStreamIds],
-      });
-      const runtimeDefinition = composite.toRuntime();
-      const graphqlSchema = printGraphQLSchema(runtimeDefinition);
-      return new BasicMessageDto('ok', 0, {
-        composite,
-        runtimeDefinition,
-        graphqlSchema,
-      });
-    } catch (e) {
-      throw new InternalServerErrorException(`ModelIdToGraphql: ${e}`);
+  async modelIdToGraphql(@Body() dto: ModelIdToGaphqlDto) {
+    if (dto.models?.length != 1) {
+      throw new BadRequestException("models' length is not 1.");
     }
+
+    const graphqlSchemaDefinitionSet = await this.modelService.getModelGraphql(dto.network, dto.models[0]);
+    let graphqlSchemaDefinition;
+    if (graphqlSchemaDefinitionSet?.length > 0) {
+      graphqlSchemaDefinition = graphqlSchemaDefinitionSet.join('\n');
+    }
+
+    const graphCache = await this.modelService.getModelGraphCache(
+      dto.network,
+      dto.models[0],
+    );
+    if (graphCache) {
+      return new BasicMessageDto('ok', 0, { ...graphCache, graphqlSchemaDefinition });
+    } else {
+      try {
+        const { CeramicClient } = await importDynamic(
+          '@ceramicnetwork/http-client',
+        );
+        const { Composite } = await importDynamic('@composedb/devtools');
+        const { printGraphQLSchema } = await importDynamic(
+          '@composedb/runtime',
+        );
+        console.time('initing ceramic client');
+        const ceramic = new CeramicClient(getCeramicNode(dto.network));
+        console.timeEnd('initing ceramic client');
+
+        // build all model stream ids for the model
+        console.time('fetching relation model streamIds');
+        const allModelStreamIds = [];
+        for await (const streamId of dto.models) {
+          const relationModelStreamIds =
+            await this.streamService.getRelationStreamIds(ceramic, streamId);
+          allModelStreamIds.push(...relationModelStreamIds);
+        }
+        console.timeEnd('fetching relation model streamIds');
+
+        // buid composite
+        console.time('creating composite');
+        console.log(
+          'creating composite models:',
+          dto.models,
+          allModelStreamIds,
+        );
+        const composite = await Composite.fromModels({
+          ceramic: ceramic,
+          models: [...dto.models, ...allModelStreamIds],
+        });
+        console.timeEnd('creating composite');
+
+        console.time('creating runtimeDefinition');
+        const runtimeDefinition = composite.toRuntime();
+        console.timeEnd('creating runtimeDefinition');
+
+        console.time('buiding graphqlSchema');
+        const graphqlSchema = printGraphQLSchema(runtimeDefinition);
+        console.timeEnd('buiding graphqlSchema');
+
+        // cache the model graph info
+        await this.modelService.saveModelGraphCache(
+          dto.network,
+          dto.models[0],
+          composite,
+          runtimeDefinition,
+          graphqlSchema,
+        );
+        return new BasicMessageDto('ok', 0, {
+          composite,
+          runtimeDefinition,
+          graphqlSchema,
+          graphqlSchemaDefinition,
+        });
+      } catch (e) {
+        throw new InternalServerErrorException(`ModelIdToGraphql: ${e}`);
+      }
+    }
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/ids')
+  async getModelsByIds(@Body() dto: { network: Network; ids: string[] }) {
+    const [models, indexedModelStreamIds] = await Promise.all([
+      this.modelService.findModelsByIds(dto.ids, dto.network),
+      this.modelService.findIndexedModelIds(dto.network, dto.ids),
+    ]);
+    if (!models) {
+      throw new NotFoundException(
+        new BasicMessageDto(`no models found for ids ${dto.ids}`, 0),
+      );
+    }
+    if (!indexedModelStreamIds) {
+      throw new NotFoundException(
+        new BasicMessageDto(`no indexed models found for ids ${dto.ids}`, 0),
+      );
+    }
+
+    const useCountMap = await this.modelService.findModelUseCount(
+      dto.network,
+      dto.ids,
+    );
+    const dbUseCountMap = await this.modelService.findIndexedModelUseCount(
+      dto.network,
+      indexedModelStreamIds,
+    );
+    const firstRecordMap = await this.modelService.findModelFirstRecord(
+      dto.network,
+      indexedModelStreamIds,
+    );
+
+    const dbUseCountMapRecently =
+      await this.modelService.findIndexedModelUseCount(
+        dto.network,
+        indexedModelStreamIds,
+        true,
+      );
+
+    const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
+    models.forEach((e) => {
+      const isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
+      const useCount = isIndexed
+        ? dbUseCountMap.get(e.getStreamId) ?? 0
+        : useCountMap?.get(e.getStreamId) ?? 0;
+
+      const firstRecord = firstRecordMap.get(e.getStreamId);
+      const firstRecordTime = isIndexed && firstRecord?.created_at;
+
+      const recentlyUseCount =
+        isIndexed && dbUseCountMapRecently.get(e.getStreamId);
+
+      e.useCount = useCount;
+      e.isIndexed = isIndexed;
+      e.firstRecordTime = firstRecordTime;
+      e.recentlyUseCount = recentlyUseCount;
+    });
+
+    return new BasicMessageDto('ok', 0, models);
+  }
+
+  @Get('/:modelStreamId/sdk')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModelSdk(@Param('modelStreamId') modelStreamId: string, @Query('type') type: string = 'ClientPreset', @Query('network') network: string = Network.TESTNET
+  ): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching model(${modelStreamId}) type(${type}) sdk.`);
+    const graphqlInfo: any = await this.modelIdToGraphql({ network: network.toUpperCase() as Network, models: [modelStreamId] });
+    const schema = graphqlInfo?.data.graphqlSchema;
+    if (!schema) {
+      throw new NotFoundException(new BasicMessageDto(`modelStreamId ${modelStreamId} does not exist on network ${network}`, 0));
+    }
+    this.logger.log(`Generating sdk for model(${modelStreamId}) type(${type}), schema(${schema}).`);
+
+    // Build model query for documents
+    const model = Object.keys(graphqlInfo.data.runtimeDefinition.models)[0];
+    // query ${model}PersonalList($first: Int, $after: String) {
+    //   viewer {
+    //       ${model.toLowerCase()}List(first: $first, after: $after) {
+    //         edges {
+    //           node {
+    //             id
+    //           }
+    //         }
+    //         pageInfo {
+    //           hasNextPage
+    //           hasPreviousPage
+    //           startCursor
+    //           endCursor
+    //       }
+    //     }
+    //   }
+    // }
+
+    // query ${model}List($first: Int, $after: String) {
+    //     ${model.toLowerCase()}Index(first: $first, after: $after) {
+    //       edges {
+    //         node {
+    //           id
+    //         }
+    //       }
+    //       pageInfo {
+    //         hasNextPage
+    //         hasPreviousPage
+    //         startCursor
+    //         endCursor
+    //       }
+    //   }
+    // }
+
+    const operationGraphql = `query Get${model}($id: ID!) {
+      node(id: $id) {
+      id
+          ...on ${model} {
+              id
+          }
+      }
+    }
+
+    mutation Create${model}($input: Create${model}Input!) {
+      create${model}(input: $input) {
+      document {
+          id
+      }
+      }
+    }
+
+    mutation Update${model}($input: Update${model}Input!) {
+      update${model}(input: $input) {
+      document {
+          id
+      }
+      }
+    }
+  `
+    // Generate the code
+    // target output should be a directory, ex: "generated/gql/". Make sure you add "/" at the end of the directory
+    const generatedDirectory = 'generated/gql/';
+    let config: CodegenConfig;
+    if (type == 'ClientPreset') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        generates: {
+          'generated/gql/': {
+            preset: 'client'
+          }
+        }
+      }
+    } else if (type == 'ReactQueryHooks') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        pluginLoader: (name: string): CodegenPlugin => {
+          switch (name) {
+            case '@graphql-codegen/typescript':
+              return typescriptPlugin
+            case '@graphql-codegen/typescript-operations':
+              return typescriptOperationsPlugin
+            case '@graphql-codegen/add':
+              return addPlugin
+            case '@graphql-codegen/typescript-validation-schema':
+              return typescriptValidationPlugin
+            case '@graphql-codegen/typescript-react-query':
+              return typescriptReactQueryPlugin
+            default:
+              throw Error(`couldn't find plugin ${name}`)
+          }
+        },
+        generates: {
+          [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
+            plugins: [
+              'typescript',
+              'typescript-operations',
+              'typescript-react-query',
+            ],
+            config: {
+              scalars: {
+                CeramicCommitID: 'string',
+                CeramicStreamID: 'string',
+                Date: 'string',
+                DateTime: 'string',
+                DID: 'any',
+                URI: 'string',
+              },
+              skipTypeName: true,
+              strictScalars: true,
+              declarationKind: 'interface',
+            },
+          },
+        }
+      }
+    } else if (type == 'ReactApolloHooks') {
+      config = {
+        schema: schema,
+        documents: operationGraphql,
+        pluginLoader: (name: string): CodegenPlugin => {
+          switch (name) {
+            case '@graphql-codegen/typescript':
+              return typescriptPlugin
+            case '@graphql-codegen/typescript-operations':
+              return typescriptOperationsPlugin
+            case '@graphql-codegen/add':
+              return addPlugin
+            case '@graphql-codegen/typescript-validation-schema':
+              return typescriptValidationPlugin
+            case '@graphql-codegen/typescript-react-apollo':
+              return typescriptReactApolloPlugin
+            default:
+              throw Error(`couldn't find plugin ${name}`)
+          }
+        },
+        generates: {
+          [path.join(generatedDirectory, 'types-and-hooks.tsx')]: {
+            plugins: [
+              'typescript',
+              'typescript-operations',
+              'typescript-react-apollo',
+            ],
+            config: {
+              scalars: {
+                CeramicCommitID: 'string',
+                CeramicStreamID: 'string',
+                Date: 'string',
+                DateTime: 'string',
+                DID: 'any',
+                URI: 'string',
+              },
+              skipTypeName: true,
+              strictScalars: true,
+              declarationKind: 'interface',
+            },
+          },
+        }
+      }
+    } else {
+      throw new NotFoundException(new BasicMessageDto(`type ${type} is not supported`, 0));
+    }
+
+    const result = await generate(config, false);
+    result.push({
+      filename: 'runtime-composite.ts',
+      content: JSON.stringify(graphqlInfo.data.runtimeDefinition)
+    });
+    return new BasicMessageDto('ok', 0, result.map(r => { return { filename: r.filename.replace(generatedDirectory, ''), content: r.content }; }));
+  }
+
+  @Get('/:modelStreamId')
+  @ApiOkResponse({ type: BasicMessageDto })
+  async getModel(
+    @Query('network') network: Network = Network.TESTNET,
+    @Param('modelStreamId') modelStreamId: string,
+  ): Promise<BasicMessageDto> {
+    this.logger.log(`Seaching model(${modelStreamId}) on network ${network}.`);
+
+    const model = await this.modelService.getModel(network, modelStreamId);
+    if (!model) {
+      throw new NotFoundException(
+        new BasicMessageDto(
+          `modelStreamId ${modelStreamId} does not exist on network ${network}`,
+          0,
+        ),
+      );
+    }
+
+    const [modelDappsMap, useCountMap] = await Promise.all([await this.modelService.getDappsByModels(network,
+      [modelStreamId]), await this.streamService.findModelUseCount(
+        network,
+        [modelStreamId],
+      )]);
+
+    return new BasicMessageDto('ok', 0, {
+      ...model,
+      useCount: useCountMap?.get(modelStreamId) ?? 0,
+      dapps: modelDappsMap?.get(modelStreamId) ?? [],
+    });
   }
 }

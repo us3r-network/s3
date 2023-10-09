@@ -13,6 +13,7 @@ import DocIcon from './Icons/DocIcon'
 import { DOCS_URL } from '../constants'
 import StarGoldIcon from './Icons/StarGoldIcon'
 import ComponentIcon from './Icons/ComponentIcon'
+import SdkIcon from './Icons/SdkIcon'
 
 export default function Nav({ appId }: { appId: string }) {
   const [open, setOpen] = useState(true)
@@ -44,13 +45,18 @@ export default function Nav({ appId }: { appId: string }) {
               icon: TerminalIcon,
             },
             {
+              path: `/dapp/${appId}/model-sdk`,
+              name: 'Model SDK',
+              icon: SdkIcon,
+            },
+            {
               path: `/dapp/${appId}/statistic`,
               name: 'Model Metrics',
               icon: ChartIcon,
             },
             {
               path: `/dapp/${appId}/components`,
-              name: 'Components',
+              name: 'S3 Components',
               icon: ComponentIcon,
             },
             {
