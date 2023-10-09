@@ -2,15 +2,12 @@
 S3 is a set of develop tools for the Ceramic network.  
 S3 is completely open source.
 
-## Us3rScan
+## US3R-Scan
 https://scan.s3.xyz
 
-## OUs3rDashboard
+## US3R-Dashboard
 https://dashboard.s3.xyz
 
-## SDKs
-Client side under ./packages/client.  
-Server side under ./packages/server.
 
 ## Docker
 S3 ships with a [Docker Compose](https://docs.docker.com/compose/) configuration for setting up a local development and testing environment.  

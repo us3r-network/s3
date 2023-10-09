@@ -10,6 +10,7 @@ import {
 export enum Network {
   MAINNET = 'MAINNET',
   TESTNET = 'TESTNET',
+  ALL = 'ALL'
 }
 
 export enum Status {
