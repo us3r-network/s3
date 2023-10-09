@@ -182,7 +182,7 @@ export default class ModelService {
 
           schema.push(...graphqls);
           createModelGraphqlsMap.set(model, schema);
-          this.logger.log(`Creating ${model} ${schema} the composite...`);
+          this.logger.log(`Creating ${model} ${JSON.stringify(schema)} the composite...`);
           let composite = await Composite.create({
             ceramic: ceramic,
             schema: schema,
