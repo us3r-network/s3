@@ -37,6 +37,14 @@ export function uploadImage({ file }: { file: File }) {
   })
 }
 
+export function getDapp(appId: string) {
+  let host = APP_API_URL
+  return axios({
+    url: host + `/dapps/${appId}`,
+    method: 'GET',
+  })
+}
+
 export function createDapp(
   dapp: ClientDApp,
   didSession: string
@@ -206,7 +214,7 @@ export function getDappComposites({
   didSession,
 }: {
   dapp: ClientDApp
-  didSession: string
+  didSession?: string
 }): AxiosPromise<ApiResp<DappComposite[]>> {
   let host = APP_API_URL
 
@@ -214,7 +222,7 @@ export function getDappComposites({
     url: host + `/dapps/${id}/composites`,
     method: 'GET',
     headers: {
-      'did-session': didSession,
+      'did-session': didSession || '',
     },
   })
 }
@@ -294,5 +302,22 @@ export function startIndexModel({
     headers: {
       'did-session': didSession || '',
     },
+  })
+}
+
+export function getStreamsCountWithModels({
+  network,
+  modelStreamIds,
+}: {
+  network: Network
+  modelStreamIds: string
+}): AxiosPromise<ApiResp<number>> {
+  let host = APP_API_URL
+  let net = network === Network.MAINNET ? Network.MAINNET : Network.TESTNET
+  return axios({
+    url:
+      host +
+      `/${net.toUpperCase()}/streams/count?modelStreamIds=${modelStreamIds}`,
+    method: 'GET',
   })
 }
