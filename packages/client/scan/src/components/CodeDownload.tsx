@@ -20,7 +20,7 @@ export default function CodeDownload({
   downloadContent: string
   downloadFileName: string
 }) {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(true)
   const download = (text: string, filename: string) => {
     const blob = new Blob([text], {
       type: 'text/plain;charset=utf-8',

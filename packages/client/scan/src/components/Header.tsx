@@ -16,7 +16,6 @@ import {
 } from 'react-aria-components'
 import { isMobile } from 'react-device-detect'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { LogoutButton } from '@us3r-network/profile'
 
 export default function Header() {
   const navigate = useNavigate()
@@ -26,7 +25,8 @@ export default function Header() {
     const show =
       location.pathname === '/' ||
       location.pathname === '/models' ||
-      location.pathname === '/streams'
+      location.pathname === '/streams' ||
+      location.pathname === '/dapps'
     return !show
   }, [location])
 
@@ -51,11 +51,12 @@ export default function Header() {
         {(showBack && window.history.length > 1 && (
           <BackBtn
             backAction={() => {
-              if (location.pathname.startsWith('/models/modelview')) {
-                navigate('/models')
-              } else {
-                navigate(-1)
-              }
+              navigate(-1)
+              // if (location.pathname.startsWith('/models/modelview')) {
+              //   navigate('/models')
+              // } else {
+              //   navigate(-1)
+              // }
             }}
           />
         )) || <div></div>}
