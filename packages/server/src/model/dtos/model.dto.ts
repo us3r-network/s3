@@ -12,5 +12,5 @@ export class ModelIdToGaphqlDto {
   @ApiProperty()
   models: string[];
   @ApiProperty()
-  network?: Network;
+  network: Network;
 }

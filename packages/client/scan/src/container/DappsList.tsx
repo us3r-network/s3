@@ -7,6 +7,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import { ImgOrName } from '../components/ImgOrName'
 import { Dapp } from '../types'
+import { shortPubKey } from '../utils/shortPubKey'
 
 export default function DappsList() {
   const { dapps, loadMoreDapps, hasMore, searchText, setSearchText } =
@@ -47,7 +48,7 @@ export default function DappsList() {
               <tr>
                 <th>Dapp Name</th>
                 <th>Description</th>
-                <th>Model</th>
+                <th>Model/Schema</th>
               </tr>
             </thead>
             <tbody>
@@ -67,8 +68,8 @@ export default function DappsList() {
                     </td>
                     <td>
                       <div className="model">
-                        {(item.modelDetals.length > 0 &&
-                          item.modelDetals.map((item, idx) => {
+                        {item.modelDetails.length > 0 &&
+                          item.modelDetails.map((item, idx) => {
                             return (
                               <span key={idx}>
                                 <Link
@@ -78,7 +79,21 @@ export default function DappsList() {
                                 </Link>
                               </span>
                             )
-                          })) ||
+                          })}
+                        {item.schemaDetails.length > 0 &&
+                          item.schemaDetails.map((item, idx) => {
+                            return (
+                              <span>
+                                <Link
+                                  to={`/streams/stream/${item.streamId}?network=${network}`}
+                                >
+                                  {item.content.title}
+                                </Link>
+                              </span>
+                            )
+                          })}
+                        {item.modelDetails.length === 0 &&
+                          item.schemas.length === 0 &&
                           '-'}
                       </div>
                     </td>

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Network, Status, Stream } from '../entities/stream/stream.entity';
 import { StreamRepository } from '../entities/stream/stream.repository';
+import e from 'express';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -11,8 +12,8 @@ export default class CeramicSubscriberService {
   constructor(
     @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
-  ) {}
-  async SubCeramic(
+  ) { }
+  async subCeramic(
     network: Network,
     bootstrapMultiaddrs: string[],
     listen: string[],
@@ -30,19 +31,23 @@ export default class CeramicSubscriberService {
         const parsed = JSON.parse(asString);
         if (parsed.typ == 0) {
           // MsgType: UPDATE
-          await this.store(ceramic, network, parsed.stream);
-        } else if (parsed.typ == 2) {
-          // MsgType: RESPONSE
-          const streamIds = Object.keys(parsed.tips);
-          await Promise.all(
-            streamIds?.map(async (streamId) => {
-              await this.store(ceramic, network, streamId);
-            }),
+          this.logger.log(
+            `${network}, sub p2p message: ${JSON.stringify(parsed)}`,
           );
+          await this.store(ceramic, network, parsed.stream);
         }
+        // else if (parsed.typ == 2) {
+        //   // MsgType: RESPONSE
+        //   const streamIds = Object.keys(parsed.tips);
+        //   await Promise.all(
+        //     streamIds?.map(async (streamId) => {
+        //       await this.store(ceramic, network, streamId);
+        //     }),
+        //   );
+        // }
       } catch (error) {
         this.logger.error(
-          `ceramic sub err, messgage:${message} error:${error}`,
+          `${network} ceramic sub err, messgage:${message} error:${error}`,
         );
       }
     });
@@ -53,12 +58,14 @@ export default class CeramicSubscriberService {
     try {
       const ipfsHttpClient = await _importDynamic('ipfs-http-client');
       const ipfs = await ipfsHttpClient.create({
-        url: 'https://ipfs.io',
+        url: 'https://gateway.ipfs.io',
       });
 
       const genesisDag = await ipfs.dag.get(cid, { timeout: 6000 });
-
-      if (!genesisDag?.value) return;
+      if (!genesisDag.value || !genesisDag.value.signatures) {
+        return;
+      }
+      this.logger.log(`[CACAO] Getting genesis cacao value:${JSON.stringify(genesisDag.value)} cid:${cid}`);
 
       const { base64urlToJSON } = await _importDynamic(
         '@ceramicnetwork/common',
@@ -67,15 +74,21 @@ export default class CeramicSubscriberService {
         genesisDag.value.signatures[0].protected,
       );
       const capIPFSUri = decodedProtectedHeader.cap;
+      this.logger.log(`[CACAO] Getting capIPFSUri:${capIPFSUri} cid:${cid}`);
       if (!capIPFSUri) return;
 
       const { CID } = await _importDynamic('multiformats/cid');
       const cacaoCid = CID.parse(capIPFSUri.replace('ipfs://', ''));
       if (!cacaoCid) return;
 
-      cacaoDag = await ipfs.dag.get(cacaoCid);
+      cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
     } catch (error) {
-      this.logger.warn(`get Cacao err, cid:${cid} error:${error}`);
+      const ipfsErr = 'Error 500 (Internal server error) when trying to fetch content from the IPFS network.';
+      if (error.toString().includes(ipfsErr)) {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${ipfsErr}`);
+      } else {
+        this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
+      }
     }
 
     return cacaoDag;
@@ -115,9 +128,26 @@ export default class CeramicSubscriberService {
     return new CeramicClient.CeramicClient(ceramicNetworkUrl);
   }
 
+  async loadStream(ceramic: any, streamId: string) {
+    let remainRetires = 3;
+    while (remainRetires > 0) {
+      try {
+        const stream = await ceramic.loadStream(streamId);
+        return stream;
+      } catch (error) {
+        remainRetires--;
+        this.logger.error(
+          `load stream err, remainRetires:${remainRetires} streamId:${streamId} error:${error}`,
+        );
+      }
+    }
+  }
+
   // Store all streams.
   async store(ceramic: any, network: Network, streamId: string) {
-    const stream = await ceramic.loadStream(streamId);
+    const stream = await this.loadStream(ceramic, streamId);
+    if (!stream) return;
+
     await this.storeStream(
       network,
       streamId,
@@ -128,24 +158,28 @@ export default class CeramicSubscriberService {
     // save schema stream
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
-      const schemaStream = await ceramic.loadStream(schemaStreamId);
-      await this.storeStream(
-        network,
-        schemaStreamId,
-        schemaStream.allCommitIds,
-        schemaStream.state,
-      );
+      const schemaStream = await this.loadStream(ceramic, schemaStreamId);
+      if (schemaStream) {
+        await this.storeStream(
+          network,
+          schemaStreamId,
+          schemaStream.allCommitIds,
+          schemaStream.state,
+        );
+      }
     }
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
-      const modelStream = await ceramic.loadStream(modelStreamId);
-      await this.storeStream(
-        network,
-        modelStreamId,
-        modelStream.allCommitIds,
-        modelStream.state,
-      );
+      const modelStream = await this.loadStream(ceramic, modelStreamId);
+      if (modelStream) {
+        await this.storeStream(
+          network,
+          modelStreamId,
+          modelStream.allCommitIds,
+          modelStream.state,
+        );
+      }
     }
   }
 
@@ -157,11 +191,15 @@ export default class CeramicSubscriberService {
     genesisCid?: any,
   ) {
     try {
-      let domian: string;
-      if (genesisCid) {
-        // this.logger.log(`To store stream(${streamId})  network:${network}`);
+      let domain: string;
+      if (genesisCid && streamState?.metadata?.model) {
+        this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
+
         const cacao = await this.getCacao(genesisCid);
-        domian = cacao?.value?.p?.domain;
+        this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
+
+        domain = cacao?.value?.p?.domain;
+        this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
       }
 
       const stream = this.convertToStreamEntity(
@@ -169,7 +207,7 @@ export default class CeramicSubscriberService {
         streamId,
         commitIds,
         streamState,
-        domian,
+        domain,
       );
       if (!stream) return;
 
@@ -177,14 +215,14 @@ export default class CeramicSubscriberService {
         'network',
         'stream_id',
       ]);
-      // this.logger.log(`Saved network(${network}) stream id(${streamId})`);
+      this.logger.log(`Saved network(${network}) stream id(${streamId})`);
       return savedStream;
     } catch (error) {
-      this.logger.error(
-        `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
-          error,
-        )}`,
-      );
+      // this.logger.error(
+      //   `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
+      //     error,
+      //   )}`,
+      // );
     }
   }
 
