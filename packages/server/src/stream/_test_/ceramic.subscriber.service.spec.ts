@@ -1,7 +1,7 @@
 import { Network, Status, Stream } from '../../entities/stream/stream.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import CeramicSubscriberService from '../ceramic.subscriber.service';
+import CeramicSubscriberService from '../subscriber/ceramic.subscriber.service';
 import { Test, TestingModule } from '@nestjs/testing';
 
 describe('CeramicSubscriberService Logic Test', () => {

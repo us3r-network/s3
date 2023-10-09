@@ -23,6 +23,7 @@
   "dependencies": {
     "@ceramicnetwork/common": "^2.35.0",
     "@ceramicnetwork/http-client": "^2.32.0",
+    "@ceramicnetwork/job-queue": "^1.2.0",
     "@chainsafe/libp2p-gossipsub": "^6.1.0",
     "@chainsafe/libp2p-noise": "^11.0.0",
     "@composedb/devtools": "^0.5.0",
