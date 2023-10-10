@@ -11,7 +11,8 @@ import styled from 'styled-components'
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { Dapp } from '@us3r-network/data-model'
-import { set } from 'lodash'
+import Spinner from '../components/icons/Spinner'
+import { ADMIN_ADDRESS } from '../constants'
 
 export default function ModelView() {
   const { streamId } = useParams()
@@ -108,12 +109,13 @@ export default function ModelView() {
   const startIndex = useCallback(async () => {
     if (!streamId) return
     try {
+      setIndexing(true)
       const resp = await startIndexModel({
         network,
         modelId: streamId,
         didSession: session?.serialize(),
       })
-      console.log('startIndex', resp.data)
+
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
       }
@@ -150,13 +152,30 @@ export default function ModelView() {
     return ['Instance', 'Playground']
   }, [isIndexed])
 
+  const isAdmin = useMemo(() => {
+    if (!session?.id || !ADMIN_ADDRESS) return false
+    return session.id.endsWith(ADMIN_ADDRESS.toLowerCase())
+  }, [session?.id])
+
   return (
     <Tabs disabledKeys={disabledKeys}>
       <div className="title-bar">
-        <ToolsBox>
-          <span>{modelStream?.streamContent?.name}</span>
-          {!isIndexed && <button onClick={startIndex}>Start index</button>}
-        </ToolsBox>
+        {(modelStream?.streamContent?.name && (
+          <ToolsBox>
+            <span>{modelStream?.streamContent?.name}</span>
+            {isAdmin && !isIndexed && (
+              <>
+                {indexing ? (
+                  <button>
+                    <Spinner />
+                  </button>
+                ) : (
+                  <button onClick={startIndex}>Start index</button>
+                )}
+              </>
+            )}
+          </ToolsBox>
+        )) || <div></div>}
         <TabList aria-label="History of Ancient Rome">
           <Tab id="Definition">Model Definition</Tab>
           <Tab id="Instance">Model Instance Documents</Tab>

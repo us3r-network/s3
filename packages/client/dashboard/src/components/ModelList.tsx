@@ -7,7 +7,7 @@ import { Modal, ModalOverlay } from 'react-aria-components'
 import PlusIcon from './Icons/PlusIcon'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DappComposite, ModelStream } from '../types'
 import { getStarModels, getDappComposites, deleteDappComposites } from '../api'
 import { Network } from './Selector/EnumSelect'
@@ -22,6 +22,7 @@ import CreateCompositeModal from './CreateCompositeModal'
 import MergeIcon from './Icons/MergeIcon'
 import { shortPubKey } from '../utils/shortPubKey'
 import CopyTint from './CopyTint'
+import useIsOwner from '../hooks/useIsOwner'
 
 export default function ModelList({
   editable,
@@ -38,7 +39,7 @@ export default function ModelList({
   editable?: boolean
 }) {
   const session = useSession()
-  const { loadDapps } = useAppCtx()
+  const { loadDapps, currDapp } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -46,16 +47,22 @@ export default function ModelList({
   const [composites, setComposites] = useState<DappComposite[]>([])
   const location = useLocation()
 
+  const dapp = useMemo(() => {
+    return selectedDapp || currDapp
+  }, [selectedDapp, currDapp])
+
+  const { isOwner } = useIsOwner()
+
   const loadModelsInfo = useCallback(async () => {
-    if (selectedDapp?.models?.length === 0 || !selectedDapp) {
+    if (dapp?.models?.length === 0 || !dapp) {
       setDappModels([])
       return
     }
 
     try {
       const resp = await getStarModels({
-        network: selectedDapp.network as Network,
-        ids: selectedDapp.models || [],
+        network: dapp.network as Network,
+        ids: dapp.models || [],
       })
 
       const list = resp.data.data
@@ -67,22 +74,20 @@ export default function ModelList({
       console.error(error)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDapp])
+  }, [dapp])
 
   const loadDappComposites = useCallback(async () => {
-    if (!session) return
-    if (!selectedDapp) return
+    if (!dapp) return
     try {
       const resp = await getDappComposites({
-        dapp: selectedDapp,
-        didSession: session.serialize(),
+        dapp,
       })
       if (resp.data.code !== 0) throw new Error(resp.data.msg)
       setComposites(resp.data.data)
     } catch (error) {
       console.error(error)
     }
-  }, [selectedDapp, session])
+  }, [dapp])
 
   const removeModelFromDapp = useCallback(
     async (modelId: string) => {
@@ -168,7 +173,7 @@ export default function ModelList({
         <h3>Models</h3>
         <Favorite />
         <CreateNew />
-        {editable && (
+        {editable && isOwner && (
           <MenuTrigger>
             <Button aria-label="Menu">
               <PlusIcon />
@@ -200,7 +205,7 @@ export default function ModelList({
       </div>
 
       <DappModelList
-        editable={editable}
+        editable={editable && isOwner}
         selected={selectModel}
         setSelected={setSelectModel}
         dappModels={dappModels || []}
@@ -221,7 +226,7 @@ export default function ModelList({
         <>
           <div className="title">
             <h3>Composites</h3>
-            {editable && (
+            {editable && isOwner && (
               <CreateComposite
                 loadDappComposites={loadDappComposites}
                 dappModels={dappModels || []}
@@ -231,14 +236,14 @@ export default function ModelList({
 
           <DappCompositeList
             composites={composites}
-            editable={editable}
+            editable={editable && isOwner}
             selectComposite={selectComposite}
             setSelectedComposite={setSelectComposite}
             removeAction={delDappComposite}
           />
         </>
       )}
-      {editable && (
+      {editable && isOwner && (
         <MergeBox>
           <DialogTrigger>
             <Button className={'merge-btn'}>

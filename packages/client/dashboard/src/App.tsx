@@ -23,7 +23,7 @@ import DappModelPlayground from './container/DappModelPlayground'
 import DappDataStatistic from './container/DappDataStatistic'
 import Components from './container/Components'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ModelList from './components/ModelList'
 import { DappComposite, ModelStream } from './types'
 import { ToastContainer } from 'react-toastify'
@@ -96,8 +96,12 @@ function Layout() {
 }
 
 function DappLayout() {
-  const { loadingDApps } = useAppCtx()
+  const { loadingDApps, setCurrAppId } = useAppCtx()
   const { appId } = useParams()
+
+  useEffect(() => {
+    if (appId) setCurrAppId(appId)
+  }, [appId, setCurrAppId])
 
   if (!appId || loadingDApps) {
     return (

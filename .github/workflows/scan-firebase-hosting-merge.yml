@@ -30,6 +30,7 @@ jobs:
           REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
           REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
           REACT_APP_CERAMIC_TESTNET_HOST: '${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}'
+          REACT_APP_ADMIN_ADDRESS: '${{ vars.REACT_APP_ADMIN_ADDRESS }}'
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -60,6 +61,7 @@ jobs:
           REACT_APP_UPLOAD_API_URL: '${{ vars.REACT_APP_UPLOAD_API_URL }}'
           REACT_APP_CERAMIC_MAINNET_HOST: '${{ vars.REACT_APP_CERAMIC_MAINNET_HOST }}'
           REACT_APP_CERAMIC_TESTNET_HOST: '${{ vars.REACT_APP_CERAMIC_TESTNET_HOST }}'
+          REACT_APP_ADMIN_ADDRESS: '${{ vars.REACT_APP_ADMIN_ADDRESS }}'
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
