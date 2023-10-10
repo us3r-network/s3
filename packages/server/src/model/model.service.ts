@@ -207,13 +207,14 @@ export default class ModelService {
 
       // Merge composites
       const mergedComposite = Composite.from(composites);
+      console.log(`Merged composite: ${mergedComposite.toJSON()}`);
 
       // Compile composites
       let runtimeDefinition;
       try {
         this.logger.log('Compiling the composite...');
         runtimeDefinition = mergedComposite.toRuntime();
-        this.logger.log(JSON.stringify(runtimeDefinition));
+        this.logger.log(`RuntimeDefinition: ${JSON.stringify(runtimeDefinition)}`);
         this.logger.log(`Compiling the composite... Done!`);
       } catch (e) {
         this.logger.error((e as Error).message);
