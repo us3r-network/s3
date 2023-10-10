@@ -200,14 +200,14 @@ export default class ModelService {
           schema: dto.graphql,
         });
         this.logger.log(
-          `Creating the composite... Done! The encoded representation:${composite.toJSON()}`,
+          `Creating the composite... Done! The encoded representation:${JSON.stringify(composite.toJSON())}`,
         );
         composites.push(composite);
       }
 
       // Merge composites
       const mergedComposite = Composite.from(composites);
-      console.log(`Merged composite: ${mergedComposite.toJSON()}`);
+      console.log(`Merged composite: ${JSON.stringify(mergedComposite.toJSON())}`);
 
       // Compile composites
       let runtimeDefinition;
