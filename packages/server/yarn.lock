@@ -788,16 +788,6 @@
     query-string "^7.1.0"
     rxjs "^7.5.2"
 
-"@ceramicnetwork/job-queue@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@ceramicnetwork/job-queue/-/job-queue-1.2.0.tgz#32775cad03fd4aeca23488d3052d970f2573a5dd"
-  integrity sha512-KFUPbDcTkORmVQOXdG0UDeIEQP1iV8j4TSbNdnFzhVoelimmJA1Y6ZCC0/CESQWD22V8ecYgXZ4qxLn5ltC2SQ==
-  dependencies:
-    "@ceramicnetwork/common" "^2.35.0"
-    pg "^8.11.3"
-    pg-boss "^8.2.0"
-    rxjs "^7.8.1"
-
 "@ceramicnetwork/stream-caip10-link@^2.0.0", "@ceramicnetwork/stream-caip10-link@^2.21.0":
   version "2.21.0"
   resolved "https://registry.yarnpkg.com/@ceramicnetwork/stream-caip10-link/-/stream-caip10-link-2.21.0.tgz#47466dac80cfb62e8603ec374f92f9949dfe8bad"
@@ -10338,10 +10328,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-pg-boss@^8.2.0:
-  version "8.4.2"
-  resolved "https://registry.yarnpkg.com/pg-boss/-/pg-boss-8.4.2.tgz#4c300e3683e6acd7c157481544a49b8f565fe5e5"
-  integrity sha512-xcl/G8C7qlCyrcvlQvgLVBIe68zO0XfZc6K86/G9fq/mL+YQMEo1spW6lHqsPpNi2KGlpXwBEL/XZxkMa19eRA==
+pg-boss@^9.0.3:
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/pg-boss/-/pg-boss-9.0.3.tgz#518ca7217d2d17f3ac5499f4f1ba2c289a4633c5"
+  integrity sha512-cUWUiv3sr563yNy0nCZ25Tv5U0m59Y9MhX/flm0vTR012yeVCrqpfboaZP4xFOQPdWipMJpuu4g94HR0SncTgw==
   dependencies:
     cron-parser "^4.0.0"
     delay "^5.0.0"
@@ -10420,7 +10410,7 @@ pg-types@^4.0.1:
     postgres-interval "^3.0.0"
     postgres-range "^1.1.1"
 
-pg@^8.11.3, pg@^8.5.1:
+pg@^8.5.1:
   version "8.11.3"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.11.3.tgz#d7db6e3fe268fcedd65b8e4599cda0b8b4bf76cb"
   integrity sha512-+9iuvG8QfaaUrrph+kpF24cXkH1YOOUeArRNYIxq1viYHZagBxrTno7cecY1Fa44tJeZvaoG+Djpkc3JwehN5g==
@@ -11082,7 +11072,7 @@ rxjs@^6.6.0:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^7.5.2, rxjs@^7.5.5, rxjs@^7.8.0, rxjs@^7.8.1:
+rxjs@^7.5.2, rxjs@^7.5.5, rxjs@^7.8.1:
   version "7.8.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.1.tgz#6f6f3d99ea8044291efd92e7c7fcf562c4057543"
   integrity sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==

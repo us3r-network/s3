@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Network, Stream } from '../../entities/stream/stream.entity';
 import { StreamRepository } from '../../entities/stream/stream.repository';
-import { IJobQueue, Job, JobQueue } from '@ceramicnetwork/job-queue';
+import { IJobQueue, Job, JobQueue } from './job-queue';
 import StoreWorker, { StoreStreamJob, StreamStoreData, createStreamStoreJob } from './store.worker';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
@@ -15,8 +15,7 @@ export default class CeramicSubscriberService {
     @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
   ) {
-    // TODO 
-    this.jobQueue = new JobQueue('', null)
+    this.jobQueue = new JobQueue(process.env.PG_BOSS_DATABASE_URL);
   }
   async subCeramic(
     network: Network,

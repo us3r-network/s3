@@ -1,6 +1,6 @@
 import { default as PgBoss } from 'pg-boss'
 import { type SendOptions } from 'pg-boss'
-import type { Worker, Job } from '@ceramicnetwork/job-queue'
+import type { Worker, Job } from './job-queue'
 import { Network, Status, Stream } from '../../entities/stream/stream.entity';
 import { Logger } from '@nestjs/common';
 import { StreamRepository } from 'src/entities/stream/stream.repository';
