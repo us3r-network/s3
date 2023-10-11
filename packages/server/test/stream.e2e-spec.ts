@@ -7,7 +7,7 @@ import { Network, Stream } from '../src/entities/stream/stream.entity';
 import { StreamModule } from '../src/stream/stream.module';
 import { ConfigModule } from '@nestjs/config';
 import StreamService from '../src/stream/stream.service';
-import CeramicSubscriberService from '../src/stream/ceramic.subscriber.service';
+import CeramicSubscriberService from '../src/stream/subscriber/ceramic.subscriber.service';
 import { StreamRepository } from '../src/entities/stream/stream.repository';
 
 describe('BookmarkController (e2e)', () => {

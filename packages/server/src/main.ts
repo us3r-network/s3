@@ -4,7 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Network } from './entities/stream/stream.entity';
-import CeramicSubscriberService from './stream/ceramic.subscriber.service';
+import CeramicSubscriberService from './stream/subscriber/ceramic.subscriber.service';
 
 async function bootstrap() {
   // init the apm
@@ -27,6 +27,7 @@ async function bootstrap() {
   const ceramicSubscriberService = app.get(CeramicSubscriberService);
 
   // Sub ceramic test network.
+
   if (!process.env.DISABLE_P2P_SUB){
     await ceramicSubscriberService.subCeramic(
       Network.TESTNET,
