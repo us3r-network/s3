@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Network, Stream } from '../../entities/stream/stream.entity';
 import { StreamRepository } from '../../entities/stream/stream.repository';
 import { IJobQueue, Job, JobQueue } from './job-queue';
-import StoreWorker, { StoreStreamJob, StreamStoreData, createStreamStoreJob } from './store.worker';
+import StoreWorker, { getStreamStoreJob, StreamStoreData, createStreamStoreJob } from './store.worker';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -30,12 +30,13 @@ export default class CeramicSubscriberService {
     const ceramicClient = await this.createCeramicClient(ceramicNetworkUrl);
 
     // init job queue
+    const storeStreamJob = getStreamStoreJob(network);
     await this.jobQueue.init({
-      [StoreStreamJob]: new StoreWorker(
+      [storeStreamJob]: new StoreWorker(
         this.streamRepository, ceramicClient
       ),
     });
-
+    this.logger.log(`init job queue ${storeStreamJob} success`)
     node.pubsub.addEventListener('message', async (message) => {
       try {
         const textDecoder = new TextDecoder('utf-8');
@@ -46,7 +47,7 @@ export default class CeramicSubscriberService {
           this.logger.log(
             `${network}, sub p2p message: ${JSON.stringify(parsed)}`,
           );
-          const job: Job<StreamStoreData> = createStreamStoreJob(StoreStreamJob, {
+          const job: Job<StreamStoreData> = createStreamStoreJob(storeStreamJob, {
             network: network,
             streamId: parsed.stream,
           });

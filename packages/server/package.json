@@ -77,7 +77,7 @@
     "jsonwebtoken": "^8.5.1",
     "key-did-provider-ed25519": "^3.0.0",
     "libp2p": "^0.42.2",
-    "pg": "^8.7.3",
+    "pg": "^8.11.3",
     "pg-boss": "^9.0.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
