@@ -30,7 +30,7 @@ export default class CeramicSubscriberService {
     const ceramicClient = await this.createCeramicClient(ceramicNetworkUrl);
 
     // init job queue
-    const storeStreamJob = getStreamStoreJob(network);
+    const storeStreamJob = getStreamStoreJob();
     await this.jobQueue.init({
       [storeStreamJob]: new StoreWorker(
         this.streamRepository, ceramicClient
