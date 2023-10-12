@@ -27,8 +27,9 @@ async function bootstrap() {
   const ceramicSubscriberService = app.get(CeramicSubscriberService);
 
   // Sub ceramic test network.
-
   if (!process.env.DISABLE_P2P_SUB){
+    await ceramicSubscriberService.initJobQueue();
+
     await ceramicSubscriberService.subCeramic(
       Network.TESTNET,
       [
@@ -38,7 +39,6 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/20000/ws'],
       '/ceramic/testnet-clay',
-      'http://34.92.232.17:7007/',
     );
   
     // Sub ceramic main network.
@@ -50,7 +50,6 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/30000/ws'],
       '/ceramic/mainnet',
-      'http://35.220.227.2:7007/',
     );
   }
 }
