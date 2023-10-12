@@ -30,6 +30,7 @@ export default class CeramicSubscriberService {
         this.streamRepository, ceramicTestnetClient
       ),
     });
+    this.logger.log('init job queue success');
   }
 
   async subCeramic(
