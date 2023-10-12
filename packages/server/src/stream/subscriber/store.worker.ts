@@ -7,8 +7,8 @@ import { StreamRepository } from 'src/entities/stream/stream.repository';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 const JobOption: SendOptions = {
-  retryLimit: 5,
-  retryDelay: 60, // 1 minute
+  retryLimit: 0,
+  retryDelay: 0, // 1 minute
   retryBackoff: true,
   expireInHours: 12,
   retentionDays: 3,
