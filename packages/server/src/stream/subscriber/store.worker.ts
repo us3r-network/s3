@@ -44,15 +44,7 @@ export default class StoreWorker implements Worker<StreamStoreData> {
   async handler(job: PgBoss.Job) {
     const jobData = job.data as StreamStoreData;
     this.logger.log('Reived job: ' + JSON.stringify(jobData));
-    try {
-      await this.store(jobData.network, jobData.streamId);
-    } catch (error) {
-      this.logger.error(
-        `To store network(${jobData.network}) stream(${jobData.streamId}) err:${JSON.stringify(
-          error,
-        )}`,
-      );
-    }
+    this.store(jobData.network, jobData.streamId);
   }
 
   async storeCacao(network: Network,
@@ -125,42 +117,51 @@ export default class StoreWorker implements Worker<StreamStoreData> {
 
   // Store all streams.
   async store(network: Network, streamId: string) {
-    const stream = await this.loadStream(streamId);
-    if (!stream) return;
-
-    await this.storeStream(
-      network,
-      streamId,
-      stream.allCommitIds,
-      stream.state,
-      stream.id.cid,
-    );
-    // save schema stream
-    if (stream?.metadata?.schema) {
-      const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
-      const schemaStream = await this.loadStream(schemaStreamId);
-      if (schemaStream) {
-        await this.storeStream(
-          network,
-          schemaStreamId,
-          schemaStream.allCommitIds,
-          schemaStream.state,
-        );
+    try {
+      const stream = await this.loadStream(streamId);
+      if (!stream) return;
+  
+      await this.storeStream(
+        network,
+        streamId,
+        stream.allCommitIds,
+        stream.state,
+        stream.id.cid,
+      );
+      // save schema stream
+      if (stream?.metadata?.schema) {
+        const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
+        const schemaStream = await this.loadStream(schemaStreamId);
+        if (schemaStream) {
+          await this.storeStream(
+            network,
+            schemaStreamId,
+            schemaStream.allCommitIds,
+            schemaStream.state,
+          );
+        }
       }
-    }
-    // save model stream
-    if (stream?.metadata?.model) {
-      const modelStreamId = stream.metadata.model.toString();
-      const modelStream = await this.loadStream(modelStreamId);
-      if (modelStream) {
-        await this.storeStream(
-          network,
-          modelStreamId,
-          modelStream.allCommitIds,
-          modelStream.state,
-        );
+      // save model stream
+      if (stream?.metadata?.model) {
+        const modelStreamId = stream.metadata.model.toString();
+        const modelStream = await this.loadStream(modelStreamId);
+        if (modelStream) {
+          await this.storeStream(
+            network,
+            modelStreamId,
+            modelStream.allCommitIds,
+            modelStream.state,
+          );
+        }
       }
+    } catch (error) {
+      this.logger.error(
+        `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
+          error,
+        )}`,
+      );
     }
+   
   }
 
   async storeStream(
@@ -173,7 +174,7 @@ export default class StoreWorker implements Worker<StreamStoreData> {
     try {
       let domain: string;
       if (genesisCid && streamState?.metadata?.model) {
-        // this.storeCacao(network, streamId, genesisCid);
+        this.storeCacao(network, streamId, genesisCid);
       }
 
       const stream = this.convertToStreamEntity(
