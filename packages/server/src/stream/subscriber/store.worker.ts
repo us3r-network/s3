@@ -173,7 +173,7 @@ export default class StoreWorker implements Worker<StreamStoreData> {
     try {
       let domain: string;
       if (genesisCid && streamState?.metadata?.model) {
-        this.storeCacao(network, streamId, genesisCid);
+        // this.storeCacao(network, streamId, genesisCid);
       }
 
       const stream = this.convertToStreamEntity(
