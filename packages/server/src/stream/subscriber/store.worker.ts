@@ -1,56 +1,58 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Network, Status, Stream } from '../entities/stream/stream.entity';
-import { StreamRepository } from '../entities/stream/stream.repository';
-import e from 'express';
+import PgBoss = require("pg-boss")
+import { type SendOptions } from 'pg-boss'
+import type { Worker, Job } from './job-queue'
+import { Network, Status, Stream } from '../../entities/stream/stream.entity';
+import { Logger } from '@nestjs/common';
+import { StreamRepository } from 'src/entities/stream/stream.repository';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
-@Injectable()
-export default class CeramicSubscriberService {
-  private readonly logger = new Logger(CeramicSubscriberService.name);
+const JobOption: SendOptions = {
+  retryLimit: 5,
+  retryDelay: 60, // 1 minute
+  retryBackoff: true,
+  expireInHours: 12,
+  retentionDays: 3,
+}
 
+export interface StreamStoreData {
+  network: Network
+  streamId: string
+}
+
+export function createStreamStoreJob(
+  name: string,
+  data: StreamStoreData,
+  options?: SendOptions
+): Job<StreamStoreData> {
+  return {
+    name,
+    data,
+    options: options || JobOption,
+  }
+}
+
+export function getStreamStoreJob() {
+  return 'store_stream_job';
+}
+export default class StoreWorker implements Worker<StreamStoreData> {
+  private readonly logger = new Logger(StoreWorker.name);
   constructor(
-    @InjectRepository(Stream, 'testnet')
     private readonly streamRepository: StreamRepository,
+    private readonly ceramicClient: any,
   ) { }
-  async subCeramic(
-    network: Network,
-    bootstrapMultiaddrs: string[],
-    listen: string[],
-    topic: string,
-    ceramicNetworkUrl: string,
-  ) {
-    const node = await this.createP2PNode(bootstrapMultiaddrs, listen);
-    node.pubsub.subscribe(topic);
 
-    const ceramic = await this.createCeramicClient(ceramicNetworkUrl);
-    node.pubsub.addEventListener('message', async (message) => {
-      try {
-        const textDecoder = new TextDecoder('utf-8');
-        const asString = textDecoder.decode(message.detail.data);
-        const parsed = JSON.parse(asString);
-        if (parsed.typ == 0) {
-          // MsgType: UPDATE
-          this.logger.log(
-            `${network}, sub p2p message: ${JSON.stringify(parsed)}`,
-          );
-          await this.store(ceramic, network, parsed.stream);
-        }
-        // else if (parsed.typ == 2) {
-        //   // MsgType: RESPONSE
-        //   const streamIds = Object.keys(parsed.tips);
-        //   await Promise.all(
-        //     streamIds?.map(async (streamId) => {
-        //       await this.store(ceramic, network, streamId);
-        //     }),
-        //   );
-        // }
-      } catch (error) {
-        this.logger.error(
-          `${network} ceramic sub err, messgage:${message} error:${error}`,
-        );
-      }
-    });
+  async handler(job: PgBoss.Job) {
+    const jobData = job.data as StreamStoreData;
+    this.logger.log('Reived job: ' + JSON.stringify(jobData));
+    try {
+      await this.store(jobData.network, jobData.streamId);
+    } catch (error) {
+      this.logger.error(
+        `To store network(${jobData.network}) stream(${jobData.streamId}) err:${JSON.stringify(
+          error,
+        )}`,
+      );
+    }
   }
 
   async getCacao(cid: any): Promise<any> {
@@ -94,45 +96,11 @@ export default class CeramicSubscriberService {
     return cacaoDag;
   }
 
-  async createP2PNode(bootstrapMultiaddrs: string[], listen: string[]) {
-    const libp2p = await _importDynamic('libp2p');
-    const webSockets = await _importDynamic('@libp2p/websockets');
-    const mplex = await _importDynamic('@libp2p/mplex');
-    const noise = await _importDynamic('@chainsafe/libp2p-noise');
-    const gossipsub = await _importDynamic('@chainsafe/libp2p-gossipsub');
-    const bootstrap = await _importDynamic('@libp2p/bootstrap');
-
-    return await libp2p.createLibp2p({
-      peerDiscovery: [
-        bootstrap.bootstrap({
-          list: bootstrapMultiaddrs, // provide array of multiaddrs
-        }),
-      ],
-      connectionManager: {
-        autoDial: true, // Auto connect to discovered peers (limited by ConnectionManager minConnections)
-        // The `tag` property will be searched when creating the instance of your Peer Discovery service.
-        // The associated object, will be passed to the service when it is instantiated.
-      },
-      addresses: {
-        listen: listen,
-      },
-      transports: [webSockets.webSockets()],
-      streamMuxers: [mplex.mplex()],
-      connectionEncryption: [noise.noise()],
-      pubsub: gossipsub.gossipsub(),
-    });
-  }
-
-  async createCeramicClient(ceramicNetworkUrl: string) {
-    const CeramicClient = await _importDynamic('@ceramicnetwork/http-client');
-    return new CeramicClient.CeramicClient(ceramicNetworkUrl);
-  }
-
-  async loadStream(ceramic: any, streamId: string) {
+  async loadStream(streamId: string) {
     let remainRetires = 3;
     while (remainRetires > 0) {
       try {
-        const stream = await ceramic.loadStream(streamId);
+        const stream = await this.ceramicClient.loadStream(streamId);
         return stream;
       } catch (error) {
         remainRetires--;
@@ -144,8 +112,8 @@ export default class CeramicSubscriberService {
   }
 
   // Store all streams.
-  async store(ceramic: any, network: Network, streamId: string) {
-    const stream = await this.loadStream(ceramic, streamId);
+  async store(network: Network, streamId: string) {
+    const stream = await this.loadStream(streamId);
     if (!stream) return;
 
     await this.storeStream(
@@ -158,7 +126,7 @@ export default class CeramicSubscriberService {
     // save schema stream
     if (stream?.metadata?.schema) {
       const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
-      const schemaStream = await this.loadStream(ceramic, schemaStreamId);
+      const schemaStream = await this.loadStream(schemaStreamId);
       if (schemaStream) {
         await this.storeStream(
           network,
@@ -171,7 +139,7 @@ export default class CeramicSubscriberService {
     // save model stream
     if (stream?.metadata?.model) {
       const modelStreamId = stream.metadata.model.toString();
-      const modelStream = await this.loadStream(ceramic, modelStreamId);
+      const modelStream = await this.loadStream(modelStreamId);
       if (modelStream) {
         await this.storeStream(
           network,
@@ -270,4 +238,5 @@ export default class CeramicSubscriberService {
     stream.setLastModifiedAt = new Date();
     return stream;
   }
+
 }

@@ -32,6 +32,9 @@ import DappCreate from './container/DappCreate'
 import DappInfo from './container/DappInfo'
 import DappEdit from './container/DappEdit'
 import { useEffect, useState } from 'react'
+import DappsLayout from './container/DappsLayout'
+import DappsList from './container/DappsList'
+import DappsInfo from './container/DappsInfo'
 
 dayjs.extend(relativeTime)
 
@@ -62,6 +65,11 @@ function Routers() {
           <Route path="create" element={<DappCreate />} />
           <Route path=":appId/edit" element={<DappEdit />} />
           <Route path=":appId" element={<DappInfo />} />
+        </Route>
+
+        <Route path="dapps" element={<DappsLayout />}>
+          <Route index element={<DappsList />} />
+          <Route path=":dappId" element={<DappsInfo />} />
         </Route>
       </Route>
       <Route path="*" element={<NoMatch />} />

@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import { createImageFromInitials } from '../../utils/createImage'
 import { getRandomColor } from '../../utils/randomColor'
 import { useRef } from 'react'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import useIsOwner from '../../hooks/useIsOwner'
 
 export default function Header({
   icon,
@@ -11,6 +13,8 @@ export default function Header({
   name: string
 }) {
   const imgColor = useRef(getRandomColor())
+  const session = useSession()
+  const { isOwner } = useIsOwner()
   return (
     <HeaderWrap>
       <DappImg
@@ -19,9 +23,12 @@ export default function Header({
           createImageFromInitials(60, name.slice(0, 1), imgColor.current)
         }
       />
-      <DappName>
-        {name}, <Welcome>Welcome back!</Welcome>
-      </DappName>
+
+      {session?.id && isOwner && (
+        <DappName>
+          {name}, <Welcome>Welcome back!</Welcome>
+        </DappName>
+      )}
     </HeaderWrap>
   )
 }

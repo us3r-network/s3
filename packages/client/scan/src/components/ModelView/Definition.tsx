@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -10,6 +10,10 @@ import { schemas } from '../../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'
 import { useCeramicCtx } from '../../context/CeramicCtx'
 import CodeDownload from '../CodeDownload'
+import { UserAvatar } from '@us3r-network/profile'
+import dayjs from 'dayjs'
+import { shortPubKey } from '../../utils/shortPubKey'
+import { ImgOrName } from '../ImgOrName'
 
 export default function Definition() {
   const { streamId } = useParams()
@@ -102,6 +106,7 @@ export default function Definition() {
         />
       </EditorBox>
       <ResultBox>
+        <Info modelStream={modelStream} />
         {modelData?.composite && (
           <CodeDownload
             title="Composite"
@@ -123,6 +128,162 @@ export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
     </div>
   )
 }
+
+function Info({ modelStream }: { modelStream: ModelStream | undefined }) {
+  return (
+    <InfoBox>
+      <div className="title">
+        <div>
+          <h3>Model‘s Information</h3>
+        </div>
+        <button></button>
+      </div>
+      {modelStream && (
+        <div className="info">
+          <div>
+            <span>Model name:</span>
+            {modelStream.streamContent.name}
+          </div>
+          <div>
+            <span>Description:</span>
+            {modelStream.streamContent.description || ''}
+          </div>
+          <div>
+            <span>Model ID:</span>
+            {shortPubKey(modelStream.streamId, { len: 10 })}
+          </div>
+          <div>
+            <span>Usage count:</span>
+            {modelStream.useCount || 0}
+          </div>
+          <div>
+            <span>Creator:</span>
+            <div className="avatar">
+              <UserAvatar did={modelStream.controllerDid} />
+              <span>{shortPubKey(modelStream.controllerDid, { len: 10 })}</span>
+            </div>
+          </div>
+          <div>
+            <span>Release date:</span>
+            {dayjs(modelStream.createdAt).format('YYYY-MM-DD')}
+          </div>
+          <div>
+            <span>Dapps:</span>
+            {modelStream.dapps && <Dapps dapps={modelStream.dapps} />}
+          </div>
+        </div>
+      )}
+    </InfoBox>
+  )
+}
+
+function Dapps({
+  dapps,
+}: {
+  dapps: Array<{ name: string; description: string; icon: string; id: number }>
+}) {
+  const { network } = useCeramicCtx()
+  return (
+    <>
+      {[...dapps].map((item, idx) => {
+        return (
+          <div key={item.name} className="dapp">
+            <Link to={`/dapps/${item.id}?network=${network}`}>
+              <ImgOrName name={item.name} imgUrl={item.icon} />
+              {item.name}
+            </Link>
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+const InfoBox = styled.div`
+  box-sizing: border-box;
+  background-color: #1a1a1c;
+  height: fit-content;
+  overflow: hidden;
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    font-style: italic;
+    color: #ffffff;
+
+    h3 {
+      margin: 0;
+      padding: 0;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 24px;
+    }
+  }
+
+  .info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    > div {
+      word-wrap: break-word;
+      > span {
+        margin-right: 5px;
+        color: #718096;
+      }
+    }
+
+    .avatar {
+      display: flex;
+      margin-top: 5px;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+
+  .dapp a {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    span {
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #718096;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      &.name {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      &.left {
+        border: none;
+        color: #fff;
+        justify-content: start;
+        font-family: Rubik;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border-radius: 50%;
+      }
+    }
+  }
+`
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
@@ -146,9 +307,10 @@ const ResultBox = styled.div`
     background: #1b1e23;
     border: 1px solid #39424c;
     border-radius: 20px;
+    flex-shrink: 0;
   }
   > div {
-    width: calc(50% - 10px);
+    width: calc(33% - 8px);
     margin: 20px 0px;
     /* padding: 10px; */
     box-sizing: border-box;
