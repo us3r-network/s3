@@ -12,7 +12,12 @@ import { HealthModule } from './health/health.module';
 import { DappModule } from './dapp/dapp.module';
 
 const env: string | undefined = process.env.NODE_ENV;
-
+function scheduleModule(){
+  if(process.env.SCHEDULED){
+    return [ScheduleModule.forRoot()];
+  }
+  return [];
+}
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -95,8 +100,7 @@ const env: string | undefined = process.env.NODE_ENV;
         url: process.env.REDIS_URL,
       },
     }),
-    ScheduleModule.forRoot(),
-  ],
+  ].concat(scheduleModule()),
   controllers: [],
   providers: [
     {
@@ -105,4 +109,5 @@ const env: string | undefined = process.env.NODE_ENV;
     },
   ],
 })
-export class AppModule {}
+
+export class AppModule { }

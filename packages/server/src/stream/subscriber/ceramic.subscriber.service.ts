@@ -55,7 +55,7 @@ export default class CeramicSubscriberService {
             network: network,
             streamId: parsed.stream,
           });
-          await this.jobQueue.addJob(job);
+          this.jobQueue.addJob(job);
         }
         // else if (parsed.typ == 2) {
         //   // MsgType: RESPONSE
