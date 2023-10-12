@@ -31,8 +31,8 @@ export function createStreamStoreJob(
   }
 }
 
-export function getStreamStoreJob() {
-  return 'store_stream_job';
+export function getStreamStoreJob(network: Network) {
+  return 'store_stream_job_from_' + network.toLowerCase();
 }
 export default class StoreWorker implements Worker<StreamStoreData> {
   private readonly logger = new Logger(StoreWorker.name);
