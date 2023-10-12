@@ -7,8 +7,8 @@ import { StreamRepository } from 'src/entities/stream/stream.repository';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 const JobOption: SendOptions = {
-  retryLimit: 5,
-  retryDelay: 60, // 1 minute
+  retryLimit: 0,
+  retryDelay: 0, // 1 minute
   retryBackoff: true,
   expireInHours: 12,
   retentionDays: 3,
@@ -44,19 +44,11 @@ export default class StoreWorker implements Worker<StreamStoreData> {
   async handler(job: PgBoss.Job) {
     const jobData = job.data as StreamStoreData;
     this.logger.log('Reived job: ' + JSON.stringify(jobData));
-    try {
-      await this.store(jobData.network, jobData.streamId);
-    } catch (error) {
-      this.logger.error(
-        `To store network(${jobData.network}) stream(${jobData.streamId}) err:${JSON.stringify(
-          error,
-        )}`,
-      );
-    }
+    this.store(jobData.network, jobData.streamId);
   }
 
-  async getCacao(cid: any): Promise<any> {
-    let cacaoDag;
+  async storeCacao(network: Network,
+    streamId: string, cid: any): Promise<any> {
     try {
       const ipfsHttpClient = await _importDynamic('ipfs-http-client');
       const ipfs = await ipfsHttpClient.create({
@@ -83,7 +75,21 @@ export default class StoreWorker implements Worker<StreamStoreData> {
       const cacaoCid = CID.parse(capIPFSUri.replace('ipfs://', ''));
       if (!cacaoCid) return;
 
-      cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
+      const cacaoDag = await ipfs.dag.get(cacaoCid, { timeout: 6000 });
+      this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacaoDag)}) stream(${streamId})  network:${network}`);
+
+      const domain = cacaoDag?.value?.p?.domain;
+      this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
+      if (domain) {
+        const stream = new Stream();
+        stream.setStreamId = streamId;
+        stream.setNetwork = network;
+        stream.setDomain = domain;
+        const savedStream = await this.streamRepository.upsert(stream, [
+          'network',
+          'stream_id',
+        ]);
+      }
     } catch (error) {
       const ipfsErr = 'Error 500 (Internal server error) when trying to fetch content from the IPFS network.';
       if (error.toString().includes(ipfsErr)) {
@@ -92,8 +98,6 @@ export default class StoreWorker implements Worker<StreamStoreData> {
         this.logger.warn(`Getting cacao err, cid:${cid} error:${JSON.stringify(error)}`);
       }
     }
-
-    return cacaoDag;
   }
 
   async loadStream(streamId: string) {
@@ -113,42 +117,51 @@ export default class StoreWorker implements Worker<StreamStoreData> {
 
   // Store all streams.
   async store(network: Network, streamId: string) {
-    const stream = await this.loadStream(streamId);
-    if (!stream) return;
-
-    await this.storeStream(
-      network,
-      streamId,
-      stream.allCommitIds,
-      stream.state,
-      stream.id.cid,
-    );
-    // save schema stream
-    if (stream?.metadata?.schema) {
-      const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
-      const schemaStream = await this.loadStream(schemaStreamId);
-      if (schemaStream) {
-        await this.storeStream(
-          network,
-          schemaStreamId,
-          schemaStream.allCommitIds,
-          schemaStream.state,
-        );
+    try {
+      const stream = await this.loadStream(streamId);
+      if (!stream) return;
+  
+      await this.storeStream(
+        network,
+        streamId,
+        stream.allCommitIds,
+        stream.state,
+        stream.id.cid,
+      );
+      // save schema stream
+      if (stream?.metadata?.schema) {
+        const schemaStreamId = stream.metadata.schema.replace('ceramic://', '');
+        const schemaStream = await this.loadStream(schemaStreamId);
+        if (schemaStream) {
+          await this.storeStream(
+            network,
+            schemaStreamId,
+            schemaStream.allCommitIds,
+            schemaStream.state,
+          );
+        }
       }
-    }
-    // save model stream
-    if (stream?.metadata?.model) {
-      const modelStreamId = stream.metadata.model.toString();
-      const modelStream = await this.loadStream(modelStreamId);
-      if (modelStream) {
-        await this.storeStream(
-          network,
-          modelStreamId,
-          modelStream.allCommitIds,
-          modelStream.state,
-        );
+      // save model stream
+      if (stream?.metadata?.model) {
+        const modelStreamId = stream.metadata.model.toString();
+        const modelStream = await this.loadStream(modelStreamId);
+        if (modelStream) {
+          await this.storeStream(
+            network,
+            modelStreamId,
+            modelStream.allCommitIds,
+            modelStream.state,
+          );
+        }
       }
+    } catch (error) {
+      this.logger.error(
+        `To store network(${network}) stream(${streamId}) err:${JSON.stringify(
+          error,
+        )}`,
+      );
     }
+   
   }
 
   async storeStream(
@@ -160,15 +173,9 @@ export default class StoreWorker implements Worker<StreamStoreData> {
   ) {
     try {
       let domain: string;
-      // if (genesisCid && streamState?.metadata?.model) {
-      //   this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
-
-      //   const cacao = await this.getCacao(genesisCid);
-      //   this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
-
-      //   domain = cacao?.value?.p?.domain;
-      //   this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
-      // }
+      if (genesisCid && streamState?.metadata?.model) {
+        this.storeCacao(network, streamId, genesisCid);
+      }
 
       const stream = this.convertToStreamEntity(
         network,
