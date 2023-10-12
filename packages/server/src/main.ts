@@ -24,10 +24,9 @@ async function bootstrap() {
 
   await app.listen(3000);
 
-  const ceramicSubscriberService = app.get(CeramicSubscriberService);
-
   // Sub ceramic test network.
   if (!process.env.DISABLE_P2P_SUB){
+    const ceramicSubscriberService = app.get(CeramicSubscriberService);
     await ceramicSubscriberService.initJobQueue();
 
     await ceramicSubscriberService.subCeramic(

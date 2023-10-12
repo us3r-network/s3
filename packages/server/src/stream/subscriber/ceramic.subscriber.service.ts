@@ -40,7 +40,6 @@ export default class CeramicSubscriberService {
     const node = await this.createP2PNode(bootstrapMultiaddrs, listen);
     node.pubsub.subscribe(topic);
 
-    // init job queue
     node.pubsub.addEventListener('message', async (message) => {
       try {
         const textDecoder = new TextDecoder('utf-8');
