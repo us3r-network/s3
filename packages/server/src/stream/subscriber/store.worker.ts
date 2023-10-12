@@ -160,15 +160,15 @@ export default class StoreWorker implements Worker<StreamStoreData> {
   ) {
     try {
       let domain: string;
-      if (genesisCid && streamState?.metadata?.model) {
-        this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
+      // if (genesisCid && streamState?.metadata?.model) {
+      //   this.logger.log(`[CACAO] Getting cacao stream(${streamId})  network:${network}`);
 
-        const cacao = await this.getCacao(genesisCid);
-        this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
+      //   const cacao = await this.getCacao(genesisCid);
+      //   this.logger.log(`[CACAO] Getting cacao(${JSON.stringify(cacao)}) stream(${streamId})  network:${network}`);
 
-        domain = cacao?.value?.p?.domain;
-        this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
-      }
+      //   domain = cacao?.value?.p?.domain;
+      //   this.logger.log(`[CACAO] Getting domain(${domain}) stream(${streamId})  network:${network}`);
+      // }
 
       const stream = this.convertToStreamEntity(
         network,
