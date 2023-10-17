@@ -10,6 +10,7 @@ const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 export default class CeramicSubscriberService {
   private readonly logger = new Logger(CeramicSubscriberService.name);
   private readonly jobQueue!: IJobQueue<StreamStoreData>
+  private p2pNode: any;
 
   constructor(
     @InjectRepository(Stream, 'testnet')
@@ -22,14 +23,14 @@ export default class CeramicSubscriberService {
     // init ceramic clients
     const ceramicMiannetClient = await this.createCeramicClient('http://35.220.227.2:7007/');
     const ceramicTestnetClient = await this.createCeramicClient('http://34.92.232.17:7007/');
-    await this.jobQueue.init({
-      [getStreamStoreJob(Network.MAINNET)]: new StoreWorker(
-        this.streamRepository, ceramicMiannetClient
-      ),
-      [getStreamStoreJob(Network.TESTNET)]: new StoreWorker(
-        this.streamRepository, ceramicTestnetClient
-      ),
-    });
+    // await this.jobQueue.init({
+    //   [getStreamStoreJob(Network.MAINNET)]: new StoreWorker(
+    //     this.streamRepository, ceramicMiannetClient
+    //   ),
+    //   [getStreamStoreJob(Network.TESTNET)]: new StoreWorker(
+    //     this.streamRepository, ceramicTestnetClient
+    //   ),
+    // });
     this.logger.log('init job queue success');
   }
 
@@ -38,10 +39,10 @@ export default class CeramicSubscriberService {
     bootstrapMultiaddrs: string[],
     listen: string[],
     topic: string) {
-    const node = await this.createP2PNode(bootstrapMultiaddrs, listen);
-    node.pubsub.subscribe(topic);
+    this.p2pNode = await this.createP2PNode(bootstrapMultiaddrs, listen);
+    this.p2pNode.pubsub.subscribe(topic);
 
-    node.pubsub.addEventListener('message', async (message) => {
+    this.p2pNode.pubsub.addEventListener('message', async (message) => {
       try {
         const textDecoder = new TextDecoder('utf-8');
         const asString = textDecoder.decode(message.detail.data);
