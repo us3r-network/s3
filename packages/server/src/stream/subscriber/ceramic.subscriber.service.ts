@@ -23,14 +23,14 @@ export default class CeramicSubscriberService {
     // init ceramic clients
     const ceramicMiannetClient = await this.createCeramicClient('http://35.220.227.2:7007/');
     const ceramicTestnetClient = await this.createCeramicClient('http://34.92.232.17:7007/');
-    // await this.jobQueue.init({
-    //   [getStreamStoreJob(Network.MAINNET)]: new StoreWorker(
-    //     this.streamRepository, ceramicMiannetClient
-    //   ),
-    //   [getStreamStoreJob(Network.TESTNET)]: new StoreWorker(
-    //     this.streamRepository, ceramicTestnetClient
-    //   ),
-    // });
+    await this.jobQueue.init({
+      [getStreamStoreJob(Network.MAINNET)]: new StoreWorker(
+        this.streamRepository, ceramicMiannetClient
+      ),
+      [getStreamStoreJob(Network.TESTNET)]: new StoreWorker(
+        this.streamRepository, ceramicTestnetClient
+      ),
+    });
     this.logger.log('init job queue success');
   }
 
