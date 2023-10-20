@@ -31,6 +31,7 @@
     "@didtools/cacao": "^2.0.0",
     "@didtools/pkh-ethereum": "^0.3.0",
     "@didtools/pkh-solana": "^0.1.1",
+    "@ethersproject/providers": "^5.7.2",
     "@graphql-codegen/cli": "^4.0.1",
     "@graphql-codegen/client-preset": "^4.0.1",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
