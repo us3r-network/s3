@@ -9,7 +9,7 @@ const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 @Injectable()
 export default class CeramicSubscriberService {
   private readonly logger = new Logger(CeramicSubscriberService.name);
-  private readonly jobQueue!: IJobQueue<StreamStoreData>
+  public jobQueue!: IJobQueue<StreamStoreData>
   private p2pNode: any;
 
   constructor(

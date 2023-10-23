@@ -689,6 +689,16 @@
     multiformats "^11.0.1"
     uint8arrays "^4.0.3"
 
+"@ceramicnetwork/anchor-utils@^1.20.0":
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/anchor-utils/-/anchor-utils-1.20.0.tgz#0465fcc1f68ad2d8517bf841e26adefbfd46530a"
+  integrity sha512-5z/0nqQoqAkxentqsVzCRIiqmR9/zSkf9Bzv0B+qhzGEGc8VfihMNSEOOMY2+trwgXIBiET51fulOUOgcvULfQ==
+  dependencies:
+    "@ceramicnetwork/common" "^2.37.0"
+    "@ethersproject/abi" "^5.7.0"
+    multiformats "^11.0.1"
+    uint8arrays "^4.0.3"
+
 "@ceramicnetwork/codecs@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ceramicnetwork/codecs/-/codecs-1.1.0.tgz#ab4ac5703f8afd18986a41ef6dd9c8cd68755749"
@@ -703,6 +713,18 @@
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@ceramicnetwork/codecs/-/codecs-1.10.0.tgz#9daccdca63b96cc48f9beea2e2aa43e1d9e6e346"
   integrity sha512-0/5/NCjKax2UFbvnlQuRzZ+T7sp+HKgGsBsW/fKK06E/ui0MBVMSK1eitn/ozvMFUo+nCjKPQF3ixXVpdsQl4A==
+  dependencies:
+    "@ceramicnetwork/streamid" "^2.17.0"
+    cartonne "^2.1.1"
+    codeco "^1.1.0"
+    dag-jose "^4.0.0"
+    multiformats "^11.0.1"
+    uint8arrays "^4.0.3"
+
+"@ceramicnetwork/codecs@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/codecs/-/codecs-1.12.0.tgz#ade572676363468d566a9ea7b29dcf7f369434a8"
+  integrity sha512-LpQzhfPRsMAyNOltMXsk5AuBh+g6VixlkH9JfLaRYnjJuVPiMPl/t/ezL+25jPWndW69qPvmCPEedePq9WTFkA==
   dependencies:
     "@ceramicnetwork/streamid" "^2.17.0"
     cartonne "^2.1.1"
@@ -741,6 +763,30 @@
   integrity sha512-1TsdVYAjTIVTBz+6dlrEJACFGqMzYZeOvwLNbpk9E5vMh6fnrgRm8q9JPeGhDyGwdGlY7l4e1yqzWAoZGnJARQ==
   dependencies:
     "@ceramicnetwork/codecs" "^1.10.0"
+    "@ceramicnetwork/streamid" "^2.17.0"
+    "@didtools/cacao" "^2.1.0"
+    "@didtools/pkh-ethereum" "^0.1.0"
+    "@didtools/pkh-solana" "^0.1.0"
+    "@didtools/pkh-stacks" "^0.1.0"
+    "@didtools/pkh-tezos" "^0.2.1"
+    "@stablelib/random" "^1.0.1"
+    caip "~1.1.0"
+    cross-fetch "^3.1.4"
+    flat "^5.0.2"
+    it-first "^1.0.7"
+    jet-logger "1.2.2"
+    lodash.clonedeep "^4.5.0"
+    logfmt "^1.3.2"
+    multiformats "^11.0.1"
+    rxjs "^7.5.2"
+    uint8arrays "^4.0.3"
+
+"@ceramicnetwork/common@^2.37.0":
+  version "2.37.0"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/common/-/common-2.37.0.tgz#81b1cc7ccad567f342c700b235f5f0aa180b7bd1"
+  integrity sha512-8v6mIu6xq6j/E0pK5EW/LPpZTqfUlk7iu97rZPrPdjxtNiOFxW1YX5jjDe9SYTjGZNOi/89MRzCLA1tzab8a9Q==
+  dependencies:
+    "@ceramicnetwork/codecs" "^1.12.0"
     "@ceramicnetwork/streamid" "^2.17.0"
     "@didtools/cacao" "^2.1.0"
     "@didtools/pkh-ethereum" "^0.1.0"
@@ -1197,6 +1243,21 @@
     js-yaml "^3.13.1"
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
+
+"@ethersproject/abi@^5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/abi/-/abi-5.7.0.tgz#b3f3e045bbbeed1af3947335c247ad625a44e449"
+  integrity sha512-351ktp42TiRcYB3H1OP8yajPeAQstMW/yCFokj/AthP9bLHzQFPlOrxOcwYEDkUAICmOHljvN4K39OMTMUa9RA==
+  dependencies:
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bignumber" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/constants" "^5.7.0"
+    "@ethersproject/hash" "^5.7.0"
+    "@ethersproject/keccak256" "^5.7.0"
+    "@ethersproject/logger" "^5.7.0"
+    "@ethersproject/properties" "^5.7.0"
+    "@ethersproject/strings" "^5.7.0"
 
 "@ethersproject/abstract-provider@^5.7.0":
   version "5.7.0"
@@ -7000,6 +7061,11 @@ eventemitter3@^4.0.0, eventemitter3@^4.0.7:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
+
 events@^3.2.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
@@ -10192,6 +10258,14 @@ p-queue@^7.2.0:
   integrity sha512-esox8CWt0j9EZECFvkFl2WNPat8LN4t7WWeXq73D9ha0V96qPRufApZi4ZhPwXAln1uVVal429HVVKPa2X0yQg==
   dependencies:
     eventemitter3 "^4.0.7"
+    p-timeout "^5.0.2"
+
+p-queue@^7.4.1:
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-7.4.1.tgz#7f86f853048beca8272abdbb7cec1ed2afc0f265"
+  integrity sha512-vRpMXmIkYF2/1hLBKisKeVYJZ8S2tZ0zEAmIJgdVKP2nq0nh4qCdf8bgw+ZgKrkh71AOCaqzwbJJk1WtdcF3VA==
+  dependencies:
+    eventemitter3 "^5.0.1"
     p-timeout "^5.0.2"
 
 p-reflect@^3.1.0:

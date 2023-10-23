@@ -7,6 +7,22 @@ export interface EthNetwork {
     endpoint?: string
 }
 
+export type SupportedNetwork =
+  | 'eip155:1' // mainnet
+  | 'eip155:3' // ropsten
+  | 'eip155:5' // goerli
+  | 'eip155:100' // gnosis
+  | 'eip155:1337' // ganache
+
+
+export const ChainIdEnum = {
+    MAINNET: 'eip155:1',
+    ROPSTEN: 'eip155:3',
+    RINKEBY: 'eip155:4',
+    GOERLI: 'eip155:5',
+    GNOSIS: 'eip155:100',
+}
+
 export const EthChainIdMappings: Record<string, EthNetwork> = {
     'eip155:1': { network: 'mainnet', chain: 'ETH', chainId: 1, networkId: 1, type: 'Production' },
     'eip155:3': { network: 'ropsten', chain: 'ETH', chainId: 3, networkId: 3, type: 'Test' },
@@ -33,3 +49,5 @@ export interface SyncJobData {
     fromBlock: number
     toBlock: number
 }
+
+export const CeramicAnchorContractAddress = '0x231055a0852d67c7107ad0d0dfeab60278fe6adc';
