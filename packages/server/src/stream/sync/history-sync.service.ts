@@ -1,17 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import type { Provider } from '@ethersproject/providers'
-import { IJobQueue, Job, JobQueue } from "../subscriber/job-queue";
+import { IJobQueue, Job } from "../subscriber/job-queue";
 import { BlockConfirmations, CeramicAnchorContractAddress, ChainIdEnum, EthChainIdMappings, EthNetwork, InitialIndexingBlocks, SyncJobData } from "./constants";
 import { InjectRepository } from "@nestjs/typeorm";
 import { HistorySyncState, Network, Stream } from "src/entities/stream/stream.entity";
 import { HistorySyncStateRepository, StreamRepository } from "src/entities/stream/stream.repository";
 import { StreamStoreData, createStreamStoreJob, getStreamStoreJob } from "../subscriber/store.worker";
-import * as providers from '@ethersproject/providers';
-import {
-    getCidFromAnchorEventLog,
-} from '@ceramicnetwork/anchor-utils';
-import { CID } from 'multiformats/cid';
-import PQueue from 'p-queue';
+
 import { sleep } from "./utils";
 import { S3SeverBizDbName } from "src/common/constants";
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
@@ -34,8 +29,8 @@ export default class HistorySyncService {
         this.streamJobQueue = streamJobQueue;
 
         // init eth providers
-        this.mainnetProvider = this.getProvider(ChainIdEnum.MAINNET.toString());
-        this.testnetProvider = this.getProvider(ChainIdEnum.GNOSIS.toString());
+        this.mainnetProvider = await this.getProvider(ChainIdEnum.MAINNET.toString());
+        this.testnetProvider = await this.getProvider(ChainIdEnum.GNOSIS.toString());
 
         // init state table data
         await this.initStatetable(ChainIdEnum.MAINNET.toString());
@@ -87,6 +82,7 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Logs' length: ${logs?.length}`);
                     if (logs?.length > 0) {
                         // anchor proof root is a CID
+                        const {getCidFromAnchorEventLog} = await _importDynamic('@ceramicnetwork/anchor-utils');
                         const anchorProofRoots = logs.map(log => getCidFromAnchorEventLog(log))
                         this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}`);
                         if (anchorProofRoots?.length > 0) {
@@ -128,7 +124,7 @@ export default class HistorySyncService {
         }
     }
 
-    async getStreamIdsFromIpfs(cid: CID | string): Promise<any> {
+    async getStreamIdsFromIpfs(cid: any): Promise<any> {
         const metedataPath = '2'
         const resolution = this.ipfs.dag.resolve(cid, {
             timeout: 30000,
@@ -165,7 +161,9 @@ export default class HistorySyncService {
      * @param chain - CAIP-2 Chain ID
      * @private
      */
-    getProvider(chainId: string | null): providers.BaseProvider {
+   async getProvider(chainId: string | null) {
+        const providers = await _importDynamic('@ethersproject/providers');
+        this.logger.log(`[${chainId}] Dynamic import of @ethersproject/providers ${JSON.stringify(providers)}`)
 
         if (!chainId.startsWith('eip155')) {
             throw new Error(`Unsupported chainId '${chainId}' - must be eip155 namespace`)
