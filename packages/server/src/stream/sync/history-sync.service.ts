@@ -57,7 +57,7 @@ export default class HistorySyncService {
                         chain_id: chainId
                     }
                 })
-                this.logger.log('Start history sync state:' + JSON.stringify(historySyncState) + 'for chain id:' + chainId);
+                this.logger.log('Start history sync state:' + JSON.stringify(historySyncState) + ' for chain id:' + chainId);
                 if (historySyncState == null) {
                     this.logger.error('History sync state is null, please check the history sync state table');
                     break;
@@ -66,7 +66,7 @@ export default class HistorySyncService {
                 // verify the history sync state, if the state exceed the max block number, then skip;
                 const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
                 const confirmedBlock = await provider.getBlock(-BlockConfirmations);
-                if (confirmedBlock.number <= +currentBlockNumber){
+                if (confirmedBlock.number <= +currentBlockNumber) {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
@@ -76,13 +76,13 @@ export default class HistorySyncService {
                     // and parse anchor proof root for ETH logs
                     const logs = await provider.getLogs({
                         address: CeramicAnchorContractAddress,
-                        fromBlock: historySyncState.getProcessedBlockNumber,
-                        toBlock: +historySyncState.getProcessedBlockNumber + 1,
+                        fromBlock: +historySyncState.getProcessedBlockNumber,
+                        toBlock: +historySyncState.getProcessedBlockNumber + 100,
                     });
                     this.logger.log(`[${chainId}] Logs' length: ${logs?.length}`);
                     if (logs?.length > 0) {
                         // anchor proof root is a CID
-                        const {getCidFromAnchorEventLog} = await _importDynamic('@ceramicnetwork/anchor-utils');
+                        const { getCidFromAnchorEventLog } = await _importDynamic('@ceramicnetwork/anchor-utils');
                         const anchorProofRoots = logs.map(log => getCidFromAnchorEventLog(log))
                         this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}`);
                         if (anchorProofRoots?.length > 0) {
@@ -113,7 +113,7 @@ export default class HistorySyncService {
                     this.logger.error(`[${chainId}] Error: ${error.message}`);
                 }
                 // update state table data
-                historySyncState.setProcessedBlockNumber = currentBlockNumber + 1;
+                historySyncState.setProcessedBlockNumber = (+currentBlockNumber + 1).toString();
                 await this.historySyncStateRepository.update({ chain_id: chainId }, historySyncState);
 
                 // sleep 10 seconds
@@ -126,7 +126,7 @@ export default class HistorySyncService {
 
     async getStreamIdsFromIpfs(cid: any): Promise<any> {
         const metedataPath = '2'
-        const resolution = this.ipfs.dag.resolve(cid, {
+        const resolution = await this.ipfs.dag.resolve(cid, {
             timeout: 30000,
             path: metedataPath,
         });
@@ -148,7 +148,7 @@ export default class HistorySyncService {
             }
         })
         this.logger.log('Init history sync state data, the current data is:' + JSON.stringify(historySyncState));
-        if (historySyncState == null) {
+        if (!historySyncState) {
             const newHistorySyncState = new HistorySyncState()
             newHistorySyncState.setChainId = chainId
             newHistorySyncState.setProcessedBlockNumber = InitialIndexingBlocks[chainId].toString();
@@ -161,26 +161,23 @@ export default class HistorySyncService {
      * @param chain - CAIP-2 Chain ID
      * @private
      */
-   async getProvider(chainId: string | null) {
-        const providers = await _importDynamic('@ethersproject/providers');
-        this.logger.log(`[${chainId}] Dynamic import of @ethersproject/providers ${JSON.stringify(providers)}`)
-
+    async getProvider(chainId: string | null) {
+        const { StaticJsonRpcProvider, getDefaultProvider } = await _importDynamic('@ethersproject/providers');
         if (!chainId.startsWith('eip155')) {
             throw new Error(`Unsupported chainId '${chainId}' - must be eip155 namespace`)
         }
-        this.logger.log(`[${chainId}] Get ethereum provider`)
         const ethNetwork: EthNetwork = EthChainIdMappings[chainId]
         const endpoint = ethNetwork?.endpoint
 
         let provider
         if (endpoint) {
-            provider = new providers.StaticJsonRpcProvider(endpoint)
+            provider = new StaticJsonRpcProvider(endpoint)
         } else {
             if (ethNetwork == null) {
                 throw new Error(`No ethereum provider available for chainId ${chainId}`)
             }
 
-            provider = providers.getDefaultProvider(ethNetwork.network)
+            provider = getDefaultProvider(ethNetwork.network)
         }
         return provider
     }

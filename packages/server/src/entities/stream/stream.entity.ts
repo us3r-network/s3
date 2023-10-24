@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -236,7 +237,7 @@ export class Stream extends BaseEntity {
 @Entity({ name: 'history_sync_state' })
 export class HistorySyncState extends BaseEntity {
 
-  @Column({ nullable: false })
+  @PrimaryColumn()
   chain_id: string;
 
   @Column({ nullable: true })
