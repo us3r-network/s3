@@ -1,4 +1,4 @@
-import { EntityRepository, EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 import { HistorySyncState, Stream } from './stream.entity';
 
 @EntityRepository(Stream)

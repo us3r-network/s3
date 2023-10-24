@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import type { Provider } from '@ethersproject/providers'
 import { IJobQueue, Job, JobQueue } from "../subscriber/job-queue";
-import { CeramicAnchorContractAddress, ChainIdEnum, EthChainIdMappings, EthNetwork, InitialIndexingBlocks, SyncJobData } from "./constants";
+import { BlockConfirmations, CeramicAnchorContractAddress, ChainIdEnum, EthChainIdMappings, EthNetwork, InitialIndexingBlocks, SyncJobData } from "./constants";
 import { InjectRepository } from "@nestjs/typeorm";
 import { HistorySyncState, Network, Stream } from "src/entities/stream/stream.entity";
 import { HistorySyncStateRepository, StreamRepository } from "src/entities/stream/stream.repository";
@@ -13,6 +13,7 @@ import {
 import { CID } from 'multiformats/cid';
 import PQueue from 'p-queue';
 import { sleep } from "./utils";
+import { S3SeverBizDbName } from "src/common/constants";
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -23,9 +24,9 @@ export default class HistorySyncService {
     private testnetProvider: Provider;
     private ipfs: any;
 
-    constructor(@InjectRepository(HistorySyncState, 'testnet')
+    constructor(@InjectRepository(HistorySyncState, S3SeverBizDbName)
     private readonly historySyncStateRepository: HistorySyncStateRepository,
-        @InjectRepository(Stream, 'testnet')
+        @InjectRepository(Stream, S3SeverBizDbName)
         private readonly streamRepository: StreamRepository,) {
     }
 
@@ -67,12 +68,17 @@ export default class HistorySyncService {
                     break;
                 }
                 const currentBlockNumber = historySyncState.getProcessedBlockNumber;
-                // TODO  verify the history sync state, if the state exceed the max block number, then return;
+                // verify the history sync state, if the state exceed the max block number, then skip;
+                const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
+                const confirmedBlock = await provider.getBlock(-BlockConfirmations);
+                if (confirmedBlock.number <= +currentBlockNumber){
+                    this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
+                    continue;
+                }
 
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
-                    const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
                     const logs = await provider.getLogs({
                         address: CeramicAnchorContractAddress,
                         fromBlock: historySyncState.getProcessedBlockNumber,
@@ -164,7 +170,7 @@ export default class HistorySyncService {
         if (!chainId.startsWith('eip155')) {
             throw new Error(`Unsupported chainId '${chainId}' - must be eip155 namespace`)
         }
-
+        this.logger.log(`[${chainId}] Get ethereum provider`)
         const ethNetwork: EthNetwork = EthChainIdMappings[chainId]
         const endpoint = ethNetwork?.endpoint
 

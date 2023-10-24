@@ -4,6 +4,7 @@ import { Network, Stream } from '../../entities/stream/stream.entity';
 import { StreamRepository } from '../../entities/stream/stream.repository';
 import { IJobQueue, Job, JobQueue } from './job-queue';
 import StoreWorker, { getStreamStoreJob, StreamStoreData, createStreamStoreJob } from './store.worker';
+import { S3SeverBizDbName } from 'src/common/constants';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -13,7 +14,7 @@ export default class CeramicSubscriberService {
   private p2pNode: any;
 
   constructor(
-    @InjectRepository(Stream, 'testnet')
+    @InjectRepository(Stream, S3SeverBizDbName)
     private readonly streamRepository: StreamRepository,
   ) {
     this.jobQueue = new JobQueue(process.env.PG_BOSS_DATABASE_URL);

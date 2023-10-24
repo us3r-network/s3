@@ -51,3 +51,5 @@ export interface SyncJobData {
 }
 
 export const CeramicAnchorContractAddress = '0x231055a0852d67c7107ad0d0dfeab60278fe6adc';
+
+export const BlockConfirmations = 20;
