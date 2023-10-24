@@ -1,16 +1,18 @@
 import { Injectable, Logger } from "@nestjs/common";
 import type { Provider } from '@ethersproject/providers'
-import { IJobQueue, JobQueue } from "../subscriber/job-queue";
+import { IJobQueue, Job, JobQueue } from "../subscriber/job-queue";
 import { CeramicAnchorContractAddress, ChainIdEnum, EthChainIdMappings, EthNetwork, InitialIndexingBlocks, SyncJobData } from "./constants";
 import { InjectRepository } from "@nestjs/typeorm";
-import { HistorySyncState, Stream } from "src/entities/stream/stream.entity";
+import { HistorySyncState, Network, Stream } from "src/entities/stream/stream.entity";
 import { HistorySyncStateRepository, StreamRepository } from "src/entities/stream/stream.repository";
-import { StreamStoreData } from "../subscriber/store.worker";
+import { StreamStoreData, createStreamStoreJob, getStreamStoreJob } from "../subscriber/store.worker";
 import * as providers from '@ethersproject/providers';
 import {
     getCidFromAnchorEventLog,
-} from '@ceramicnetwork/anchor-utils'
+} from '@ceramicnetwork/anchor-utils';
+import { CID } from 'multiformats/cid';
 import PQueue from 'p-queue';
+import { sleep } from "./utils";
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -41,7 +43,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-          url: 'https://gateway.ipfs.io',
+            url: 'https://gateway.ipfs.io',
         });
     }
 
@@ -52,43 +54,90 @@ export default class HistorySyncService {
     }
 
     async startHistorySyncForChain(chainId: string) {
-        const historySyncState = await this.historySyncStateRepository.findOne({
-            where: {
-                chain_id: chainId
+        while (true) {
+            try {
+                const historySyncState = await this.historySyncStateRepository.findOne({
+                    where: {
+                        chain_id: chainId
+                    }
+                })
+                this.logger.log('Start history sync state:' + JSON.stringify(historySyncState) + 'for chain id:' + chainId);
+                if (historySyncState == null) {
+                    this.logger.error('History sync state is null, please check the history sync state table');
+                    break;
+                }
+                const currentBlockNumber = historySyncState.getProcessedBlockNumber;
+                // TODO  verify the history sync state, if the state exceed the max block number, then return;
+
+                try {
+                    // get block log data from the provider
+                    // and parse anchor proof root for ETH logs
+                    const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
+                    const logs = await provider.getLogs({
+                        address: CeramicAnchorContractAddress,
+                        fromBlock: historySyncState.getProcessedBlockNumber,
+                        toBlock: +historySyncState.getProcessedBlockNumber + 1,
+                    });
+                    this.logger.log(`[${chainId}] Logs' length: ${logs?.length}`);
+                    if (logs?.length > 0) {
+                        // anchor proof root is a CID
+                        const anchorProofRoots = logs.map(log => getCidFromAnchorEventLog(log))
+                        this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}`);
+                        if (anchorProofRoots?.length > 0) {
+                            // parse stream id from anchor proof roots by ipfs
+                            const streamIdsFromBlockLogs: string[] = [];
+                            for await (const cid of anchorProofRoots) {
+                                try {
+                                    const streamIds = await this.getStreamIdsFromIpfs(cid);
+                                    streamIdsFromBlockLogs.push(...streamIds);
+                                    this.logger.log(`[${chainId}] Stream ids' length: ${streamIds?.length} for cid: ${cid}`);
+                                } catch (error) {
+                                    this.logger.error(`[${chainId}] Error: ${error.message}`);
+                                }
+                            }
+                            this.logger.log(`[${chainId}] Stream ids' length: ${streamIdsFromBlockLogs?.length} for block number: ${currentBlockNumber}`);
+                            // add stream id to queue
+                            const network = chainId == ChainIdEnum.MAINNET.toString() ? Network.MAINNET : Network.TESTNET;
+                            for await (const streamId of streamIdsFromBlockLogs) {
+                                const job: Job<StreamStoreData> = createStreamStoreJob(getStreamStoreJob(network), {
+                                    network: network,
+                                    streamId: streamId,
+                                });
+                                await this.streamJobQueue.addJob(job);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    this.logger.error(`[${chainId}] Error: ${error.message}`);
+                }
+                // update state table data
+                historySyncState.setProcessedBlockNumber = currentBlockNumber + 1;
+                await this.historySyncStateRepository.update({ chain_id: chainId }, historySyncState);
+
+                // sleep 10 seconds
+                await sleep(10000);
+            } catch (error) {
+                this.logger.error(`[${chainId}] Error: ${error.message}`);
             }
-        })
-        this.logger.log('Start history sync state:' + JSON.stringify(historySyncState) + 'for chain id:' + chainId);
-        if (historySyncState == null) {
-            this.logger.error('History sync state is null, please check the history sync state table');
-            return;
         }
-
-        const currentBlockNumber = historySyncState.getProcessedBlockNumber;
-        // get block log data from the provider
-        // and parse anchor proof root for ETH logs
-        const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
-        const logs = await provider.getLogs({
-            address: CeramicAnchorContractAddress,
-            fromBlock: historySyncState.getProcessedBlockNumber,
-            toBlock: +historySyncState.getProcessedBlockNumber + 1,
-        });
-        this.logger.log(`[${chainId}] Logs' length: ${logs?.length}`);
-        if (logs?.length == 0) {
-            return;
-        }
-        // anchor proof root is a CID
-        const anchorProofRoots = logs.map(log => getCidFromAnchorEventLog(log))
-        this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}`);
-        if (anchorProofRoots?.length == 0) {
-            return;
-        }
-
-        // parse stream id by ipfs
-
-        // add stream id to queue
-
-        // update state table data
     }
+
+    async getStreamIdsFromIpfs(cid: CID | string): Promise<any> {
+        const metedataPath = '2'
+        const resolution = this.ipfs.dag.resolve(cid, {
+            timeout: 30000,
+            path: metedataPath,
+        });
+        const blockCid = resolution.cid
+
+        const codec = await this.ipfs.codecs.getCodec(blockCid.code);
+        const block = this.ipfs.block.get(blockCid, {
+            timeout: 30000,
+        });
+        const metadata = codec.decode(block)
+        return metadata?.streamIds;
+    }
+
 
     async initStatetable(chainId: string) {
         const historySyncState = await this.historySyncStateRepository.findOne({

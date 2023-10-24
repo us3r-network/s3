@@ -237,13 +237,13 @@ export class Stream extends BaseEntity {
 export class HistorySyncState extends BaseEntity {
 
   @Column({ nullable: false })
-  private chain_id: string;
+  chain_id: string;
 
   @Column({ nullable: true })
-  private processed_block_hash: string;
+  processed_block_hash: string;
 
   @Column({ nullable: false })
-  private processed_block_number: string;
+  processed_block_number: string;
 
   get getChainId(): string {
     return this.chain_id;
@@ -254,8 +254,8 @@ export class HistorySyncState extends BaseEntity {
 
   get getProcessedBlockHash(): string {
     return this.processed_block_hash;
-  } 
-  set setProcessedBlockHash(processedBlockHash: string) { 
+  }
+  set setProcessedBlockHash(processedBlockHash: string) {
     this.processed_block_hash = processedBlockHash;
   }
 
@@ -263,6 +263,6 @@ export class HistorySyncState extends BaseEntity {
     return this.processed_block_number;
   }
   set setProcessedBlockNumber(processedBlockNumber: string) {
-      this.processed_block_number = processedBlockNumber;
+    this.processed_block_number = processedBlockNumber;
   }
 }
