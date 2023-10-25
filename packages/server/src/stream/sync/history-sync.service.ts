@@ -40,7 +40,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://4everland.io',
+            url: 'https://cloudflare-ipfs.com/',
         });
     }
 
@@ -67,6 +67,7 @@ export default class HistorySyncService {
                 // verify the history sync state, if the state exceed the max block number, then skip;
                 const provider = chainId == ChainIdEnum.MAINNET.toString() ? this.mainnetProvider : this.testnetProvider;
                 const confirmedBlock = await provider.getBlock(-BlockConfirmations);
+                this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number}, processed block number: ${currentBlockNumber}`);
                 if (confirmedBlock.number <= +currentBlockNumber) {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
