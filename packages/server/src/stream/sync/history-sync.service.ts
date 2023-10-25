@@ -40,7 +40,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://gateway.ipfs.io/',
+            url: 'https://ipfs.io/',
         });
     }
 
@@ -141,7 +141,7 @@ export default class HistorySyncService {
         const block = await this.ipfs.block.get(blockCid, {
             timeout: timeoutMs,
         });
-        const metadata = codec.decode(block)
+        const metadata = codec.decode(block);
         return metadata?.streamIds;
     }
 
