@@ -72,7 +72,7 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
-                const blockDelta = 100;
+                const blockDelta = 1;
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
@@ -120,7 +120,7 @@ export default class HistorySyncService {
                 await this.historySyncStateRepository.update({ chain_id: chainId }, historySyncState);
 
                 // sleep 10 seconds
-                await sleep(1000);
+                await sleep(10000);
             } catch (error) {
                 this.logger.error(`[${chainId}] Error: ${error.message}`);
             }
