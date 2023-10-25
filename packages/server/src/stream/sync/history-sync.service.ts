@@ -103,6 +103,7 @@ export default class HistorySyncService {
                             // add stream id to queue
                             const network = chainId == ChainIdEnum.MAINNET.toString() ? Network.MAINNET : Network.TESTNET;
                             for await (const streamId of streamIdsFromBlockLogs) {
+                                this.logger.log(`[${chainId}] network: ${network} Add stream id: ${streamId} to queue`);
                                 const job: Job<StreamStoreData> = createStreamStoreJob(getStreamStoreJob(network), {
                                     network: network,
                                     streamId: streamId,
