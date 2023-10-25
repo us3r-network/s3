@@ -72,7 +72,7 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
-                const blockDelta = 100;               
+                const blockDelta = 100;
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
@@ -128,22 +128,35 @@ export default class HistorySyncService {
     }
 
     async getStreamIdsFromIpfs(cid: any): Promise<any> {
-        const metedataPath = '2'
-        const timeoutMs = 3000;
-        const resolution = await this.ipfs.dag.resolve(cid, {
-            timeout: timeoutMs,
-            path: metedataPath,
-        });
-        this.logger.log(`[${cid}] Block resolution: ${JSON.stringify(resolution)}`);
-        const blockCid = resolution.cid
-        this.logger.log(`[${cid}] Block CID: ${JSON.stringify(blockCid)}`);
-        const codec = await this.ipfs.codecs.getCodec(blockCid.code);
-        this.logger.log(`[${cid}] Codec: ${JSON.stringify(codec)}`);
-        const block = await this.ipfs.block.get(blockCid, {
-            timeout: timeoutMs,
-        });
-        const metadata = codec.decode(block);
-        return metadata?.streamIds;
+        let retryTimes = 2;
+        let streamIds: string[] = [];
+        while (retryTimes > 0) {
+            try {
+
+                const metedataPath = '2'
+                const timeoutMs = 30000;
+                const resolution = await this.ipfs.dag.resolve(cid, {
+                    timeout: timeoutMs,
+                    path: metedataPath,
+                });
+                this.logger.log(`[${cid}] Block resolution: ${JSON.stringify(resolution)}`);
+                const blockCid = resolution.cid
+                this.logger.log(`[${cid}] Block CID: ${JSON.stringify(blockCid)}`);
+                const codec = await this.ipfs.codecs.getCodec(blockCid.code);
+                this.logger.log(`[${cid}] Codec: ${JSON.stringify(codec)}`);
+                const block = await this.ipfs.block.get(blockCid, {
+                    timeout: timeoutMs,
+                });
+                const metadata = codec.decode(block);
+                streamIds = metadata?.streamIds;
+                break;
+            } catch (error) {
+                retryTimes--;
+                this.logger.error(`[${cid}] Error: ${JSON.stringify(error)}`);
+            }
+        }
+        return streamIds;
+
     }
 
 
