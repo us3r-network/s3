@@ -46,7 +46,7 @@ export default class HistorySyncService {
 
     async startHistorySync() {
         // start history sync for each chain
-        // await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
+        await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
         await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
     }
 

@@ -28,7 +28,7 @@ async function bootstrap() {
   // Sync and subscribe to ceramic.
   if (!process.env.DISABLE_P2P_SUB){
     const ceramicSubscriberService = app.get(CeramicSubscriberService);
-    // await ceramicSubscriberService.initJobQueue();
+    await ceramicSubscriberService.initJobQueue();
 
     // Sync history data from ceramic.
     const historySyncService = app.get(HistorySyncService);
