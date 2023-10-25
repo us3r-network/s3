@@ -72,7 +72,7 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
-                const blockDelta = 10;               
+                const blockDelta = 100;               
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
