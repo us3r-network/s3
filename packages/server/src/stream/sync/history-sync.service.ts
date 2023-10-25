@@ -40,7 +40,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://gateway.ipfs.io/',
+            url: 'https://gateway.ipfs.io',
         });
     }
 
@@ -72,7 +72,7 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
-                const blockDelta = 100;               
+                const blockDelta = 10;               
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
