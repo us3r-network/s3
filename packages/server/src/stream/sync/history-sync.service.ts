@@ -134,8 +134,9 @@ export default class HistorySyncService {
         });
         this.logger.log(`[${cid}] Block resolution: ${JSON.stringify(resolution)}`);
         const blockCid = resolution.cid
-
+        this.logger.log(`[${cid}] Block CID: ${JSON.stringify(blockCid)}`);
         const codec = await this.ipfs.codecs.getCodec(blockCid.code);
+        this.logger.log(`[${cid}] Codec: ${JSON.stringify(codec)}`);
         const block = this.ipfs.block.get(blockCid, {
             timeout: timeoutMs,
         });
