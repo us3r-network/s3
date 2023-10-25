@@ -40,14 +40,14 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://4everland.io',
+            url: 'https://gateway.ipfs.io',
         });
     }
 
     async startHistorySync() {
         // start history sync for each chain
-        // await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
-        await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
+        await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
+        // await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
     }
 
     async startHistorySyncForChain(chainId: string) {
