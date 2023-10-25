@@ -46,8 +46,8 @@ export default class HistorySyncService {
 
     async startHistorySync() {
         // start history sync for each chain
-        await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
-        // await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
+        // await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
+        await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
     }
 
     async startHistorySyncForChain(chainId: string) {
@@ -132,7 +132,6 @@ export default class HistorySyncService {
         let streamIds: string[] = [];
         while (retryTimes > 0) {
             try {
-
                 const metedataPath = '2'
                 const timeoutMs = 30000;
                 const resolution = await this.ipfs.dag.resolve(cid, {
@@ -152,7 +151,7 @@ export default class HistorySyncService {
                 break;
             } catch (error) {
                 retryTimes--;
-                this.logger.error(`[${cid}] Error: ${JSON.stringify(error)}`);
+                this.logger.error(`Fetching cid:[${cid}] Error: ${JSON.stringify(error)} from ipfs, retry times remain: ${retryTimes}`);
             }
         }
         return streamIds;
