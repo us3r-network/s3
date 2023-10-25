@@ -40,7 +40,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://gateway.ipfs.io',
+            url: 'https://4everland.io',
         });
     }
 
