@@ -9,6 +9,7 @@ import { StreamStoreData, createStreamStoreJob, getStreamStoreJob } from "../sub
 
 import { sleep } from "./utils";
 import { S3SeverBizDbName } from "src/common/constants";
+import { timeout } from 'rxjs';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
@@ -45,7 +46,7 @@ export default class HistorySyncService {
 
     async startHistorySync() {
         // start history sync for each chain
-        await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
+        // await this.startHistorySyncForChain(ChainIdEnum.MAINNET.toString());
         await this.startHistorySyncForChain(ChainIdEnum.GNOSIS.toString());
     }
 
@@ -70,21 +71,21 @@ export default class HistorySyncService {
                     this.logger.log(`[${chainId}] Current confirmed block number: ${confirmedBlock.number} is not greater than processed block number: ${currentBlockNumber}, skip to sync`);
                     continue;
                 }
-
+                const blockDelta = 100;               
                 try {
                     // get block log data from the provider
                     // and parse anchor proof root for ETH logs
                     const logs = await provider.getLogs({
                         address: CeramicAnchorContractAddress,
                         fromBlock: +historySyncState.getProcessedBlockNumber,
-                        toBlock: +historySyncState.getProcessedBlockNumber + 100,
+                        toBlock: +historySyncState.getProcessedBlockNumber + blockDelta,
                     });
-                    this.logger.log(`[${chainId}] Logs' length: ${logs?.length}`);
+                    this.logger.log(`[${chainId}] Logs' length: ${logs?.length}, ${JSON.stringify(logs)}`);
                     if (logs?.length > 0) {
                         // anchor proof root is a CID
                         const { getCidFromAnchorEventLog } = await _importDynamic('@ceramicnetwork/anchor-utils');
                         const anchorProofRoots = logs.map(log => getCidFromAnchorEventLog(log))
-                        this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}`);
+                        this.logger.log(`[${chainId}] Anchor proof roots' length: ${anchorProofRoots?.length}, ${JSON.stringify(anchorProofRoots)}`);
                         if (anchorProofRoots?.length > 0) {
                             // parse stream id from anchor proof roots by ipfs
                             const streamIdsFromBlockLogs: string[] = [];
@@ -113,11 +114,11 @@ export default class HistorySyncService {
                     this.logger.error(`[${chainId}] Error: ${error.message}`);
                 }
                 // update state table data
-                historySyncState.setProcessedBlockNumber = (+currentBlockNumber + 1).toString();
+                historySyncState.setProcessedBlockNumber = (+currentBlockNumber + blockDelta).toString();
                 await this.historySyncStateRepository.update({ chain_id: chainId }, historySyncState);
 
                 // sleep 10 seconds
-                await sleep(10000);
+                await sleep(1000);
             } catch (error) {
                 this.logger.error(`[${chainId}] Error: ${error.message}`);
             }
@@ -126,15 +127,17 @@ export default class HistorySyncService {
 
     async getStreamIdsFromIpfs(cid: any): Promise<any> {
         const metedataPath = '2'
+        const timeoutMs = 3000;
         const resolution = await this.ipfs.dag.resolve(cid, {
-            timeout: 30000,
+            timeout: timeoutMs,
             path: metedataPath,
         });
+        this.logger.log(`[${cid}] Block resolution: ${JSON.stringify(resolution)}`);
         const blockCid = resolution.cid
 
         const codec = await this.ipfs.codecs.getCodec(blockCid.code);
         const block = this.ipfs.block.get(blockCid, {
-            timeout: 30000,
+            timeout: timeoutMs,
         });
         const metadata = codec.decode(block)
         return metadata?.streamIds;
