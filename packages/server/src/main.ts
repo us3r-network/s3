@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Network } from './entities/stream/stream.entity';
 import CeramicSubscriberService from './stream/subscriber/ceramic.subscriber.service';
+import HistorySyncService from './stream/sync/history-sync.service';
 
 async function bootstrap() {
   // init the apm
@@ -24,11 +25,17 @@ async function bootstrap() {
 
   await app.listen(3000);
 
-  // Sub ceramic test network.
+  // Sync and subscribe to ceramic.
   if (!process.env.DISABLE_P2P_SUB){
     const ceramicSubscriberService = app.get(CeramicSubscriberService);
     await ceramicSubscriberService.initJobQueue();
 
+    // Sync history data from ceramic.
+    const historySyncService = app.get(HistorySyncService);
+    await historySyncService.init(ceramicSubscriberService.jobQueue);
+    await historySyncService.startHistorySync();
+
+    // Subsciber ceramic test network.
     await ceramicSubscriberService.subCeramic(
       Network.TESTNET,
       [
@@ -40,7 +47,7 @@ async function bootstrap() {
       '/ceramic/testnet-clay',
     );
   
-    // Sub ceramic main network.
+    // Subsciber ceramic main network.
     await ceramicSubscriberService.subCeramic(
       Network.MAINNET,
       [

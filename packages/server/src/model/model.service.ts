@@ -18,6 +18,7 @@ import { Network as DappNetwork } from 'src/entities/dapp/dapp.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
+  S3SeverBizDbName,
   S3_MAINNET_MODELS_USE_COUNT_ZSET,
   S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX,
   S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX,
@@ -58,13 +59,13 @@ export default class ModelService {
     @InjectEntityManager('mainnet')
     private mainnetCeramicEntityManager: EntityManager,
 
-    @InjectRepository(Stream, 'testnet')
+    @InjectRepository(Stream, S3SeverBizDbName)
     private readonly streamRepository: StreamRepository,
 
-    @InjectRepository(DappDomain, 's3-server-db')
+    @InjectRepository(DappDomain, S3SeverBizDbName)
     private readonly dappDomainRepository: DappDomainRepository,
 
-    @InjectRepository(Dapp, 's3-server-db')
+    @InjectRepository(Dapp, S3SeverBizDbName)
     private readonly dappRepository: DappRepository,
 
     @InjectRedis() private readonly redis: Redis,

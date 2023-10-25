@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -230,5 +231,39 @@ export class Stream extends BaseEntity {
   }
   set setLastModifiedAt(LastModifiedAt: Date) {
     this.last_modified_at = LastModifiedAt;
+  }
+}
+
+@Entity({ name: 'history_sync_state' })
+export class HistorySyncState extends BaseEntity {
+
+  @PrimaryColumn()
+  chain_id: string;
+
+  @Column({ nullable: true })
+  processed_block_hash: string;
+
+  @Column({ nullable: false })
+  processed_block_number: string;
+
+  get getChainId(): string {
+    return this.chain_id;
+  }
+  set setChainId(chainId: string) {
+    this.chain_id = chainId;
+  }
+
+  get getProcessedBlockHash(): string {
+    return this.processed_block_hash;
+  }
+  set setProcessedBlockHash(processedBlockHash: string) {
+    this.processed_block_hash = processedBlockHash;
+  }
+
+  get getProcessedBlockNumber(): string {
+    return this.processed_block_number;
+  }
+  set setProcessedBlockNumber(processedBlockNumber: string) {
+    this.processed_block_number = processedBlockNumber;
   }
 }
