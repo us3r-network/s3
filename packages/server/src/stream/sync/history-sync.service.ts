@@ -40,7 +40,7 @@ export default class HistorySyncService {
         // init ipfs client
         const ipfsHttpClient = await _importDynamic('ipfs-http-client');
         this.ipfs = await ipfsHttpClient.create({
-            url: 'https://gateway.ipfs.io',
+            url: 'https://4everland.io',
         });
     }
 
@@ -130,7 +130,7 @@ export default class HistorySyncService {
         const timeoutMs = 3000;
         const resolution = await this.ipfs.dag.resolve(cid, {
             timeout: timeoutMs,
-            // path: metedataPath,
+            path: metedataPath,
         });
         this.logger.log(`[${cid}] Block resolution: ${JSON.stringify(resolution)}`);
         const blockCid = resolution.cid
