@@ -6,16 +6,17 @@ import StreamService from 'src/stream/stream.service';
 import { ILike } from 'typeorm';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 import ModelService from 'src/model/model.service';
+import { S3SeverBizDbName } from 'src/common/constants';
 @Injectable()
 export default class DappService {
   private readonly logger = new Logger(DappService.name);
 
   constructor(
-    @InjectRepository(Dapp, 's3-server-db')
+    @InjectRepository(Dapp, S3SeverBizDbName)
     private readonly dappRepository: DappRepository,
-    @InjectRepository(DappComposite, 's3-server-db')
+    @InjectRepository(DappComposite, S3SeverBizDbName)
     private readonly dappCompositeRepository: DappCompositeRepository,
-    @InjectRepository(DappDomain, 's3-server-db')
+    @InjectRepository(DappDomain, S3SeverBizDbName)
     private readonly dappDomainRepository: DappDomainRepository,
     private readonly streamService: StreamService,
     private readonly modelService: ModelService,

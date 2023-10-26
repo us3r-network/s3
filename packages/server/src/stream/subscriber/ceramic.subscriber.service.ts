@@ -4,15 +4,17 @@ import { Network, Stream } from '../../entities/stream/stream.entity';
 import { StreamRepository } from '../../entities/stream/stream.repository';
 import { IJobQueue, Job, JobQueue } from './job-queue';
 import StoreWorker, { getStreamStoreJob, StreamStoreData, createStreamStoreJob } from './store.worker';
+import { S3SeverBizDbName } from 'src/common/constants';
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 @Injectable()
 export default class CeramicSubscriberService {
   private readonly logger = new Logger(CeramicSubscriberService.name);
-  private readonly jobQueue!: IJobQueue<StreamStoreData>
+  public jobQueue!: IJobQueue<StreamStoreData>
+  private p2pNode: any;
 
   constructor(
-    @InjectRepository(Stream, 'testnet')
+    @InjectRepository(Stream, S3SeverBizDbName)
     private readonly streamRepository: StreamRepository,
   ) {
     this.jobQueue = new JobQueue(process.env.PG_BOSS_DATABASE_URL);
@@ -38,10 +40,10 @@ export default class CeramicSubscriberService {
     bootstrapMultiaddrs: string[],
     listen: string[],
     topic: string) {
-    const node = await this.createP2PNode(bootstrapMultiaddrs, listen);
-    node.pubsub.subscribe(topic);
+    this.p2pNode = await this.createP2PNode(bootstrapMultiaddrs, listen);
+    this.p2pNode.pubsub.subscribe(topic);
 
-    node.pubsub.addEventListener('message', async (message) => {
+    this.p2pNode.pubsub.addEventListener('message', async (message) => {
       try {
         const textDecoder = new TextDecoder('utf-8');
         const asString = textDecoder.decode(message.detail.data);

@@ -7,3 +7,5 @@ export const S3_MODEL_GRAPHQL_RUNTIMEDEFINITION_CACHE_PREFIX =
   's3:model:graphql:runtimeDefinition:cache:';
 export const S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX =
   's3:model:graphql:graphqlSchema:cache:';
+
+export const S3SeverBizDbName = 's3-server-db';
