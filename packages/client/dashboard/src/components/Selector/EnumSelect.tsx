@@ -10,6 +10,7 @@ import {
 import styled from 'styled-components'
 import SelectorIcon from './SelectorIcon'
 import { useMemo, useState } from 'react'
+import { CeramicNetwork } from '../../types'
 
 export enum Stage {
   DEVELOPMENT = 'Under development',
@@ -44,7 +45,7 @@ export enum GraphqlGenTypeServer {
 }
 
 export default function EnumSelector<
-  T extends Stage | Network | AppType | GraphqlGenType
+  T extends Stage | Network | CeramicNetwork | AppType | GraphqlGenType
 >({
   value,
   setValue,
