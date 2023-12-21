@@ -2,9 +2,9 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-15 10:50:39
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-19 17:40:39
+ * @LastEditTime: 2023-12-21 16:51:47
  * @FilePath: /s3/packages/client/dashboard/src/container/DappNode.tsx
- * @Description: 
+ * @Description:
  */
 
 import styled from 'styled-components'
@@ -176,29 +176,29 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
         {node.status === CeramicStatus.PREPARING ? (
           <div className='prepareing-info'>
             <img src='/loading.gif' alt='' />
-            Preparing your deployment...
+            Preparing your deployment... (It may take a few minutes)
           </div>
         ) : node.status === CeramicStatus.RUNNING ? (
           <div className='node-infos'>
             <div className='node-info'>
               <div className='node-info-key'>Node URL: </div>
-              {node.serviceUrl}
+              <div className='node-info-value'>{node.serviceUrl}</div>
               <CopyTint data={node.serviceUrl} />
             </div>
             <div className='node-info'>
               <div className='node-info-key'>Private Key: </div>
-              {node.privateKey}
+              <div className='node-info-value'>{node.privateKey}</div>
               <CopyTint data={node.privateKey} />
             </div>
             <div className='node-info'>
               <div className='node-info-key'>API Key: </div>
-              {node.apiKey}
+              <div className='node-info-value'>{node.apiKey}</div>
               <CopyTint data={node.apiKey} />
             </div>
           </div>
         ) : null}
       </NodeInfoBox>
-      {node?.id && node.status===CeramicStatus.RUNNING && session?.did && (
+      {node?.id && node.status === CeramicStatus.RUNNING && session?.did && (
         <NodeTermnalBox>
           <NodeTerminal ceramicId={node.id} didSession={session.serialize()} />
         </NodeTermnalBox>
@@ -370,13 +370,25 @@ const NodeInfoBox = styled.div`
   .node-infos {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     .node-info {
+      width: 100%;
       display: flex;
       flex-direction: row;
       gap: 10px;
       .node-info-key {
+        flex-shrink: 0;
+        text-align: right;
+        width: 90px;
         color: #718094;
+      }
+      .node-info-value {
+        flex-shrink: 1;
+        max-width: 840px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
