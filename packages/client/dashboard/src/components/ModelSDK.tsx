@@ -13,7 +13,7 @@ import useSelectedDapp from '../hooks/useSelectedDapp'
 import { sdkTemplate } from './sdkTemplate'
 
 import { GraphqlGenType, Network } from './Selector/EnumSelect'
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'react-aria-components'
+import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import FileSaver from 'file-saver'
 
 export default function ModelSDK({
@@ -142,22 +142,17 @@ export const definition = ${JSON.stringify(
                     className={'code-tabs'}
                     aria-label="Dynamic tabs"
                     items={codes}
-                    onSelectionChange={(key) => {
-                      // setSelectKey(key.toString())
-                    }}
                   >
-                    {(item) => <Tab className={'code-tab'}>{item.title}</Tab>}
+                    {(item) => <Tab id={String(item.id)} className={'code-tab'}>{item.title}</Tab>}
                   </TabList>
 
                   <button onClick={downloadCurr}>Download</button>
                 </TabBox>
-                <TabPanels items={codes}>
-                  {(item) => (
-                    <TabPanel>
-                      <Code name={item.title} content={item.content} />
-                    </TabPanel>
-                  )}
-                </TabPanels>
+                {codes.map((item) => (
+                  <TabPanel id={String(item.id)} key={item.id} >
+                    <Code name={item.title} content={item.content} />
+                  </TabPanel>
+                ))}
               </TabsStyle>
             </SDKBox>
           )}

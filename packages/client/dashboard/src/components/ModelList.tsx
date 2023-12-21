@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components'
-import { MenuTrigger, Menu, Item } from 'react-aria-components'
+import { MenuTrigger, Menu, MenuItem } from 'react-aria-components'
 
 import { Modal, ModalOverlay } from 'react-aria-components'
 
@@ -195,9 +195,9 @@ export default function ModelList({
                   }
                 }}
               >
-                <Item id="explore">Explore Models</Item>
-                <Item id="favorite">Add From Favorite</Item>
-                <Item id="create">Create New Model</Item>
+                <MenuItem id="explore">Explore Models</MenuItem>
+                <MenuItem id="favorite">Add From Favorite</MenuItem>
+                <MenuItem id="create">Create New Model</MenuItem>
               </Menu>
             </Popover>
           </MenuTrigger>
