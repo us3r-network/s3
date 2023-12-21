@@ -1,6 +1,6 @@
 import {
   Button,
-  Item,
+  ListBoxItem,
   Label,
   ListBox,
   Popover,
@@ -86,7 +86,7 @@ export default function EnumSelector<
       </ButtonStyled>
       <PopoverStyled width={width}>
         <ListBox items={options}>
-          {(item) => <ItemStyled id={item.id}>{item.name}</ItemStyled>}
+          {(item) => <ListBoxItemStyled id={item.id}>{item.name}</ListBoxItemStyled>}
         </ListBox>
       </PopoverStyled>
     </SelectStyled>
@@ -167,7 +167,7 @@ const PopoverStyled = styled(Popover)<{ width: number }>`
   }
 `
 
-const ItemStyled = styled(Item)`
+const ListBoxItemStyled = styled(ListBoxItem)`
   margin: 0px;
   padding: 15px 20px;
   border-radius: 6px;
