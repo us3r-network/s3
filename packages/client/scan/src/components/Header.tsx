@@ -29,17 +29,6 @@ export default function Header() {
     return !show
   }, [location])
 
-  // const params = useParams()
-  // const session = useSession()
-  // const showLogoutButton = useMemo(() => {
-  //   return (
-  //     location.pathname.startsWith('/streams/profile') &&
-  //     session &&
-  //     session.id &&
-  //     session.id === params?.did
-  //   )
-  // }, [location, session, params?.did])
-
   if (isMobile) {
     return null
   }
@@ -60,7 +49,6 @@ export default function Header() {
           />
         )) || <div></div>}
         <NetworkSwitch />
-        {/* {showLogoutButton && <LogoutButton />} */}
       </div>
     </Box>
   )
