@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import {
   Button,
-  Item,
+  ListBoxItem,
   Label,
   ListBox,
   Popover,
@@ -55,8 +55,8 @@ export default function SearchFilter() {
           </Button>
           <Popover className={'home-popover'}>
             <ListBox>
-              <Item id={'model'}>Model</Item>
-              <Item id={'stream'}>Stream</Item>
+              <ListBoxItem id={'model'}>Model</ListBoxItem>
+              <ListBoxItem id={'stream'}>Stream</ListBoxItem>
             </ListBox>
           </Popover>
         </Select>
