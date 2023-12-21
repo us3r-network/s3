@@ -2,7 +2,7 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-18 13:28:56
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-19 17:23:53
+ * @LastEditTime: 2023-12-21 16:24:13
  * @FilePath: /s3/packages/client/dashboard/src/components/Terminal.tsx
  * @Description:
  */
@@ -126,12 +126,15 @@ export default function NodeTerminal ({
           // terminal.write(
           //   `${ANSI_COLOR.red}${data.message}${ANSI_COLOR.reset}\r\n`
           // )
+          terminal.write(
+            `...`
+          )
           setTimeout(() => {
             socket.emit('events', {
               ceramicId: ceramicId,
               didSession: didSession
             })
-          }, 3000)
+          }, 1000)
         }
       })
     }
