@@ -1,4 +1,4 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
+import { Tabs, TabList, Tab, TabPanel } from 'react-aria-components'
 import Definition from './Definition'
 import PlaygroundGraphiQL from './Playground'
 import { Network } from './Selector/EnumSelect'
@@ -25,17 +25,15 @@ export default function ExploreModelTabs({
           <button>addToFavorite</button>
         </div>
       </ModelModalBox>
-      <TabPanels>
-        <TabPanel id="Definition">
-          <Definition streamId={modelId} />
-        </TabPanel>
-        <TabPanel id="Instance">
-          <ExploreInstance streamId={modelId} />
-        </TabPanel>
-        <TabPanel id="Playground">
-          <PlaygroundGraphiQL streamId={modelId} />
-        </TabPanel>
-      </TabPanels>
+      <TabPanel id="Definition">
+        <Definition streamId={modelId} />
+      </TabPanel>
+      <TabPanel id="Instance">
+        <ExploreInstance streamId={modelId} />
+      </TabPanel>
+      <TabPanel id="Playground">
+        <PlaygroundGraphiQL streamId={modelId} />
+      </TabPanel>
     </Tabs>
   )
 }

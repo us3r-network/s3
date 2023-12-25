@@ -159,7 +159,7 @@ export default function PlaygroundGraphiQL(
           selectedDapp?.network === Network.MAINNET
             ? CERAMIC_MAINNET_HOST
             : CERAMIC_TESTNET_HOST,
-        definition: definition as RuntimeCompositeDefinition,
+        definition: definition as unknown as RuntimeCompositeDefinition,
       }),
     [definition, selectedDapp?.network]
   )
