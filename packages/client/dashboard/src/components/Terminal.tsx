@@ -2,7 +2,7 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-18 13:28:56
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-21 16:24:13
+ * @LastEditTime: 2023-12-25 16:50:57
  * @FilePath: /s3/packages/client/dashboard/src/components/Terminal.tsx
  * @Description:
  */
@@ -32,7 +32,8 @@ const WELCOME_TEXT = [
 ]
 const REGS = {
   time: '((?:2|1)\\d{3}(?:-|/)(?:(?:0[1-9])|(?:1[0-2]))(?:-|/)(?:(?:0[1-9])|(?:[1-2][0-9])|(?:3[0-1]))(?:T|\\s)(?:(?:[0-1][0-9])|(?:2[0-3])):(?:[0-5][0-9]):(?:[0-5][0-9])[.][0-9]{3,9}[Z])',
-  importants: 'IMPORTANT:'
+  importants: 'IMPORTANT:',
+  error: 'ERROR:'
 }
 export default function NodeTerminal ({
   ceramicId,
@@ -114,6 +115,11 @@ export default function NodeTerminal ({
           log = log.replace(
             new RegExp(REGS.importants, 'g'),
             `${ANSI_COLOR.magenta}${REGS.importants}${ANSI_COLOR.reset}`
+          )
+          // importants
+          log = log.replace(
+            new RegExp(REGS.error, 'g'),
+            `${ANSI_COLOR.red}${REGS.importants}${ANSI_COLOR.reset}`
           )
           terminal.write(log + '\r\n')
         })
