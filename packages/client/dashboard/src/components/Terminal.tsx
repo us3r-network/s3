@@ -2,7 +2,7 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-18 13:28:56
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-25 16:50:57
+ * @LastEditTime: 2023-12-25 16:52:23
  * @FilePath: /s3/packages/client/dashboard/src/components/Terminal.tsx
  * @Description:
  */
@@ -81,9 +81,9 @@ export default function NodeTerminal ({
     // console.log('init socket', ceramicId, didSession)
     if (!ceramicId || !didSession) return
     if (!socket.hasListeners('connect')) {
-      console.log('init socket listeners...')
+      // console.log('init socket listeners...')
       socket.on('connect', function () {
-        console.log('connected', socket.id)
+        // console.log('connected', socket.id)
         // input
         //   terminal.onData(data => {
         //     console.log('terminal onData', data)
@@ -102,7 +102,7 @@ export default function NodeTerminal ({
     }
     if (!socket.hasListeners('events')) {
       socket.on('events', function (data) {
-        console.log('events', socket.id)
+        // console.log('events', socket.id)
         const logs = data.log.split('\n')
         logs.forEach((log: string) => {
           if (log === '') return
@@ -119,7 +119,7 @@ export default function NodeTerminal ({
           // importants
           log = log.replace(
             new RegExp(REGS.error, 'g'),
-            `${ANSI_COLOR.red}${REGS.importants}${ANSI_COLOR.reset}`
+            `${ANSI_COLOR.red}${REGS.error}${ANSI_COLOR.reset}`
           )
           terminal.write(log + '\r\n')
         })
@@ -127,7 +127,7 @@ export default function NodeTerminal ({
     }
     if (!socket.hasListeners('exception')) {
       socket.on('exception', function (data) {
-        console.log('exception', socket.id, data)
+        // console.log('exception', socket.id, data)
         if (data.code === 1) {
           // terminal.write(
           //   `${ANSI_COLOR.red}${data.message}${ANSI_COLOR.reset}\r\n`
