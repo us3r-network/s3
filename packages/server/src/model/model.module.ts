@@ -11,6 +11,7 @@ import { ModelController } from './model.controller';
 import { StreamModule } from '../stream/stream.module';
 import { Stream } from 'src/entities/stream/stream.entity';
 import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
+import { S3SeverBizDbName } from 'src/common/constants';
 
 @Module({
   imports: [
@@ -22,8 +23,7 @@ import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
       [MetaModelMainnet, CeramicModelMainNet],
       'mainnet',
     ),
-    TypeOrmModule.forFeature([Stream], 'testnet'),
-    TypeOrmModule.forFeature([Dapp, DappDomain], 's3-server-db'),
+    TypeOrmModule.forFeature([Stream, Dapp, DappDomain], S3SeverBizDbName),
     forwardRef(() => StreamModule),
   ],
   controllers: [ModelController],

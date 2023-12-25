@@ -7,15 +7,15 @@ import { StatsDto } from './dtos/common.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { Cron } from '@nestjs/schedule';
-import { number } from 'joi';
 import { IsNull, MoreThan, Not, In } from 'typeorm';
+import { S3SeverBizDbName } from 'src/common/constants';
 
 @Injectable()
 export default class StreamService {
   private readonly logger = new Logger(StreamService.name);
 
   constructor(
-    @InjectRepository(Stream, 'testnet')
+    @InjectRepository(Stream, S3SeverBizDbName)
     private readonly streamRepository: StreamRepository,
     private readonly modelService: ModelService,
     @InjectRedis() private readonly redis: Redis,

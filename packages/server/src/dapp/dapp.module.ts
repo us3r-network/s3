@@ -6,9 +6,10 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { UserAuthMiddleware } from 'src/middlewares/user-auth.middleware';
 import { ModelModule } from 'src/model/model.module';
 import { StreamModule } from 'src/stream/stream.module';
+import { S3SeverBizDbName } from 'src/common/constants';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Dapp, DappComposite, DappDomain], 's3-server-db'), ModelModule, StreamModule],
+  imports: [TypeOrmModule.forFeature([Dapp, DappComposite, DappDomain], S3SeverBizDbName), ModelModule, StreamModule],
   controllers: [DappController],
   providers: [DappService],
   exports: [DappService],
