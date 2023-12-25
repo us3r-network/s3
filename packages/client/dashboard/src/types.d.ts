@@ -1,3 +1,11 @@
+/*
+ * @Author: bufan bufan@hotmail.com
+ * @Date: 2023-12-15 10:06:03
+ * @LastEditors: bufan bufan@hotmail.com
+ * @LastEditTime: 2023-12-15 14:48:02
+ * @FilePath: /s3/packages/client/dashboard/src/types.d.ts
+ * @Description: 
+ */
 export type ClientDApp = {
   id?: number
   modelId?: string
@@ -82,4 +90,47 @@ export type DappComposite = {
   runtimeDefinition: string
   createdAt: number
   lastModifiedAt: number
+}
+
+export type CeramicDto = {
+  id: number;
+  name: string;
+  network: CeramicNetwork;
+  status: string;
+  privateKey: string;
+  apiKey: string;
+  namespace: string;
+  serviceHost: string;
+  serviceUrl: string;
+  serviceK8sMetadata: CeramicServiceK8sMetadata;
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type CeramicRequestDto = {
+  name: string;
+  network: CeramicNetwork;
+}
+
+export enum CeramicNetwork {
+  MAINNET = 'mainnet',
+  TESTNET = 'testnet-clay',
+  ALL = 'all',
+}
+
+export enum CeramicStatus {
+  PREPARING = 'Preparing',
+  RUNNING = 'Running',
+  // PAUSE = 'Pause',
+  // RESUMING = 'Resuming',
+  TERMINATE = 'Terminate',
+  FAILED = 'Failed',
+  ALL = 'All',
+}
+
+export type CeramicServiceK8sMetadata = {
+  // k8s namespace is created by `ns_${creater_did}_${id}`
+  keramikObjectName: string;
+  ceramicLoadbalanceHost: string;
+  ceramicLoadbalancePort: number;
 }
