@@ -7,10 +7,12 @@ import CloseIcon from './Icons/CloseIcon'
 
 import { schemas } from '../utils/composedb-types/schemas'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { createModel, updateDapp } from '../api'
-import { Network } from './Selector/EnumSelect'
+import { updateDapp } from '../api'
+// import { Network } from './Selector/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { createCompositeFromBrowser } from '../utils/creamic-composedb'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 
 export default function CreateNewModel({
   closeModal,
@@ -26,23 +28,42 @@ export default function CreateNewModel({
     code: schemas.code,
     libraries: schemas.library,
   })
-
+  
+  const {
+    ceramicNodes,
+  } = useCeramicNodeCtx()
   const submit = useCallback(async () => {
     if (submitting) return
     if (!selectedDapp) return
     if (!session?.id) return
     if (!gqlSchema.code) return
+    if (!ceramicNodes || !ceramicNodes.length) return
     try {
       setSubmitting(true)
-      const resp = await createModel(
+
+      // create model through api
+      // const resp = await createModel(
+      //   gqlSchema.code,
+      //   (selectedDapp.network as Network) || Network.TESTNET
+      // )
+      // const { composite, runtimeDefinition } = resp.data.data
+      // const newModelIDs = Object.key(composite.models)
+
+      // create model directly through the ceramic node
+      const result = await createCompositeFromBrowser(
         gqlSchema.code,
-        (selectedDapp.network as Network) || Network.TESTNET
+        ceramicNodes[0].serviceUrl+'/',
+        // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
+        // ceramicNodes[0].privateKey,
+        '',
+        session
       )
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { composite, runtimeDefinition } = resp.data.data
-      const modelsId = Object.keys(composite.models)
+      if (!result) return
+      const { composite } = result;
+      const newModelIDs = Object.values(composite.modelIDs)
       const models = selectedDapp.models || []
-      models.push(...modelsId)
+      models.push(...newModelIDs)
+      console.log("models: ", newModelIDs, models)
       await updateDapp({ ...selectedDapp, models }, session.serialize())
       await loadDapps()
       closeModal()
@@ -52,7 +73,7 @@ export default function CreateNewModel({
     } finally {
       setSubmitting(false)
     }
-  }, [closeModal, gqlSchema.code, loadDapps, selectedDapp, session, submitting])
+  }, [ceramicNodes, closeModal, gqlSchema.code, loadDapps, selectedDapp, session, submitting])
 
   return (
     <CreateBox>
