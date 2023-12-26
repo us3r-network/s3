@@ -32,6 +32,7 @@ import * as addPlugin from '@graphql-codegen/add';
 import * as typescriptValidationPlugin from 'graphql-codegen-typescript-validation-schema';
 import * as typescriptReactQueryPlugin from '@graphql-codegen/typescript-react-query';
 import * as typescriptReactApolloPlugin from '@graphql-codegen/typescript-react-apollo';
+import IUserRequest from 'src/interfaces/user-request';
 
 
 @ApiTags('/models')
@@ -253,11 +254,11 @@ export class ModelController {
 
   @Post('/indexing')
   async indexModels(
-    @Query('model') model: string,
-    @Query('network') network: Network = Network.TESTNET,
+    @Body() dto: {network: Network, models: string[], ceramicId: number},
+    @Req() req: IUserRequest,
   ): Promise<BasicMessageDto> {
-    this.logger.log(`Starting index ${network} models ${model}.`);
-    await this.modelService.indexModels([model], network);
+    this.logger.log(`Starting index ${dto.network} models ${dto.models} for ceramic ${dto.ceramicId} by ${req.did}`);
+    await this.modelService.indexModels(dto.models, dto.network, dto.ceramicId, req.did);
     return new BasicMessageDto('ok', 0);
   }
 
