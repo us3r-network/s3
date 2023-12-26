@@ -5,6 +5,7 @@ import GitHubButton from 'react-github-btn'
 import Logo from './Logo'
 import { useCeramicCtx } from '../context/CeramicCtx'
 import LoginButton from './LoginButton'
+import { S3_CONSOLE_URL } from '../constants'
 
 export default function Nav() {
   let location = useLocation()
@@ -60,7 +61,7 @@ export default function Nav() {
               </div>
             </div>
           </Link>
-          <a target='_blank' href={`https://console.s3.xyz`} rel="noreferrer">
+          <a target='_blank' href={S3_CONSOLE_URL} rel="noreferrer">
             <div className={`nav-item`}>
               <ConsoleIcon />
               <div className="tint-c">

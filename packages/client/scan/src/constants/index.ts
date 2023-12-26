@@ -46,3 +46,5 @@ export const WALLET_CONNECT_PROJECT_ID =
   'c652d0148879353d7e965d7f6f361e59'
 
 export const ADMIN_ADDRESS = process.env.REACT_APP_ADMIN_ADDRESS
+
+export const S3_CONSOLE_URL = process.env.REACT_APP_S3_CONSOLE_URL
