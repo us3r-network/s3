@@ -390,6 +390,8 @@ export class ModelController {
         true,
       );
 
+    const modelDappsMap = await this.modelService.getDappsByModels(dto.network, dto.ids);
+
     const indexedModelStreamIdSet = new Set(indexedModelStreamIds);
     models.forEach((e) => {
       const isIndexed = indexedModelStreamIdSet.has(e.getStreamId);
@@ -407,6 +409,9 @@ export class ModelController {
       e.isIndexed = isIndexed;
       e.firstRecordTime = firstRecordTime;
       e.recentlyUseCount = recentlyUseCount;
+      
+      const dapps = modelDappsMap.get(e.getStreamId);
+      e.dapps = dapps??[];
     });
 
     return new BasicMessageDto('ok', 0, models);
