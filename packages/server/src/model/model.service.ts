@@ -465,7 +465,7 @@ export default class ModelService {
     });
   }
 
-  async indexModels(models: string[], network: Network, ceramicId: number, did: string): Promise<void> {
+  async indexModels(models: string[], ceramicId?: number, did?: string, network?: Network): Promise<void> {
     try {
       // index new models
       const { CeramicClient } = await importDynamic(

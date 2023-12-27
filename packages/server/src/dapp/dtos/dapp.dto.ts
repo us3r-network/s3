@@ -61,6 +61,8 @@ export class DappDto {
   schemas: string[];
   @ApiProperty()
   modelDetails: any[];
+  @ApiProperty()
+  ceramicId?: number;
   // TODO Delete the property
   @ApiProperty()
   modelDetals: any[];
