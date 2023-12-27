@@ -37,7 +37,7 @@ export class DappController {
     this.logger.log(
       `Save req did ${req.did} dapp. dto: ${JSON.stringify(dto)}`,
     );
-    if (dto.models?.length > 0) {
+    if (dto.ceramicId && dto.models?.length > 0) {
       await this.modelService.indexModels(dto.models, dto.ceramicId, req.did);
     }
     const dapp = convertToDapp(dto, req.did);
