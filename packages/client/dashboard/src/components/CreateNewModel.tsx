@@ -52,8 +52,8 @@ export default function CreateNewModel ({
         gqlSchema.code,
         ceramicNodes[0].serviceUrl + '/',
         // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
-        // ceramicNodes[0].privateKey,
-        '',
+        ceramicNodes[0].privateKey,
+        // '',
         session
       )
       if (!result) return
