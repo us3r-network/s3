@@ -14,24 +14,22 @@ import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { createCompositeFromBrowser } from '../utils/creamic-composedb'
 import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 
-export default function CreateNewModel({
-  closeModal,
+export default function CreateNewModel ({
+  closeModal
 }: {
   closeModal: () => void
 }) {
   const { selectedDapp } = useSelectedDapp()
+  const { ceramicNodes } = useCeramicNodeCtx()
   const { loadDapps } = useAppCtx()
   const session = useSession()
   const [submitting, setSubmitting] = useState(false)
 
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
-    libraries: schemas.library,
+    libraries: schemas.library
   })
   
-  const {
-    ceramicNodes,
-  } = useCeramicNodeCtx()
   const submit = useCallback(async () => {
     if (submitting) return
     if (!selectedDapp) return
@@ -52,19 +50,23 @@ export default function CreateNewModel({
       // create model directly through the ceramic node
       const result = await createCompositeFromBrowser(
         gqlSchema.code,
-        ceramicNodes[0].serviceUrl+'/',
+        ceramicNodes[0].serviceUrl + '/',
         // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
         // ceramicNodes[0].privateKey,
         '',
         session
       )
       if (!result) return
-      const { composite } = result;
+      const { composite } = result
       const newModelIDs = Object.values(composite.modelIDs)
       const models = selectedDapp.models || []
       models.push(...newModelIDs)
-      console.log("models: ", newModelIDs, models)
-      await updateDapp({ ...selectedDapp, models }, session.serialize())
+      // console.log("models: ", newModelIDs, models)
+      await updateDapp(
+        { ...selectedDapp, models },
+        session.serialize(),
+        ceramicNodes[0].id
+      )
       await loadDapps()
       closeModal()
     } catch (error) {
@@ -73,11 +75,19 @@ export default function CreateNewModel({
     } finally {
       setSubmitting(false)
     }
-  }, [ceramicNodes, closeModal, gqlSchema.code, loadDapps, selectedDapp, session, submitting])
+  }, [
+    ceramicNodes,
+    closeModal,
+    gqlSchema.code,
+    loadDapps,
+    selectedDapp,
+    session,
+    submitting
+  ])
 
   return (
     <CreateBox>
-      <div className="title">
+      <div className='title'>
         <h1>Create Model</h1>
         <button onClick={closeModal}>
           <CloseIcon />
@@ -85,24 +95,24 @@ export default function CreateNewModel({
       </div>
       <EditorBox>
         <GraphQLEditor
-          setSchema={(props) => {
+          setSchema={props => {
             setGqlSchema(props)
           }}
           schema={gqlSchema}
           sidebarExpanded={false}
           routeState={{
-            code: 'on',
+            code: 'on'
           }}
         />
       </EditorBox>
-      <div className="btns">
+      <div className='btns'>
         <button onClick={closeModal}>Cancel</button>
         {(submitting && (
-          <button className="submit">
-            <img src="/loading.gif" alt="" />
+          <button className='submit'>
+            <img src='/loading.gif' alt='' />
           </button>
         )) || (
-          <button className="submit" onClick={submit}>
+          <button className='submit' onClick={submit}>
             Submit
           </button>
         )}

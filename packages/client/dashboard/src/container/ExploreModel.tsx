@@ -9,7 +9,7 @@ import {
   getModelStreamList,
   getStarModels,
   startIndexModel,
-  updateDapp,
+  updateDapp
 } from '../api'
 import { TableBox, TableContainer } from '../components/TableBox'
 import dayjs from 'dayjs'
@@ -24,28 +24,40 @@ import StarGoldIcon from '../components/Icons/StarGoldIcon'
 import { S3_SCAN_URL } from '../constants'
 import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
 import PlusCircleIcon from '../components/Icons/PlusCircleIcon'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Modal,
+  ModalOverlay
+} from 'react-aria-components'
+import NoCeramicNodeModal from '../components/NoCeramicNodeModal'
 
-export default function ExploreModel() {
+export default function ExploreModel () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useSearchParams()
   const { s3ModelCollection, selectedDapp } = useSelectedDapp()
+  const { ceramicNodes } = useCeramicNodeCtx()
   const session = useSession()
   const [models, setModels] = useState<Array<ModelStream>>([])
   const [starModels, setStarModels] = useState<Array<ModelStream>>([])
   const [hasMore, setHasMore] = useState(true)
   const searchText = useRef('')
   const pageNum = useRef(1)
-
   const [personalCollections, setPersonalCollections] = useState<
     PersonalCollection[]
   >([])
-
+  const ceramicNodeId = useMemo(() => {
+    if (!ceramicNodes || !ceramicNodes.length) return NaN
+    return ceramicNodes[0].id
+  }, [ceramicNodes])
   const fetchPersonalCollections = useCallback(async () => {
     if (!session) return
     s3ModelCollection.authComposeClient(session)
     try {
       const personal = await s3ModelCollection.queryPersonalCollections({
-        first: 500,
+        first: 500
       })
       if (personal.errors) throw new Error(personal.errors[0].message)
       const collected = personal.data?.viewer.modelCollectionList
@@ -53,12 +65,12 @@ export default function ExploreModel() {
       if (collected) {
         setPersonalCollections(
           collected?.edges
-            .filter((item) => item.node && item.node.revoke === false)
-            .map((item) => {
+            .filter(item => item.node && item.node.revoke === false)
+            .map(item => {
               return {
                 modelId: item.node.modelID,
                 id: item.node.id!,
-                revoke: !!item.node.revoke,
+                revoke: !!item.node.revoke
               }
             })
         )
@@ -70,8 +82,8 @@ export default function ExploreModel() {
 
   const fetchStarModels = useCallback(async () => {
     const ids = personalCollections
-      .filter((item) => item.revoke === false)
-      .map((item) => {
+      .filter(item => item.revoke === false)
+      .map(item => {
         return item.modelId
       })
     if (ids.length === 0) {
@@ -82,7 +94,7 @@ export default function ExploreModel() {
     try {
       const resp = await getStarModels({
         network: (selectedDapp?.network as Network) || Network.TESTNET,
-        ids,
+        ids
       })
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
@@ -100,7 +112,7 @@ export default function ExploreModel() {
     setHasMore(true)
     const resp = await getModelStreamList({
       name: searchText.current,
-      network: (selectedDapp?.network as Network) || Network.TESTNET,
+      network: (selectedDapp?.network as Network) || Network.TESTNET
     })
     const list = resp.data.data
     setModels(list)
@@ -111,7 +123,7 @@ export default function ExploreModel() {
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
-        pageNumber,
+        pageNumber
       })
       const list = resp.data.data
       setHasMore(list.length >= PageSize)
@@ -126,7 +138,7 @@ export default function ExploreModel() {
   }, [fetchModel, fetchPersonalCollections])
 
   useEffect(() => {
-    fetchStarModels().catch((err) => {
+    fetchStarModels().catch(err => {
       setStarModels([])
       console.error(err)
     })
@@ -144,12 +156,12 @@ export default function ExploreModel() {
   return (
     <ExploreModelContainer>
       <div className={'title-box'}>
-        <div className="title">ComposeDB Models</div>
+        <div className='title'>ComposeDB Models</div>
 
-        <div className="tools">
+        <div className='tools'>
           <Search
             text={searchText.current}
-            searchAction={(text) => {
+            searchAction={text => {
               searchText.current = text
               setModels([])
               fetchModel()
@@ -185,7 +197,7 @@ export default function ExploreModel() {
             <tbody>
               {lists.map((item, idx) => {
                 const hasStarItem = personalCollections.find(
-                  (starItem) => starItem.modelId === item.stream_id
+                  starItem => starItem.modelId === item.stream_id
                 )
                 return (
                   <tr key={item.stream_id + idx}>
@@ -195,14 +207,14 @@ export default function ExploreModel() {
                           href={`${S3_SCAN_URL}/models/modelview/${
                             item.stream_id
                           }?network=${selectedDapp?.network.toUpperCase()}`}
-                          target="_blank"
-                          rel="noreferrer"
+                          target='_blank'
+                          rel='noreferrer'
                         >
                           {item.stream_content.name}
                         </a>
                       </div>
                     </td>
-                    <td className="description">
+                    <td className='description'>
                       <div>{item.stream_content.description}</div>
                     </td>
                     <td>
@@ -211,8 +223,8 @@ export default function ExploreModel() {
                           href={`${S3_SCAN_URL}/streams/stream/${
                             item.stream_id
                           }?network=${selectedDapp?.network.toUpperCase()}`}
-                          target="_blank"
-                          rel="noreferrer"
+                          target='_blank'
+                          rel='noreferrer'
                         >
                           {shortPubKey(item.stream_id, { len: 8, split: '-' })}
                         </a>
@@ -236,8 +248,8 @@ export default function ExploreModel() {
                           href={`${S3_SCAN_URL}/models/model/${
                             item.stream_id
                           }/mids?network=${selectedDapp?.network.toUpperCase()}`}
-                          target="_blank"
-                          rel="noreferrer"
+                          target='_blank'
+                          rel='noreferrer'
                         >
                           {item.useCount}
                         </a>
@@ -260,6 +272,7 @@ export default function ExploreModel() {
                         hasIndexed={!!item.isIndexed}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
+                        ceramicNodeId={ceramicNodeId}
                       />
                     </td>
                   </tr>
@@ -274,11 +287,12 @@ export default function ExploreModel() {
   )
 }
 
-function ModelStarItem({
+function ModelStarItem ({
   hasStarItem,
   fetchPersonal,
   stream_id,
   hasIndexed,
+  ceramicNodeId
 }: {
   hasIndexed: boolean
   stream_id: string
@@ -290,6 +304,7 @@ function ModelStarItem({
       }
     | undefined
   fetchPersonal: () => void
+  ceramicNodeId?: number
 }) {
   const session = useSession()
   const { s3ModelCollection } = useSelectedDapp()
@@ -301,18 +316,23 @@ function ModelStarItem({
   const addToModelList = useCallback(
     async (modelId: string) => {
       if (!session || !selectedDapp) return
+      if (!ceramicNodeId) return
       if (!hasIndexed) {
         startIndexModel({
           modelId,
           network: selectedDapp.network as Network,
-          didSession: session.serialize(),
+          didSession: session.serialize()
         }).catch(console.error)
       }
       try {
         setAdding(true)
         const models = selectedDapp.models || []
         models.push(modelId)
-        await updateDapp({ ...selectedDapp, models }, session.serialize())
+        await updateDapp(
+          { ...selectedDapp, models },
+          session.serialize(),
+          ceramicNodeId
+        )
         await loadDapps()
       } catch (err) {
         console.error(err)
@@ -320,7 +340,7 @@ function ModelStarItem({
         setAdding(false)
       }
     },
-    [loadDapps, selectedDapp, session, setAdding, hasIndexed]
+    [loadDapps, selectedDapp, session, setAdding, hasIndexed, ceramicNodeId]
   )
 
   const starModelAction = useCallback(
@@ -332,7 +352,7 @@ function ModelStarItem({
         setStaring(true)
         if (id) {
           const resp = await s3ModelCollection.updateCollection(id, {
-            revoke: !revoke,
+            revoke: !revoke
           })
           if (resp.errors) {
             throw new Error(resp.errors[0].message)
@@ -340,7 +360,7 @@ function ModelStarItem({
         } else {
           const resp = await s3ModelCollection.createCollection({
             modelID: modelId,
-            revoke: false,
+            revoke: false
           })
           if (resp.errors) {
             throw new Error(resp.errors[0].message)
@@ -362,7 +382,7 @@ function ModelStarItem({
     <OpsBox className={''}>
       {(staring && (
         <button>
-          <img src="/loading.gif" title="loading" alt="" />
+          <img src='/loading.gif' title='loading' alt='' />
         </button>
       )) || (
         <button
@@ -384,22 +404,41 @@ function ModelStarItem({
 
       {adding ? (
         <button>
-          <img className="loading" src="/loading.gif" alt="loading" />
+          <img className='loading' src='/loading.gif' alt='loading' />
         </button>
       ) : (
         <>
           {selectedDapp?.models?.includes(modelId) ? (
-            <button>
+            <button disabled>
               <CheckCircleIcon />
             </button>
-          ) : (
+          ) : ceramicNodeId ? (
             <button
+              disabled={!ceramicNodeId}
+              title={
+                ceramicNodeId
+                  ? 'Add this model to Dapp'
+                  : 'There is no available node now, Deploy a private node first!'
+              }
               onClick={() => {
                 addToModelList(modelId)
               }}
             >
               <PlusCircleIcon />
             </button>
+          ) : (
+            <DialogTrigger>
+              <Button>
+                <PlusCircleIcon />
+              </Button>
+              <ModalOverlay>
+                <Modal>
+                  <Dialog>
+                    {({ close }) => <NoCeramicNodeModal closeModal={close} />}
+                  </Dialog>
+                </Modal>
+              </ModalOverlay>
+            </DialogTrigger>
           )}
         </>
       )}
