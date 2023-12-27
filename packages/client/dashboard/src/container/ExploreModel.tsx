@@ -39,7 +39,7 @@ export default function ExploreModel () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useSearchParams()
   const { s3ModelCollection, selectedDapp } = useSelectedDapp()
-  const { ceramicNodes } = useCeramicNodeCtx()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const session = useSession()
   const [models, setModels] = useState<Array<ModelStream>>([])
   const [starModels, setStarModels] = useState<Array<ModelStream>>([])
@@ -49,10 +49,6 @@ export default function ExploreModel () {
   const [personalCollections, setPersonalCollections] = useState<
     PersonalCollection[]
   >([])
-  const ceramicNodeId = useMemo(() => {
-    if (!ceramicNodes || !ceramicNodes.length) return NaN
-    return ceramicNodes[0].id
-  }, [ceramicNodes])
   const fetchPersonalCollections = useCallback(async () => {
     if (!session) return
     s3ModelCollection.authComposeClient(session)
@@ -277,7 +273,7 @@ export default function ExploreModel () {
                         hasIndexed={!!item.isIndexed}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
-                        ceramicNodeId={ceramicNodeId}
+                        ceramicNodeId={currCeramicNode?.id}
                       />
                     </td>
                   </tr>

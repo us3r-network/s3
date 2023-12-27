@@ -20,7 +20,7 @@ export default function CreateNewModel ({
   closeModal: () => void
 }) {
   const { selectedDapp } = useSelectedDapp()
-  const { ceramicNodes } = useCeramicNodeCtx()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const { loadDapps } = useAppCtx()
   const session = useSession()
   const [submitting, setSubmitting] = useState(false)
@@ -35,7 +35,7 @@ export default function CreateNewModel ({
     if (!selectedDapp) return
     if (!session?.id) return
     if (!gqlSchema.code) return
-    if (!ceramicNodes || !ceramicNodes.length) return
+    if (!currCeramicNode) return
     try {
       setSubmitting(true)
 
@@ -50,9 +50,9 @@ export default function CreateNewModel ({
       // create model directly through the ceramic node
       const result = await createCompositeFromBrowser(
         gqlSchema.code,
-        ceramicNodes[0].serviceUrl + '/',
+        currCeramicNode.serviceUrl + '/',
         // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
-        ceramicNodes[0].privateKey,
+        currCeramicNode.privateKey,
         // '',
         session
       )
@@ -65,7 +65,7 @@ export default function CreateNewModel ({
       await updateDapp(
         { ...selectedDapp, models },
         session.serialize(),
-        ceramicNodes[0].id
+        currCeramicNode.id
       )
       await loadDapps()
       closeModal()
@@ -76,7 +76,7 @@ export default function CreateNewModel ({
       setSubmitting(false)
     }
   }, [
-    ceramicNodes,
+    currCeramicNode,
     closeModal,
     gqlSchema.code,
     loadDapps,

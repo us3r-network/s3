@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react'
 
@@ -13,11 +14,8 @@ import { getCeramicNode, getCeramicNodes } from '../api/ceramicNode'
 export interface CeramicNodeContextData {
   loadingCeramicNodes: boolean
   ceramicNodes: CeramicDto[]
-  // currCeramicNode: CeramicDto | undefined
-  // currCeramicNodeId: number | undefined
-  // setCurrCeramicNodeId: React.Dispatch<React.SetStateAction<number>>
+  currCeramicNode: CeramicDto | undefined
   loadCeramicNodes: () => Promise<void>
-  // loadCeramicNode: (id:number) => Promise<CeramicDto | undefined>
 }
 
 const CeramicNodeContext = createContext<CeramicNodeContextData | null>(null)
@@ -27,8 +25,6 @@ export default function CeramicNodeProvider({
 }: {
   children: React.ReactNode
 }) {
-  // const [currCeramicNodeId, setCurrCeramicNodeId] = useState<number>()
-  // const [currCeramicNode, setCurrCeramicNode] = useState<CeramicDto>()
   const [ceramicNodes, setCeramicNodes] = useState<CeramicDto[]>([])
   const [loadingCeramicNodes, setLoadingCeramicNodes] = useState(false)
 
@@ -46,27 +42,7 @@ export default function CeramicNodeProvider({
     setCeramicNodes(resp.data.data)
   }, [session])
 
-  // const loadCurrNode = useCallback(async () => {
-  //   setCurrCeramicNode(undefined)
-  //   if (!currCeramicNodeId) return
-  //   const resp = await getCeramicNode(currCeramicNodeId)
-  //   setCurrCeramicNode(resp.data.data)
-  // }, [currCeramicNodeId])
-
-  // useEffect(() => {
-  //   setLoadingCeramicNode(true)
-  //   loadCurrNode()
-  //     .catch(console.error)
-  //     .finally(() => {
-  //       setLoadingCeramicNode(false)
-  //     })
-  // }, [loadCurrNode])
-
-  // const loadCeramicNode = useCallback(async (id:number) => {
-  //   if (!id) return
-  //   const resp = await getCeramicNode(id)
-  //   return resp.data.data
-  // }, [])
+  const currCeramicNode = useMemo(()=>ceramicNodes[0], [ceramicNodes])
   
   useEffect(() => {
     setLoadingCeramicNodes(true)
@@ -88,11 +64,8 @@ export default function CeramicNodeProvider({
     <CeramicNodeContext.Provider
       value={{
         ceramicNodes,
-        // currCeramicNode,
-        // currCeramicNodeId,
-        // setCurrCeramicNodeId,
+        currCeramicNode,
         loadCeramicNodes,
-        // loadCeramicNode,
         loadingCeramicNodes,
       }}
     >
