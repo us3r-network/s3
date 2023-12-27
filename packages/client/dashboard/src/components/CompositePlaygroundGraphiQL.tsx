@@ -41,6 +41,7 @@ export type YogaGraphiQLProps = Omit<
     title?: string
     additionalHeaders?: LoadFromUrlOptions['headers']
     definition: string
+    ceramicNodeURL: string | undefined
   }
 
 const initialQuery = /* GraphQL */ `
@@ -71,7 +72,7 @@ const initialQuery = /* GraphQL */ `
 export default function CompositePlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
-  const { definition } = props
+  const { definition, ceramicNodeURL } = props
   const { selectedDapp } = useSelectedDapp()
 
   const updateQuery = useCallback(async () => {
@@ -88,13 +89,13 @@ export default function CompositePlaygroundGraphiQL(
   const composeClient = useMemo(
     () =>
       new ComposeClient({
-        ceramic:
+        ceramic:  ceramicNodeURL ? ceramicNodeURL :
           selectedDapp?.network === Network.MAINNET
             ? CERAMIC_MAINNET_HOST
             : CERAMIC_TESTNET_HOST,
         definition: JSON.parse(definition) as RuntimeCompositeDefinition,
       }),
-    [definition, selectedDapp?.network]
+    [ceramicNodeURL, definition, selectedDapp?.network]
   )
   const [composeClientAuthenticated, setComposeClientAuthenticated] =
     useState(false)

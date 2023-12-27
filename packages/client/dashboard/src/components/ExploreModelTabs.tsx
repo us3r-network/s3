@@ -4,6 +4,7 @@ import PlaygroundGraphiQL from './Playground'
 import { Network } from './Selector/EnumSelect'
 import styled from 'styled-components'
 import ExploreInstance from './ExploreInstance'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 
 export default function ExploreModelTabs({
   name,
@@ -12,6 +13,7 @@ export default function ExploreModelTabs({
   name: string
   modelId: string
 }) {
+  const { currCeramicNode } = useCeramicNodeCtx()
   return (
     <Tabs>
       <ModelModalBox>
@@ -32,7 +34,8 @@ export default function ExploreModelTabs({
         <ExploreInstance streamId={modelId} />
       </TabPanel>
       <TabPanel id="Playground">
-        <PlaygroundGraphiQL streamId={modelId} />
+        <PlaygroundGraphiQL streamId={modelId} 
+          ceramicNodeURL={currCeramicNode?.serviceUrl} />
       </TabPanel>
     </Tabs>
   )
