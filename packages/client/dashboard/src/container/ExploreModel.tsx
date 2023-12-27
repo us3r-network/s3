@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { ModelStream } from '../types'
+import { ClientDApp, ModelStream } from '../types'
 import {
   PageSize,
   getModelStreamList,
@@ -33,6 +33,7 @@ import {
   ModalOverlay
 } from 'react-aria-components'
 import NoCeramicNodeModal from '../components/NoCeramicNodeModal'
+import { ImgOrName } from '../components/ImgOrName'
 
 export default function ExploreModel () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -190,6 +191,7 @@ export default function ExploreModel () {
                 <th>Usage Count</th>
                 <th>7 Days Usage</th>
                 <th>Release Date</th>
+                <th>Dapps</th>
                 <th></th>
               </tr>
             </thead>
@@ -266,6 +268,9 @@ export default function ExploreModel () {
                       </div>
                     </td>
                     <td>
+                      <Dapps dapps={item.dapps || []} />
+                    </td>
+                    <td>
                       {/* <OpsBtns modelId={item.stream_id} /> */}
                       <ModelStarItem
                         stream_id={item.stream_id}
@@ -286,6 +291,79 @@ export default function ExploreModel () {
     </ExploreModelContainer>
   )
 }
+
+function Dapps({
+  dapps,
+}: {
+  dapps: ClientDApp[]
+}) {
+  const apps = useMemo(() => {
+    const data = [...dapps]
+    if (data.length > 3)
+      return { data: data.slice(0, 3), left: data.length - 3 }
+    return { data, left: 0 }
+  }, [dapps])
+
+  return (
+    <DappBox className="cc">
+      {apps.data.length > 0
+        ? apps.data.map((item, idx) => {
+            return (
+              <a target='_blank' href={`${S3_SCAN_URL}/dapps/${item.id}?network=${item.network}`} key={item.name} rel="noreferrer">
+                <ImgOrName name={item.name} imgUrl={item.icon} />
+              </a>
+            )
+          })
+        : 'None'}
+      {apps.left > 0 && <span className="left">{apps.left}+</span>}
+    </DappBox>
+  )
+}
+
+const DappBox = styled.div`
+  display: flex;
+  gap: 5px;
+  overflow: hidden;
+  color: #fff;
+  font-family: Rubik;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  a {
+    > span {
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #718096;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      &.name {
+        font-size: 20px;
+        font-weight: 500;
+      }
+      &.left {
+        border: none;
+        color: #fff;
+        justify-content: start;
+        font-family: Rubik;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+      }
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+    }
+  }
+`
 
 function ModelStarItem ({
   hasStarItem,
