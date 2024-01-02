@@ -18,6 +18,7 @@ import { Network as DappNetwork } from 'src/entities/dapp/dapp.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
+  S3SeverBizDbName,
   S3_MAINNET_MODELS_USE_COUNT_ZSET,
   S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX,
   S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX,
@@ -58,13 +59,13 @@ export default class ModelService {
     @InjectEntityManager('mainnet')
     private mainnetCeramicEntityManager: EntityManager,
 
-    @InjectRepository(Stream, 'testnet')
+    @InjectRepository(Stream, S3SeverBizDbName)
     private readonly streamRepository: StreamRepository,
 
-    @InjectRepository(DappDomain, 's3-server-db')
+    @InjectRepository(DappDomain, S3SeverBizDbName)
     private readonly dappDomainRepository: DappDomainRepository,
 
-    @InjectRepository(Dapp, 's3-server-db')
+    @InjectRepository(Dapp, S3SeverBizDbName)
     private readonly dappRepository: DappRepository,
 
     @InjectRedis() private readonly redis: Redis,
@@ -182,7 +183,7 @@ export default class ModelService {
 
           schema.push(...graphqls);
           createModelGraphqlsMap.set(model, schema);
-          this.logger.log(`Creating ${model} ${schema} the composite...`);
+          this.logger.log(`Creating ${model} ${JSON.stringify(schema)} the composite...`);
           let composite = await Composite.create({
             ceramic: ceramic,
             schema: schema,
@@ -200,20 +201,21 @@ export default class ModelService {
           schema: dto.graphql,
         });
         this.logger.log(
-          `Creating the composite... Done! The encoded representation:${composite.toJSON()}`,
+          `Creating the composite... Done! The encoded representation:${JSON.stringify(composite.toJSON())}`,
         );
         composites.push(composite);
       }
 
       // Merge composites
       const mergedComposite = Composite.from(composites);
+      console.log(`Merged composite: ${JSON.stringify(mergedComposite.toJSON())}`);
 
       // Compile composites
       let runtimeDefinition;
       try {
         this.logger.log('Compiling the composite...');
         runtimeDefinition = mergedComposite.toRuntime();
-        this.logger.log(JSON.stringify(runtimeDefinition));
+        this.logger.log(`RuntimeDefinition: ${JSON.stringify(runtimeDefinition)}`);
         this.logger.log(`Compiling the composite... Done!`);
       } catch (e) {
         this.logger.error((e as Error).message);
@@ -259,11 +261,7 @@ export default class ModelService {
       );
       if (composite && runtimeDefinition && graphqlSchema) {
         this.logger.log(
-          `Getting ${network} model ${model} graph cache conposite ${JSON.parse(
-            composite,
-          )},  runtimeDefinition ${JSON.parse(
-            runtimeDefinition,
-          )},  graphqlSchema ${graphqlSchema}`,
+          `Getting ${network} model ${model} graph cache conposite ${composite},  runtimeDefinition ${runtimeDefinition},  graphqlSchema ${graphqlSchema}`,
         );
         return {
           composite: JSON.parse(composite),
