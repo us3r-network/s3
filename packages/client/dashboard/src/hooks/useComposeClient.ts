@@ -7,22 +7,22 @@ import useSelectedDapp from './useSelectedDapp'
 import { Network } from '../components/Selector/EnumSelect'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
 
-export function useComposeClient(definition: RuntimeCompositeDefinition) {
+export function useComposeClient(definition: RuntimeCompositeDefinition | undefined, ceramicNodeURL: string|undefined = undefined) {
   const { selectedDapp } = useSelectedDapp()
   const session = useSession()
-
+  
   const composeClient = useMemo(
     () =>
       definition
         ? new ComposeClient({
-            ceramic:
+            ceramic: ceramicNodeURL ? ceramicNodeURL :
               selectedDapp?.network === Network.MAINNET
                 ? CERAMIC_MAINNET_HOST
                 : CERAMIC_TESTNET_HOST,
             definition,
           })
         : null,
-    [definition, selectedDapp?.network]
+    [ceramicNodeURL, definition, selectedDapp?.network]
   )
   const [composeClientAuthenticated, setComposeClientAuthenticated] =
     useState(false)

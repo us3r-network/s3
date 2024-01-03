@@ -9,18 +9,12 @@ import {
   GraphiQLProps,
   GraphiQLProvider,
 } from 'graphiql'
-import { useUrlSearchParams } from 'use-url-search-params'
-
-import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
 
 import styled from 'styled-components'
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { DID } from 'dids'
-import useSelectedDapp from '../hooks/useSelectedDapp'
-import { Network } from './Selector/EnumSelect'
-import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
 import { createGraphqlDefaultQuery } from '../utils/createDefaultQuery'
+import { useComposeClient } from '../hooks/useComposeClient'
+import { useUrlSearchParams } from 'use-url-search-params'
 
 const type = {
   query: String,
@@ -73,7 +67,6 @@ export default function CompositePlaygroundGraphiQL(
   props: YogaGraphiQLProps
 ): React.ReactElement {
   const { definition, ceramicNodeURL } = props
-  const { selectedDapp } = useSelectedDapp()
 
   const updateQuery = useCallback(async () => {
     const data = JSON.parse(definition)
@@ -84,36 +77,8 @@ export default function CompositePlaygroundGraphiQL(
     setQuery(initialQuery + defaultQuery)
   }, [definition])
 
-  const session = useSession()
-
-  const composeClient = useMemo(
-    () =>
-      new ComposeClient({
-        ceramic:  ceramicNodeURL ? ceramicNodeURL :
-          selectedDapp?.network === Network.MAINNET
-            ? CERAMIC_MAINNET_HOST
-            : CERAMIC_TESTNET_HOST,
-        definition: JSON.parse(definition) as RuntimeCompositeDefinition,
-      }),
-    [ceramicNodeURL, definition, selectedDapp?.network]
-  )
-  const [composeClientAuthenticated, setComposeClientAuthenticated] =
-    useState(false)
-
-  const authComposeClients = useCallback(() => {
-    if (session) {
-      composeClient.setDID(session.did)
-      setComposeClientAuthenticated(true)
-    } else {
-      const did = new DID()
-      composeClient.setDID(did)
-      setComposeClientAuthenticated(false)
-    }
-  }, [session, composeClient, setComposeClientAuthenticated])
-
-  useEffect(() => {
-    authComposeClients()
-  }, [authComposeClients])
+  const { composeClient, composeClientAuthenticated } =
+  useComposeClient(definition as unknown as RuntimeCompositeDefinition, ceramicNodeURL)
 
   useEffect(() => {
     localStorage.setItem('graphiql:theme', 'dark')
@@ -122,10 +87,12 @@ export default function CompositePlaygroundGraphiQL(
 
   const fetcher: Fetcher = useMemo(() => {
     return function fetcher(graphQLParams: FetcherParams, opts?: FetcherOpts) {
-      return composeClient.executeQuery(
+      return composeClient ?  composeClient.executeQuery(
         graphQLParams.query,
         graphQLParams.variables
       )
+      :
+      Promise.reject('composeClient is NOT ready yet!')
     }
   }, [composeClient])
 
@@ -143,12 +110,6 @@ export default function CompositePlaygroundGraphiQL(
     onEdit: setQuery,
     showAttribution: true,
   })
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  // const isAuthenticated = useMemo(() => {
-  //   return composeClientAuthenticated && composeClient.context.isAuthenticated()
-  // }, [composeClient, composeClientAuthenticated])
-  // console.log({ isAuthenticated })
 
   return (
     <GraphiqlContainer>

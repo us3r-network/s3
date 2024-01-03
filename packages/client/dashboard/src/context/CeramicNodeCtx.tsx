@@ -4,12 +4,12 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useState
 } from 'react'
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { CeramicDto } from '../types'
-import { getCeramicNode, getCeramicNodes } from '../api/ceramicNode'
+import { getCeramicNodes } from '../api/ceramicNode'
 
 export interface CeramicNodeContextData {
   loadingCeramicNodes: boolean
@@ -20,8 +20,8 @@ export interface CeramicNodeContextData {
 
 const CeramicNodeContext = createContext<CeramicNodeContextData | null>(null)
 
-export default function CeramicNodeProvider({
-  children,
+export default function CeramicNodeProvider ({
+  children
 }: {
   children: React.ReactNode
 }) {
@@ -42,8 +42,8 @@ export default function CeramicNodeProvider({
     setCeramicNodes(resp.data.data)
   }, [session])
 
-  const currCeramicNode = useMemo(()=>ceramicNodes[0], [ceramicNodes])
-  
+  const currCeramicNode = useMemo(() => ceramicNodes[0], [ceramicNodes])
+
   useEffect(() => {
     setLoadingCeramicNodes(true)
     loadCeramicNodes()
@@ -52,7 +52,6 @@ export default function CeramicNodeProvider({
         setLoadingCeramicNodes(false)
       })
   }, [loadCeramicNodes])
-
 
   useEffect(() => {
     if (!session) {
@@ -66,7 +65,7 @@ export default function CeramicNodeProvider({
         ceramicNodes,
         currCeramicNode,
         loadCeramicNodes,
-        loadingCeramicNodes,
+        loadingCeramicNodes
       }}
     >
       {children}
@@ -74,12 +73,12 @@ export default function CeramicNodeProvider({
   )
 }
 
-export function useCeramicNodeCtx() {
+export function useCeramicNodeCtx () {
   const context = useContext(CeramicNodeContext)
   if (!context) {
     throw new Error('Missing connection context')
   }
   return {
-    ...context,
+    ...context
   }
 }
