@@ -14,6 +14,7 @@ import { ModelStream } from '../types'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import { S3_SCAN_URL } from '../constants'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 
 export default function FavoriteModal({
   closeModal,
@@ -38,6 +39,7 @@ export default function FavoriteModal({
 function ModelList() {
   const { s3ModelCollection, selectedDapp } = useSelectedDapp()
   const session = useSession()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const [starModels, setStarModels] = useState<Array<ModelStream>>([])
   const [personalCollections, setPersonalCollections] = useState<
     PersonalCollection[]
@@ -179,6 +181,7 @@ function ModelList() {
                     <OpsBtns
                       modelId={item.stream_id}
                       hasIndexed={!!item.isIndexed}
+                      ceramicNodeId={currCeramicNode?.id}
                     />
                   </td>
                 </tr>
@@ -194,9 +197,11 @@ function ModelList() {
 export function OpsBtns({
   modelId,
   hasIndexed,
+  ceramicNodeId,
 }: {
   modelId: string
   hasIndexed: boolean
+  ceramicNodeId?: number
 }) {
   const { loadDapps } = useAppCtx()
   const session = useSession()
@@ -212,11 +217,12 @@ export function OpsBtns({
           didSession: session.serialize(),
         }).catch(console.error)
       }
+      if (!ceramicNodeId) return
       try {
         setAdding(true)
         const models = selectedDapp.models || []
         models.push(modelId)
-        await updateDapp({ ...selectedDapp, models }, session.serialize())
+        await updateDapp({ ...selectedDapp, models }, session.serialize(),ceramicNodeId)
         await loadDapps()
       } catch (err) {
         console.error(err)
