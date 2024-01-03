@@ -63,7 +63,7 @@ export function createDapp(
 export function updateDapp(
   dapp: ClientDApp,
   didSession: string,
-  ceramiceId?:number,
+  ceramicId?:number,
 ): AxiosPromise<ApiResp<ClientDApp>> {
   if (!dapp.id) throw new Error('dapp id is required')
 
@@ -75,7 +75,7 @@ export function updateDapp(
     headers: {
       'did-session': didSession,
     },
-    data: { ...dapp, ceramiceId, id: Number(dapp.id) },
+    data: { ...dapp, ceramicId, id: Number(dapp.id) },
   })
 }
 
