@@ -3,32 +3,28 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useMemo,
+  useState
 } from 'react'
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { CeramicDto } from '../types'
-import { getCeramicNode, getCeramicNodes } from '../api/ceramicNode'
+import { getCeramicNodes } from '../api/ceramicNode'
 
 export interface CeramicNodeContextData {
   loadingCeramicNodes: boolean
   ceramicNodes: CeramicDto[]
-  // currCeramicNode: CeramicDto | undefined
-  // currCeramicNodeId: number | undefined
-  // setCurrCeramicNodeId: React.Dispatch<React.SetStateAction<number>>
+  currCeramicNode: CeramicDto | undefined
   loadCeramicNodes: () => Promise<void>
-  // loadCeramicNode: (id:number) => Promise<CeramicDto | undefined>
 }
 
 const CeramicNodeContext = createContext<CeramicNodeContextData | null>(null)
 
-export default function CeramicNodeProvider({
-  children,
+export default function CeramicNodeProvider ({
+  children
 }: {
   children: React.ReactNode
 }) {
-  // const [currCeramicNodeId, setCurrCeramicNodeId] = useState<number>()
-  // const [currCeramicNode, setCurrCeramicNode] = useState<CeramicDto>()
   const [ceramicNodes, setCeramicNodes] = useState<CeramicDto[]>([])
   const [loadingCeramicNodes, setLoadingCeramicNodes] = useState(false)
 
@@ -46,28 +42,8 @@ export default function CeramicNodeProvider({
     setCeramicNodes(resp.data.data)
   }, [session])
 
-  // const loadCurrNode = useCallback(async () => {
-  //   setCurrCeramicNode(undefined)
-  //   if (!currCeramicNodeId) return
-  //   const resp = await getCeramicNode(currCeramicNodeId)
-  //   setCurrCeramicNode(resp.data.data)
-  // }, [currCeramicNodeId])
+  const currCeramicNode = useMemo(() => ceramicNodes[0], [ceramicNodes])
 
-  // useEffect(() => {
-  //   setLoadingCeramicNode(true)
-  //   loadCurrNode()
-  //     .catch(console.error)
-  //     .finally(() => {
-  //       setLoadingCeramicNode(false)
-  //     })
-  // }, [loadCurrNode])
-
-  // const loadCeramicNode = useCallback(async (id:number) => {
-  //   if (!id) return
-  //   const resp = await getCeramicNode(id)
-  //   return resp.data.data
-  // }, [])
-  
   useEffect(() => {
     setLoadingCeramicNodes(true)
     loadCeramicNodes()
@@ -76,7 +52,6 @@ export default function CeramicNodeProvider({
         setLoadingCeramicNodes(false)
       })
   }, [loadCeramicNodes])
-
 
   useEffect(() => {
     if (!session) {
@@ -88,12 +63,9 @@ export default function CeramicNodeProvider({
     <CeramicNodeContext.Provider
       value={{
         ceramicNodes,
-        // currCeramicNode,
-        // currCeramicNodeId,
-        // setCurrCeramicNodeId,
+        currCeramicNode,
         loadCeramicNodes,
-        // loadCeramicNode,
-        loadingCeramicNodes,
+        loadingCeramicNodes
       }}
     >
       {children}
@@ -101,12 +73,12 @@ export default function CeramicNodeProvider({
   )
 }
 
-export function useCeramicNodeCtx() {
+export function useCeramicNodeCtx () {
   const context = useContext(CeramicNodeContext)
   if (!context) {
     throw new Error('Missing connection context')
   }
   return {
-    ...context,
+    ...context
   }
 }

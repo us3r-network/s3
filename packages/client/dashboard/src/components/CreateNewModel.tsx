@@ -7,43 +7,66 @@ import CloseIcon from './Icons/CloseIcon'
 
 import { schemas } from '../utils/composedb-types/schemas'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { createModel, updateDapp } from '../api'
-import { Network } from './Selector/EnumSelect'
+import { updateDapp } from '../api'
+// import { Network } from './Selector/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
+import { createCompositeFromBrowser } from '../utils/creamic-composedb'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 
-export default function CreateNewModel({
-  closeModal,
+export default function CreateNewModel ({
+  closeModal
 }: {
   closeModal: () => void
 }) {
   const { selectedDapp } = useSelectedDapp()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const { loadDapps } = useAppCtx()
   const session = useSession()
   const [submitting, setSubmitting] = useState(false)
 
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schemas.code,
-    libraries: schemas.library,
+    libraries: schemas.library
   })
-
+  
   const submit = useCallback(async () => {
     if (submitting) return
     if (!selectedDapp) return
     if (!session?.id) return
     if (!gqlSchema.code) return
+    if (!currCeramicNode) return
     try {
       setSubmitting(true)
-      const resp = await createModel(
+
+      // create model through api
+      // const resp = await createModel(
+      //   gqlSchema.code,
+      //   (selectedDapp.network as Network) || Network.TESTNET
+      // )
+      // const { composite, runtimeDefinition } = resp.data.data
+      // const newModelIDs = Object.key(composite.models)
+
+      // create model directly through the ceramic node
+      const result = await createCompositeFromBrowser(
         gqlSchema.code,
-        (selectedDapp.network as Network) || Network.TESTNET
+        currCeramicNode.serviceUrl + '/',
+        // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
+        currCeramicNode.privateKey,
+        // '',
+        session
       )
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { composite, runtimeDefinition } = resp.data.data
-      const modelsId = Object.keys(composite.models)
+      if (!result) return
+      const { composite } = result
+      const newModelIDs = Object.values(composite.modelIDs)
       const models = selectedDapp.models || []
-      models.push(...modelsId)
-      await updateDapp({ ...selectedDapp, models }, session.serialize())
+      models.push(...newModelIDs)
+      // console.log("models: ", newModelIDs, models)
+      await updateDapp(
+        { ...selectedDapp, models },
+        session.serialize(),
+        currCeramicNode.id
+      )
       await loadDapps()
       closeModal()
     } catch (error) {
@@ -52,11 +75,19 @@ export default function CreateNewModel({
     } finally {
       setSubmitting(false)
     }
-  }, [closeModal, gqlSchema.code, loadDapps, selectedDapp, session, submitting])
+  }, [
+    currCeramicNode,
+    closeModal,
+    gqlSchema.code,
+    loadDapps,
+    selectedDapp,
+    session,
+    submitting
+  ])
 
   return (
     <CreateBox>
-      <div className="title">
+      <div className='title'>
         <h1>Create Model</h1>
         <button onClick={closeModal}>
           <CloseIcon />
@@ -64,24 +95,24 @@ export default function CreateNewModel({
       </div>
       <EditorBox>
         <GraphQLEditor
-          setSchema={(props) => {
+          setSchema={props => {
             setGqlSchema(props)
           }}
           schema={gqlSchema}
           sidebarExpanded={false}
           routeState={{
-            code: 'on',
+            code: 'on'
           }}
         />
       </EditorBox>
-      <div className="btns">
+      <div className='btns'>
         <button onClick={closeModal}>Cancel</button>
         {(submitting && (
-          <button className="submit">
-            <img src="/loading.gif" alt="" />
+          <button className='submit'>
+            <img src='/loading.gif' alt='' />
           </button>
         )) || (
-          <button className="submit" onClick={submit}>
+          <button className='submit' onClick={submit}>
             Submit
           </button>
         )}

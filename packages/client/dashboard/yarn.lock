@@ -5484,18 +5484,18 @@
     "@typescript-eslint/types" "5.59.8"
     eslint-visitor-keys "^3.3.0"
 
-"@us3r-network/auth-with-rainbowkit@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.2.1.tgz#bce3345a54eca8499ce6a52fff2de814b27fb03b"
-  integrity sha512-7Futy5KEinrmbO5YPRAteLKaJyzU/3KkRkqsznrobcODVaa0ZVNcuQhdHvsivfPPkHKoxuvkD5LTCq4x8iySMQ==
+"@us3r-network/auth-with-rainbowkit@^0.2.4-alpha.0":
+  version "0.2.4-alpha.0"
+  resolved "https://registry.npmjs.org/@us3r-network/auth-with-rainbowkit/-/auth-with-rainbowkit-0.2.4-alpha.0.tgz#f557b57b327ee5b7d79b6897021517b741556302"
+  integrity sha512-0QFg7b0LpfWqCWGwY4vyDC99V4bJ008AeO116490RwoYIcDZbBtmBvqV/gXW9YUE4zB6JsBJdwRGFmySbaVOeQ==
   dependencies:
-    "@us3r-network/auth" "^0.2.3"
+    "@us3r-network/auth" "^0.2.4-alpha.0"
     buffer "^6.0.3"
 
-"@us3r-network/auth@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.npmjs.org/@us3r-network/auth/-/auth-0.2.3.tgz#cc2e5488be6811599409fad1a3102e0dab8944f8"
-  integrity sha512-gBMu9eEcb6r9dkdA2jZNjUSskELmEPeWqYYKwYPD2nYdJh83p4mo8DT1/09IHuvkDIEhz0dbwZEHc5jIvORo0A==
+"@us3r-network/auth@^0.2.4-alpha.0":
+  version "0.2.4-alpha.0"
+  resolved "https://registry.npmjs.org/@us3r-network/auth/-/auth-0.2.4-alpha.0.tgz#ec44ff2647a17655ffd8c7887c528aea25e7632e"
+  integrity sha512-2CU3QchrxY0GhB/hAT7Ic9f/wy9E9FseEVJIfnFG26+mHdaG6TQNTQRE+2VbZ00SUfyYdDS/pwkvhfnQtd5IQA==
   dependencies:
     "@didtools/pkh-ethereum" "^0.4.1"
     "@didtools/pkh-solana" "^0.1.1"

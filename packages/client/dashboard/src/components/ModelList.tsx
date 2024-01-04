@@ -23,13 +23,15 @@ import MergeIcon from './Icons/MergeIcon'
 import { shortPubKey } from '../utils/shortPubKey'
 import CopyTint from './CopyTint'
 import useIsOwner from '../hooks/useIsOwner'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import NoCeramicNodeModal from './NoCeramicNodeModal'
 
-export default function ModelList({
+export default function ModelList ({
   editable,
   selectComposite,
   setSelectComposite,
   selectModel,
-  setSelectModel,
+  setSelectModel
 }: {
   selectModel: ModelStream | undefined
   setSelectModel: (m: ModelStream | undefined) => void
@@ -41,6 +43,7 @@ export default function ModelList({
   const session = useSession()
   const { loadDapps, currDapp } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
+  const { ceramicNodes } = useCeramicNodeCtx()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
@@ -62,7 +65,7 @@ export default function ModelList({
     try {
       const resp = await getStarModels({
         network: dapp.network as Network,
-        ids: dapp.models || [],
+        ids: dapp.models || []
       })
 
       const list = resp.data.data
@@ -80,7 +83,7 @@ export default function ModelList({
     if (!dapp) return
     try {
       const resp = await getDappComposites({
-        dapp,
+        dapp
       })
       if (resp.data.code !== 0) throw new Error(resp.data.msg)
       setComposites(resp.data.data)
@@ -96,7 +99,7 @@ export default function ModelList({
 
       try {
         const newModels =
-          selectedDapp?.models?.filter((id) => id !== modelId) || []
+          selectedDapp?.models?.filter(id => id !== modelId) || []
 
         await updateDapp(
           { ...selectedDapp, models: newModels },
@@ -118,7 +121,7 @@ export default function ModelList({
         await deleteDappComposites({
           compositeId: id,
           didSession: session.serialize(),
-          dapp: selectedDapp,
+          dapp: selectedDapp
         })
         await loadDappComposites()
       } catch (error) {
@@ -160,8 +163,8 @@ export default function ModelList({
   if (loading) {
     return (
       <ListBox>
-        <div className="loading">
-          <img src="/loading.gif" alt="" />
+        <div className='loading'>
+          <img src='/loading.gif' alt='' />
         </div>
       </ListBox>
     )
@@ -169,39 +172,54 @@ export default function ModelList({
 
   return (
     <ListBox>
-      <div className="title">
+      <div className='title'>
         <h3>Models</h3>
         <Favorite />
         <CreateNew />
-        {editable && isOwner && (
-          <MenuTrigger>
-            <Button aria-label="Menu">
-              <PlusIcon />
-            </Button>
-            <Popover>
-              <Menu
-                onAction={(id) => {
-                  if (id === 'explore') {
-                    navigate(`/dapp/${appId}/explore`)
-                    return
-                  }
-                  if (id === 'favorite') {
-                    document.getElementById('add-from-favorite')?.click()
-                    return
-                  }
-                  if (id === 'create') {
-                    document.getElementById('create-new')?.click()
-                    return
-                  }
-                }}
-              >
-                <MenuItem id="explore">Explore Models</MenuItem>
-                <MenuItem id="favorite">Add From Favorite</MenuItem>
-                <MenuItem id="create">Create New Model</MenuItem>
-              </Menu>
-            </Popover>
-          </MenuTrigger>
-        )}
+        {editable &&
+          isOwner &&
+          (!ceramicNodes || ceramicNodes.length === 0 ? (
+            <DialogTrigger>
+              <Button>
+                <PlusIcon />
+              </Button>
+              <ModalOverlay>
+                <Modal>
+                  <Dialog>
+                    {({ close }) => <NoCeramicNodeModal closeModal={close} />}
+                  </Dialog>
+                </Modal>
+              </ModalOverlay>
+            </DialogTrigger>
+          ) : (
+            <MenuTrigger>
+              <Button aria-label='Menu'>
+                <PlusIcon />
+              </Button>
+              <Popover>
+                <Menu
+                  onAction={id => {
+                    if (id === 'explore') {
+                      navigate(`/dapp/${appId}/explore`)
+                      return
+                    }
+                    if (id === 'favorite') {
+                      document.getElementById('add-from-favorite')?.click()
+                      return
+                    }
+                    if (id === 'create') {
+                      document.getElementById('create-new')?.click()
+                      return
+                    }
+                  }}
+                >
+                  <MenuItem id='explore'>Explore Models</MenuItem>
+                  <MenuItem id='favorite'>Add From Favorite</MenuItem>
+                  <MenuItem id='create'>Create New Model</MenuItem>
+                </Menu>
+              </Popover>
+            </MenuTrigger>
+          ))}
       </div>
 
       <DappModelList
@@ -224,7 +242,7 @@ export default function ModelList({
 
       {!(isMetrics || isSdk) && (
         <>
-          <div className="title">
+          <div className='title'>
             <h3>Composites</h3>
             {editable && isOwner && (
               <CreateComposite
@@ -270,12 +288,12 @@ export default function ModelList({
   )
 }
 
-function DappCompositeList({
+function DappCompositeList ({
   composites,
   removeAction,
   editable,
   selectComposite,
-  setSelectedComposite,
+  setSelectedComposite
 }: {
   composites: DappComposite[]
   selectComposite: DappComposite | undefined
@@ -292,12 +310,12 @@ function DappCompositeList({
   }
   return (
     <DappModelsListBox>
-      {composites?.map((item) => {
+      {composites?.map(item => {
         const active = selectComposite?.id === item.id
         return (
           <div key={item.id} className={active ? 'active' : ''}>
             <div
-              className="title"
+              className='title'
               onClick={() => {
                 setSelectedComposite(item)
               }}
@@ -319,13 +337,13 @@ function DappCompositeList({
   )
 }
 
-function DappModelList({
+function DappModelList ({
   selected,
   setSelected,
   dappModels,
   selectAction,
   removeModelAction,
-  editable,
+  editable
 }: {
   selected?: ModelStream
   setSelected: (ms: ModelStream) => void
@@ -343,12 +361,12 @@ function DappModelList({
   }
   return (
     <DappModelsListBox>
-      {dappModels?.map((item) => {
+      {dappModels?.map(item => {
         const active = selected?.stream_id === item.stream_id
         return (
           <div key={item.stream_id} className={active ? 'active' : ''}>
             <div
-              className="title"
+              className='title'
               onClick={() => {
                 selectAction(item)
                 setSelected(item)
@@ -365,7 +383,7 @@ function DappModelList({
             {active && (
               <>
                 <hr />
-                <div className="id-copy">
+                <div className='id-copy'>
                   <p>ID: {shortPubKey(selected.stream_id, { len: 7 })}</p>
                   <div>
                     <CopyTint data={selected.stream_id} />
@@ -384,9 +402,9 @@ function DappModelList({
   )
 }
 
-function ModelListItemTrash({
+function ModelListItemTrash ({
   streamId,
-  removeModelAction,
+  removeModelAction
 }: {
   streamId: string
   removeModelAction: (modelId: string) => Promise<void>
@@ -394,14 +412,14 @@ function ModelListItemTrash({
   const [removing, setRemoving] = useState(false)
   if (removing) {
     return (
-      <div className="removing">
-        <img src="/loading.gif" title="loading" alt="" />{' '}
+      <div className='removing'>
+        <img src='/loading.gif' title='loading' alt='' />{' '}
       </div>
     )
   }
   return (
     <button
-      onClick={async (e) => {
+      onClick={async e => {
         e.stopPropagation()
         setRemoving(true)
         await removeModelAction(streamId)
@@ -413,14 +431,14 @@ function ModelListItemTrash({
   )
 }
 
-function Favorite() {
+function Favorite () {
   return (
     <DialogTrigger>
       <Button
         style={{
-          display: 'none',
+          display: 'none'
         }}
-        id="add-from-favorite"
+        id='add-from-favorite'
       >
         Add From Favorite
       </Button>
@@ -433,7 +451,7 @@ function Favorite() {
   )
 }
 
-function CreateNew() {
+function CreateNew () {
   const [searchParams] = useSearchParams()
   useEffect(() => {
     if (searchParams.get('create-new') === 'true') {
@@ -444,9 +462,9 @@ function CreateNew() {
     <DialogTrigger>
       <Button
         style={{
-          display: 'none',
+          display: 'none'
         }}
-        id="create-new"
+        id='create-new'
       >
         Create New
       </Button>
@@ -461,9 +479,9 @@ function CreateNew() {
   )
 }
 
-function CreateComposite({
+function CreateComposite ({
   loadDappComposites,
-  dappModels,
+  dappModels
 }: {
   loadDappComposites: () => Promise<void>
   dappModels: ModelStream[]

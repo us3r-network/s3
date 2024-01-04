@@ -2,7 +2,7 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-15 10:06:03
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-15 14:48:02
+ * @LastEditTime: 2023-12-27 16:19:42
  * @FilePath: /s3/packages/client/dashboard/src/types.d.ts
  * @Description: 
  */
@@ -59,6 +59,7 @@ export type ModelStream = {
   recentlyUseCount?: number
   firstRecordTime?: string
   isIndexed?: boolean
+  dapps?: ClientDApp[]
 }
 
 export type ModeCreateResult = {

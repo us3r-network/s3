@@ -65,6 +65,7 @@ export default function App () {
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
       appName='S3 Console'
+      authOpts={{resources:["ceramic://*","ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d"],expirationTime:''}}
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider>

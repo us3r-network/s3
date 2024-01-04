@@ -2,7 +2,7 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-15 10:50:39
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-21 16:51:47
+ * @LastEditTime: 2023-12-25 16:54:15
  * @FilePath: /s3/packages/client/dashboard/src/container/DappNode.tsx
  * @Description:
  */
@@ -35,7 +35,7 @@ export default function CeramicNodes () {
     undefined
   )
   useEffect(() => {
-    console.log('ceramicNodes changes: ', ceramicNodes)
+    // console.log('ceramicNodes changes: ', ceramicNodes)
     if (ceramicNodes.length > 0) {
       if (ceramicNodes[0].status === CeramicStatus.PREPARING) {
         setTimeout(() => {

@@ -2,18 +2,13 @@
  * @Author: bufan bufan@hotmail.com
  * @Date: 2023-12-15 10:06:03
  * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-19 17:07:22
+ * @LastEditTime: 2023-12-22 10:59:18
  * @FilePath: /s3/packages/client/dashboard/src/constants/index.ts
  * @Description: 
  */
 export const APP_API_URL = process.env.REACT_APP_API_BASE_URL
 
 export const UPLOAD_API_URL = process.env.REACT_APP_UPLOAD_API_URL
-
-export const CERAMIC_NODE =
-  process.env.REACT_APP_CERAMIC_NODE || 'https://ceramic.s3.xyz/'
-export const CERAMIC_NODE_ADMIN_PRIVATE_KEY =
-  process.env.REACT_APP_CERAMIC_NODE_ADMIN_PRIVATE_KEY
 
 export const CERAMIC_MAINNET_HOST = process.env
   .REACT_APP_CERAMIC_MAINNET_HOST as string

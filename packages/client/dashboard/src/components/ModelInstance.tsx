@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 // import ModelStreamList from '../../components/ModelStreamList'
 import { AxiosError } from 'axios'
 import { Network } from './Selector/EnumSelect'
-import { ModelMid, ModelStream } from '../types'
-import { getModelMid, PageSize, queryModelGraphql } from '../api'
+import { ModelStream } from '../types'
+import { queryModelGraphql } from '../api'
 import ModelStreamList from './ModelStreamList'
 import { Button } from 'react-aria-components'
 import PlusIcon from './Icons/PlusIcon'
@@ -14,68 +14,23 @@ import ModelInstanceFormModal from './ModelInstanceFormModal'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useComposeClient } from '../hooks/useComposeClient'
 import { toast } from 'react-toastify'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import { lowerFirst } from 'lodash'
+import { Stream } from '@ceramicnetwork/common'
 
-export default function Instance({
+export default function Instance ({
   streamId,
   network,
   schema,
-  name,
+  name
 }: {
   streamId: string
   network: Network
   schema: ModelStream['stream_content']['schema']
   name: string
 }) {
-  const pageNum = useRef(1)
-  // const { network } = useCeramicCtx()
-  const [hasMore, setHasMore] = useState(true)
-  const [streams, setStreams] = useState<Array<ModelMid>>([])
-  const [loading, setLoading] = useState(false)
-  const [errMsg, setErrMsg] = useState('')
-
-  const fetchMoreStreams = useCallback(
-    async (pageNumber: number) => {
-      if (!streamId) return
-      const resp = await getModelMid({
-        network,
-        modelId: streamId,
-        pageNumber,
-      })
-      const list = resp.data.data
-      setHasMore(list.length >= PageSize)
-      setStreams([...streams, ...list])
-    },
-    [streams, streamId, network]
-  )
-  const fetchModelMid = useCallback(async () => {
-    if (!streamId) return
-    try {
-      setLoading(true)
-      setErrMsg('')
-      const resp = await getModelMid({ network, modelId: streamId })
-      const list = resp.data.data
-      setHasMore(list.length >= PageSize)
-      setStreams(list)
-    } catch (error) {
-      const err = error as AxiosError
-      setErrMsg((err.response?.data as any).message || err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [streamId, network])
-
-  useEffect(() => {
-    fetchModelMid()
-  }, [fetchModelMid])
-
-  // stream form
-  const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
-  const [formType, setFormType] = useState<'create' | 'update'>('create')
-  const [formData, setFormData] = useState({})
-  const [formDisabled, setFormDisabled] = useState(false)
-  const [updateStreamId, setUpdateStreamId] = useState('')
-  const [definition, setDefinition] = useState<any>()
   const { selectedDapp } = useSelectedDapp()
+  const [definition, setDefinition] = useState<any>()
   useEffect(() => {
     ;(async () => {
       if (!streamId || !selectedDapp) {
@@ -95,106 +50,197 @@ export default function Instance({
     })()
   }, [streamId, selectedDapp])
 
-  const { composeClient, composeClientAuthenticated } =
-    useComposeClient(definition)
+  const { currCeramicNode } = useCeramicNodeCtx()
+  const {
+    ceramicClient,
+    loadMultiStreams,
+    composeClient,
+    composeClientAuthenticated
+  } = useComposeClient(definition, currCeramicNode?.serviceUrl)
 
-  const createStream = useCallback(async () => {
-    if (!composeClientAuthenticated || !composeClient) {
-      toast.error('composeClient not authenticated')
-      return
-    }
-    if (!name) {
-      toast.error('model name not found')
-      return
-    }
-    const mutation = `
-      mutation create${name}($input: Create${name}Input!) {
-        create${name}(input: $input) {
-          document {
-            id
-          }
-        }
-      }
-    `
-    setFormDisabled(true)
-    const res = await composeClient.executeQuery(mutation, {
-      input: {
-        content: { ...formData },
-      },
-    })
-    if (res?.errors && res?.errors.length > 0) {
-      toast.error(res?.errors[0]?.message)
-    } else {
-      toast.success('Submitted successfully!')
-      setIsOpenStreamForm(false)
-      fetchModelMid()
-    }
-    setFormDisabled(false)
-  }, [formData, composeClientAuthenticated, composeClient, name, fetchModelMid])
+  const PAGE_SIZE = 10
+  const [hasMore, setHasMore] = useState(false)
+  const [endCursor, setEndCursor] = useState('')
+  const [streams, setStreams] = useState<Record<string, Stream>>()
+  const [loading, setLoading] = useState(false)
+  const [errMsg, setErrMsg] = useState('')
 
-  const updateStream = useCallback(async () => {
-    if (!composeClientAuthenticated || !composeClient) {
-      toast.error('composeClient not authenticated')
-      return
-    }
-    if (!name) {
-      toast.error('model name not found')
-      return
-    }
-    const mutation = `
-      mutation update${name}($input: Update${name}Input!) {
-        update${name}(input: $input) {
-          document {
-            id
-          }
-        }
+  const queryStream = useCallback(
+    async ({
+      first = PAGE_SIZE,
+      after = ''
+    }: {
+      first?: number
+      after?: string
+    }) => {
+      if (!composeClientAuthenticated || !composeClient) {
+        // toast.error('composeClient not authenticated')
+        return
       }
-    `
-    setFormDisabled(true)
-    const res = await composeClient.executeQuery(mutation, {
-      input: {
-        id: updateStreamId,
-        content: { ...formData },
-      },
-    })
-    if (res?.errors && res?.errors.length > 0) {
-      toast.error(res?.errors[0]?.message)
-    } else {
-      toast.success('Submitted successfully!')
-      setStreams(
-        (streams) =>
-          streams?.map((stream: any) => {
-            if (stream.streamId === updateStreamId) {
-              return {
-                ...stream,
-                streamContent: {
-                  ...(stream?.streamContent || {}),
-                  ...formData,
-                },
+      if (!name) {
+        toast.error('model name not found')
+        return
+      }
+      const listQueryName = `${lowerFirst(name)}Index`
+      const query = `
+        query {
+          ${listQueryName}(first: ${first}, after: "${after}") {
+            edges {
+              node {
+                id
               }
             }
-            return stream
-          }) || []
-      )
-      setIsOpenStreamForm(false)
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
+          }
+        }
+        `
+      const res = await composeClient.executeQuery(query)
+      if (res?.errors && res?.errors.length > 0) {
+        toast.error(res?.errors[0]?.message)
+      } else {
+        const data: { edges: any; pageInfo: any } = res?.data?.[
+          listQueryName
+        ] as { edges: any; pageInfo: any }
+        if (!data) return
+        if (data.edges)
+          return {
+            mids: data.edges?.map((edge: any) => edge.node) || [],
+            pageInfo: data.pageInfo || {}
+          }
+      }
+    },
+    [composeClientAuthenticated, composeClient]
+  )
+
+  const fetchMoreMids = useCallback(async () => {
+    if (!endCursor) return
+    const data = await queryStream({ after: endCursor })
+    if (data) {
+      setHasMore(data.pageInfo.hasNextPage || false)
+      setEndCursor(data.pageInfo.endCursor || '')
+      const ids = data.mids.map((item: { id: any }) => item.id)
+      const newStreams = await loadMultiStreams(ids)
+      setStreams({ ...streams, ...newStreams })
     }
-    setFormDisabled(false)
-  }, [
-    updateStreamId,
-    formData,
-    composeClientAuthenticated,
-    composeClient,
-    name,
-  ])
+  }, [queryStream, endCursor, streams])
+
+  const fetchMids = useCallback(async () => {
+    try {
+      setLoading(true)
+      setErrMsg('')
+      const data = await queryStream({})
+      if (data) {
+        setHasMore(data.pageInfo.hasNextPage || false)
+        setEndCursor(data.pageInfo.endCursor || '')
+        const ids = data.mids.map((item: { id: any }) => item.id)
+        const newStreams = await loadMultiStreams(ids)
+        setStreams(newStreams)
+      }
+    } catch (error) {
+      const err = error as AxiosError
+      setErrMsg((err.response?.data as any).message || err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [queryStream])
+
+  useEffect(() => {
+    fetchMids()
+  }, [fetchMids])
+
+  const createStream = useCallback(
+    async (formData = {}) => {
+      if (!composeClientAuthenticated || !composeClient) {
+        toast.error('composeClient not authenticated')
+        return
+      }
+      if (!name) {
+        toast.error('model name not found')
+        return
+      }
+      const mutation = `
+        mutation create${name}($input: Create${name}Input!) {
+          create${name}(input: $input) {
+            document {
+              id
+            }
+          }
+        }
+      `
+      setFormDisabled(true)
+      const res = await composeClient.executeQuery(mutation, {
+        input: {
+          content: { ...formData }
+        }
+      })
+      if (res?.errors && res?.errors.length > 0) {
+        toast.error(res?.errors[0]?.message)
+      } else {
+        toast.success('Submitted successfully!')
+        setIsOpenStreamForm(false)
+        fetchMids()
+      }
+      setFormDisabled(false)
+    },
+    [composeClientAuthenticated, composeClient, name, fetchMids]
+  )
+
+  const updateStream = useCallback(
+    async (updateStreamId: string, formData = {}) => {
+      if (!composeClientAuthenticated || !composeClient) {
+        toast.error('composeClient not authenticated')
+        return
+      }
+      if (!name) {
+        toast.error('model name not found')
+        return
+      }
+      const mutation = `
+        mutation update${name}($input: Update${name}Input!) {
+          update${name}(input: $input) {
+            document {
+              id
+            }
+          }
+        }
+      `
+      setFormDisabled(true)
+      const res = await composeClient.executeQuery(mutation, {
+        input: {
+          id: updateStreamId,
+          content: { ...formData }
+        }
+      })
+      if (res?.errors && res?.errors.length > 0) {
+        toast.error(res?.errors[0]?.message)
+      } else {
+        toast.success('Submitted successfully!')
+        setIsOpenStreamForm(false)
+      }
+      setFormDisabled(false)
+    },
+    [composeClientAuthenticated, composeClient, name]
+  )
+
+  const [isOpenStreamForm, setIsOpenStreamForm] = useState(false)
+  const [formType, setFormType] = useState<'create' | 'update'>('create')
+  const [formData, setFormData] = useState({})
+  const [formDisabled, setFormDisabled] = useState(false)
+  const [updateStreamId, setUpdateStreamId] = useState('')
 
   const submitStream = useCallback(async () => {
     if (formType === 'create') {
-      await createStream()
+      await createStream(formData)
     }
     if (formType === 'update') {
-      await updateStream()
+      await updateStream(updateStreamId, formData)
     }
-  }, [formType, createStream, updateStream])
+  }, [formType, createStream, formData, updateStream, updateStreamId])
 
   if (loading) {
     return (
@@ -207,7 +253,7 @@ export default function Instance({
   if (errMsg) {
     return (
       <PageBox>
-        <div className="title-box" />
+        <div className='title-box' />
         <Loading>{errMsg}</Loading>
       </PageBox>
     )
@@ -222,7 +268,7 @@ export default function Instance({
         onOpenChange={setIsOpenStreamForm}
         schema={schema}
         formData={formData}
-        onChange={(e) => setFormData(e.formData)}
+        onChange={e => setFormData(e.formData)}
         onSubmit={() => submitStream()}
       />
       <ListHeading>
@@ -239,29 +285,37 @@ export default function Instance({
           </PlusButton>
         )}
       </ListHeading>
-      <InfiniteScroll
-        dataLength={streams.length}
-        next={() => {
-          pageNum.current += 1
-          fetchMoreStreams(pageNum.current)
-        }}
-        hasMore={hasMore}
-        loader={<Loading>Loading...</Loading>}
-      >
-        {streamId && (
-          <ModelStreamList
-            data={streams}
-            modelId={streamId}
-            editable={composeClientAuthenticated}
-            editAction={(stream: any) => {
-              setFormType('update')
-              setUpdateStreamId(stream?.streamId)
-              setFormData(stream?.streamContent)
-              setIsOpenStreamForm(true)
-            }}
-          />
-        )}
-      </InfiniteScroll>
+      {streams && Object.keys(streams).length > 0 && (
+        <InfiniteScroll
+          dataLength={Object.keys(streams).length}
+          next={() => {
+            fetchMoreMids()
+          }}
+          hasMore={hasMore}
+          loader={<Loading>Loading...</Loading>}
+        >
+          {streamId && (
+            <ModelStreamList
+              data={streams}
+              modelId={streamId}
+              editable={composeClientAuthenticated}
+              editAction={(stream: Stream) => {
+                setFormType('update')
+                setUpdateStreamId(stream?.id.toString())
+                setFormData(stream?.content)
+                setIsOpenStreamForm(true)
+              }}
+              // pinAction={(stream: Stream, pin:boolean =true) => {
+              //   if (!stream?.id || !ceramicClient) return
+              //   if (pin)
+              //     ceramicClient?.pin.add(stream.id)
+              //   else
+              //     ceramicClient?.pin.rm(stream.id)
+              // }}
+            />
+          )}
+        </InfiniteScroll>
+      )}
       {!hasMore && <Loading>no more data</Loading>}
     </PageBox>
   )
