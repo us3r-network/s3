@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { TableBox } from './TableBox'
-import { ModelMid } from '../types'
 import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'
 import UserAvatarStyled from './UserAvatarStyled'
@@ -11,17 +10,21 @@ import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { useMemo } from 'react'
 import { S3_SCAN_URL } from '../constants'
 import useSelectedDapp from '../hooks/useSelectedDapp'
+import { Stream } from '@ceramicnetwork/common'
+import PlusIcon from './Icons/PlusIcon'
 
-export default function ModelStreamList({
+export default function ModelStreamList ({
   modelId,
   data,
   editable,
   editAction,
+  pinAction
 }: {
   modelId: string
-  data: ModelMid[]
+  data: Record<string, Stream>
   editable?: boolean
-  editAction?: (stream: ModelMid) => void
+  editAction?: (stream: Stream) => void
+  pinAction?: (stream: Stream) => void
 }) {
   const session = useSession()
   const showAction = useMemo(
@@ -35,58 +38,72 @@ export default function ModelStreamList({
         <thead>
           <tr>
             <th>Stream ID</th>
-            <th>DID</th>
+            <th>Controller</th>
             <th>Create Time</th>
             <th>Update Time</th>
             {showAction && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => {
+          {Object.keys(data).map(streamId => {
+            const stream = data[streamId]
+            const controller = stream.metadata.controller
+            const logs = stream.state.log
             return (
-              <tr key={item.streamId}>
+              <tr key={streamId}>
                 <td>
                   <a
-                    href={`${S3_SCAN_URL}/streams/stream/${
-                      item.streamId
-                    }?network=${selectedDapp?.network.toUpperCase()}`}
-                    target="_blank"
-                    rel="noreferrer"
+                    href={`${S3_SCAN_URL}/streams/stream/${streamId}?network=${selectedDapp?.network.toUpperCase()}`}
+                    target='_blank'
+                    rel='noreferrer'
                   >
-                    <div className="stream-id">
-                      {shortPubKey(item.streamId, {
+                    <div className='stream-id'>
+                      {shortPubKey(streamId, {
                         len: 8,
-                        split: '-',
+                        split: '-'
                       })}
                     </div>
                   </a>
                 </td>
-                <td className="td-did">
-                  <UserAvatarStyled did={item.controllerDid} />
-                  <UserName did={item.controllerDid} />
+                <td className='td-did'>
+                  <UserAvatarStyled did={controller} />
+                  <UserName did={controller} />
                 </td>
-                <td className="index-time">
-                  <div>
-                    <time>{dayjs(item.createdAt).fromNow()}</time>
-                  </div>
+                <td className='index-time'>
+                  {logs && logs.length > 0 && logs[0]?.timestamp &&(
+                    <div>
+                      <time>{dayjs(logs[0].timestamp * 1000).fromNow()}</time>
+                    </div>
+                  )}
                 </td>
-                <td className="index-time">
-                  <div>
-                    <time>{dayjs(item.updatedAt).fromNow()}</time>
-                  </div>
+                <td className='index-time'>
+                  {logs && logs.length > 0 && logs[logs.length-1]?.timestamp && (
+                    <div>
+                      <time>
+                        {dayjs(logs[logs.length-1].timestamp! * 1000).fromNow()}
+                      </time>
+                    </div>
+                  )}
                 </td>
                 {showAction && (
-                  <td className="td-action">
-                    {session?.id === item.controllerDid ? (
-                      <EditBtn
+                  <td className='td-action'>
+                    {editAction && session?.id === controller && (
+                      <ActionBtn
                         onPress={() => {
-                          if (editAction) editAction(item)
+                          if (editAction) editAction(stream)
                         }}
                       >
                         <EditIcon />
-                      </EditBtn>
-                    ) : (
-                      '-'
+                      </ActionBtn>
+                    )}
+                    {pinAction && (
+                      <ActionBtn
+                        onPress={() => {
+                          if (pinAction) pinAction(stream)
+                        }}
+                      >
+                        <PlusIcon />
+                      </ActionBtn>
                     )}
                   </td>
                 )}
@@ -183,7 +200,7 @@ const TableContainer = styled.table`
     color: #718096;
   }
 `
-const EditBtn = styled(Button)`
+const ActionBtn = styled(Button)`
   margin: 0;
   padding: 0;
 `

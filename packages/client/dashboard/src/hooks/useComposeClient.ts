@@ -6,11 +6,21 @@ import { DID } from 'dids'
 import useSelectedDapp from './useSelectedDapp'
 import { Network } from '../components/Selector/EnumSelect'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
+import { CeramicClient } from '@ceramicnetwork/http-client'
 
 export function useComposeClient(definition: RuntimeCompositeDefinition | undefined, ceramicNodeURL: string|undefined = undefined) {
   const { selectedDapp } = useSelectedDapp()
   const session = useSession()
-  
+  const ceramicClient = useMemo(
+    () =>
+      new CeramicClient(
+            ceramicNodeURL ? ceramicNodeURL :
+              selectedDapp?.network === Network.MAINNET
+                ? CERAMIC_MAINNET_HOST
+                : CERAMIC_TESTNET_HOST
+          ),
+    [ceramicNodeURL, selectedDapp?.network]
+  )
   const composeClient = useMemo(
     () =>
       definition
@@ -43,5 +53,10 @@ export function useComposeClient(definition: RuntimeCompositeDefinition | undefi
     authComposeClients()
   }, [authComposeClients])
 
-  return { composeClient, composeClientAuthenticated }
+  async function loadMultiStreams(ids = []) {
+    const queries = ids.map((streamId) => ({ streamId }))
+    // This will return an Object of stream ID keys to stream values
+    return await ceramicClient.multiQuery(queries)
+  }
+  return { ceramicClient, loadMultiStreams, composeClient, composeClientAuthenticated }
 }
