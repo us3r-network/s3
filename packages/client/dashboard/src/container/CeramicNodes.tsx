@@ -190,10 +190,18 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
               <div className='node-info-value'>{node.privateKey}</div>
               <CopyTint data={node.privateKey} />
             </div>
-            <div className='node-info'>
+            {/* <div className='node-info'>
               <div className='node-info-key'>API Key: </div>
               <div className='node-info-value'>{node.apiKey}</div>
               <CopyTint data={node.apiKey} />
+            </div> */}
+            <div className='node-info'>
+              <div className='node-info-key'>DB Type: </div>
+              <div className='node-info-value'>{node.serviceK8sMetadata.ceramicDbType}</div>
+            </div>
+            <div className='node-info'>
+              <div className='node-info-key'>Historical Sync: </div>
+              <div className='node-info-value'>{node.serviceK8sMetadata.ceramicEnableHistoricalSync.toString()}</div>
             </div>
           </div>
         ) : null}
@@ -379,7 +387,7 @@ const NodeInfoBox = styled.div`
       .node-info-key {
         flex-shrink: 0;
         text-align: right;
-        width: 90px;
+        width: 120px;
         color: #718094;
       }
       .node-info-value {

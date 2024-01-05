@@ -111,6 +111,13 @@ export type CeramicDto = {
 export type CeramicRequestDto = {
   name: string;
   network: CeramicNetwork;
+  ceramicDbType?: CeramicDBType;
+  ceramicEnableHistoricalSync?: boolean;
+}
+
+export enum CeramicDBType {
+  SQLITE ='sqlite',
+  PGSQL = 'postgres',
 }
 
 export enum CeramicNetwork {
@@ -134,4 +141,6 @@ export type CeramicServiceK8sMetadata = {
   keramikObjectName: string;
   ceramicLoadbalanceHost: string;
   ceramicLoadbalancePort: number;
+  ceramicDbType: CeramicDBType;
+  ceramicEnableHistoricalSync: boolean;
 }

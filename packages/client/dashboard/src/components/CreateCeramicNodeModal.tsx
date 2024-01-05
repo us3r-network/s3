@@ -8,7 +8,8 @@ import {
   useSession
 } from '@us3r-network/auth-with-rainbowkit'
 import { createCeramicNode } from '../api/ceramicNode'
-import { CeramicNetwork } from '../types.d'
+import { CeramicDBType, CeramicNetwork } from '../types.d'
+import { Checkbox } from 'react-aria-components'
 
 export default function CreateCeramicNodeModal ({
   fixedNetwork,
@@ -22,6 +23,10 @@ export default function CreateCeramicNodeModal ({
   const [submitting, setSubmitting] = useState(false)
   const [network, setNetwork] = useState<CeramicNetwork>(
     fixedNetwork || CeramicNetwork.TESTNET
+  )
+  const [dbType, setDbType] = useState<CeramicDBType>(CeramicDBType.SQLITE)
+  const [historicalSync, setHistoricalSync] = useState<boolean | undefined>(
+    true
   )
   const { signIn } = useAuthentication()
   const session = useSession()
@@ -38,7 +43,12 @@ export default function CreateCeramicNodeModal ({
     try {
       setSubmitting(true)
       const resp = await createCeramicNode(
-        { name: nodeName, network },
+        {
+          name: nodeName,
+          network,
+          ceramicEnableHistoricalSync: true,
+          ceramicDbType: dbType
+        },
         session.serialize()
       )
       if (resp.data.code !== 0) {
@@ -77,6 +87,19 @@ export default function CreateCeramicNodeModal ({
             values={[CeramicNetwork.TESTNET, CeramicNetwork.MAINNET]}
           />
         )}
+        <EnumSelect
+          {...{ value: dbType, setValue: setDbType }}
+          labelText='* DB Type:'
+          values={[CeramicDBType.PGSQL, CeramicDBType.SQLITE]}
+        />
+        <Checkbox isSelected={historicalSync} onChange={setHistoricalSync}>
+          <div className='checkbox' aria-hidden='true'>
+            <svg viewBox='0 0 18 18'>
+              <polyline points='1 9 7 14 15 4' />
+            </svg>
+          </div>
+          Enable Historic Sync
+        </Checkbox>
       </EditorBox>
       <div className='btns'>
         <button onClick={closeModal}>Cancel</button>
