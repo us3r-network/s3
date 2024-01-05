@@ -1,4 +1,12 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'react-aria-components'
+/*
+ * @Author: bufan bufan@hotmail.com
+ * @Date: 2023-12-15 10:06:03
+ * @LastEditors: bufan bufan@hotmail.com
+ * @LastEditTime: 2023-12-21 14:55:14
+ * @FilePath: /s3/packages/client/dashboard/src/components/ModelTabs.tsx
+ * @Description: 
+ */
+import { Tabs, TabList, Tab, TabPanel } from 'react-aria-components'
 import Definition from './Definition'
 
 import ModelSDK from './ModelSDK'
@@ -19,14 +27,12 @@ export default function ModelTabs({
           <Tab id="model-sdk">Model SDK</Tab>
         </TabList>
       </div>
-      <TabPanels>
-        <TabPanel id="Definition">
-          <Definition streamId={modelId} />
-        </TabPanel>
-        <TabPanel id="model-sdk">
-          <ModelSDK modelId={modelId} modelName={name} />
-        </TabPanel>
-      </TabPanels>
+      <TabPanel id="Definition">
+        <Definition streamId={modelId} />
+      </TabPanel>
+      <TabPanel id="model-sdk">
+        <ModelSDK modelId={modelId} modelName={name} />
+      </TabPanel>
     </Tabs>
   )
 }

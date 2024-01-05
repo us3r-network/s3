@@ -29,50 +29,55 @@ import { DappComposite, ModelStream } from './types'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 import DappModelSdk from './container/DappModelSdk'
+import CeramicNodes from './container/CeramicNodes'
+import CeramicNodeProvider from './context/CeramicNodeCtx'
 
 dayjs.extend(relativeTime)
 
-function Routers() {
+function Routers () {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route path='/' element={<Layout />}>
         <Route index element={<MyDapps />} />
-        <Route path="dapp/create" element={<DappCreate />} />
-        <Route path="dapp/:appId" element={<DappLayout />}>
-          <Route path="index" element={<DappHome />} />
+        <Route path='dapp/create' element={<DappCreate />} />
+        <Route path='dapp/:appId' element={<DappLayout />}>
+          <Route path='index' element={<DappHome />} />
+          <Route path='node' element={<CeramicNodes />} />
           <Route element={<ModelEditorLayout />}>
-            <Route path="model-editor" element={<DappModelEditor />} />
-            <Route path="model-playground" element={<DappModelPlayground />} />
-            <Route path="model-sdk" element={<DappModelSdk />} />
-            <Route path="statistic" element={<DappDataStatistic />} />
+            <Route path='model-editor' element={<DappModelEditor />} />
+            <Route path='model-playground' element={<DappModelPlayground />} />
+            <Route path='model-sdk' element={<DappModelSdk />} />
+            <Route path='statistic' element={<DappDataStatistic />} />
           </Route>
-          <Route path="info" element={<DappInfo />} />
-          <Route path="explore" element={<ExploreModel />} />
-          <Route path="favorite" element={<ExploreModel />} />
-          <Route path="components" element={<Components />} />
+          <Route path='info' element={<DappInfo />} />
+          <Route path='explore' element={<ExploreModel />} />
+          <Route path='favorite' element={<ExploreModel />} />
+          <Route path='components' element={<Components />} />
         </Route>
       </Route>
-      <Route path="*" element={<NoMatch />} />
+      <Route path='*' element={<NoMatch />} />
     </Routes>
   )
 }
 
-export default function App() {
+export default function App () {
   return (
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
-      appName="S3 Console"
+      appName='S3 Console'
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
         <CeramicProvider>
-          <Routers />
+          <CeramicNodeProvider>
+            <Routers />
+          </CeramicNodeProvider>
         </CeramicProvider>
       </ProfileStateProvider>
     </Us3rAuthWithRainbowkitProvider>
   )
 }
 
-function Layout() {
+function Layout () {
   return (
     <div>
       <Header />
@@ -80,7 +85,7 @@ function Layout() {
         <Outlet />
       </AppContainer>
       <ToastContainer
-        position="top-right"
+        position='top-right'
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -89,13 +94,13 @@ function Layout() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme='dark'
       />
     </div>
   )
 }
 
-function DappLayout() {
+function DappLayout () {
   const { loadingDApps, setCurrAppId } = useAppCtx()
   const { appId } = useParams()
 
@@ -105,16 +110,16 @@ function DappLayout() {
 
   if (!appId || loadingDApps) {
     return (
-      <main className="container">
-        <div className="login-first">
-          <img src="/loading.gif" alt="" />
+      <main className='container'>
+        <div className='login-first'>
+          <img src='/loading.gif' alt='' />
         </div>
       </main>
     )
   }
 
   return (
-    <main className="container">
+    <main className='container'>
       <Nav appId={appId} />
       <div>
         <Outlet />
@@ -123,7 +128,7 @@ function DappLayout() {
   )
 }
 
-function ModelEditorLayout() {
+function ModelEditorLayout () {
   const [selectModel, setSelectModel] = useState<ModelStream>()
   const [selectComposite, setSelectComposite] = useState<DappComposite>()
 
@@ -133,11 +138,11 @@ function ModelEditorLayout() {
     <EditorLayoutContainer>
       <ModelList
         selectModel={selectModel}
-        setSelectModel={(data) => {
+        setSelectModel={data => {
           setSelectModel(data)
           setSelectComposite(undefined)
         }}
-        setSelectComposite={(data) => {
+        setSelectComposite={data => {
           setSelectModel(undefined)
           setSelectComposite(data)
         }}
@@ -147,7 +152,7 @@ function ModelEditorLayout() {
       <Outlet
         context={{
           selectModel,
-          selectComposite,
+          selectComposite
         }}
       />
     </EditorLayoutContainer>

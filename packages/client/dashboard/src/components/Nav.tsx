@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import ChevronRight from './Icons/ChevronRight'
-import Home from './Icons/HomeIcon'
+import HomeIcon from './Icons/HomeIcon'
+import NodeIcon from './Icons/NodeIcon'
 import LayoutIcon from './Icons/LayoutIcon'
 import InfoIcon from './Icons/InfoIcon'
 import TerminalIcon from './Icons/TerminalIcon'
@@ -32,7 +33,12 @@ export default function Nav({ appId }: { appId: string }) {
             {
               path: `/dapp/${appId}/index`,
               name: 'Home',
-              icon: Home,
+              icon: HomeIcon,
+            },
+            {
+              path: `/dapp/${appId}/node`,
+              name: 'Node Deployment',
+              icon: NodeIcon,
             },
             {
               path: `/dapp/${appId}/model-editor`,

@@ -10,7 +10,7 @@ import 'dotenv/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { DappModule } from './dapp/dapp.module';
-import { S3SeverBizDbName } from './common/constants';
+import { S3NodeServiceDbName, S3SeverBizDbName } from './common/constants';
 
 const env: string | undefined = process.env.NODE_ENV;
 function scheduleModule() {
@@ -44,12 +44,34 @@ function scheduleModule() {
     }),
 
     TypeOrmModule.forRoot({
-      name: 'testnet',
+      name: S3NodeServiceDbName,
       port: 5432,
       host: process.env.DATABASE_HOST,
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE,
+      database: process.env.NODE_SERVICE_DB_NAME,
+      logging: false,
+      entities: ['dist/**/ceramic.entity{.ts,.js}'],
+      type: 'postgres',
+      pool: {
+        max: 70,
+        min: 10,
+        idleTimeoutMillis: 600000,
+      },
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
+    }),
+
+    TypeOrmModule.forRoot({
+      name: 'testnet',
+      port: 5432,
+      host: process.env.DATABASE_HOST_TESTNET,
+      username: process.env.DATABASE_USER_TESTNET,
+      password: process.env.DATABASE_PASSWORD_TESTNET,
+      database: process.env.DATABASE_TESTNET,
       logging: false,
       entities: ['dist/**/*.entity{.ts,.js}'],
       type: 'postgres',

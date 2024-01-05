@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   CeramicModelMainNet,
@@ -11,7 +11,9 @@ import { ModelController } from './model.controller';
 import { StreamModule } from '../stream/stream.module';
 import { Stream } from 'src/entities/stream/stream.entity';
 import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
-import { S3SeverBizDbName } from 'src/common/constants';
+import { S3NodeServiceDbName, S3SeverBizDbName } from 'src/common/constants';
+import { UserAuthMiddleware } from 'src/middlewares/user-auth.middleware';
+import { Ceramic } from 'src/entities/ceramic/ceramic.entity';
 
 @Module({
   imports: [
@@ -24,10 +26,20 @@ import { S3SeverBizDbName } from 'src/common/constants';
       'mainnet',
     ),
     TypeOrmModule.forFeature([Stream, Dapp, DappDomain], S3SeverBizDbName),
+    TypeOrmModule.forFeature([Ceramic], S3NodeServiceDbName),
     forwardRef(() => StreamModule),
   ],
   controllers: [ModelController],
   providers: [ModelService],
   exports: [ModelService],
 })
-export class ModelModule {}
+export class ModelModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(UserAuthMiddleware)
+      .forRoutes( {
+        path: '/models/indexing',
+        method: RequestMethod.ALL,
+      });
+  }
+}

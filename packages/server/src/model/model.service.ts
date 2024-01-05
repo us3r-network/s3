@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import {
   CeramicModelMainNet,
@@ -18,6 +18,7 @@ import { Network as DappNetwork } from 'src/entities/dapp/dapp.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
+  S3NodeServiceDbName,
   S3SeverBizDbName,
   S3_MAINNET_MODELS_USE_COUNT_ZSET,
   S3_MODEL_GRAPHQL_COMPOSITE_CACHE_PREFIX,
@@ -35,6 +36,8 @@ import { generateLoadModelGraphqls, parseToCreateModelGraphqls } from 'src/utils
 import { StreamRepository } from 'src/entities/stream/stream.repository';
 import { Dapp, DappDomain } from 'src/entities/dapp/dapp.entity';
 import { DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import { Ceramic } from 'src/entities/ceramic/ceramic.entity';
+import { CeramicRepository } from 'src/entities/ceramic/ceramic.repository';
 
 @Injectable()
 export default class ModelService {
@@ -67,6 +70,9 @@ export default class ModelService {
 
     @InjectRepository(Dapp, S3SeverBizDbName)
     private readonly dappRepository: DappRepository,
+
+    @InjectRepository(Ceramic, S3NodeServiceDbName)
+    private readonly ceramicRepository: CeramicRepository,
 
     @InjectRedis() private readonly redis: Redis,
   ) { }
@@ -450,7 +456,16 @@ export default class ModelService {
     };
   }
 
-  async indexModels(models: string[], network: Network): Promise<void> {
+  async findCeramicInstance(ceramicId: number, did: string): Promise<Ceramic> {
+    return await this.ceramicRepository.findOne({
+      where: {
+        id: ceramicId,
+        creater_did: did,
+      },
+    });
+  }
+
+  async indexModels(models: string[], ceramicId?: number, did?: string, network?: Network): Promise<void> {
     try {
       // index new models
       const { CeramicClient } = await importDynamic(
@@ -462,25 +477,34 @@ export default class ModelService {
       );
       const { getResolver } = await importDynamic('key-did-resolver');
       const { fromString } = await importDynamic('uint8arrays/from-string');
-      const ceramicNode = getCeramicNode(network);
-      const ceramicNodeAdminKey = getCeramicNodeAdminKey(network);
+      let ceramicNode;
+      let ceramicNodeAdminKey;
+      if (ceramicId) {
+        const ceramicEntity = await this.findCeramicInstance(ceramicId, did);
+        if (!ceramicEntity) throw new NotFoundException('Ceramic not found');
+        ceramicNode = 'http://'+ceramicEntity.getServiceK8sMetadata.ceramicLoadbalanceHost+':'+ceramicEntity.getServiceK8sMetadata.ceramicLoadbalancePort;
+        ceramicNodeAdminKey = atob(ceramicEntity.getPrivateKey)
+      }else {
+        ceramicNode = getCeramicNode(network);
+        ceramicNodeAdminKey = getCeramicNodeAdminKey(network);
+      }
+      this.logger.log(`Index models, stream id:${models} on ${ceramicNode} with ${ceramicNodeAdminKey}`);
+
       const ceramic = new CeramicClient(ceramicNode);
       const privateKey = fromString(ceramicNodeAdminKey, 'base16');
-      const did = new DID({
+      const authDid = new DID({
         resolver: getResolver(),
         provider: new Ed25519Provider(privateKey),
       });
-      await did.authenticate();
-      ceramic.did = did;
+      await authDid.authenticate();
+      ceramic.did = authDid;
 
-      for await (const m of models) {
-        try {
-          this.logger.log(`Index models, stream id:${m}`);
-          const res = await ceramic.admin.startIndexingModels([m]);
-          this.logger.log(`Indexed model: ${m}.`);
-        } catch (error) {
-          this.logger.error(`Add model ${m} index err: ${error}`);
-        }
+      try {
+        this.logger.log(`Index models, stream ids:${models}`);
+        const res = await ceramic.admin.startIndexingModels(models);
+        this.logger.log(`Indexed model: ${models}.`);
+      } catch (error) {
+        this.logger.error(`Add models ${models} index err: ${error}`);
       }
     } catch (error) {
       this.logger.error(`Add models index err: ${error}`);

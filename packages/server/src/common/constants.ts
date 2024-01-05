@@ -9,3 +9,4 @@ export const S3_MODEL_GRAPHQL_GRAPHQLSCHEMA_CACHE_PREFIX =
   's3:model:graphql:graphqlSchema:cache:';
 
 export const S3SeverBizDbName = 's3-server-db';
+export const S3NodeServiceDbName = 'ceramic_node_service';
