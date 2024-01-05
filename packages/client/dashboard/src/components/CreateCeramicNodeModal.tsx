@@ -24,7 +24,7 @@ export default function CreateCeramicNodeModal ({
   const [network, setNetwork] = useState<CeramicNetwork>(
     fixedNetwork || CeramicNetwork.TESTNET
   )
-  const [dbType, setDbType] = useState<CeramicDBType>(CeramicDBType.SQLITE)
+  const [dbType, setDbType] = useState<CeramicDBType>(CeramicDBType.PGSQL)
   const [historicalSync, setHistoricalSync] = useState<boolean | undefined>(
     true
   )
@@ -90,7 +90,8 @@ export default function CreateCeramicNodeModal ({
         <EnumSelect
           {...{ value: dbType, setValue: setDbType }}
           labelText='* DB Type:'
-          values={[CeramicDBType.PGSQL, CeramicDBType.SQLITE]}
+          // values={[CeramicDBType.PGSQL, CeramicDBType.SQLITE]}
+          values={[CeramicDBType.PGSQL]}
         />
         <Checkbox isSelected={historicalSync} onChange={setHistoricalSync}>
           <div className='checkbox' aria-hidden='true'>
