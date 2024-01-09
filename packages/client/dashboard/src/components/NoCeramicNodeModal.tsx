@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import CloseIcon from './Icons/CloseIcon'
 import { Link } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import { CeramicStatus } from '../types.d'
 
 export default function NoCeramicNodeModal ({
   closeModal
@@ -9,6 +11,7 @@ export default function NoCeramicNodeModal ({
   closeModal: () => void
 }) {
   const { selectedDapp } = useSelectedDapp()
+  const { currCeramicNode } = useCeramicNodeCtx()
   return (
     <Box>
       <div className='title'>
@@ -17,11 +20,24 @@ export default function NoCeramicNodeModal ({
           <CloseIcon />
         </button>
       </div>
-      <div>There is no available node now.</div>
-      {selectedDapp && (
-        <Link to={`/dapp/${selectedDapp?.id}/node`}>
-          <button className='ok-button'>Deploy Private Node</button>
-        </Link>
+      {currCeramicNode ? (
+        currCeramicNode.status !== CeramicStatus.RUNNING ? (
+          <div>
+            <p>Your Private Ceramic Node is {currCeramicNode.status} ......</p>
+            <p>Please wait while it is ready!</p>
+          </div>
+        ) : (
+          <div>Your Private Ceramic Node is Ready to use.</div>
+        )
+      ) : (
+        <div>
+          <div>There is no available node now.</div>
+          {selectedDapp && (
+            <Link to={`/dapp/${selectedDapp?.id}/node`}>
+              <button className='ok-button'>Deploy Private Node</button>
+            </Link>
+          )}
+        </div>
       )}
     </Box>
   )
@@ -29,12 +45,12 @@ export default function NoCeramicNodeModal ({
 const Box = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   padding: 30px;
   gap: 20px;
   position: relative;
   width: 600px;
-  min-height: 200px;
+  min-height: 160px;
   margin: 0 auto;
 
   background: #1b1e23;

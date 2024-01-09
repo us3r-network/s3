@@ -10,7 +10,7 @@ import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { PersonalCollection, useAppCtx } from '../context/AppCtx'
 import { Network } from './Selector/EnumSelect'
 import { getStarModels, startIndexModel, updateDapp } from '../api'
-import { ModelStream } from '../types'
+import { CeramicStatus, ModelStream } from '../types.d'
 import { shortPubKey } from '../utils/shortPubKey'
 import dayjs from 'dayjs'
 import { S3_SCAN_URL } from '../constants'
@@ -181,7 +181,12 @@ function ModelList() {
                     <OpsBtns
                       modelId={item.stream_id}
                       hasIndexed={!!item.isIndexed}
-                      ceramicNodeId={currCeramicNode?.id}
+                      ceramicNodeId={
+                        currCeramicNode &&
+                        currCeramicNode.status === CeramicStatus.RUNNING
+                          ? currCeramicNode?.id
+                          : undefined
+                      }
                     />
                   </td>
                 </tr>
@@ -230,7 +235,7 @@ export function OpsBtns({
         setAdding(false)
       }
     },
-    [hasIndexed, loadDapps, selectedDapp, session]
+    [ceramicNodeId, hasIndexed, loadDapps, selectedDapp, session]
   )
   return (
     <div className="btns">
@@ -295,7 +300,7 @@ const ListBox = styled.div`
   .btns {
     display: flex;
     align-items: center;
-
+    
     .loading {
       width: 20px;
     }

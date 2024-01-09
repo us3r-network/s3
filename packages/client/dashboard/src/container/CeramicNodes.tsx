@@ -26,24 +26,26 @@ import NodeTerminal from '../components/Terminal'
 import CopyTint from '../components/CopyTint'
 export default function CeramicNodes () {
   const {
+    currCeramicNode,
     loadingCeramicNodes: loading,
     ceramicNodes,
     loadCeramicNodes
   } = useCeramicNodeCtx()
   const { currDapp } = useAppCtx()
-  const [selectedNode, setSelectedNode] = useState<CeramicDto | undefined>(
-    undefined
-  )
+
   useEffect(() => {
+    let timer: NodeJS.Timeout | undefined
     // console.log('ceramicNodes changes: ', ceramicNodes)
     if (ceramicNodes.length > 0) {
-      if (ceramicNodes[0].status === CeramicStatus.PREPARING) {
-        setTimeout(() => {
+      if (ceramicNodes[0].status !== CeramicStatus.RUNNING) {
+        timer = setTimeout(() => {
           loadCeramicNodes()
-        }, 10000)
+        }, 5000)
       }
-      setSelectedNode(ceramicNodes[0])
-    } else setSelectedNode(undefined)
+    }
+    return ()=>{
+      if (timer) clearTimeout(timer)
+    }
   }, [ceramicNodes, loadCeramicNodes])
 
   const [curentDappNetwork, setCurentDappNetwork] = useState<CeramicNetwork>(
@@ -83,15 +85,11 @@ export default function CeramicNodes () {
           </div>
           <NodesListBox>
             {ceramicNodes?.map(item => {
-              const active = selectedNode?.id === item.id
+              const active = currCeramicNode?.id === item.id
               return (
                 <div key={item.id} className={active ? 'active' : ''}>
                   <div
                     className='title'
-                    onClick={() => {
-                      if (active) return
-                      setSelectedNode(item)
-                    }}
                   >
                     <div>{item.name}</div>
                   </div>
@@ -108,7 +106,7 @@ export default function CeramicNodes () {
             })}
           </NodesListBox>
         </ListBox>
-        {selectedNode && <CeramicNodeInfo node={selectedNode} />}
+        {currCeramicNode && <CeramicNodeInfo node={currCeramicNode} />}
       </Container>
     )
   }
