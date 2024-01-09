@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { ClientDApp, ModelStream } from '../types'
+import { CeramicStatus, ClientDApp, ModelStream } from '../types.d'
 import {
   PageSize,
   getModelStreamList,
@@ -273,7 +273,12 @@ export default function ExploreModel () {
                         hasIndexed={!!item.isIndexed}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
-                        ceramicNodeId={currCeramicNode?.id}
+                        ceramicNodeId={
+                          currCeramicNode &&
+                          currCeramicNode.status === CeramicStatus.RUNNING
+                            ? currCeramicNode?.id
+                            : undefined
+                        }
                       />
                     </td>
                   </tr>
@@ -288,11 +293,7 @@ export default function ExploreModel () {
   )
 }
 
-function Dapps({
-  dapps,
-}: {
-  dapps: ClientDApp[]
-}) {
+function Dapps ({ dapps }: { dapps: ClientDApp[] }) {
   const apps = useMemo(() => {
     const data = [...dapps]
     if (data.length > 3)
@@ -301,17 +302,22 @@ function Dapps({
   }, [dapps])
 
   return (
-    <DappBox className="cc">
+    <DappBox className='cc'>
       {apps.data.length > 0
         ? apps.data.map((item, idx) => {
             return (
-              <a target='_blank' href={`${S3_SCAN_URL}/dapps/${item.id}?network=${item.network}`} key={item.name} rel="noreferrer">
+              <a
+                target='_blank'
+                href={`${S3_SCAN_URL}/dapps/${item.id}?network=${item.network}`}
+                key={item.name}
+                rel='noreferrer'
+              >
                 <ImgOrName name={item.name} imgUrl={item.icon} />
               </a>
             )
           })
         : 'None'}
-      {apps.left > 0 && <span className="left">{apps.left}+</span>}
+      {apps.left > 0 && <span className='left'>{apps.left}+</span>}
     </DappBox>
   )
 }

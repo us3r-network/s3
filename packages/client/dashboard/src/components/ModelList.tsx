@@ -8,7 +8,7 @@ import PlusIcon from './Icons/PlusIcon'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { DappComposite, ModelStream } from '../types'
+import { CeramicStatus, DappComposite, ModelStream } from '../types.d'
 import { getStarModels, getDappComposites, deleteDappComposites } from '../api'
 import { Network } from './Selector/EnumSelect'
 import TrashIcon from './Icons/TrashIcon'
@@ -43,7 +43,7 @@ export default function ModelList ({
   const session = useSession()
   const { loadDapps, currDapp } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
-  const { ceramicNodes } = useCeramicNodeCtx()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
@@ -178,7 +178,8 @@ export default function ModelList ({
         <CreateNew />
         {editable &&
           isOwner &&
-          (!ceramicNodes || ceramicNodes.length === 0 ? (
+          (!currCeramicNode ||
+          currCeramicNode.status !== CeramicStatus.RUNNING ? (
             <DialogTrigger>
               <Button>
                 <PlusIcon />

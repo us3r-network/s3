@@ -53,7 +53,6 @@ export default function CreateNewModel ({
         currCeramicNode.serviceUrl + '/',
         // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
         currCeramicNode.privateKey,
-        // '',
         session
       )
       if (!result) return

@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { CeramicDto } from '../types'
+import { CeramicDto } from '../types.d'
 import { getCeramicNodes } from '../api/ceramicNode'
 
 export interface CeramicNodeContextData {
@@ -42,7 +42,10 @@ export default function CeramicNodeProvider ({
     setCeramicNodes(resp.data.data)
   }, [session])
 
-  const currCeramicNode = useMemo(() => ceramicNodes[0], [ceramicNodes])
+  const currCeramicNode = useMemo(
+    () => ceramicNodes[0],
+    [ceramicNodes]
+  )
 
   useEffect(() => {
     setLoadingCeramicNodes(true)
