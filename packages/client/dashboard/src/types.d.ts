@@ -128,6 +128,7 @@ export enum CeramicNetwork {
 
 export enum CeramicStatus {
   PREPARING = 'Preparing',
+  STARTING = 'Starting',
   RUNNING = 'Running',
   // PAUSE = 'Pause',
   // RESUMING = 'Resuming',

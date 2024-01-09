@@ -197,31 +197,44 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
             </div> */}
             <div className='node-info'>
               <div className='node-info-key'>DB Type: </div>
-              <div className='node-info-value'>{node.serviceK8sMetadata.ceramicDbType}</div>
+              <div className='node-info-value'>
+                {node.serviceK8sMetadata.ceramicDbType}
+              </div>
             </div>
             <div className='node-info'>
               <div className='node-info-key'>Historical Sync: </div>
-              <div className='node-info-value'>{node.serviceK8sMetadata.ceramicEnableHistoricalSync.toString()}</div>
+              <div className='node-info-value'>
+                {node.serviceK8sMetadata.ceramicEnableHistoricalSync.toString()}
+              </div>
             </div>
           </div>
         ) : null}
       </NodeInfoBox>
-      {node?.id && node.status === CeramicStatus.RUNNING && session?.did && (
-        <NodeTermnalBox>
-          <NodeTerminal ceramicId={node.id} didSession={session.serialize()} />
-        </NodeTermnalBox>
-      )}
+      {node?.id &&
+        (node.status === CeramicStatus.STARTING ||
+          node.status === CeramicStatus.RUNNING) &&
+        session?.did && (
+          <NodeTermnalBox>
+            <NodeTerminal
+              ceramicId={node.id}
+              didSession={session.serialize()}
+            />
+          </NodeTermnalBox>
+        )}
     </NodeInfoContainer>
   )
 }
 
 const Container = styled.main`
+  height: 100%;
   display: flex;
   flex-direction: row;
   gap: 20px;
-  margin-top: 25px;
-  margin-bottom: 25px;
   justify-content: stretch;
+  padding: 20px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 `
 const ListBox = styled.div`
   background: #1b1e23;
@@ -331,6 +344,7 @@ const NodesListBox = styled.div`
 `
 
 const NodeInfoContainer = styled.div`
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -342,10 +356,11 @@ const NodeInfoBox = styled.div`
   border-radius: 20px;
   border: 1px solid #39424c;
   background: #1b1e23;
-  width: calc(100%-280px);
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex-shrink: 0;
+  flex-grow: 0;
   .title {
     display: flex;
     flex-direction: row;
@@ -402,8 +417,8 @@ const NodeInfoBox = styled.div`
   }
 `
 const NodeTermnalBox = styled.div`
-  width: calc(100%-280px);
-  height: 600px;
+  flex-shrink: 1;
+  flex-grow: 1;
   padding: 20px;
   background-color: black;
   border-radius: 20px;
