@@ -6,7 +6,7 @@ import {
   useAuthentication,
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
-import { createDapp } from '../api'
+import { createDapp } from '../api/dapp'
 import { useAppCtx } from '../context/AppCtx'
 
 export default function DappCreate() {

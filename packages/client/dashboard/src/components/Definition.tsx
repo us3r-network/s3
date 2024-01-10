@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { getModelInfo, queryModelGraphql } from '../api'
+import { getModelInfo, queryModelGraphql } from '../api/model'
 import { ModeQueryResult, ModelStream } from '../types'
 import { schemas } from '../utils/composedb-types/schemas'
 import { AxiosError } from 'axios'

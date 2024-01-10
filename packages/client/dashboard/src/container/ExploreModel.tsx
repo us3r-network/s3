@@ -4,13 +4,13 @@ import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { CeramicStatus, ClientDApp, ModelStream } from '../types.d'
+import { PageSize } from '../api'
+import { updateDapp } from '../api/dapp'
 import {
-  PageSize,
   getModelStreamList,
   getStarModels,
-  startIndexModel,
-  updateDapp
-} from '../api'
+  startIndexModel
+} from '../api/model'
 import { TableBox, TableContainer } from '../components/TableBox'
 import dayjs from 'dayjs'
 import { shortPubKey } from '../utils/shortPubKey'

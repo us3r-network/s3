@@ -8,7 +8,7 @@ import React, {
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { ClientDApp } from '../types'
-import { getDapp, getDappWithDid } from '../api'
+import { getDapp, getDappWithDid } from '../api/dapp'
 import { useGuideStepsState } from '../hooks/useGuideSteps'
 
 export type PersonalCollection = {

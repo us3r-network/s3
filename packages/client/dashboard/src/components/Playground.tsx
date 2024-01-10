@@ -16,7 +16,7 @@ import { AxiosError } from 'axios'
 import styled from 'styled-components'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { Network } from './Selector/EnumSelect'
-import { queryModelGraphql } from '../api'
+import { queryModelGraphql } from '../api/model'
 import { createGraphqlDefaultQuery } from '../utils/createDefaultQuery'
 import { useComposeClient } from '../hooks/useComposeClient'
 

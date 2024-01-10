@@ -5,7 +5,7 @@ import AppIconInput from './AppIconInput'
 import InputItem from './InputItem'
 import EnumSelect, { AppType, Network, Stage } from './Selector/EnumSelect'
 import { ClientDApp } from '../types'
-import { updateDapp } from '../api'
+import { updateDapp } from '../api/dapp'
 import {
   useAuthentication,
   useSession,

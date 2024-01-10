@@ -7,7 +7,7 @@ import CloseIcon from './Icons/CloseIcon'
 
 import { schemas } from '../utils/composedb-types/schemas'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { updateDapp } from '../api'
+import { updateDapp } from '../api/dapp'
 // import { Network } from './Selector/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'

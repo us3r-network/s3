@@ -8,7 +8,7 @@ import 'prismjs/components/prism-typescript'
 import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
 
-import { getModelSDK } from '../api'
+import { getModelSDK } from '../api/model'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { sdkTemplate } from './sdkTemplate'
 

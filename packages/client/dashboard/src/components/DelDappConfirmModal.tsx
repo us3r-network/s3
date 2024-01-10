@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useAppCtx } from '../context/AppCtx'
 import { useCallback, useState } from 'react'
 import useSelectedDapp from '../hooks/useSelectedDapp'
-import { delDapp } from '../api'
+import { delDapp } from '../api/dapp'
 import CloseIcon from './Icons/CloseIcon'
 import InfoCircleIcon from './Icons/InfoCircleIcon'
 

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import CloseIcon from './Icons/CloseIcon'
 import InputItem from './InputItem'
-import { updateDapp } from '../api'
+import { updateDapp } from '../api/dapp'
 import { DISCORD, GITHUB, MEDIUM, MIRROR, TWITTER } from '../constants'
 import { ClientDApp } from '../types'
 import {

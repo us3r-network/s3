@@ -1,12 +1,3 @@
-/*
- * @Author: bufan bufan@hotmail.com
- * @Date: 2023-12-15 14:39:12
- * @LastEditors: bufan bufan@hotmail.com
- * @LastEditTime: 2023-12-15 15:25:53
- * @FilePath: /s3/packages/client/dashboard/src/api/ceramicNode.ts
- * @Description: 
- */
-
 import axios, { AxiosPromise } from 'axios'
 import { CERAMIC_NODE_SERVICE_API_URL } from '../constants'
 import {
@@ -14,17 +5,7 @@ import {
   CeramicDto,
   CeramicNetwork,
 } from '../types'
-
-enum ApiRespCode {
-  SUCCESS = 0,
-  ERROR = 1,
-}
-
-type ApiResp<T> = {
-  code: ApiRespCode
-  msg: string
-  data: T
-}
+import { ApiResp } from '.'
 
 export function getCeramicNode(id: number): AxiosPromise<ApiResp<CeramicDto>> {
   return axios({
