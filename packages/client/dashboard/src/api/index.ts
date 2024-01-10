@@ -1,8 +1,6 @@
 import axios from 'axios'
 import { UPLOAD_API_URL } from '../constants'
 
-export const PageSize = 50
-
 enum ApiRespCode {
   SUCCESS = 0,
   ERROR = 1,

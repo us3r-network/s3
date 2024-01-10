@@ -4,9 +4,9 @@ import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { CeramicStatus, ClientDApp, ModelStream } from '../types.d'
-import { PageSize } from '../api'
 import { updateDapp } from '../api/dapp'
 import {
+  PAGE_SIZE,
   getModelStreamList,
   getStarModels,
   startIndexModel
@@ -113,7 +113,7 @@ export default function ExploreModel () {
     })
     const list = resp.data.data
     setModels(list)
-    setHasMore(list.length >= PageSize)
+    setHasMore(list.length >= PAGE_SIZE)
     pageNum.current = 1
   }, [selectedDapp?.network])
 
@@ -123,7 +123,7 @@ export default function ExploreModel () {
         pageNumber
       })
       const list = resp.data.data
-      setHasMore(list.length >= PageSize)
+      setHasMore(list.length >= PAGE_SIZE)
       setModels([...models, ...list])
     },
     [models]

@@ -11,12 +11,13 @@ import {
   GraphqlGenTypeServer,
   Network,
 } from '../components/Selector/EnumSelect'
-import { ApiResp, PageSize } from '.'
+import { ApiResp } from '.'
 
+export const PAGE_SIZE = 50
 export function getModelStreamList({
   name,
   did,
-  pageSize = PageSize,
+  pageSize = PAGE_SIZE,
   pageNumber = 1,
   network,
 }: {
