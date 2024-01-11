@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { DappComposite } from '../types'
+import { DappComposite } from '../types.d'
 import { schemas } from '../utils/composedb-types/schemas'
 
 import CodeDownload from './CodeDownload'

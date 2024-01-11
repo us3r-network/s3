@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import CloseIcon from './Icons/CloseIcon'
 import AppIconInput from './AppIconInput'
 import InputItem from './InputItem'
-import EnumSelect, { AppType, Network, Stage } from './Selector/EnumSelect'
-import { ClientDApp } from '../types'
+import EnumSelect from './common/EnumSelect'
+import { ClientDApp, AppType, Network, Stage } from '../types.d'
 import { updateDapp } from '../api/dapp'
 import {
   useAuthentication,

@@ -12,7 +12,7 @@ import { getModelSDK } from '../api/model'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { sdkTemplate } from './sdkTemplate'
 
-import { GraphqlGenType, Network } from './Selector/EnumSelect'
+import { GraphqlGenType, Network } from '../types.d'
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import FileSaver from 'file-saver'
 

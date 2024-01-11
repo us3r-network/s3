@@ -6,7 +6,7 @@ import {
   useSession
 } from '@us3r-network/auth-with-rainbowkit'
 import { delCeramicNode } from '../api/ceramicNode'
-import { CeramicDto } from '../types'
+import { CeramicDto } from '../types.d'
 
 export default function DeleteCeramicNodeModal ({
   node,

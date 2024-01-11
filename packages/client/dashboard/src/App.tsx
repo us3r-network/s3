@@ -25,7 +25,7 @@ import Components from './container/Components'
 
 import { useEffect, useState } from 'react'
 import ModelList from './components/ModelList'
-import { DappComposite, ModelStream } from './types'
+import { DappComposite, ModelStream } from './types.d'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 import DappModelSdk from './container/DappModelSdk'

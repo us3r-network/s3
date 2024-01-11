@@ -4,7 +4,7 @@ import CloseIcon from './Icons/CloseIcon'
 import InputItem from './InputItem'
 import { updateDapp } from '../api/dapp'
 import { DISCORD, GITHUB, MEDIUM, MIRROR, TWITTER } from '../constants'
-import { ClientDApp } from '../types'
+import { ClientDApp } from '../types.d'
 import {
   useAuthentication,
   useSession,

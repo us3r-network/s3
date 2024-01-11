@@ -1,6 +1,6 @@
 import PlaygroundGraphiQL from '../components/Playground'
 import { useOutletContext } from 'react-router-dom'
-import { DappComposite, ModelStream } from '../types'
+import { DappComposite, ModelStream } from '../types.d'
 import CompositePlaygroundGraphiQL from '../components/CompositePlaygroundGraphiQL'
 import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 

@@ -3,7 +3,7 @@ import { APP_API_URL } from '../constants'
 import {
   ClientDApp,
   DappComposite,
-} from '../types'
+} from '../types.d'
 import { ApiResp } from '.'
 
 export function getDappComposites({

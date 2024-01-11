@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { useCallback, useState } from 'react'
 
 import CloseIcon from './Icons/CloseIcon'
-import EnumSelect from './Selector/EnumSelect'
+import EnumSelect from './common/EnumSelect'
 import {
   useAuthentication,
   useSession

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { CeramicStatus, ClientDApp, ModelStream } from '../types.d'
+import { CeramicStatus, ClientDApp, ModelStream, Network } from '../types.d'
 import { updateDapp } from '../api/dapp'
 import {
   PAGE_SIZE,
@@ -18,7 +18,6 @@ import Search from '../components/Search'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { PersonalCollection, useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { Network } from '../components/Selector/EnumSelect'
 import StarIcon from '../components/Icons/StarIcon'
 import StarGoldIcon from '../components/Icons/StarGoldIcon'
 import { S3_SCAN_URL } from '../constants'

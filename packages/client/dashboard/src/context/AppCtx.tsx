@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { ClientDApp } from '../types'
+import { ClientDApp } from '../types.d'
 import { getDapp, getDappWithDid } from '../api/dapp'
 import { useGuideStepsState } from '../hooks/useGuideSteps'
 

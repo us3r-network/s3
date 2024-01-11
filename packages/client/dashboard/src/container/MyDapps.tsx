@@ -7,7 +7,7 @@ import {
   useAuthentication,
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
-import { ClientDApp } from '../types'
+import { ClientDApp } from '../types.d'
 import { createImageFromInitials } from '../utils/createImage'
 import { getRandomColor } from '../utils/randomColor'
 

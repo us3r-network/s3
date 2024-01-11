@@ -1,7 +1,7 @@
 import { ModelInstanceFormProps } from './ModelInstanceForm'
 import ModelInstanceForm from './ModelInstanceForm'
 import styled from 'styled-components'
-import ModalBase, { ModalBaseProps } from './Modal/ModalBase'
+import ModalBase, { ModalBaseProps } from './common/ModalBase'
 
 interface ModelInstanceFormModalProps
   extends ModalBaseProps,

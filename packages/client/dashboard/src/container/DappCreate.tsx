@@ -1,5 +1,6 @@
 import styled from 'styled-components'
-import EnumSelect, { Network } from '../components/Selector/EnumSelect'
+import { Network } from '../types.d'
+import EnumSelect from '../components/common/EnumSelect'
 import { useNavigate } from 'react-router-dom'
 import { useCallback, useState } from 'react'
 import {

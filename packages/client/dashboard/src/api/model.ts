@@ -5,12 +5,10 @@ import {
   ModeQueryResult,
   ModelMid,
   ModelStream,
-} from '../types'
-import {
   GraphqlGenType,
   GraphqlGenTypeServer,
   Network,
-} from '../components/Selector/EnumSelect'
+} from '../types.d'
 import { ApiResp } from '.'
 
 export const PAGE_SIZE = 50

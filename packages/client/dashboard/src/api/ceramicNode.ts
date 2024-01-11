@@ -4,7 +4,7 @@ import {
   CeramicRequestDto,
   CeramicDto,
   CeramicNetwork,
-} from '../types'
+} from '../types.d'
 import { ApiResp } from '.'
 
 export function getCeramicNode(id: number): AxiosPromise<ApiResp<CeramicDto>> {

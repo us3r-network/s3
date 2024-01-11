@@ -4,7 +4,7 @@ import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
 import { DID } from 'dids'
 import useSelectedDapp from './useSelectedDapp'
-import { Network } from '../components/Selector/EnumSelect'
+import { Network } from '../types.d'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 

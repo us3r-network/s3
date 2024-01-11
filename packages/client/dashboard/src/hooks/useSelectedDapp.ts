@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useAppCtx } from '../context/AppCtx'
 import { useMemo } from 'react'
-import { Network } from '../components/Selector/EnumSelect'
+import { Network } from '../types.d'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
 import { S3ModelCollectionModel } from '@us3r-network/data-model'
 

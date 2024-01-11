@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
-import { DappComposite, ModelStream } from '../types'
+import { DappComposite, ModelStream } from '../types.d'
 import styled from 'styled-components'
 import ModelSDK from '../components/ModelSDK'
 

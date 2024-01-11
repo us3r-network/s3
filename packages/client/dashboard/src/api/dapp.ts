@@ -2,10 +2,8 @@ import axios, { AxiosPromise } from 'axios'
 import { APP_API_URL } from '../constants'
 import {
   ClientDApp,
-} from '../types'
-import {
   Network,
-} from '../components/Selector/EnumSelect'
+} from '../types.d'
 import { ApiResp } from '.'
 
 export const PageSize = 50

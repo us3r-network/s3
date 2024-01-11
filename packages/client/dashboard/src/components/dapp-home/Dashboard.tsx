@@ -5,8 +5,7 @@ import streamsIconUrl from './imgs/streams.svg'
 import { useEffect, useState, useMemo } from 'react'
 import { getStreamsCountWithModels } from '../../api/model'
 import { getDappComposites } from '../../api/composite'
-import { Network } from '../Selector/EnumSelect'
-import { ClientDApp } from '../../types'
+import { ClientDApp, Network } from '../../types.d'
 
 export default function Dashboard({ dapp }: { dapp: ClientDApp }) {
   const models = useMemo(() => dapp?.models || [], [dapp])

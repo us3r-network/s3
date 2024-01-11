@@ -2,10 +2,14 @@ import styled from 'styled-components'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 
 import { LogoWhite } from './Logo'
-import { Link } from 'react-router-dom'
-import DappSelector from './Selector/DappSelector'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import LoginButton from './LoginButton'
 import useSelectedDapp from '../hooks/useSelectedDapp'
+import { useMemo } from 'react'
+import { Item } from './common/ComboBox'
+import { Select } from './common/Select'
+import { Label } from './common/ListBox'
+
 
 export default function Header() {
   const { appId, selectDapps } = useSelectedDapp()
@@ -74,3 +78,44 @@ const HeaderContainer = styled.header`
     }
   }
 `
+
+function DappSelector({
+  dapps,
+  selected,
+}: {
+  dapps: { id: number; name: string }[]
+  selected: string
+}) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const dappItems = useMemo(() => {
+    return [...dapps, { id: 0, name: '+ Create Dapp' }]
+  }, [dapps])
+
+  return (
+    <Select
+      label="Reviewer"
+      items={dappItems}
+      selectedKey={Number(selected)}
+      onSelectionChange={(k) => {
+        if (k === 0) {
+          navigate('/dapp/create')
+          return
+        }
+        const { pathname } = location
+        const data = pathname.split('/')
+        data[2] = `${k}`
+        navigate(data.join('/'))
+      }}
+    >
+      {(item) => (
+        <Item textValue={item.name}>
+          <div>
+            <Label>{item.name}</Label>
+          </div>
+        </Item>
+      )}
+    </Select>
+  )
+}

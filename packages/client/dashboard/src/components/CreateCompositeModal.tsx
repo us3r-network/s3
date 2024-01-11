@@ -9,7 +9,7 @@ import { schemas } from '../utils/composedb-types/schemas'
 import useSelectedDapp from '../hooks/useSelectedDapp'
 import { createDappComposites } from '../api/composite'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { ModelStream } from '../types'
+import { ModelStream } from '../types.d'
 
 const TINT_WORD = `# Edit the model's relation based on your business needs.
 # See Example below

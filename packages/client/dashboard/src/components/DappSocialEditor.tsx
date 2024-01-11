@@ -15,7 +15,7 @@ import MirrorIcon from './Icons/MirrorIcon'
 import MediumIcon from './Icons/MediumIcon'
 import GithubIcon from './Icons/GithubIcon'
 import React from 'react'
-import { ClientDApp } from '../types'
+import { ClientDApp } from '../types.d'
 
 const IconMap: { [key: string]: () => JSX.Element } = {
   twitter: TwitterIcon,

@@ -10,39 +10,7 @@ import {
 import styled from 'styled-components'
 import SelectorIcon from './SelectorIcon'
 import { useMemo, useState } from 'react'
-import { CeramicDBType, CeramicNetwork } from '../../types'
-
-export enum Stage {
-  DEVELOPMENT = 'Under development',
-  NOT_RELEASE = 'Completed but not released',
-  RELEASE = 'Completed and released',
-}
-
-export enum Network {
-  MAINNET = 'Mainnet',
-  TESTNET = 'Testnet',
-}
-
-export enum AppType {
-  GAME = 'Game',
-  SOCIAL = 'Social',
-  MARKETPLACE = 'Marketplace',
-  TOOL = 'Tool',
-  DEFI = 'DeFi',
-  OTHER = 'Other',
-}
-
-export enum GraphqlGenType {
-  CLIENT_PRESET = 'Client preset',
-  REACT_QUERY_HOOKS = 'React-Query Hooks',
-  REACT_APOLLO_HOOKS = 'React-Apollo Hooks',
-}
-
-export enum GraphqlGenTypeServer {
-  'Client preset' = 'ClientPreset',
-  'React-Query Hooks' = 'ReactQueryHooks',
-  'React-Apollo Hooks' = 'ReactApolloHooks',
-}
+import { AppType, CeramicDBType, CeramicNetwork, GraphqlGenType, Network, Stage } from '../../types.d'
 
 export default function EnumSelector<
   T extends Stage | Network | CeramicNetwork | CeramicDBType | AppType | GraphqlGenType

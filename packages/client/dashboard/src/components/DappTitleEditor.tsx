@@ -8,8 +8,7 @@ import {
   Modal,
   ModalOverlay,
 } from 'react-aria-components'
-import { ClientDApp } from '../types'
-import { Network } from './Selector/EnumSelect'
+import { ClientDApp, Network } from '../types.d'
 
 export default function DappTitleEditor({
   selectedDapp,
