@@ -9,7 +9,7 @@ import { useAppCtx } from './context/AppCtx'
 
 import MyDapps from './container/MyDapps'
 import NoMatch from './container/NoMatch'
-import CeramicProvider from './context/AppCtx'
+import AppProvider from './context/AppCtx'
 import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 import DappHome from './container/DappHome'
 import DappCreate from './container/DappCreate'
@@ -65,14 +65,20 @@ export default function App () {
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
       appName='S3 Console'
-      authOpts={{resources:["ceramic://*","ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d"],expirationTime:''}}
+      authOpts={{
+        resources: [
+          'ceramic://*',
+          'ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d'
+        ],
+        expirationTime: ''
+      }}
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
-        <CeramicProvider>
-          <CeramicNodeProvider>
+        <CeramicNodeProvider>
+          <AppProvider>
             <Routers />
-          </CeramicNodeProvider>
-        </CeramicProvider>
+          </AppProvider>
+        </CeramicNodeProvider>
       </ProfileStateProvider>
     </Us3rAuthWithRainbowkitProvider>
   )
