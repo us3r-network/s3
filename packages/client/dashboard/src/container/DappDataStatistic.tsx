@@ -1,8 +1,8 @@
-import Instance from '../components/ModelInstance'
-import useSelectedDapp from '../hooks/useSelectedDapp'
 import { useLocation, useOutletContext } from 'react-router-dom'
+import CompositeDefinition from '../components/model/CompositeDefinition'
+import Instance from '../components/model/ModelInstance'
+import useSelectedDapp from '../hooks/useSelectedDapp'
 import { DappComposite, ModelStream, Network } from '../types.d'
-import CompositeDefinition from '../components/CompositeDefinition'
 
 export default function DappDataStatistic() {
   const { selectModel, selectComposite } = useOutletContext<{

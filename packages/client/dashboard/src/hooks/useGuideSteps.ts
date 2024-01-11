@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ClientDApp } from '../types.d'
 import { useLocation } from 'react-router-dom'
+import { ClientDApp } from '../types.d'
 
 const GUIDE_STEPS_KEY = 'guide-steps'
 const GUIDE_STEPS_DEFAULT = [false, false, false, false, false]

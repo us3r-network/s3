@@ -6,8 +6,8 @@ import {
   ModalOverlay,
   ModalOverlayProps,
 } from 'react-aria-components'
-import CloseIcon from '../Icons/CloseIcon'
 import styled, { keyframes } from 'styled-components'
+import CloseIcon from '../icons/CloseIcon'
 
 export interface ModalBaseProps extends ModalOverlayProps {
   children?: React.ReactNode

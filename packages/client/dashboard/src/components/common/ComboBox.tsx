@@ -1,14 +1,11 @@
-import * as React from 'react'
-import styled from 'styled-components'
 import type { ComboBoxProps } from '@react-types/combobox'
+import * as React from 'react'
+import { useButton, useComboBox, useFilter } from 'react-aria'
 import { useComboBoxState } from 'react-stately'
-import { useComboBox, useButton, useFilter } from 'react-aria'
-
+import styled from 'styled-components'
 import { ListBox } from './ListBox'
 import { Popover } from './Popover'
-import { Wrapper, Label } from './shared'
-
-export { Item, Section } from 'react-stately'
+import { Label, Wrapper } from './shared'
 
 interface StyleProps {
   isFocused?: boolean

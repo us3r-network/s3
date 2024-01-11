@@ -1,8 +1,8 @@
-import type { OverlayTriggerState } from 'react-stately'
 import type { AriaPopoverProps } from '@react-aria/overlays'
-import styled from 'styled-components'
+import { DismissButton, Overlay, usePopover } from '@react-aria/overlays'
 import React from 'react'
-import { usePopover, DismissButton, Overlay } from '@react-aria/overlays'
+import type { OverlayTriggerState } from 'react-stately'
+import styled from 'styled-components'
 
 interface PopoverProps extends Omit<AriaPopoverProps, 'popoverRef'> {
   children: React.ReactNode

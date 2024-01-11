@@ -1,29 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import styled from 'styled-components'
-import InfiniteScroll from 'react-infinite-scroll-component'
-
-import { CeramicStatus, ClientDApp, ModelStream, Network } from '../types.d'
-import { updateDapp } from '../api/dapp'
-import {
-  PAGE_SIZE,
-  getModelStreamList,
-  getStarModels,
-  startIndexModel
-} from '../api/model'
-import { TableBox, TableContainer } from '../components/TableBox'
-import dayjs from 'dayjs'
-import { shortPubKey } from '../utils/shortPubKey'
-import Search from '../components/Search'
-import useSelectedDapp from '../hooks/useSelectedDapp'
-import { PersonalCollection, useAppCtx } from '../context/AppCtx'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import StarIcon from '../components/Icons/StarIcon'
-import StarGoldIcon from '../components/Icons/StarGoldIcon'
-import { S3_SCAN_URL } from '../constants'
-import CheckCircleIcon from '../components/Icons/CheckCircleIcon'
-import PlusCircleIcon from '../components/Icons/PlusCircleIcon'
-import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import dayjs from 'dayjs'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -31,8 +8,30 @@ import {
   Modal,
   ModalOverlay
 } from 'react-aria-components'
-import NoCeramicNodeModal from '../components/NoCeramicNodeModal'
-import { ImgOrName } from '../components/ImgOrName'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useSearchParams } from 'react-router-dom'
+import styled from 'styled-components'
+import { updateDapp } from '../api/dapp'
+import {
+  PAGE_SIZE,
+  getModelStreamList,
+  getStarModels,
+  startIndexModel
+} from '../api/model'
+import { ImgOrName } from '../components/common/ImgOrName'
+import Search from '../components/common/Search'
+import { TableBox, TableContainer } from '../components/common/TableBox'
+import CheckCircleIcon from '../components/icons/CheckCircleIcon'
+import PlusCircleIcon from '../components/icons/PlusCircleIcon'
+import StarGoldIcon from '../components/icons/StarGoldIcon'
+import StarIcon from '../components/icons/StarIcon'
+import NoCeramicNodeModal from '../components/node/NoCeramicNodeModal'
+import { S3_SCAN_URL } from '../constants'
+import { PersonalCollection, useAppCtx } from '../context/AppCtx'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import useSelectedDapp from '../hooks/useSelectedDapp'
+import { CeramicStatus, ClientDApp, ModelStream, Network } from '../types.d'
+import { shortPubKey } from '../utils/shortPubKey'
 
 export default function ExploreModel () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

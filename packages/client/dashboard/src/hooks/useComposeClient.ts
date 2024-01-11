@@ -1,12 +1,12 @@
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { CeramicClient } from '@ceramicnetwork/http-client'
 import { ComposeClient } from '@composedb/client'
 import { RuntimeCompositeDefinition } from '@composedb/types'
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { DID } from 'dids'
-import useSelectedDapp from './useSelectedDapp'
-import { Network } from '../types.d'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../constants'
-import { CeramicClient } from '@ceramicnetwork/http-client'
+import { Network } from '../types.d'
+import useSelectedDapp from './useSelectedDapp'
 
 export function useComposeClient(definition: RuntimeCompositeDefinition | undefined, ceramicNodeURL: string|undefined = undefined) {
   const { selectedDapp } = useSelectedDapp()

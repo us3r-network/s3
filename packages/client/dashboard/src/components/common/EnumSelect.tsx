@@ -1,16 +1,16 @@
+import { useMemo, useState } from 'react'
 import {
   Button,
-  ListBoxItem,
   Label,
   ListBox,
+  ListBoxItem,
   Popover,
   Select,
   SelectValue,
 } from 'react-aria-components'
 import styled from 'styled-components'
-import SelectorIcon from './SelectorIcon'
-import { useMemo, useState } from 'react'
 import { AppType, CeramicDBType, CeramicNetwork, GraphqlGenType, Network, Stage } from '../../types.d'
+import SelectorIcon from '../icons/SelectorIcon'
 
 export default function EnumSelector<
   T extends Stage | Network | CeramicNetwork | CeramicDBType | AppType | GraphqlGenType

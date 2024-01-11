@@ -1,12 +1,12 @@
-import styled from 'styled-components'
-import { useAppCtx } from '../context/AppCtx'
-import ChevronLeft from '../components/Icons/ChevronLeft'
-import PlusIcon from '../components/Icons/PlusIcon'
-import { Link, useNavigate } from 'react-router-dom'
 import {
   useAuthentication,
   useSession,
 } from '@us3r-network/auth-with-rainbowkit'
+import { Link, useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import ChevronLeft from '../components/icons/ChevronLeft'
+import PlusIcon from '../components/icons/PlusIcon'
+import { useAppCtx } from '../context/AppCtx'
 import { ClientDApp } from '../types.d'
 import { createImageFromInitials } from '../utils/createImage'
 import { getRandomColor } from '../utils/randomColor'

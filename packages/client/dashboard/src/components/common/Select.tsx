@@ -1,21 +1,18 @@
-import React from 'react'
-import styled from 'styled-components'
 import type { AriaSelectProps } from '@react-types/select'
-import { useSelectState } from 'react-stately'
+import React from 'react'
 import {
-  useSelect,
   HiddenSelect,
-  useButton,
   mergeProps,
+  useButton,
   useFocusRing,
+  useSelect,
 } from 'react-aria'
-
+import { useSelectState } from 'react-stately'
+import styled from 'styled-components'
 import { ListBox } from './ListBox'
 import { Popover } from './Popover'
-import { Wrapper, Label } from './shared'
-import SelectorIcon from './SelectorIcon'
-
-export { Item } from 'react-stately'
+import SelectorIcon from '../icons/SelectorIcon'
+import { Label, Wrapper } from './shared'
 
 interface ButtonProps {
   isOpen?: boolean

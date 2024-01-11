@@ -1,3 +1,4 @@
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import React, {
   createContext,
   useCallback,
@@ -6,10 +7,8 @@ import React, {
   useMemo,
   useState
 } from 'react'
-
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { CeramicDto } from '../types.d'
 import { getCeramicNodes } from '../api/ceramicNode'
+import { CeramicDto } from '../types.d'
 
 export interface CeramicNodeContextData {
   loadingCeramicNodes: boolean

@@ -1,3 +1,4 @@
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import React, {
   createContext,
   useCallback,
@@ -5,11 +6,9 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { ClientDApp } from '../types.d'
 import { getDapp, getDappWithDid } from '../api/dapp'
 import { useGuideStepsState } from '../hooks/useGuideSteps'
+import { ClientDApp } from '../types.d'
 
 export type PersonalCollection = {
   modelId: string

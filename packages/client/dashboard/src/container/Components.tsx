@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import ChevronRightDouble from '../components/Icons/ChevronRightDouble'
+import ChevronRightDouble from '../components/icons/ChevronRightDouble'
 import { DOCS_URL } from '../constants'
 
 const pkgs = [

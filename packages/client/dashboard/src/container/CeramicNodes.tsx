@@ -7,22 +7,20 @@
  * @Description:
  */
 
-import styled from 'styled-components'
-import { useEffect, useState } from 'react'
-import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
-import { Button, Dialog, DialogTrigger } from 'react-aria-components'
-
-import { Modal, ModalOverlay } from 'react-aria-components'
-import PlusIcon from '../components/Icons/PlusIcon'
-import CreateCeramicNodeModal from '../components/CreateCeramicNodeModal'
-import { CeramicDto, CeramicNetwork, CeramicStatus, Network } from '../types.d'
-import dayjs from 'dayjs'
-import { useAppCtx } from '../context/AppCtx'
-import DeleteCeramicNodeModal from '../components/DeleteCeramicNodeModal'
-import TrashIcon from '../components/Icons/TrashIcon'
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import NodeTerminal from '../components/Terminal'
-import CopyTint from '../components/CopyTint'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { Button, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components'
+import styled from 'styled-components'
+import PlusIcon from '../components/icons/PlusIcon'
+import TrashIcon from '../components/icons/TrashIcon'
+import CopyTint from '../components/common/CopyTint'
+import CreateCeramicNodeModal from '../components/node/CreateCeramicNodeModal'
+import DeleteCeramicNodeModal from '../components/node/DeleteCeramicNodeModal'
+import NodeTerminal from '../components/node/Terminal'
+import { useAppCtx } from '../context/AppCtx'
+import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
+import { CeramicDto, CeramicNetwork, CeramicStatus, Network } from '../types.d'
 export default function CeramicNodes () {
   const {
     currCeramicNode,

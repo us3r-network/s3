@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import * as React from 'react'
-import styled from 'styled-components'
 import type { AriaListBoxOptions } from '@react-aria/listbox'
 import type { Node } from '@react-types/shared'
-import type { ListState } from 'react-stately'
+import * as React from 'react'
 import { useListBox, useOption } from 'react-aria'
+import type { ListState } from 'react-stately'
+import styled from 'styled-components'
 
 interface ListBoxProps extends AriaListBoxOptions<any> {
   listBoxRef?: React.RefObject<HTMLUListElement>

@@ -1,8 +1,8 @@
 import { useOutletContext } from 'react-router-dom'
-import { DappComposite, ModelStream } from '../types.d'
-import CompositeDefinition from '../components/CompositeDefinition'
 import styled from 'styled-components'
-import Definition from '../components/Definition'
+import CompositeDefinition from '../components/model/CompositeDefinition'
+import Definition from '../components/model/Definition'
+import { DappComposite, ModelStream } from '../types.d'
 
 export default function DappModelEditor() {
   const { selectModel, selectComposite } = useOutletContext<{
