@@ -124,7 +124,8 @@ export default function Instance ({
       const newStreams = await loadMultiStreams(ids)
       setStreams({ ...streams, ...newStreams })
     }
-  }, [endCursor, queryStream, loadMultiStreams, streams])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endCursor, queryStream, streams])
 
   const fetchMids = useCallback(async () => {
     try {
@@ -144,7 +145,8 @@ export default function Instance ({
     } finally {
       setLoading(false)
     }
-  }, [loadMultiStreams, queryStream])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryStream])
 
   useEffect(() => {
     fetchMids()
