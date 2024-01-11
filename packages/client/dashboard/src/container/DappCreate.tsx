@@ -1,15 +1,16 @@
-import styled from 'styled-components'
-import EnumSelect, { Network } from '../components/Selector/EnumSelect'
-import { useNavigate } from 'react-router-dom'
-import { useCallback, useState } from 'react'
 import {
   useAuthentication,
-  useSession,
+  useSession
 } from '@us3r-network/auth-with-rainbowkit'
-import { createDapp } from '../api'
+import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import { createDapp } from '../api/dapp'
+import EnumSelect from '../components/common/EnumSelect'
 import { useAppCtx } from '../context/AppCtx'
+import { Network } from '../types.d'
 
-export default function DappCreate() {
+export default function DappCreate () {
   const navigate = useNavigate()
   const [network, setNetwork] = useState(Network.TESTNET)
   const { signIn } = useAuthentication()
@@ -44,35 +45,35 @@ export default function DappCreate() {
   }, [appName, navigate, network, session, signIn, loadDapps])
 
   return (
-    <DappCreateContainer className="container">
+    <DappCreateContainer className='container'>
       <div>
         <h1>Create Application</h1>
         <div>
-          <div className="app-name">
+          <div className='app-name'>
             <span>* App Name:</span>
             <input
-              type="text"
+              type='text'
               value={appName}
-              onChange={(e) => setAppName(e.target.value)}
+              onChange={e => setAppName(e.target.value)}
             />
           </div>
 
           <EnumSelect
             {...{ value: network, setValue: setNetwork }}
-            labelText="* Network:"
+            labelText='* Network:'
             values={Network}
           />
 
-          <div className="btns">
-            <button className="cancel" onClick={() => navigate(-1)}>
+          <div className='btns'>
+            <button className='cancel' onClick={() => navigate(-1)}>
               Cancel
             </button>
             {creating ? (
               <button>
-                <img src="/loading.gif" alt="" />
+                <img src='/loading.gif' alt='' />
               </button>
             ) : (
-              <button className="create" onClick={createAction}>
+              <button className='create' onClick={createAction}>
                 Create
               </button>
             )}

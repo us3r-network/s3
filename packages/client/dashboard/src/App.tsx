@@ -1,36 +1,35 @@
+import { useEffect, useState } from 'react'
 import { Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Us3rAuthWithRainbowkitProvider } from '@us3r-network/auth-with-rainbowkit'
 import { ProfileStateProvider } from '@us3r-network/profile'
-
-import { useAppCtx } from './context/AppCtx'
-
-import MyDapps from './container/MyDapps'
-import NoMatch from './container/NoMatch'
-import CeramicProvider from './context/AppCtx'
-import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
-import DappHome from './container/DappHome'
-import DappCreate from './container/DappCreate'
-import Header from './components/Header'
-import Nav from './components/Nav'
-import DappInfo from './container/DappInfo'
-import ExploreModel from './container/ExploreModel'
-
-import DappModelEditor from './container/DappModelEditor'
-import DappModelPlayground from './container/DappModelPlayground'
-import DappDataStatistic from './container/DappDataStatistic'
-import Components from './container/Components'
-
-import { useEffect, useState } from 'react'
-import ModelList from './components/ModelList'
-import { DappComposite, ModelStream } from './types'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
-import DappModelSdk from './container/DappModelSdk'
-import CeramicNodes from './container/CeramicNodes'
+
+import { DappComposite, ModelStream } from './types.d'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
+
+import AppProvider, { useAppCtx } from './context/AppCtx'
 import CeramicNodeProvider from './context/CeramicNodeCtx'
+
+import MyDapps from './container/MyDapps'
+import DappCreate from './container/DappCreate'
+import DappHome from './container/DappHome'
+import DappInfo from './container/DappInfo'
+import DappModelEditor from './container/DappModelEditor'
+import DappModelPlayground from './container/DappModelPlayground'
+import DappModelSdk from './container/DappModelSdk'
+import DappDataStatistic from './container/DappDataStatistic'
+import Components from './container/Components'
+import CeramicNodes from './container/CeramicNodes'
+import ExploreModel from './container/ExploreModel'
+import NoMatch from './container/NoMatch'
+
+import Header from './components/nav/Header'
+import Nav from './components/nav/Nav'
+import ModelList from './components/model/ModelList'
 
 dayjs.extend(relativeTime)
 
@@ -65,14 +64,20 @@ export default function App () {
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
       appName='S3 Console'
-      authOpts={{resources:["ceramic://*","ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d"],expirationTime:''}}
+      authOpts={{
+        resources: [
+          'ceramic://*',
+          'ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d'
+        ],
+        expirationTime: ''
+      }}
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
-        <CeramicProvider>
-          <CeramicNodeProvider>
+        <CeramicNodeProvider>
+          <AppProvider>
             <Routers />
-          </CeramicNodeProvider>
-        </CeramicProvider>
+          </AppProvider>
+        </CeramicNodeProvider>
       </ProfileStateProvider>
     </Us3rAuthWithRainbowkitProvider>
   )

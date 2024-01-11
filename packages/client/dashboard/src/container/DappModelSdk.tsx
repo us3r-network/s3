@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom'
-import { DappComposite, ModelStream } from '../types'
 import styled from 'styled-components'
-import ModelSDK from '../components/ModelSDK'
+import ModelSDK from '../components/model/ModelSDK'
+import { DappComposite, ModelStream } from '../types.d'
 
 export default function DappModelSdk() {
   const { selectModel } = useOutletContext<{

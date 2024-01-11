@@ -6,6 +6,28 @@
  * @FilePath: /s3/packages/client/dashboard/src/types.d.ts
  * @Description: 
  */
+
+/************************ App ******************************/
+export enum Stage {
+  DEVELOPMENT = 'Under development',
+  NOT_RELEASE = 'Completed but not released',
+  RELEASE = 'Completed and released',
+}
+
+export enum Network {
+  MAINNET = 'Mainnet',
+  TESTNET = 'Testnet',
+}
+
+export enum AppType {
+  GAME = 'Game',
+  SOCIAL = 'Social',
+  MARKETPLACE = 'Marketplace',
+  TOOL = 'Tool',
+  DEFI = 'DeFi',
+  OTHER = 'Other',
+}
+
 export type ClientDApp = {
   id?: number
   modelId?: string
@@ -21,6 +43,73 @@ export type ClientDApp = {
   models?: string[]
   createdAt?: number
   lastModifiedAt?: number
+}
+
+/************************ Node ******************************/
+export type CeramicDto = {
+  id: number;
+  name: string;
+  network: CeramicNetwork;
+  status: string;
+  privateKey: string;
+  apiKey: string;
+  namespace: string;
+  serviceHost: string;
+  serviceUrl: string;
+  serviceK8sMetadata: CeramicServiceK8sMetadata;
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type CeramicRequestDto = {
+  name: string;
+  network: CeramicNetwork;
+  ceramicDbType?: CeramicDBType;
+  ceramicEnableHistoricalSync?: boolean;
+}
+
+export enum CeramicDBType {
+  SQLITE ='sqlite',
+  PGSQL = 'postgres',
+}
+
+export enum CeramicNetwork {
+  MAINNET = 'mainnet',
+  TESTNET = 'testnet-clay',
+  ALL = 'all',
+}
+
+export enum CeramicStatus {
+  PREPARING = 'Preparing',
+  STARTING = 'Starting',
+  RUNNING = 'Running',
+  // PAUSE = 'Pause',
+  // RESUMING = 'Resuming',
+  TERMINATE = 'Terminate',
+  FAILED = 'Failed',
+  ALL = 'All',
+}
+
+export type CeramicServiceK8sMetadata = {
+  // k8s namespace is created by `ns_${creater_did}_${id}`
+  keramikObjectName: string;
+  ceramicLoadbalanceHost: string;
+  ceramicLoadbalancePort: number;
+  ceramicDbType: CeramicDBType;
+  ceramicEnableHistoricalSync: boolean;
+}
+
+/************************ Model ******************************/
+export enum GraphqlGenType {
+  CLIENT_PRESET = 'Client preset',
+  REACT_QUERY_HOOKS = 'React-Query Hooks',
+  REACT_APOLLO_HOOKS = 'React-Apollo Hooks',
+}
+
+export enum GraphqlGenTypeServer {
+  'Client preset' = 'ClientPreset',
+  'React-Query Hooks' = 'ReactQueryHooks',
+  'React-Apollo Hooks' = 'ReactApolloHooks',
 }
 
 export type ModelStream = {
@@ -91,57 +180,4 @@ export type DappComposite = {
   runtimeDefinition: string
   createdAt: number
   lastModifiedAt: number
-}
-
-export type CeramicDto = {
-  id: number;
-  name: string;
-  network: CeramicNetwork;
-  status: string;
-  privateKey: string;
-  apiKey: string;
-  namespace: string;
-  serviceHost: string;
-  serviceUrl: string;
-  serviceK8sMetadata: CeramicServiceK8sMetadata;
-  createdAt: number;
-  lastModifiedAt: number;
-}
-
-export type CeramicRequestDto = {
-  name: string;
-  network: CeramicNetwork;
-  ceramicDbType?: CeramicDBType;
-  ceramicEnableHistoricalSync?: boolean;
-}
-
-export enum CeramicDBType {
-  SQLITE ='sqlite',
-  PGSQL = 'postgres',
-}
-
-export enum CeramicNetwork {
-  MAINNET = 'mainnet',
-  TESTNET = 'testnet-clay',
-  ALL = 'all',
-}
-
-export enum CeramicStatus {
-  PREPARING = 'Preparing',
-  STARTING = 'Starting',
-  RUNNING = 'Running',
-  // PAUSE = 'Pause',
-  // RESUMING = 'Resuming',
-  TERMINATE = 'Terminate',
-  FAILED = 'Failed',
-  ALL = 'All',
-}
-
-export type CeramicServiceK8sMetadata = {
-  // k8s namespace is created by `ns_${creater_did}_${id}`
-  keramikObjectName: string;
-  ceramicLoadbalanceHost: string;
-  ceramicLoadbalancePort: number;
-  ceramicDbType: CeramicDBType;
-  ceramicEnableHistoricalSync: boolean;
 }
