@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Dapp, DappComposite, DappDomain, Network } from 'src/entities/dapp/dapp.entity';
-import { DappCompositeRepository, DappDomainRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
+import { Dapp, DappComposite, DappCompositeMapping, DappDomain, DappModel, Network } from 'src/entities/dapp/dapp.entity';
+import { DappCompositeMappingRepository, DappCompositeRepository, DappDomainRepository, DappModelRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
 import StreamService from 'src/stream/stream.service';
 import { ILike } from 'typeorm';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
@@ -16,8 +16,12 @@ export default class DappService {
     private readonly dappRepository: DappRepository,
     @InjectRepository(DappComposite, S3SeverBizDbName)
     private readonly dappCompositeRepository: DappCompositeRepository,
+    @InjectRepository(DappModel, S3SeverBizDbName)
+    private readonly dappModelRepository: DappModelRepository,
     @InjectRepository(DappDomain, S3SeverBizDbName)
     private readonly dappDomainRepository: DappDomainRepository,
+    @InjectRepository(DappCompositeMapping, S3SeverBizDbName)
+    private readonly dappCompositeMappingRepository: DappCompositeMappingRepository,
     private readonly streamService: StreamService,
     private readonly modelService: ModelService,
   ) { }
@@ -125,17 +129,35 @@ export default class DappService {
     });
   }
 
-  async saveComposite(dappId: number, dappComposite: DappComposite): Promise<DappComposite> {
+  async saveModel(dappId: number, dappModel: DappModel): Promise<DappModel> {
     const dapp = await this.findDappById(dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
-    dappComposite.setDappId = dappId;
-    dappComposite.setLastModifiedAt = new Date();
-    return await this.dappCompositeRepository.save(dappComposite);
+    dappModel.setDappId = dappId;
+    dappModel.setLastModifiedAt = new Date();
+    return await this.dappModelRepository.save(dappModel);
   }
 
-  async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {
-    return await this.dappCompositeRepository.find({ dapp_id: dappId, is_deleted: false });
+  // TODO add TX for the following methods
+  async saveComposite(dappId: number, dappComposite: DappComposite): Promise<DappModel> {
+    const dapp = await this.findDappById(dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+
+    const savedDappComposite = await this.dappModelRepository.save(dappComposite);
+
+    const dappCompositeMapping = new DappCompositeMapping();
+    dappCompositeMapping.setDappId = dappId;
+    dappCompositeMapping.setCompositeId = savedDappComposite.getId;
+    await this.dappCompositeMappingRepository.save(dappCompositeMapping);
+    return savedDappComposite;
+  }
+
+  // async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {
+  //   return await this.dappCompositeRepository.find({ dapp_id: dappId, is_deleted: false });
+  // }
+
+  async findModelsByDappId(dappId: number): Promise<DappModel[]> {
+    return await this.dappModelRepository.find({ dapp_id: dappId, is_deleted: false });
   }
 
   async deleteCompositeById(id: number): Promise<void> {

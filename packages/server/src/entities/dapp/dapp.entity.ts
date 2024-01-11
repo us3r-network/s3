@@ -198,8 +198,8 @@ export class Dapp extends BaseEntity {
   }
 }
 
-@Entity({ name: 'dapp_composites' })
-export class DappComposite extends BaseEntity {
+@Entity({ name: 'dapp_models' })
+export class DappModel extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -208,7 +208,7 @@ export class DappComposite extends BaseEntity {
   dapp_id: number;
 
   @Column({ nullable: true })
-  name: string;
+  model_stream_id: string;
 
   @Column({ nullable: true })
   graphql: string;
@@ -268,6 +268,165 @@ export class DappComposite extends BaseEntity {
   }
   set setDappId(dappId: number) {
     this.dapp_id = dappId;
+  }
+
+  get getModelStreamId(): string {
+    return this.model_stream_id;
+  }
+  set setModelStreamId(modelStreamId: string) {
+    this.model_stream_id = modelStreamId;
+  }
+
+  get getCreatedAt(): Date {
+    return this.created_at;
+  }
+  set setCreatedAt(createdAt: Date) {
+    this.created_at = createdAt;
+  }
+
+  get getLastModifiedAt(): Date {
+    return this.last_modified_at;
+  }
+  set setLastModifiedAt(LastModifiedAt: Date) {
+    this.last_modified_at = LastModifiedAt;
+  }
+}
+
+
+@Entity({ name: 'dapp_composite_mappings' })
+export class DappCompositeMapping extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Index()
+  @Column({ nullable: true })
+  dapp_id: number;
+
+  @Column({ nullable: true })
+  composite_id: number;
+
+  @Column({ nullable: false, default: false })
+  is_deleted: boolean;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  last_modified_at: Date;
+
+  get getId(): number {
+    return this.id;
+  }
+  set setId(id: number) {
+    this.id = id;
+  }
+
+  get getIsDeleted(): boolean {
+    return this.is_deleted;
+  }
+  set setIsDeleted(isDeleted: boolean) {
+    this.is_deleted = isDeleted;
+  }
+
+  get getDappId(): number {
+    return this.dapp_id;
+  }
+  set setDappId(dappId: number) {
+    this.dapp_id = dappId;
+  }
+
+  get getCompositeId(): number {
+    return this.composite_id;
+  }
+  set setCompositeId(compositeId: number) {
+    this.composite_id = compositeId;
+  }
+
+  get getCreatedAt(): Date {
+    return this.created_at;
+  }
+  set setCreatedAt(createdAt: Date) {
+    this.created_at = createdAt;
+  }
+
+  get getLastModifiedAt(): Date {
+    return this.last_modified_at;
+  }
+  set setLastModifiedAt(LastModifiedAt: Date) {
+    this.last_modified_at = LastModifiedAt;
+  }
+}
+
+@Entity({ name: 'composites' })
+export class DappComposite extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ nullable: true })
+  graphql: string;
+
+  @Column({ nullable: true })
+  composite: string;
+
+  @Index()
+  @Column({ nullable: true })
+  created_by_did: string;
+
+  @Column({ nullable: true })
+  runtime_definition: string;
+
+  @Column({ nullable: false, default: false })
+  is_deleted: boolean;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  last_modified_at: Date;
+
+  get getId(): number {
+    return this.id;
+  }
+  set setId(id: number) {
+    this.id = id;
+  }
+
+  get getIsDeleted(): boolean {
+    return this.is_deleted;
+  }
+  set setIsDeleted(isDeleted: boolean) {
+    this.is_deleted = isDeleted;
+  }
+
+  get getRuntimeDefinition(): string {
+    return this.runtime_definition;
+  }
+  set setRuntimeDefinition(runtimeDefinition: string) {
+    this.runtime_definition = runtimeDefinition;
+  }
+
+  get getGraphql(): string {
+    return this.graphql;
+  }
+  set setGraphql(graphql: string) {
+    this.graphql = graphql;
+  }
+
+  get getComposite(): string {
+    return this.composite;
+  }
+  set setComposite(composite: string) {
+    this.composite = composite;
+  }
+
+  get getCreatedByDid(): string {
+    return this.created_by_did;
+  }
+  set setCreatedByDid(createdByDid: string) {
+    this.created_by_did = createdByDid;
   }
 
   get getName(): string {
