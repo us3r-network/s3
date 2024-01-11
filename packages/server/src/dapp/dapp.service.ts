@@ -164,6 +164,14 @@ export default class DappService {
     await this.dappCompositeRepository.update({ id: id }, { is_deleted: true });
   }
 
+  async deleteCompositeMapping(dappId: number, composteId: number): Promise<void> {
+    await this.dappCompositeMappingRepository.update({ dapp_id: dappId, composite_id: composteId }, { is_deleted: true });
+  }
+
+  async deleteModelById(id: number): Promise<void> {
+    await this.dappModelRepository.update({ id: id }, { is_deleted: true });
+  }
+
   async deleteDappById(id: number): Promise<void> {
     await this.dappRepository.update({ id: id }, { is_deleted: true });
   }

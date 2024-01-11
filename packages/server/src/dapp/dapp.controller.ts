@@ -294,7 +294,22 @@ export class DappController {
         `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
       );
 
-    await this.dappService.deleteCompositeById(+id);
+    await this.dappService.deleteCompositeMapping(+dappId, +id);
+    return new BasicMessageDto('OK.', 0);
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Delete('/:dappId/models/:id')
+  async deleteModelById(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Param('id') id: string) {
+    this.logger.log(`Delete model by id ${id}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+    if (dapp.getCreatedByDid !== req.did)
+      throw new BadRequestException(
+        `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
+      );
+
+    await this.dappService.deleteModelById(+id);
     return new BasicMessageDto('OK.', 0);
   }
 }
