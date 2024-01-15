@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>wl.xyz</title>
+    <style>
+      html {
+        font-size: 16px;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", "Microsoft Yahei", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      body * {
+        box-sizing: border-box;
+        flex-shrink: 0;
+      }
+
+      .flex-row {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .flex-col {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .justify-start {
+        justify-content: flex-start;
+      }
+
+      .justify-center {
+        justify-content: center;
+      }
+
+      .justify-end {
+        justify-content: flex-end;
+      }
+
+      .justify-evenly {
+        justify-content: space-evenly;
+      }
+
+      .justify-around {
+        justify-content: space-around;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .items-start {
+        align-items: flex-start;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .items-end {
+        align-items: flex-end;
+      }
+      .page {
+        padding: 2.5rem 0;
+        background-color: #ebeee4;
+        width: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 100%;
+      }
+      .section {
+        margin: 0 2.5rem;
+        padding: 2.5rem 2.13rem 2.13rem 2.5rem;
+        background-color: #f7f9f1;
+        border-radius: 1.25rem;
+        box-shadow: 0px 0.25rem 0px #00000040;
+        border: solid 0.25rem #333333;
+      }
+      .image {
+        align-self: flex-start;
+        width: 10rem;
+        height: 5.13rem;
+      }
+      .font_1 {
+        font-size: 1rem;
+        font-family: Poppins;
+        line-height: 1.19rem;
+        color: #333333;
+      }
+      .text {
+        margin-top: 1.5rem;
+      }
+      .text-title-box {
+        margin-top: 2.5rem;
+        align-self: flex-start;
+        height: 2.5rem;
+        font-size: 1rem;
+        line-height: 1.19rem;
+        font-weight: 550;
+        font-size: 2.25rem;
+      }
+      .text-title {
+        font-weight: 700;
+        color: #333333;
+      }
+      .connect-button {
+        margin-top: 2.5rem;
+        padding: 1rem 0 1.13rem;
+        align-self: flex-start;
+        background-color: #3dd606;
+        border-radius: 0.63rem;
+        box-shadow: 0px -0.25rem 0px #0000001a inset;
+        width: 18.75rem;
+        position: relative;
+        cursor: pointer;
+      }
+      .text_2 {
+        color: #ffffff;
+        font-size: 1.13rem;
+        font-family: Poppins;
+        font-weight: 700;
+        line-height: 0.91rem;
+      }
+      .group {
+        margin-left: 0.063rem;
+        padding: 2.88rem 0 2.63rem;
+        align-self: flex-start;
+      }
+      .space-y-5 > *:not(:first-child) {
+        margin-top: 0.31rem;
+      }
+      .text_3 {
+        line-height: 1.03rem;
+      }
+      .text_4 {
+        text-decoration: underline;
+      }
+      .section_2 {
+        align-self: flex-start;
+        background-color: #333333;
+        width: 2.5rem;
+        height: 0.25rem;
+      }
+      .text_5 {
+        margin-left: 0.063rem;
+        margin-top: 2.75rem;
+        align-self: flex-start;
+        color: #33333380;
+        font-size: 0.88rem;
+        font-family: Poppins;
+        line-height: 0.91rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-col page">
+      <div class="flex-col section">
+        <img
+          class="image"
+          src="data:image/png;base64,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"
+        />
+        <div class="text-title-box">
+          <span>😃</span>
+          <span class="text-title">You're almost there!</span>
+        </div>
+        <span class="font_1 text">
+          Click the link below to confirm your email and finish connecting with your WL account. This link will expire in 2 hours and can only be used once.
+        </span>
+        <div
+          class="flex-col items-center connect-button"
+          onclick="window.open({{confirmEmailURL}})"
+        >
+          <span class="text_2">Connect Your email</span>
+        </div>
+        <div class="flex-col items-start space-y-5 group">
+          <span class="font_1 text_3"
+            >If the button above doesn't work, paste this link into your web browser:</span>
+          <a href="{{confirmEmailURL}}" class="font_1 text_4">{{confirmEmailURL}}</a>
+        </div>
+        <div class="section_2"></div>
+        <span class="text_5"
+          >If you did not make this request, you can safely ignore this email.</span>
+      </div>
+    </div>
+  </body>
+</html>

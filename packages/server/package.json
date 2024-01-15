@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles  --runInBand --forceExit"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.490.0",
     "@ceramicnetwork/anchor-utils": "^1.20.0",
     "@ceramicnetwork/common": "^2.35.0",
     "@ceramicnetwork/http-client": "^2.32.0",
