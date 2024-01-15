@@ -96,20 +96,20 @@ export function getModelMid({
   })
 }
 
-export function getModelInfo({
-  network,
-  id,
-}: {
-  network: Network
-  id: string
-}): AxiosPromise<ApiResp<ModelStream>> {
-  let host = APP_API_URL
-  return axios.get(`${host}/models/${id}`, {
-    params: {
-      network: network.toUpperCase(),
-    },
-  })
-}
+// export function getModelInfo({
+//   network,
+//   id,
+// }: {
+//   network: Network
+//   id: string
+// }): AxiosPromise<ApiResp<ModelStream>> {
+//   let host = APP_API_URL
+//   return axios.get(`${host}/models/${id}`, {
+//     params: {
+//       network: network.toUpperCase(),
+//     },
+//   })
+// }
 
 export function getModelSDK({
   network,

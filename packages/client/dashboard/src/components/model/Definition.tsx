@@ -2,9 +2,9 @@ import { AxiosError } from 'axios'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { getModelInfo, queryModelGraphql } from '../../api/model'
+import { queryModelGraphql } from '../../api/model'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { ModeQueryResult, ModelStream, Network } from '../../types.d'
+import { ModeQueryResult, Network } from '../../types.d'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
 
@@ -14,21 +14,8 @@ export default function Definition({ streamId }: { streamId: string }) {
     code: schemas.code,
   })
   const [errMsg, setErrMsg] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [modelStream, setModelStream] = useState<ModelStream>()
   const { selectedDapp } = useSelectedDapp()
   const [loading, setLoading] = useState(false)
-
-  const fetchModelInfo = useCallback(
-    async (streamId: string) => {
-      const resp = await getModelInfo({
-        network: (selectedDapp?.network as Network) || Network.TESTNET,
-        id: streamId,
-      })
-      setModelStream(resp.data.data)
-    },
-    [selectedDapp]
-  )
 
   const fetchModelGraphql = useCallback(
     async (streamId: string) => {
@@ -64,8 +51,7 @@ export default function Definition({ streamId }: { streamId: string }) {
   useEffect(() => {
     if (!streamId) return
     fetchModelGraphql(streamId)
-    fetchModelInfo(streamId)
-  }, [fetchModelGraphql, streamId, fetchModelInfo])
+  }, [fetchModelGraphql, streamId])
 
   if (loading) {
     return (
