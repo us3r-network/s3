@@ -22,7 +22,7 @@ import { AccountType } from "src/entities/account/account.entity";
 @Controller('/users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post('/email')
   async linkByEmail(
@@ -30,7 +30,7 @@ export class UserController {
     @Req() req: IUserRequest,
   ): Promise<BasicMessageDto> {
     const account = await this.userService.getAccount(req.did, AccountType.EMAIL);
-    if (!account) {
+    if (account) {
       throw new BadRequestException('The email has existed.');
     }
     await this.userService.linkByEmail(req.did, dto.email);
@@ -44,7 +44,7 @@ export class UserController {
   ): Promise<BasicMessageDto> {
     const account = await this.userService.getAccount(req.did, AccountType.EMAIL);
     if (!account) {
-      throw new BadRequestException('email not found');
+      return new BasicMessageDto('The user email not found', 1);
     }
     return new BasicMessageDto('OK', 0, { email: account.getThirdpartyId });
   }
