@@ -30,6 +30,7 @@ function scheduleModule() {
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
       logging: false,
+      synchronize: true,
       entities: ['dist/**/dapp.entity{.ts,.js}', 'dist/**/stream.entity{.ts,.js}', 'dist/**/account.entity{.ts,.js}'],
       type: 'postgres',
       pool: {
