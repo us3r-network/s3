@@ -88,7 +88,7 @@ export default function Email ({
               onClick={send}
             >
               {sendEmailCountDown
-                ? `Send Email (${sendEmailCountDown})`
+                ? `Send in ${sendEmailCountDown}s`
                 : `Send Email`}
             </button>
           </div>
