@@ -24,4 +24,10 @@ export const TEMPLETES: TemplateData[] = [
     path: './activateCodeEmailU3.html',
     params: ['activateCode'],
   },
+  {
+    name: 'activateCode-email-s3',
+    subject: 's3.xyz email confirm',
+    path: './activateCodeEmailS3.html',
+    params: ['activateCode'],
+  },
 ];

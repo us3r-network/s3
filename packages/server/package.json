@@ -18,7 +18,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles  --runInBand --forceExit"
+    "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles  --runInBand --forceExit",
+    "update-templates": "ts-node src/utils/email/templates/createTemplateScript.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.490.0",
@@ -110,7 +111,7 @@
     "supertest": "^6.0.0",
     "ts-jest": "^29.1.0",
     "ts-loader": "^8.0.8",
-    "ts-node": "^9.0.0",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.0.5"
   },

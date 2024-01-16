@@ -23,7 +23,7 @@ export default class UserService {
     await this.redis.set(`link:emails:${email}`, code, 'EX', 600);
 
     const sendTemplateEmailResult = await sendTemplateEmail(
-      TEMPLETES[2].name, //use activateCode-email-u3 templete
+      TEMPLETES[3].name, //use activateCode-email-s3 templete
       { activateCode: code },
       email,
       DEFAULT_FROM_ADDRESS,
