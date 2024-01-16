@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { UPLOAD_API_URL } from '../constants'
 
-enum ApiRespCode {
+export enum ApiRespCode {
   SUCCESS = 0,
   ERROR = 1,
 }

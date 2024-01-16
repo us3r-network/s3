@@ -9,6 +9,8 @@ import { createCeramicNode } from '../../api/ceramicNode'
 import { CeramicDBType, CeramicNetwork } from '../../types.d'
 import EnumSelect from '../common/EnumSelect'
 import CloseIcon from '../icons/CloseIcon'
+import UserEmail from './UserEmail'
+import { EmailStatus } from '../../hooks/useUserAccount'
 
 export default function CreateCeramicNodeModal ({
   fixedNetwork,
@@ -60,8 +62,17 @@ export default function CreateCeramicNodeModal ({
     } finally {
       setSubmitting(false)
     }
-  }, [submitting, session, signIn, nodeName, network, dbType, onSussess, closeModal])
-
+  }, [
+    submitting,
+    session,
+    signIn,
+    nodeName,
+    network,
+    dbType,
+    onSussess,
+    closeModal
+  ])
+  const [userEmailVerified, setUserEmailVerified] = useState(false)
   return (
     <CreateBox>
       <div className='title'>
@@ -100,6 +111,11 @@ export default function CreateCeramicNodeModal ({
           </div>
           Enable Historic Sync
         </Checkbox>
+        <UserEmail
+          emailStatusChange={stutas =>
+            setUserEmailVerified(stutas === EmailStatus.VERIFIED)
+          }
+        />
       </EditorBox>
       <div className='btns'>
         <button onClick={closeModal}>Cancel</button>
@@ -108,7 +124,7 @@ export default function CreateCeramicNodeModal ({
             <img src='/loading.gif' alt='' />
           </button>
         )) || (
-          <button className='submit' onClick={submit}>
+          <button className='submit' onClick={submit} disabled={!userEmailVerified}>
             Submit
           </button>
         )}
@@ -116,6 +132,7 @@ export default function CreateCeramicNodeModal ({
     </CreateBox>
   )
 }
+
 const EditorBox = styled.div`
   display: flex;
   flex-direction: column;
