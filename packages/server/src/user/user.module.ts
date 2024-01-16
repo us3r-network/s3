@@ -4,15 +4,16 @@ import { S3SeverBizDbName } from "src/common/constants";
 import { UserAuthMiddleware } from "src/middlewares/user-auth.middleware";
 import { UserController } from "./user.controller";
 import { Account } from "src/entities/account/account.entity";
+import UserService from "./user.service";
 
 
 @Module({
   imports: [ 
     TypeOrmModule.forFeature([Account], S3SeverBizDbName),
   ],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [UserController],
+  providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
