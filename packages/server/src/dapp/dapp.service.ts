@@ -181,6 +181,35 @@ export default class DappService {
     return await this.dappCompositeRepository.findOne({ id: id });
   }
 
+
+  async findDappsByCompositeId(id: number): Promise<Dapp[]> {
+    const dappCompositeMappings = await this.dappCompositeMappingRepository.find({ where: { composite_id: id } });
+    if (dappCompositeMappings.length == 0) return [];
+    const dappIds = dappCompositeMappings.map(d => d.dapp_id);
+    return await this.dappRepository.find({ id: In(dappIds) });
+  }
+
+  async findDappsByCompositeIds(ids: number[]): Promise<Map<number, Dapp[]>> {
+    const dappCompositeMappings = await this.dappCompositeMappingRepository.find({ where: { composite_id: In(ids) } });
+    if (dappCompositeMappings.length == 0) return;
+
+    const dappIds = dappCompositeMappings.map(d => d.dapp_id);
+    const dapps = await this.dappRepository.find({ id: In(dappIds) });
+    const dappMap = new Map<number, Dapp>();
+    dapps.forEach(d => {
+      dappMap.set(d.id, d);
+    });
+
+    const compositeIdDappsMap = new Map<number, Dapp[]>();
+    dappCompositeMappings.forEach(d => {
+      const dapps = compositeIdDappsMap.get(d.getCompositeId) || [];
+      dapps.push(dappMap.get(d.getDappId));
+      compositeIdDappsMap.set(d.getCompositeId, dapps);
+    });
+
+    return compositeIdDappsMap;
+  }
+
   async findCompositeByOrder(pageSize: number, pageNumber: number): Promise<DappComposite[]> {
     const composites = await this.dappCompositeRepository.find({ is_deleted: false });
     if (composites.length == 0) return [];

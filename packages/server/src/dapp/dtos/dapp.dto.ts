@@ -16,6 +16,8 @@ export class DappCompositeDto {
   @ApiProperty()
   runtimeDefinition: string;
   @ApiProperty()
+  dapps: DappDto[];
+  @ApiProperty()
   createdAt: number;
   @ApiProperty()
   lastModifiedAt: number;
@@ -54,7 +56,7 @@ export function convertToModelDto(model: DappModel): DappModelDto {
   return dto;
 }
 
-export function convertToCompositeDto(composite: DappComposite): DappCompositeDto {
+export function convertToCompositeDto(composite: DappComposite, dappDtos?: DappDto[]): DappCompositeDto {
   const dto = new DappCompositeDto();
   dto.id = composite.getId;
   dto.name = composite.getName;
@@ -63,6 +65,7 @@ export function convertToCompositeDto(composite: DappComposite): DappCompositeDt
   dto.runtimeDefinition = composite.getRuntimeDefinition;
   dto.createdAt = composite.getCreatedAt?.getTime();
   dto.lastModifiedAt = composite.getLastModifiedAt?.getTime();
+  dto.dapps = dappDtos?? [];
   return dto;
 }
 

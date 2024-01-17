@@ -53,10 +53,15 @@ export class DappController {
     const composite = await this.dappService.findCompositeById(+compositeId);
     if (!composite) throw new NotFoundException(`The composite not found. id: ${compositeId}`);
 
+    const dapps = await this.dappService.findDappsByCompositeId(+compositeId);
+    let dappDtos: DappDto[];
+    if (dapps.length > 0) {
+      dappDtos = dapps.map(d => convertToDappDto(d));
+    }
     return new BasicMessageDto(
       'OK.',
       0,
-      convertToCompositeDto(composite),
+      convertToCompositeDto(composite, dappDtos),
     );
   }
 
@@ -69,7 +74,24 @@ export class DappController {
     @Query('pageNumber')
     pageNumber: number = 1,) {
     this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}`);
-    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber);
+    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber) ?? [];
+
+    if (composites.length > 0) {
+      const compositeIds = composites.map(c => c.id);
+      const compositeIdDappsMap = await this.dappService.findDappsByCompositeIds(compositeIds);
+      return new BasicMessageDto(
+        'OK.',
+        0,
+        composites.map(c => {
+          const dapps = compositeIdDappsMap.get(c.id);
+          let dappDto: DappDto[];
+          if (dapps?.length > 0) {
+            dappDto = dapps.map(d => convertToDappDto(d));
+          }
+          return convertToCompositeDto(c, dappDto);
+        }),
+      );
+    }
 
     return new BasicMessageDto(
       'OK.',
@@ -235,7 +257,7 @@ export class DappController {
           });
         }
 
-        convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos)
+      return convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos)
       }),
     );
   }
