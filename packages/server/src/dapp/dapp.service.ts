@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Dapp, DappComposite, DappCompositeMapping, DappDomain, DappModel, Network } from 'src/entities/dapp/dapp.entity';
 import { DappCompositeMappingRepository, DappCompositeRepository, DappDomainRepository, DappModelRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
@@ -167,6 +167,11 @@ export default class DappService {
     dappCompositeMapping.setCompositeId = savedDappComposite.getId;
     await this.dappCompositeMappingRepository.save(dappCompositeMapping);
     return savedDappComposite;
+  }
+
+  async updateComposite(dappComposite: DappComposite): Promise<DappComposite> {
+    if (dappComposite.getId == null) throw new BadRequestException("Composite id is required.");
+    return  await this.dappModelRepository.save(dappComposite);
   }
 
   // async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {

@@ -360,6 +360,9 @@ export class DappComposite extends BaseEntity {
   graphql: string;
 
   @Column({ nullable: true })
+  stream_id: string;
+
+  @Column({ nullable: true })
   composite: string;
 
   @Index()
@@ -405,6 +408,13 @@ export class DappComposite extends BaseEntity {
   }
   set setGraphql(graphql: string) {
     this.graphql = graphql;
+  }
+
+  get getStreamId(): string {
+    return this.stream_id;
+  }
+  set setStreamId(streamId: string) {
+    this.stream_id = streamId;
   }
 
   get getComposite(): string {

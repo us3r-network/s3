@@ -14,6 +14,8 @@ export class DappCompositeDto {
   @ApiProperty()
   graphql: string;
   @ApiProperty()
+  streamId: string;
+  @ApiProperty()
   runtimeDefinition: string;
   @ApiProperty()
   dapps: DappDto[];
@@ -63,6 +65,7 @@ export function convertToCompositeDto(composite: DappComposite, dappDtos?: DappD
   dto.graphql = composite.getGraphql;
   dto.composite = composite.getComposite;
   dto.runtimeDefinition = composite.getRuntimeDefinition;
+  dto.streamId = composite.getStreamId;
   dto.createdAt = composite.getCreatedAt?.getTime();
   dto.lastModifiedAt = composite.getLastModifiedAt?.getTime();
   dto.dapps = dappDtos?? [];

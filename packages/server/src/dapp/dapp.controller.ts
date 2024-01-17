@@ -65,6 +65,23 @@ export class DappController {
     );
   }
 
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/composites/:id')
+  async updateComposite(@Req() req: IUserRequest, @Param('id') id: string, @Body() dto: DappCompositeDto) {
+    this.logger.log(
+      `Update req did ${req.did} dapp. dto: ${JSON.stringify(dto)}`,
+    );
+
+    const dappComposite = new DappComposite();
+    dappComposite.id =+id;
+    dappComposite.setComposite = dto.composite;
+    dappComposite.setName = dto.name;
+    dappComposite.setGraphql = dto.graphql;
+    dappComposite.setStreamId = dto.streamId
+    dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
+    const savedDappComposite = await this.dappService.updateComposite(dappComposite);
+    return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
+  }
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Get('/composites')
@@ -319,10 +336,10 @@ export class DappController {
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
     const dappComposite = new DappComposite();
-    // TODO store composites to composite table
     dappComposite.setComposite = dto.composite;
     dappComposite.setName = dto.name;
     dappComposite.setGraphql = dto.graphql;
+    dappComposite.setStreamId = dto.streamId
     dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
     const savedDappComposite = await this.dappService.saveComposite(+dappId, dappComposite);
     return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
