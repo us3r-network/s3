@@ -21,6 +21,7 @@ import NodeTerminal from '../components/node/Terminal'
 import { useAppCtx } from '../context/AppCtx'
 import { useCeramicNodeCtx } from '../context/CeramicNodeCtx'
 import { CeramicDto, CeramicNetwork, CeramicStatus, Network } from '../types.d'
+import NodeStatus from '../components/node/NodeStatus'
 export default function CeramicNodes () {
   const {
     currCeramicNode,
@@ -163,15 +164,18 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
   return (
     <NodeInfoContainer>
       <NodeInfoBox>
-        <div className='title'>
-          <div className='name'>{node.name}</div>
-          <div className='network-tag'>{node.network}</div>
+        <div className='title-container'>
+          <div className='title'>
+            <div className='name'>{node.name}</div>
+            <div className='network-tag'>{node.network}</div>
+          </div>
           <DeleteNodeButton node={node} />
         </div>
+        <NodeStatus status={node.status}/>
         {node.status === CeramicStatus.PREPARING ? (
           <div className='prepareing-info'>
-            <img src='/loading.gif' alt='' />
-            Preparing your deployment... (It may take a few minutes)
+            {/* <img src='/loading.gif' alt='' /> */}
+            {/* Preparing your deployment... (It may take a few minutes) */}
           </div>
         ) : node.status === CeramicStatus.RUNNING ? (
           <div className='node-infos'>
@@ -269,7 +273,6 @@ const ListBox = styled.div`
     text-align: center;
   }
 `
-
 const NodesListBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -337,7 +340,6 @@ const NodesListBox = styled.div`
     }
   }
 `
-
 const NodeInfoContainer = styled.div`
   height: 100%;
   display: flex;
@@ -347,6 +349,7 @@ const NodeInfoContainer = styled.div`
   flex-grow: 1;
 `
 const NodeInfoBox = styled.div`
+  width: 100%;
   padding: 20px;
   border-radius: 20px;
   border: 1px solid #39424c;
@@ -356,6 +359,12 @@ const NodeInfoBox = styled.div`
   gap: 20px;
   flex-shrink: 0;
   flex-grow: 0;
+  .title-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
   .title {
     display: flex;
     flex-direction: row;

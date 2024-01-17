@@ -44,13 +44,17 @@ export type ClientDApp = {
   createdAt?: number
   lastModifiedAt?: number
 }
-
+/************************ Account ******************************/
+export enum AccountType {
+  EMAIL = 'email',
+  ALL = 'all',
+}
 /************************ Node ******************************/
 export type CeramicDto = {
   id: number;
   name: string;
   network: CeramicNetwork;
-  status: string;
+  status: CeramicStatus;
   privateKey: string;
   apiKey: string;
   namespace: string;
