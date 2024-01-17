@@ -16,7 +16,7 @@ import {
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicMessageDto } from '../common/dto';
 import DappService from './dapp.service';
-import { DappCompositeDto, DappDto, DappModelDto, convertToModelDto, convertToDapp, convertToDappDto } from './dtos/dapp.dto';
+import { DappCompositeDto, DappDto, DappModelDto, convertToModelDto, convertToDapp, convertToDappDto, convertToCompositeDto } from './dtos/dapp.dto';
 import IUserRequest from 'src/interfaces/user-request';
 import { Dapp, DappComposite, DappDomain, DappModel, Network } from 'src/entities/dapp/dapp.entity';
 import ModelService from 'src/model/model.service';
@@ -43,6 +43,39 @@ export class DappController {
     const dapp = convertToDapp(dto, req.did);
     const savedDapp = await this.dappService.save(dapp);
     return new BasicMessageDto('OK.', 0, convertToDappDto(savedDapp));
+  }
+
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/composites/:id')
+  async findComposite(@Req() req: IUserRequest, @Param('id') compositeId: string) {
+    this.logger.log(`Find the composite by id ${compositeId}`);
+    const composite = await this.dappService.findCompositeById(+compositeId);
+    if (!composite) throw new NotFoundException(`The composite not found. id: ${compositeId}`);
+
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      convertToCompositeDto(composite),
+    );
+  }
+
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/composites')
+  async findComposites(@Req() req: IUserRequest, 
+    @Query('pageSize')
+    pageSize: number = 10,
+    @Query('pageNumber')
+    pageNumber: number = 1,) {
+    this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}`);
+    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber);
+  
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      composites.map(c=>convertToCompositeDto(c)),
+    );
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
@@ -240,13 +273,13 @@ export class DappController {
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
     const dappComposite = new DappComposite();
-     // TODO store composites to composite table
+    // TODO store composites to composite table
     dappComposite.setComposite = dto.composite;
     dappComposite.setName = dto.name;
     dappComposite.setGraphql = dto.graphql;
     dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
     const savedDappComposite = await this.dappService.saveComposite(+dappId, dappComposite);
-    return new BasicMessageDto('OK.', 0, convertToModelDto(savedDappComposite));
+    return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
@@ -259,7 +292,7 @@ export class DappController {
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
     const dappModel = new DappModel();
-     // TODO store composites to composite table
+    // TODO store composites to composite table
     dappModel.setComposite = dto.composite;
     dappModel.setModelStreamId = dto.mdoelStreamId;
     dappModel.setGraphql = dto.graphql;
@@ -295,6 +328,21 @@ export class DappController {
       );
 
     await this.dappService.deleteCompositeMapping(+dappId, +id);
+    return new BasicMessageDto('OK.', 0);
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/:dappId/composites/:id/bindings')
+  async bindingCompositeById(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Param('id') id: string) {
+    this.logger.log(`Bind dapp ${dappId} with composite by id ${id}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+    if (dapp.getCreatedByDid !== req.did)
+      throw new BadRequestException(
+        `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
+      );
+
+    await this.dappService.createCompositeMapping(+dappId, +id);
     return new BasicMessageDto('OK.', 0);
   }
 

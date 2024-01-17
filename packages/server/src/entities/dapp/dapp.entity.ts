@@ -294,6 +294,7 @@ export class DappModel extends BaseEntity {
 
 
 @Entity({ name: 'dapp_composite_mappings' })
+@Index(['dapp_id', 'composite_id'], { unique: true })
 export class DappCompositeMapping extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -304,9 +305,6 @@ export class DappCompositeMapping extends BaseEntity {
 
   @Column({ nullable: true })
   composite_id: number;
-
-  @Column({ nullable: false, default: false })
-  is_deleted: boolean;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
@@ -319,13 +317,6 @@ export class DappCompositeMapping extends BaseEntity {
   }
   set setId(id: number) {
     this.id = id;
-  }
-
-  get getIsDeleted(): boolean {
-    return this.is_deleted;
-  }
-  set setIsDeleted(isDeleted: boolean) {
-    this.is_deleted = isDeleted;
   }
 
   get getDappId(): number {
@@ -378,6 +369,7 @@ export class DappComposite extends BaseEntity {
   @Column({ nullable: true })
   runtime_definition: string;
 
+  @Index()
   @Column({ nullable: false, default: false })
   is_deleted: boolean;
 

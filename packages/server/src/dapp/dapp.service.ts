@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Dapp, DappComposite, DappCompositeMapping, DappDomain, DappModel, Network } from 'src/entities/dapp/dapp.entity';
 import { DappCompositeMappingRepository, DappCompositeRepository, DappDomainRepository, DappModelRepository, DappRepository } from 'src/entities/dapp/dapp.repository';
 import StreamService from 'src/stream/stream.service';
-import { ILike } from 'typeorm';
+import { ILike, In } from 'typeorm';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 import ModelService from 'src/model/model.service';
 import { S3SeverBizDbName } from 'src/common/constants';
@@ -73,7 +73,7 @@ export default class DappService {
         is_deleted: false
       },
     });
-    if (allMatchedDapps.length == 0 || allMatchedDapps.length < (pageNumber-1)*pageSize) return [];
+    if (allMatchedDapps.length == 0 || allMatchedDapps.length < (pageNumber - 1) * pageSize) return [];
 
     const models = new Set<string>();
     allMatchedDapps.forEach(dapp => {
@@ -96,7 +96,7 @@ export default class DappService {
     });
     const orderedDapps = [...dappUseCount.entries()].sort((a, b) => b[1] - a[1]);
 
-    const dappIds = orderedDapps.slice((pageNumber-1)*pageSize, pageNumber*pageSize).map(d => d[0]);
+    const dappIds = orderedDapps.slice((pageNumber - 1) * pageSize, pageNumber * pageSize).map(d => d[0]);
     const dapps: Dapp[] = [];
     const dappMap = new Map<number, Dapp>();
     allMatchedDapps.forEach(dapp => {
@@ -139,7 +139,7 @@ export default class DappService {
   }
 
   // TODO add TX for the following methods
-  async saveComposite(dappId: number, dappComposite: DappComposite): Promise<DappModel> {
+  async saveComposite(dappId: number, dappComposite: DappComposite): Promise<DappComposite> {
     const dapp = await this.findDappById(dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
@@ -160,12 +160,44 @@ export default class DappService {
     return await this.dappModelRepository.find({ dapp_id: dappId, is_deleted: false });
   }
 
+  async findCompositeById(id: number): Promise<DappComposite> {
+    return await this.dappCompositeRepository.findOne({ id: id });
+  }
+
+  async findCompositeByOrder(pageSize: number, pageNumber: number): Promise<DappComposite[]> {
+    const composites = await this.dappCompositeRepository.find({ is_deleted: false });
+    if (composites.length == 0) return [];
+
+    const compositeIds = composites.map(c => { c.getId });
+    const dappComposites = await this.dappCompositeMappingRepository.find({ where: { composite_id: In(compositeIds) } });
+    const dappCompositeDappMap = new Map<number, number[]>();
+    dappComposites?.forEach(dc => {
+      const dappIds = dappCompositeDappMap.get(dc.getCompositeId) || [];
+      if (!dappIds.includes(dc.getDappId)) dappIds.push(dc.getDappId);
+      dappCompositeDappMap.set(dc.getCompositeId, dappIds);
+    }
+    );
+
+    const rankedComposites = composites.sort((a, b) => {
+      const aDappIds = dappCompositeDappMap.get(a.getId) || [];
+      const bDappIds = dappCompositeDappMap.get(b.getId) || [];
+      return bDappIds.length - aDappIds.length;
+    });
+    if (rankedComposites.length < pageNumber * pageSize) return rankedComposites;
+
+    return rankedComposites.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  }
+
   async deleteCompositeById(id: number): Promise<void> {
     await this.dappCompositeRepository.update({ id: id }, { is_deleted: true });
   }
 
   async deleteCompositeMapping(dappId: number, composteId: number): Promise<void> {
-    await this.dappCompositeMappingRepository.update({ dapp_id: dappId, composite_id: composteId }, { is_deleted: true });
+    await this.dappCompositeMappingRepository.delete({ dapp_id: dappId, composite_id: composteId });
+  }
+
+  async createCompositeMapping(dappId: number, composteId: number): Promise<void> {
+    await this.dappCompositeMappingRepository.upsert({ dapp_id: dappId, composite_id: composteId }, ['dapp_id', 'composite_id']);
   }
 
   async deleteModelById(id: number): Promise<void> {

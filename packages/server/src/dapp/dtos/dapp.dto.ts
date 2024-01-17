@@ -54,6 +54,18 @@ export function convertToModelDto(model: DappModel): DappModelDto {
   return dto;
 }
 
+export function convertToCompositeDto(composite: DappComposite): DappCompositeDto {
+  const dto = new DappCompositeDto();
+  dto.id = composite.getId;
+  dto.name = composite.getName;
+  dto.graphql = composite.getGraphql;
+  dto.composite = composite.getComposite;
+  dto.runtimeDefinition = composite.getRuntimeDefinition;
+  dto.createdAt = composite.getCreatedAt?.getTime();
+  dto.lastModifiedAt = composite.getLastModifiedAt?.getTime();
+  return dto;
+}
+
 export class DappDto {
   @ApiProperty()
   id: number;
