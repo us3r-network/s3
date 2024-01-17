@@ -90,6 +90,8 @@ export class DappDto {
   @ApiProperty()
   models: string[];
   @ApiProperty()
+  composites: DappCompositeDto[];
+  @ApiProperty()
   schemas: string[];
   @ApiProperty()
   modelDetails: any[];
@@ -106,7 +108,7 @@ export class DappDto {
   lastModifiedAt: number;
 }
 
-export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>, schemaDetails?: Map<number, any[]>): DappDto {
+export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>, schemaDetails?: Map<number, any[]>, composites?: DappCompositeDto[]): DappDto {
   const dto = new DappDto();
   dto.id = dapp.getId;
   dto.name = dapp.getName;
@@ -121,6 +123,7 @@ export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]
   dto.modelDetals = modelDetailsMap?.get(dapp.getId)??[];
   dto.schemaDetails = schemaDetails?.get(dapp.getId)??[];
   dto.stage = dapp.getStage;
+  dto.composites = composites;
   dto.type = dapp.getType;
   dto.network = dapp.getNetwork;
   dto.createdAt = dapp.getCreatedAt?.getTime();

@@ -63,18 +63,18 @@ export class DappController {
 
   @ApiOkResponse({ type: BasicMessageDto })
   @Get('/composites')
-  async findComposites(@Req() req: IUserRequest, 
+  async findComposites(@Req() req: IUserRequest,
     @Query('pageSize')
     pageSize: number = 10,
     @Query('pageNumber')
     pageNumber: number = 1,) {
     this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}`);
     const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber);
-  
+
     return new BasicMessageDto(
       'OK.',
       0,
-      composites.map(c=>convertToCompositeDto(c)),
+      composites.map(c => convertToCompositeDto(c)),
     );
   }
 
@@ -220,10 +220,23 @@ export class DappController {
       });
     }
 
+    // build composites
+    const dappCompositesMap = await this.dappService.findCompositesByDappIds(dapps.map(dapp => dapp.getId));
+
     return new BasicMessageDto(
       'OK.',
       0,
-      dapps?.map((dapp) => convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap)),
+      dapps?.map((dapp) => {
+        const dappComposites = dappCompositesMap?.get(dapp.getId);
+        let dappCompositeDtos: DappCompositeDto[];
+        if (dappComposites) {
+          dappCompositeDtos = dappComposites.map(composite => {
+            return convertToCompositeDto(composite);
+          });
+        }
+
+        convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos)
+      }),
     );
   }
 
@@ -241,10 +254,21 @@ export class DappController {
     const schemaDetails = await this.streamService.findStreamsByStreamIds(dapp.getNetwork == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET, dapp.getSchemas);
     const schemaDetailsMap = new Map<number, any[]>();
     schemaDetailsMap.set(dapp.getId, schemaDetails?.map(schemaDetail => ConvertToStream(schemaDetail)) ?? []);
+
+    // build composites
+    const dappCompositesMap = await this.dappService.findCompositesByDappIds([+id]);
+    const dappComposites = dappCompositesMap?.get(+id);
+    let dappCompositeDtos: DappCompositeDto[];
+    if (dappComposites) {
+      dappCompositeDtos = dappComposites.map(composite => {
+        return convertToCompositeDto(composite);
+      });
+    }
+
     return new BasicMessageDto(
       'OK.',
       0,
-      convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap),
+      convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos),
     );
   }
 
