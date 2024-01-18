@@ -382,6 +382,21 @@ export class DappController {
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/:dappId/composites')
+  async findCompositesByDappId(@Req() req: IUserRequest, @Param('dappId') dappId: string) {
+    this.logger.log(`Find models by dappId ${dappId}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+
+    const conposites = await this.dappService.findCompositesByDappId(+dappId);
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      conposites?.map((conposite) => convertToCompositeDto(conposite)) ?? [],
+    );
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
   @Delete('/:dappId/composites/:id')
   async deleteCompositeById(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Param('id') id: string) {
     this.logger.log(`Delete composite by id ${id}`);

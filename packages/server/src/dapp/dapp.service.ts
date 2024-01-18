@@ -177,9 +177,11 @@ export default class DappService {
     return await this.dappCompositeRepository.save(dappComposite);
   }
 
-  // async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {
-  //   return await this.dappCompositeRepository.find({ dapp_id: dappId, is_deleted: false });
-  // }
+  async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {
+    const dappCompositeMappings = await this.dappCompositeMappingRepository.find({ where: { dapp_id: dappId } });
+    const dappCompositeIds = dappCompositeMappings.map(d => d.composite_id);
+    return await this.dappCompositeRepository.find({ id: In(dappCompositeIds), is_deleted: false });
+  }
 
   async findModelsByDappId(dappId: number): Promise<DappModel[]> {
     return await this.dappModelRepository.find({ dapp_id: dappId, is_deleted: false });
