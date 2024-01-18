@@ -133,14 +133,17 @@ export default class DappService {
     const dappCompositeMappings = await this.dappCompositeMappingRepository.find({ where: { dapp_id: In(dappIds) } });
     const dappCompositeIds = dappCompositeMappings.map(d => d.composite_id);
     const dappComposites = await this.dappCompositeRepository.find({ where: { id: In(dappCompositeIds), is_deleted: false } });
+
     const dappCompositeMap = new Map<number, DappComposite>();
     dappComposites.forEach(d => { dappCompositeMap.set(d.id, d) });
 
     const dappIdCompositesMap = new Map<number, DappComposite[]>();
     dappCompositeMappings.forEach(d => {
-      const composites = dappIdCompositesMap.get(d.dapp_id) || [];
-      composites.push(dappCompositeMap.get(d.composite_id));
-      dappIdCompositesMap.set(d.dapp_id, composites);
+      if (dappCompositeMap.get(d.composite_id)) {
+        const composites = dappIdCompositesMap.get(d.dapp_id) || [];
+        composites.push(dappCompositeMap.get(d.composite_id));
+        dappIdCompositesMap.set(d.dapp_id, composites);
+      }
     });
 
     return dappIdCompositesMap;
@@ -160,7 +163,7 @@ export default class DappService {
     const dapp = await this.findDappById(dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
-    const savedDappComposite = await this.dappModelRepository.save(dappComposite);
+    const savedDappComposite = await this.dappCompositeRepository.save(dappComposite);
 
     const dappCompositeMapping = new DappCompositeMapping();
     dappCompositeMapping.setDappId = dappId;
@@ -171,7 +174,7 @@ export default class DappService {
 
   async updateComposite(dappComposite: DappComposite): Promise<DappComposite> {
     if (dappComposite.getId == null) throw new BadRequestException("Composite id is required.");
-    return  await this.dappModelRepository.save(dappComposite);
+    return await this.dappCompositeRepository.save(dappComposite);
   }
 
   // async findCompositesByDappId(dappId: number): Promise<DappComposite[]> {

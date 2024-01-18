@@ -267,6 +267,7 @@ export class DappController {
       0,
       dapps?.map((dapp) => {
         const dappComposites = dappCompositesMap?.get(dapp.getId);
+        console.log('dappComposites', dappComposites);
         let dappCompositeDtos: DappCompositeDto[];
         if (dappComposites) {
           dappCompositeDtos = dappComposites.map(composite => {
@@ -340,6 +341,7 @@ export class DappController {
     dappComposite.setName = dto.name;
     dappComposite.setGraphql = dto.graphql;
     dappComposite.setStreamId = dto.streamId
+    dappComposite.setIsDeleted = false;
     dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
     const savedDappComposite = await this.dappService.saveComposite(+dappId, dappComposite);
     return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
