@@ -1,17 +1,101 @@
+import { Composite } from '@composedb/devtools'
+import { RuntimeCompositeDefinition } from '@composedb/types'
 import axios, { AxiosPromise } from 'axios'
-import { APP_API_URL } from '../constants'
+import { PassedSchema } from 'graphql-editor/lib/Models/Types'
+import { ApiResp } from '.'
+import { APP_API_URL, PAGE_SIZE } from '../constants'
 import {
+  ClientDApp,
+  DappCompositeDto,
+  GraphqlGenType,
+  GraphqlGenTypeServer,
   ModeCreateResult,
   ModeQueryResult,
   ModelMid,
   ModelStream,
-  GraphqlGenType,
-  GraphqlGenTypeServer,
   Network,
 } from '../types.d'
-import { ApiResp } from '.'
 
-export const PAGE_SIZE = 50
+export function getDappModels({
+  dapp: { id },
+  did,
+}: {
+  dapp: ClientDApp
+  did?: string
+}): AxiosPromise<ApiResp<DappCompositeDto[]>> {
+  let host = APP_API_URL
+
+  return axios({
+    url: host + `/dapps/${id}/models`,
+    method: 'GET',
+    headers: {
+      'did-session': did || '',
+    },
+  })
+}
+
+export function createDappModels({
+  did,
+  dapp,
+  data,
+}: {
+  did: string
+  dapp: ClientDApp
+  data: { mdoelStreamId:string, gqlSchema:PassedSchema , composite:Composite, runtimeDefinition:RuntimeCompositeDefinition}
+}) {
+  let host = APP_API_URL
+  return axios({
+    url: host + `/dapps/${dapp.id}/models`,
+    method: 'POST',
+    headers: {
+      'did-session': did,
+    },
+    data: { mdoelStreamId:data.mdoelStreamId, graphql: data.gqlSchema.code, composite: data.composite, runtimeDefinition: data.runtimeDefinition },
+  })
+}
+
+// export function bindingDappModels({
+//   did,
+//   dapp,
+//   modelId,
+// }: {
+//   did: string
+//   dapp: ClientDApp
+//   modelId: number
+// }) {
+//   let host = APP_API_URL
+//   return axios({
+//     url: host + `/dapps/${dapp.id}/models/${modelId}/bindings`,
+//     method: 'POST',
+//     headers: {
+//       'did-session': did,
+//     },
+//   })
+// }
+
+export function updateDappModels() {}
+
+export function deleteDappModels({
+  modelId,
+  dapp,
+  did,
+}: {
+  modelId: number
+  dapp: ClientDApp
+  did: string
+}) {
+  let host = APP_API_URL
+  return axios({
+    url: host + `/dapps/${dapp.id}/models/${modelId}`,
+    method: 'DELETE',
+    headers: {
+      'did-session': did,
+    },
+  })
+}
+
+/*******************************************************/
+
 export function getModelStreamList({
   name,
   did,

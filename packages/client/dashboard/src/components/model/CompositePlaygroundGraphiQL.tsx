@@ -69,15 +69,16 @@ export default function CompositePlaygroundGraphiQL(
 
   const updateQuery = useCallback(async () => {
     const data = JSON.parse(definition)
+    if (!data) return
     const modelName = Object.keys(data.models)[0]
     const objValues: any[] = Object.values(data.objects)
     const modelProperties = Object.entries(objValues[0])
     const defaultQuery = createGraphqlDefaultQuery(modelName, modelProperties)
     setQuery(initialQuery + defaultQuery)
   }, [definition])
-
+  console.log('definition', definition, ceramicNodeURL)
   const { composeClient, composeClientAuthenticated } =
-  useComposeClient(definition as unknown as RuntimeCompositeDefinition, ceramicNodeURL)
+  useComposeClient(JSON.parse(definition) as RuntimeCompositeDefinition, ceramicNodeURL)
 
   useEffect(() => {
     localStorage.setItem('graphiql:theme', 'dark')

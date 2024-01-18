@@ -10,6 +10,7 @@ import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { schemas } from '../../utils/composedb-types/schemas'
 import { createCompositeFromBrowser } from '../../utils/createCompositeFromBrowser'
 import CloseIcon from '../icons/CloseIcon'
+import { createDappModels } from '../../api/model'
 
 export default function CreateNewModel ({
   closeModal
@@ -26,7 +27,7 @@ export default function CreateNewModel ({
     code: schemas.code,
     libraries: schemas.library
   })
-  
+
   const submit = useCallback(async () => {
     if (submitting) return
     if (!selectedDapp) return
@@ -53,17 +54,28 @@ export default function CreateNewModel ({
         session
       )
       if (!result) return
-      const { composite } = result
+      const { composite, runtimeDefinition } = result
       const newModelIDs = Object.values(composite.modelIDs)
-      const models = selectedDapp.models || []
-      models.push(...newModelIDs)
-      // console.log("models: ", newModelIDs, models)
-      await updateDapp(
-        { ...selectedDapp, models },
-        session.serialize(),
-        currCeramicNode.id
+      // const models = selectedDapp.models || []
+      // models.push(...newModelIDs)
+      // // console.log("models: ", newModelIDs, models)
+      // await updateDapp(
+      //   { ...selectedDapp, models },
+      //   session.serialize(),
+      //   currCeramicNode.id
+      // )
+      // await loadDapps()
+      const resp = await Promise.all(
+        newModelIDs.map(async mdoelStreamId => {
+          return await createDappModels({
+            data: { mdoelStreamId, gqlSchema, composite, runtimeDefinition },
+            dapp: selectedDapp,
+            did: session.serialize()
+          })
+        })
       )
-      await loadDapps()
+      console.log(resp)
+      await loadDappModels()
       closeModal()
     } catch (error) {
       const err = error as AxiosError
@@ -71,15 +83,7 @@ export default function CreateNewModel ({
     } finally {
       setSubmitting(false)
     }
-  }, [
-    currCeramicNode,
-    closeModal,
-    gqlSchema.code,
-    loadDapps,
-    selectedDapp,
-    session,
-    submitting
-  ])
+  }, [submitting, selectedDapp, session, gqlSchema, currCeramicNode, closeModal])
 
   return (
     <CreateBox>
@@ -188,3 +192,6 @@ const CreateBox = styled.div`
     }
   }
 `
+function loadDappModels () {
+  throw new Error('Function not implemented.')
+}

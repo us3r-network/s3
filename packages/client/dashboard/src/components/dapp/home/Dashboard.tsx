@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { getDappComposites } from '../../../api/composite'
 import { getStreamsCountWithModels } from '../../../api/model'
 import { ClientDApp, Network } from '../../../types'
 import compositesIconUrl from './imgs/composites.svg'
@@ -17,19 +16,10 @@ export default function Dashboard({ dapp }: { dapp: ClientDApp }) {
     if (!dapp) {
       setCompositesCount(0)
       return
+    }else{
+      const compositesCount = dapp?.composites?.length || 0
+      setCompositesCount(compositesCount)
     }
-    ;(async () => {
-      try {
-        const resp = await getDappComposites({
-          dapp: dapp,
-        })
-        if (resp.data.code !== 0) throw new Error(resp.data.msg)
-        setCompositesCount(resp.data?.data?.length || 0)
-      } catch (error) {
-        console.error(error)
-        setCompositesCount(0)
-      }
-    })()
   }, [dapp])
 
   useEffect(() => {

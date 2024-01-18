@@ -1,14 +1,14 @@
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { DappComposite } from '../../types'
+import { DappCompositeDto } from '../../types'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
 
 export default function CompositeDefinition({
   composite,
 }: {
-  composite: DappComposite
+  composite: DappCompositeDto
 }) {
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: composite.graphql,
