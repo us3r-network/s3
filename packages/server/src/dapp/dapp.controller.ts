@@ -100,7 +100,7 @@ export class DappController {
         'OK.',
         0,
         composites.map(c => {
-          const dapps = compositeIdDappsMap.get(c.id);
+          const dapps = compositeIdDappsMap?.get(c.id);
           let dappDto: DappDto[];
           if (dapps?.length > 0) {
             dappDto = dapps.map(d => convertToDappDto(d));
