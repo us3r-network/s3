@@ -8,58 +8,58 @@ import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { ModelStream } from '../../types.d'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CloseIcon from '../icons/CloseIcon'
+import { createCompositeFromBrowser } from '../../utils/createCompositeFromBrowser'
+import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 
-const TINT_WORD = `# Edit the model's relation based on your business needs.
-# See Example below
-# https://composedb.js.org/docs/0.4.x/guides/data-modeling/relations-container-of-items
-
-`
-
-export default function CreateCompositeModal({
+export default function CreateCompositeModal ({
   closeModal,
   loadDappComposites,
-  dappModels,
+  defaultName,
+  defaultSchema,
+  readonly
 }: {
   closeModal: () => void
-  loadDappComposites: () => Promise<void>
-  dappModels: ModelStream[]
+  loadDappComposites?: () => Promise<void>
+  defaultName?: string
+  defaultSchema: string
+  readonly?: boolean
 }) {
   const { selectedDapp } = useSelectedDapp()
   const session = useSession()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const [submitting, setSubmitting] = useState(false)
-  const [name, setName] = useState('')
+  const [name, setName] = useState(defaultName)
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
-    code:
-      TINT_WORD +
-      dappModels
-        .map((item) => {
-          return `
-type ${item.stream_content.name} @loadModel(id: "${item.stream_id}") {
-  id: ID!
-}
-`
-        })
-        .join('\n'),
-    libraries: schemas.library,
+    code: defaultSchema,
+    libraries: schemas.library
   })
 
   const submit = useCallback(async () => {
     if (submitting) return
     if (!selectedDapp) return
-    if (!session?.id) return
+    if (!session?.id || !currCeramicNode) return
     if (!gqlSchema.code || !name) return
     try {
       setSubmitting(true)
+      const result = await createCompositeFromBrowser(
+        gqlSchema.code,
+        currCeramicNode.serviceUrl + '/',
+        // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
+        currCeramicNode.privateKey,
+        session
+      )
+      if (!result) return
+      const { composite, runtimeDefinition } = result
+
       const resp = await createDappComposites({
-        name,
-        data: gqlSchema.code,
+        data: { name, gqlSchema, composite, runtimeDefinition },
         dapp: selectedDapp,
-        didSession: session.serialize(),
+        did: session.serialize()
       })
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
       }
-      await loadDappComposites()
+      if (loadDappComposites) await loadDappComposites()
       closeModal()
     } catch (error) {
       const err = error as AxiosError
@@ -71,54 +71,63 @@ type ${item.stream_content.name} @loadModel(id: "${item.stream_id}") {
     submitting,
     selectedDapp,
     session,
-    gqlSchema.code,
+    currCeramicNode,
+    gqlSchema,
     name,
     loadDappComposites,
-    closeModal,
+    closeModal
   ])
 
   return (
     <CreateBox>
-      <div className="title">
+      <div className='title'>
         <h1>Create Composite</h1>
         <button onClick={closeModal}>
           <CloseIcon />
         </button>
       </div>
-      <div className="name">
+      <div className='name'>
         <span>Composite Name:</span>{' '}
         <input
-          type="text"
+          type='text'
+          placeholder='Enter composite name'
+          disabled={readonly}
           value={name}
-          onChange={(e) => {
+          onChange={e => {
             setName(e.target.value)
           }}
         />
       </div>
       <EditorBox>
         <GraphQLEditor
-          setSchema={(props) => {
+          setSchema={props => {
             setGqlSchema(props)
           }}
           schema={gqlSchema}
           sidebarExpanded={false}
           routeState={{
-            code: 'on',
+            code: 'on'
           }}
         />
       </EditorBox>
-      <div className="btns">
-        <button onClick={closeModal}>Cancel</button>
-        {(submitting && (
-          <button className="submit">
-            <img src="/loading.gif" alt="" />
-          </button>
-        )) || (
-          <button className="submit" onClick={submit}>
-            Submit
-          </button>
-        )}
-      </div>
+      {!readonly && (
+        <div className='btns'>
+          <button onClick={closeModal}>Cancel</button>
+          {(submitting && (
+            <button className='submit'>
+              <img src='/loading.gif' alt='' />
+            </button>
+          )) || (
+            <button
+              className='submit'
+              onClick={submit}
+              disabled={!name || !gqlSchema}
+            >
+              Submit
+            </button>
+          )}
+        </div>
+      )}
     </CreateBox>
   )
 }

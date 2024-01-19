@@ -10,7 +10,7 @@ import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useIsOwner from '../../hooks/useIsOwner'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { CeramicStatus, DappComposite, ModelStream, Network } from '../../types.d'
+import { CeramicStatus, DappCompositeDto, ModelStream, Network } from '../../types.d'
 import { shortPubKey } from '../../utils/shortPubKey'
 import CopyTint from '../common/CopyTint'
 import MergeIcon from '../icons/MergeIcon'
@@ -21,6 +21,7 @@ import CreateCompositeModal from './CreateCompositeModal'
 import CreateNewModel from './CreateNewModel'
 import FavoriteModel from './FavoriteModal'
 import MergeModal from './MergeModal'
+import { getCompositeDefaultSchema } from '../../utils/composedb-types/schemas'
 
 export default function ModelList ({
   editable,
@@ -31,8 +32,8 @@ export default function ModelList ({
 }: {
   selectModel: ModelStream | undefined
   setSelectModel: (m: ModelStream | undefined) => void
-  selectComposite: DappComposite | undefined
-  setSelectComposite: (composite: DappComposite | undefined) => void
+  selectComposite: DappCompositeDto | undefined
+  setSelectComposite: (composite: DappCompositeDto | undefined) => void
 
   editable?: boolean
 }) {
@@ -43,7 +44,7 @@ export default function ModelList ({
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
-  const [composites, setComposites] = useState<DappComposite[]>([])
+  const [composites, setComposites] = useState<DappCompositeDto[]>([])
   const location = useLocation()
 
   const dapp = useMemo(() => {
@@ -102,11 +103,12 @@ export default function ModelList ({
           session.serialize()
         )
         await loadDapps()
+        setSelectModel(undefined)
       } catch (error) {
         console.error(error)
       }
     },
-    [loadDapps, selectedDapp, session]
+    [loadDapps, selectedDapp, session, setSelectModel]
   )
 
   const delDappComposite = useCallback(
@@ -116,15 +118,16 @@ export default function ModelList ({
       try {
         await deleteDappComposites({
           compositeId: id,
-          didSession: session.serialize(),
+          did: session.serialize(),
           dapp: selectedDapp
         })
         await loadDappComposites()
+        setSelectComposite(undefined)
       } catch (error) {
         console.error(error)
       }
     },
-    [selectedDapp, session, loadDappComposites]
+    [session, selectedDapp, loadDappComposites, setSelectComposite]
   )
 
   const isFirstRenderRef = useRef(true)
@@ -292,9 +295,9 @@ function DappCompositeList ({
   selectComposite,
   setSelectedComposite
 }: {
-  composites: DappComposite[]
-  selectComposite: DappComposite | undefined
-  setSelectedComposite: (composite: DappComposite) => void
+  composites: DappCompositeDto[]
+  selectComposite: DappCompositeDto | undefined
+  setSelectedComposite: (composite: DappCompositeDto) => void
   removeAction: (id: number) => Promise<void>
   editable?: boolean
 }) {
@@ -495,7 +498,7 @@ function CreateComposite ({
               <CreateCompositeModal
                 closeModal={close}
                 loadDappComposites={loadDappComposites}
-                dappModels={dappModels}
+                defaultSchema={getCompositeDefaultSchema(dappModels)}
               />
             )}
           </Dialog>

@@ -28,9 +28,65 @@ export enum AppType {
   OTHER = 'Other',
 }
 
+export type DappCompositeDto = {
+  id: number;
+  dappId: number;
+  name: string;
+  composite: string;
+  graphql: string;
+  streamId: string;
+  runtimeDefinition: string;
+  dapps: DappDto[];
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+// export type DappComposite = {
+//   id: number
+//   name: string
+//   dappId: number
+//   graphql: string
+//   composite: string
+//   runtimeDefinition: string
+//   createdAt: number
+//   lastModifiedAt: number
+// }
+
+export type DappModelDto = {
+  id: number;
+  dappId: number;
+  mdoelStreamId: string;
+  composite: string;
+  graphql: string;
+  runtimeDefinition: string;
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type DappDto = {
+  id: number;
+  name: string;
+  description: string;
+  stage: string;
+  type: string;
+  network: Network;
+  icon: string;
+  url: string;
+  socialLinks: SocialLink[];
+  tags: string[];
+  models: string[];
+  composites: DappCompositeDto[];
+  schemas: string[];
+  modelDetails: any[];
+  ceramicId?: number;
+  schemaDetails: any[];
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
 export type ClientDApp = {
   id?: number
-  modelId?: string
+  // modelId?: string
   icon?: string
   name: string
   network: string
@@ -41,6 +97,7 @@ export type ClientDApp = {
   socialLinks?: { platform: string; url: string }[]
   tags?: string[]
   models?: string[]
+  composites?: DappCompositeDto[];
   createdAt?: number
   lastModifiedAt?: number
 }
@@ -73,7 +130,7 @@ export type CeramicRequestDto = {
 }
 
 export enum CeramicDBType {
-  SQLITE ='sqlite',
+  SQLITE = 'sqlite',
   PGSQL = 'postgres',
 }
 
@@ -173,15 +230,4 @@ export type ModelMid = {
   controllerDid: string
   createdAt: number
   updatedAt: number
-}
-
-export type DappComposite = {
-  id: number
-  name: string
-  dappId: number
-  graphql: string
-  composite: string
-  runtimeDefinition: string
-  createdAt: number
-  lastModifiedAt: number
 }

@@ -1,6 +1,7 @@
 import { CeramicApi } from '@ceramicnetwork/common'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { Composite } from '@composedb/devtools'
+import { RuntimeCompositeDefinition } from '@composedb/types'
 import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 import { DIDSession } from 'did-session'
 import { DID } from 'dids'
@@ -63,7 +64,7 @@ export async function createCompositeFromBrowser(
   }
 
   //1 Create My Composite
-  let myComposite
+  let myComposite: Composite
   try {
     console.log('Creating the composite...')
     myComposite = await Composite.create({
@@ -95,7 +96,7 @@ export async function createCompositeFromBrowser(
     }
 
   //3 Compile My Composite
-  let myRuntimeDefinition
+  let myRuntimeDefinition: RuntimeCompositeDefinition
   try {
     console.log('Compiling the composite...')
     myRuntimeDefinition = myComposite.toRuntime()

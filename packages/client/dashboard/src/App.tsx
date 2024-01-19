@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { NavLink, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -8,7 +8,7 @@ import { ProfileStateProvider } from '@us3r-network/profile'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 
-import { DappComposite, ModelStream } from './types.d'
+import { DappCompositeDto, ModelStream } from './types.d'
 import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 
 import AppProvider, { useAppCtx } from './context/AppCtx'
@@ -30,6 +30,7 @@ import NoMatch from './container/NoMatch'
 import Header from './components/nav/Header'
 import Nav from './components/nav/Nav'
 import ModelList from './components/model/ModelList'
+import ExploreComposite from './container/ExploreComposite'
 
 dayjs.extend(relativeTime)
 
@@ -49,8 +50,14 @@ function Routers () {
             <Route path='statistic' element={<DappDataStatistic />} />
           </Route>
           <Route path='info' element={<DappInfo />} />
-          <Route path='explore' element={<ExploreModel />} />
-          <Route path='favorite' element={<ExploreModel />} />
+          <Route path='explore' element={<ExploreLayout />}>
+            <Route path='model' element={<ExploreModel />} />
+            <Route path='composite' element={<ExploreComposite />} />
+          </Route>
+          <Route path='favorite' element={<ExploreLayout />}>
+            <Route path='model' element={<ExploreModel />} />
+            <Route path='composite' element={<ExploreComposite />} />
+          </Route>
           <Route path='components' element={<Components />} />
         </Route>
       </Route>
@@ -134,9 +141,36 @@ function DappLayout () {
   )
 }
 
+
+const AppContainer = styled.div`
+  display: flex;
+  margin-top: 60px;
+  > main.container {
+    display: flex;
+    width: 100%;
+
+    > div {
+      flex-grow: 1;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1300px;
+      z-index: 0;
+    }
+
+    .login-first {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      justify-content: center;
+    }
+  }
+`
+
 function ModelEditorLayout () {
   const [selectModel, setSelectModel] = useState<ModelStream>()
-  const [selectComposite, setSelectComposite] = useState<DappComposite>()
+  const [selectComposite, setSelectComposite] = useState<DappCompositeDto>()
 
   const { pathname } = useLocation()
 
@@ -165,32 +199,6 @@ function ModelEditorLayout () {
   )
 }
 
-const AppContainer = styled.div`
-  display: flex;
-  margin-top: 60px;
-  > main.container {
-    display: flex;
-    width: 100%;
-
-    > div {
-      flex-grow: 1;
-      margin: 0 auto;
-      width: 100%;
-      max-width: 1300px;
-      z-index: 0;
-    }
-
-    .login-first {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-      justify-content: center;
-    }
-  }
-`
-
 const EditorLayoutContainer = styled.div`
   margin-top: 25px;
   margin-bottom: 25px;
@@ -215,6 +223,55 @@ const EditorLayoutContainer = styled.div`
     }
     .graphiql-container {
       height: 100%;
+    }
+  }
+`
+
+function ExploreLayout () {
+  return (
+    <ExploreLayoutContainer>
+      <div className='explore-catalog'>
+        <NavLink to='model' key='model'>
+          {({ isActive }) => (
+            <div className={`item ${isActive ? 'active' : ''}`}>
+              <span>Models</span>
+            </div>
+          )}
+        </NavLink>
+        <NavLink to='composite' key='model'>
+          {({ isActive }) => (
+            <div className={`item ${isActive ? 'active' : ''}`}>
+              <span>Composites</span>
+            </div>
+          )}
+        </NavLink>
+      </div>
+      <div>
+        <Outlet />
+      </div>
+    </ExploreLayoutContainer>
+  )
+}
+
+const ExploreLayoutContainer = styled.div`
+  margin-top: 25px;
+  margin-bottom: 25px;
+
+  .explore-catalog {
+    position: absolute;
+    display: flex;
+    gap: 20px;
+    .item {
+      font-size: 24px;
+      font-weight: 700;
+      color: #718096;
+      > span {
+        transition: opacity 0.09s ease-in-out;
+      }
+      &.active {
+        background: #14171a;
+        color: #fff;
+      }
     }
   }
 `

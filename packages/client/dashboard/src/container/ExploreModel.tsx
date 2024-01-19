@@ -12,8 +12,8 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { updateDapp } from '../api/dapp'
+import { PAGE_SIZE } from '../constants'
 import {
-  PAGE_SIZE,
   getModelStreamList,
   getStarModels,
   startIndexModel
@@ -151,7 +151,7 @@ export default function ExploreModel () {
   return (
     <ExploreModelContainer>
       <div className={'title-box'}>
-        <div className='title'>ComposeDB Models</div>
+        {/* <div className='title'>ComposeDB Models</div> */}
 
         <div className='tools'>
           <Search
@@ -291,7 +291,7 @@ export default function ExploreModel () {
   )
 }
 
-function Dapps ({ dapps }: { dapps: ClientDApp[] }) {
+export function Dapps ({ dapps }: { dapps: ClientDApp[] }) {
   const apps = useMemo(() => {
     const data = [...dapps]
     if (data.length > 3)
@@ -550,7 +550,7 @@ const ExploreModelContainer = styled.div`
   .title-box {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: end;
     margin-bottom: 20px;
     .tools {
       display: flex;

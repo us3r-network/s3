@@ -84,19 +84,19 @@ export default function Nav({ appId }: { appId: string }) {
           })}
         </div>
         <div className="bottom">
-          <NavLink to={`/dapp/${appId}/explore`}>
+          <NavLink to={`/dapp/${appId}/explore/model`}>
             {({ isActive }) => (
               <div className={`item ${isActive ? 'active' : ''}`}>
                 <ExploreIcon />
-                <span>Explore Models</span>
+                <span>Explore</span>
               </div>
             )}
           </NavLink>
 
-          <NavLink to={`/dapp/${appId}/favorite?filterStar=filter`}>
+          <NavLink to={`/dapp/${appId}/favorite/model?filterStar=filter`}>
             <div className={'item star'}>
               {(filterStar && <StarGoldIcon />) || <StarIcon />}
-              <span>Favorite Models</span>
+              <span>Favorite</span>
             </div>
           </NavLink>
           <Link to={DOCS_URL} target="_blank">

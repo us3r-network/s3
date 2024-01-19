@@ -30,3 +30,5 @@ export const WALLET_CONNECT_PROJECT_ID =
 
 export const CERAMIC_NODE_SERVICE_API_URL = process.env.CERAMIC_NODE_SERVICE_API_URL || 'https://ceramic-node-service-test-3rnbvla4lq-df.a.run.app/ceramic-api';
 export const CERAMIC_NODE_SERVICE_WSS_URL = process.env.CERAMIC_NODE_SERVICE_WSS_URL || 'wss://ceramic-node-service-test-3rnbvla4lq-df.a.run.app';
+
+export const PAGE_SIZE = 50

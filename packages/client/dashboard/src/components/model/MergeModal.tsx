@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import { queryModelGraphql } from '../../api/model'
 import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST } from '../../constants'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { ClientDApp, DappComposite, ModelStream, Network } from '../../types.d'
+import { ClientDApp, DappCompositeDto, ModelStream, Network } from '../../types.d'
 
 export default function MergeModal({
   closeModal,
@@ -17,7 +17,7 @@ export default function MergeModal({
 }: {
   closeModal: () => void
   dappModels: ModelStream[]
-  composites: DappComposite[]
+  composites: DappCompositeDto[]
 }) {
   const [loading, setLoading] = useState(false)
   const { selectedDapp } = useSelectedDapp()
@@ -81,7 +81,7 @@ export default function MergeModal({
         .map((compositeId) => {
           return composites.find((item) => item.id + '' === compositeId)
         })
-        .filter((item): item is DappComposite => !!item)
+        .filter((item): item is DappCompositeDto => !!item)
 
       const compositeData = data.map(async (item) => {
         return await Composite.fromJSON({
