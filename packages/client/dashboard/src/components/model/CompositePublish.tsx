@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { DappCompositeDto } from '../../types'
 import { toast } from 'react-toastify'
@@ -13,8 +13,19 @@ export default function CompositePublish ({
 }: {
   composite: DappCompositeDto
 }) {
+  
+  const [published, setPublished] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const session = useSession()
+
+  useEffect(() => {
+    if (composite.streamId) {
+      setPublished(true)
+    }else{
+      setPublished(false)
+    }
+  }, [composite.streamId])
+
   const publish = useCallback(async () => {
     if (!session) {
       toast.error('Please login first')
@@ -50,6 +61,8 @@ export default function CompositePublish ({
         did: session.serialize(),
         id: composite.id,
         data: newCompositeData
+      }).then(() => {
+        setPublished(true)
       })
     }
     setPublishing(false)
@@ -57,7 +70,7 @@ export default function CompositePublish ({
 
   return (
     <PublishBox>
-      {composite.streamId ? (
+      {published ? (
         <div title={composite.streamId}>Published</div>
       ) : publishing ? (
         <button>
@@ -70,6 +83,22 @@ export default function CompositePublish ({
   )
 }
 const PublishBox = styled.div`
+  div {
+    padding: 0 15px;
+    width: 100px;
+    height: 36px;
+
+    border-radius: 10px;
+    border: 1px solid #fff;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   button {
     cursor: pointer;
     padding: 0 15px;
@@ -83,5 +112,8 @@ const PublishBox = styled.div`
     background: #fff;
     font-weight: 700;
     color: #000;
+    > img {
+        width: 24px;
+      }
   }
 `
