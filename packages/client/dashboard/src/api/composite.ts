@@ -98,12 +98,14 @@ export function getComposites({
   pageSize = PAGE_SIZE,
   pageNumber = 1,
   network,
+  published = true,
 }: {
   name?: string
   did?: string
   pageSize?: number
   pageNumber?: number
   network?: Network
+  published?:boolean
 }): AxiosPromise<ApiResp<DappCompositeDto[]>> {
   let host = APP_API_URL
 
@@ -113,6 +115,7 @@ export function getComposites({
     data: {
       pageSize,
       pageNumber,
+      published,
     },
     headers: {
       'did-session': did || '',

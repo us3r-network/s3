@@ -194,7 +194,24 @@ export default function ExploreComposite () {
                       <div>{item.name}</div>
                     </td>
                     <td>
-                      <div>{item.streamId || '-'}</div>
+                      <div>
+                        {item.streamId ? (
+                          <a
+                            href={`${S3_SCAN_URL}/streams/stream/${
+                              item.streamId
+                            }?network=${selectedDapp?.network.toUpperCase()}`}
+                            target='_blank'
+                            rel='noreferrer'
+                          >
+                            {shortPubKey(item.streamId, {
+                              len: 8,
+                              split: '-'
+                            })}
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
                     </td>
                     <td>
                       <div>
@@ -278,7 +295,10 @@ function Actions ({
   return (
     <OpsBox className={''}>
       <DialogTrigger>
-        <Button> <LayoutIcon isActive/> </Button>
+        <Button>
+          {' '}
+          <LayoutIcon isActive />{' '}
+        </Button>
         <ModalOverlay>
           <Modal>
             <Dialog>
@@ -286,8 +306,8 @@ function Actions ({
                 <CreateCompositeModal
                   closeModal={close}
                   defaultSchema={composite.graphql}
-                  readonly = {true}
-                  defaultName = {composite.name}
+                  readonly={true}
+                  defaultName={composite.name}
                 />
               )}
             </Dialog>
