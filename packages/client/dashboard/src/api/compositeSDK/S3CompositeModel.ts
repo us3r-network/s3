@@ -1,23 +1,23 @@
-export const sdkTemplate = `/**
+/**
  * How to use this model:
  * 
  * export const CERAMIC_TESTNET_HOST = "https://gcp-ceramic-testnet-dev.s3.xyz";
- * const <%= modelNameCamelcase %>Model = new S3<%= modelName %>Model(CERAMIC_TESTNET_HOST);
+ * const compositeModel = new S3CompositeModel(CERAMIC_TESTNET_HOST);
  * 
  * // auth with didSession
- * <%= modelNameCamelcase %>Model.authComposeClient(didSession);
+ * compositeModel.authComposeClient(didSession);
  * 
  * // createNew
- * const resp = await <%= modelNameCamelcase %>Model.create<%= modelName %>({...});
+ * const resp = await compositeModel.createComposite({...});
  * 
  * // update
- * const resp = await <%= modelNameCamelcase %>Model.update<%= modelName %>({...});
+ * const resp = await compositeModel.updateComposite({...});
  * 
  * // queryList
- * const resp = await <%= modelNameCamelcase %>Model.query<%= modelName %>Index({first: 100, after: ""});
+ * const resp = await compositeModel.queryCompositeIndex({first: 100, after: ""});
  *
  * // queryWithId
- * const resp = await <%= modelNameCamelcase %>Model.query<%= modelName %>WithId("...");
+ * const resp = await compositeModel.queryCompositeWithId("...");
  * 
  */
 
@@ -31,15 +31,15 @@ import { Page } from "@ceramicnetwork/common";
 import { definition } from "./runtime-composite";
 
 import {
-  <%= modelName %>,
-  Create<%= modelName %>Input,
-  Create<%= modelName %>Payload,
-  Update<%= modelName %>Input,
-  Update<%= modelName %>Payload,
+  Composite,
+  CreateCompositeInput,
+  CreateCompositePayload,
+  UpdateCompositeInput,
+  UpdateCompositePayload,
   Scalars,
 } from "./graphql";
 
-export class S3<%= modelName %>Model {
+export class S3CompositeModel {
   composeClient: ComposeClient;
 
   constructor(ceramic: CeramicApi | string) {
@@ -61,18 +61,18 @@ export class S3<%= modelName %>Model {
     this.composeClient.setDID(did);
   }
 
-  async create<%= modelName %>(input: Create<%= modelName %>Input) {
-    const mutation = \`
-      mutation create<%= modelName %>($input: Create<%= modelName %>Input!) {
-        create<%= modelName %>(input: $input) {
+  async createComposite(input: CreateCompositeInput) {
+    const mutation = `
+      mutation createComposite($input: CreateCompositeInput!) {
+        createComposite(input: $input) {
           document {
             id
           }
         }
       }
-    \`;
+    `;
     const resp = await this.composeClient.executeQuery<{
-      create<%= modelName %>: Create<%= modelName %>Payload;
+      createComposite: CreateCompositePayload;
     }>(mutation, {
       input: {
         content: {
@@ -83,18 +83,18 @@ export class S3<%= modelName %>Model {
     return resp;
   }
 
-  async update<%= modelName %>(input: Update<%= modelName %>Input) {
-    const mutation = \`
-      mutation($input: Update<%= modelName %>Input!) {
-        update<%= modelName %>(input: $input) {
+  async updateComposite(input: UpdateCompositeInput) {
+    const mutation = `
+      mutation($input: UpdateCompositeInput!) {
+        updateComposite(input: $input) {
           document {
             id
           }
         }
       }
-    \`;
+    `;
     const resp = await this.composeClient.executeQuery<{
-      update<%= modelName %>: Update<%= modelName %>Payload;
+      updateComposite: UpdateCompositePayload;
     }>(mutation, {
       input: {
         id: input.id,
@@ -107,16 +107,16 @@ export class S3<%= modelName %>Model {
     return resp;
   }
 
-  async query<%= modelName %>Index({
+  async queryCompositeIndex({
     first = 100,
     after = "",
   }: {
     first: number;
     after?: string;
   }) {
-    const query = \`
+    const query = `
       query {
-        <%= modelNameCamelcase %>Index(first: \${first}, after: "\${after}") {
+        compositeIndex(first: ${first}, after: "${after}") {
           edges {
             node {
               id
@@ -131,29 +131,29 @@ export class S3<%= modelName %>Model {
           }
         }
       }
-    \`;
+    `;
 
     const resp = await this.composeClient.executeQuery<{
-      <%= modelNameCamelcase %>Index: Page<<%= modelName %>>;
+      compositeIndex: Page<Composite>;
     }>(query);
 
     return resp;
   }
 
-  async query<%= modelName %>WithId(id: Scalars["ID"]["input"]) {
-    const query = \`
+  async queryCompositeWithId(id: Scalars["ID"]["input"]) {
+    const query = `
       query($id: ID!) {
         node(id: $id) {
-          ... on <%= modelName %> {
+          ... on Composite {
             id
             # other fields
           }
         }
       }
-    \`;
+    `;
 
     const resp = await this.composeClient.executeQuery<{
-      node: <%= modelName %>;
+      node: Composite;
     }>(query, {
       id,
     });
@@ -162,4 +162,3 @@ export class S3<%= modelName %>Model {
   }
 }
 
-`
