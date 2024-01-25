@@ -93,7 +93,7 @@ export class DappController {
     @Query('published')
     published: boolean = false) {
     this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}, published: ${published}`);
-    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber) ?? [];
+    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber, published) ?? [];
 
     if (composites.length > 0) {
       const compositeIds = composites.map(c => c.id);
