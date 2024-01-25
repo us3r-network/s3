@@ -1,7 +1,17 @@
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Dialog, DialogTrigger, Menu, MenuItem, MenuTrigger, Modal, ModalOverlay, Popover } from 'react-aria-components'
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Menu,
+  MenuItem,
+  MenuTrigger,
+  Modal,
+  ModalOverlay,
+  Popover
+} from 'react-aria-components'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { deleteDappComposites, getDappComposites } from '../../api/composite'
 import { updateDapp } from '../../api/dapp'
@@ -10,7 +20,12 @@ import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useIsOwner from '../../hooks/useIsOwner'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { CeramicStatus, DappCompositeDto, ModelStream, Network } from '../../types.d'
+import {
+  CeramicStatus,
+  DappCompositeDto,
+  ModelStream,
+  Network
+} from '../../types.d'
 import { shortPubKey } from '../../utils/shortPubKey'
 import CopyTint from '../common/CopyTint'
 import MergeIcon from '../icons/MergeIcon'
@@ -22,6 +37,16 @@ import CreateNewModel from './CreateNewModel'
 import FavoriteModel from './FavoriteModal'
 import MergeModal from './MergeModal'
 import { getCompositeDefaultSchema } from '../../utils/composedb-types/schemas'
+
+enum OPEN_MODAL {
+  NONE,
+  CREATE_NEW_MODEL,
+  ADD_FROM_ALL_MODELS,
+  ADD_FROM_FAVORITE_MODELS,
+  CREATE_NEW_COMPOSITE,
+  ADD_FROM_ALL_COMPOSITES,
+  ADD_FROM_FAVORITE_COMPOSITES
+}
 
 export default function ModelList ({
   editable,
@@ -159,6 +184,7 @@ export default function ModelList ({
   const isMetrics = location.pathname.endsWith('statistic')
   const isSdk = location.pathname.endsWith('sdk')
 
+  const [openModal, setOpenModal] = useState(OPEN_MODAL.NONE)
   if (loading) {
     return (
       <ListBox>
@@ -173,8 +199,6 @@ export default function ModelList ({
     <ListBox>
       <div className='title'>
         <h3>Models</h3>
-        <Favorite />
-        <CreateNew />
         {editable &&
           isOwner &&
           (!currCeramicNode ||
@@ -200,15 +224,15 @@ export default function ModelList ({
                 <Menu
                   onAction={id => {
                     if (id === 'explore') {
-                      navigate(`/dapp/${appId}/explore`)
+                      navigate(`/dapp/${appId}/explore/model`)
                       return
                     }
                     if (id === 'favorite') {
-                      document.getElementById('add-from-favorite')?.click()
+                      setOpenModal(OPEN_MODAL.ADD_FROM_FAVORITE_MODELS)
                       return
                     }
                     if (id === 'create') {
-                      document.getElementById('create-new')?.click()
+                      setOpenModal(OPEN_MODAL.CREATE_NEW_MODEL)
                       return
                     }
                   }}
@@ -244,12 +268,48 @@ export default function ModelList ({
         <>
           <div className='title'>
             <h3>Composites</h3>
-            {editable && isOwner && (
-              <CreateComposite
-                loadDappComposites={loadDappComposites}
-                dappModels={dappModels || []}
-              />
-            )}
+            {editable &&
+              isOwner &&
+              (!currCeramicNode ||
+              currCeramicNode.status !== CeramicStatus.RUNNING ? (
+                <DialogTrigger>
+                  <Button>
+                    <PlusIcon />
+                  </Button>
+                  <ModalOverlay>
+                    <Modal>
+                      <Dialog>
+                        {({ close }) => (
+                          <NoCeramicNodeModal closeModal={close} />
+                        )}
+                      </Dialog>
+                    </Modal>
+                  </ModalOverlay>
+                </DialogTrigger>
+              ) : (
+                <MenuTrigger>
+                  <Button aria-label='Menu'>
+                    <PlusIcon />
+                  </Button>
+                  <Popover>
+                    <Menu
+                      onAction={id => {
+                        if (id === 'explore') {
+                          navigate(`/dapp/${appId}/explore/composite`)
+                          return
+                        }
+                        if (id === 'create') {
+                          setOpenModal(OPEN_MODAL.CREATE_NEW_COMPOSITE)
+                          return
+                        }
+                      }}
+                    >
+                      <MenuItem id='explore'>Explore Composites</MenuItem>
+                      <MenuItem id='create'>Create New Composites</MenuItem>
+                    </Menu>
+                  </Popover>
+                </MenuTrigger>
+              ))}
           </div>
 
           <DappCompositeList
@@ -261,6 +321,32 @@ export default function ModelList ({
           />
         </>
       )}
+      <Modal
+        isOpen={openModal === OPEN_MODAL.CREATE_NEW_MODEL}
+        onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
+      >
+        <Dialog>{({ close }) => <CreateNewModel closeModal={close} />}</Dialog>
+      </Modal>
+      <Modal
+        isOpen={openModal === OPEN_MODAL.CREATE_NEW_COMPOSITE}
+        onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
+      >
+        <Dialog>
+          {({ close }) => (
+            <CreateCompositeModal
+              closeModal={close}
+              loadDappComposites={loadDappComposites}
+              defaultSchema={getCompositeDefaultSchema(dappModels || [])}
+            />
+          )}
+        </Dialog>
+      </Modal>
+      <Modal
+        isOpen={openModal === OPEN_MODAL.ADD_FROM_FAVORITE_MODELS}
+        onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
+      >
+        <Dialog>{({ close }) => <FavoriteModel closeModal={close} />}</Dialog>
+      </Modal>
       {editable && isOwner && (
         <MergeBox>
           <DialogTrigger>
@@ -322,11 +408,11 @@ function DappCompositeList ({
             >
               <div>{item.name}</div>
               {editable && (
-                <ModelListItemTrash
-                  removeModelAction={async () => {
+                <RemoveButton
+                  removeAction={async () => {
                     await removeAction(item.id)
                   }}
-                  streamId={item.id + ''}
+                  id={item.id + ''}
                 />
               )}
             </div>
@@ -374,9 +460,9 @@ function DappModelList ({
             >
               <div>{item.stream_content.name}</div>
               {editable && (
-                <ModelListItemTrash
-                  removeModelAction={removeModelAction}
-                  streamId={item.stream_id}
+                <RemoveButton
+                  removeAction={removeModelAction}
+                  id={item.stream_id}
                 />
               )}
             </div>
@@ -402,12 +488,12 @@ function DappModelList ({
   )
 }
 
-function ModelListItemTrash ({
-  streamId,
-  removeModelAction
+function RemoveButton ({
+  id,
+  removeAction
 }: {
-  streamId: string
-  removeModelAction: (modelId: string) => Promise<void>
+  id: string
+  removeAction: (id: string) => Promise<void>
 }) {
   const [removing, setRemoving] = useState(false)
   if (removing) {
@@ -422,89 +508,12 @@ function ModelListItemTrash ({
       onClick={async e => {
         e.stopPropagation()
         setRemoving(true)
-        await removeModelAction(streamId)
+        await removeAction(id)
         setRemoving(false)
       }}
     >
       <TrashIcon />
     </button>
-  )
-}
-
-function Favorite () {
-  return (
-    <DialogTrigger>
-      <Button
-        style={{
-          display: 'none'
-        }}
-        id='add-from-favorite'
-      >
-        Add From Favorite
-      </Button>
-      <ModalOverlay>
-        <Modal>
-          <Dialog>{({ close }) => <FavoriteModel closeModal={close} />}</Dialog>
-        </Modal>
-      </ModalOverlay>
-    </DialogTrigger>
-  )
-}
-
-function CreateNew () {
-  const [searchParams] = useSearchParams()
-  useEffect(() => {
-    if (searchParams.get('create-new') === 'true') {
-      document.getElementById('create-new')?.click()
-    }
-  }, [searchParams])
-  return (
-    <DialogTrigger>
-      <Button
-        style={{
-          display: 'none'
-        }}
-        id='create-new'
-      >
-        Create New
-      </Button>
-      <ModalOverlay>
-        <Modal>
-          <Dialog>
-            {({ close }) => <CreateNewModel closeModal={close} />}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
-    </DialogTrigger>
-  )
-}
-
-function CreateComposite ({
-  loadDappComposites,
-  dappModels
-}: {
-  loadDappComposites: () => Promise<void>
-  dappModels: ModelStream[]
-}) {
-  return (
-    <DialogTrigger>
-      <Button>
-        <PlusIcon />
-      </Button>
-      <ModalOverlay>
-        <Modal>
-          <Dialog>
-            {({ close }) => (
-              <CreateCompositeModal
-                closeModal={close}
-                loadDappComposites={loadDappComposites}
-                defaultSchema={getCompositeDefaultSchema(dappModels)}
-              />
-            )}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
-    </DialogTrigger>
   )
 }
 

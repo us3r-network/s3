@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { DappCompositeDto } from '../../types'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
+import CompositePublish from './CompositePublish'
 
 export default function CompositeDefinition({
   composite,
@@ -26,6 +27,7 @@ export default function CompositeDefinition({
     <DefinitionBox>
       <div className="title">
         <span>{composite.name}</span>
+        <CompositePublish composite={composite}/>
       </div>
       <EditorBox>
         <GraphQLEditor

@@ -50,9 +50,15 @@ export default function CreateCompositeModal ({
       )
       if (!result) return
       const { composite, runtimeDefinition } = result
-
+      
+      const newCompositeData = {
+        graphql: gqlSchema.code,
+        name,
+        composite:JSON.stringify(composite),
+        runtimeDefinition:JSON.stringify(runtimeDefinition),
+      }
       const resp = await createDappComposites({
-        data: { name, gqlSchema, composite, runtimeDefinition },
+        data: newCompositeData,
         dapp: selectedDapp,
         did: session.serialize()
       })

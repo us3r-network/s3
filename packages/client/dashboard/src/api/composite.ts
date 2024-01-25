@@ -6,6 +6,7 @@ import { ApiResp } from '.'
 import { APP_API_URL } from '../constants'
 import {
   ClientDApp,
+  CompositeInput,
   DappCompositeDto,
   Network,
 } from '../types.d'
@@ -36,7 +37,7 @@ export function createDappComposites({
 }: {
   did: string
   dapp: ClientDApp
-  data: { name: string, gqlSchema: PassedSchema, composite: Composite, runtimeDefinition: RuntimeCompositeDefinition }
+  data: CompositeInput
 }) {
   let host = APP_API_URL
   return axios({
@@ -45,7 +46,7 @@ export function createDappComposites({
     headers: {
       'did-session': did,
     },
-    data: { graphql: data.gqlSchema.code, name: data.name, composite: data.composite, runtimeDefinition: data.runtimeDefinition },
+    data,
   })
 }
 
@@ -97,12 +98,14 @@ export function getComposites({
   pageSize = PAGE_SIZE,
   pageNumber = 1,
   network,
+  published = true,
 }: {
   name?: string
   did?: string
   pageSize?: number
   pageNumber?: number
   network?: Network
+  published?:boolean
 }): AxiosPromise<ApiResp<DappCompositeDto[]>> {
   let host = APP_API_URL
 
@@ -112,6 +115,7 @@ export function getComposites({
     data: {
       pageSize,
       pageNumber,
+      published,
     },
     headers: {
       'did-session': did || '',
@@ -141,12 +145,10 @@ export function postComposite({
   did,
   id,
   data,
-  name,
 }: {
   did: string
-  id: string
-  data: string
-  name: string
+  id: number
+  data: CompositeInput
 }) {
   let host = APP_API_URL
   return axios({
@@ -155,7 +157,7 @@ export function postComposite({
     headers: {
       'did-session': did,
     },
-    data: { graphql: data, name },
+    data,
   })
 }
 
@@ -175,5 +177,3 @@ export function deleteComposite({
     },
   })
 }
-
-export { PAGE_SIZE }

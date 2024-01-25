@@ -30,7 +30,7 @@ export enum AppType {
 
 export type DappCompositeDto = {
   id: number;
-  dappId: number;
+  dappId?: number;
   name: string;
   composite: string;
   graphql: string;
@@ -41,6 +41,13 @@ export type DappCompositeDto = {
   lastModifiedAt: number;
 }
 
+export type CompositeInput = {
+  name: string;
+  composite: string;
+  graphql: string;
+  streamId?: string;
+  runtimeDefinition?: string;
+}
 // export type DappComposite = {
 //   id: number
 //   name: string
