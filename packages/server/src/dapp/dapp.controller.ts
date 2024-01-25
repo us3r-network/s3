@@ -89,8 +89,10 @@ export class DappController {
     @Query('pageSize')
     pageSize: number = 10,
     @Query('pageNumber')
-    pageNumber: number = 1,) {
-    this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}`);
+    pageNumber: number = 1,
+    @Query('published')
+    published: boolean = false) {
+    this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}, published: ${published}`);
     const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber) ?? [];
 
     if (composites.length > 0) {

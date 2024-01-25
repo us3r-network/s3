@@ -220,8 +220,11 @@ export default class DappService {
     return compositeIdDappsMap;
   }
 
-  async findCompositeByOrder(pageSize: number, pageNumber: number): Promise<DappComposite[]> {
-    const composites = await this.dappCompositeRepository.find({ is_deleted: false });
+  async findCompositeByOrder(pageSize: number, pageNumber: number, published?: boolean): Promise<DappComposite[]> {
+    let composites = await this.dappCompositeRepository.find({ is_deleted: false });
+    if (published) {
+      composites = composites.filter(c => c.getStreamId?.length > 0);
+    }
     if (composites.length == 0) return [];
 
     const compositeIds = composites.map(c => { c.getId });
