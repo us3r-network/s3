@@ -112,7 +112,7 @@ export function getComposites({
   return axios({
     url: host + `/dapps/composites`,
     method: 'GET',
-    data: {
+    params: {
       pageSize,
       pageNumber,
       published,
