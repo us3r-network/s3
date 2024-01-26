@@ -7,7 +7,7 @@
  * @Description: 
  */
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
-import Definition from './Definition'
+// import Definition from './Definition'
 import ModelSDK from './ModelSDK'
 
 export default function ModelTabs({
@@ -27,7 +27,7 @@ export default function ModelTabs({
         </TabList>
       </div>
       <TabPanel id="Definition">
-        <Definition streamId={modelId} />
+        {/* <Definition streamId={modelId} /> */}
       </TabPanel>
       <TabPanel id="model-sdk">
         <ModelSDK modelId={modelId} modelName={name} />
