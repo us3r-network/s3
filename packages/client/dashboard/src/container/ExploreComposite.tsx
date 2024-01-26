@@ -84,7 +84,7 @@ export default function ExploreComposite () {
   //   }
 
   //   try {
-  //     const resp = await getStarModels({
+  //     const resp = await getModelsInfoByIds({
   //       network: (selectedDapp?.network as Network) || Network.TESTNET,
   //       ids
   //     })

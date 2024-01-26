@@ -6,7 +6,7 @@ import { ApiResp } from '.'
 import { APP_API_URL, PAGE_SIZE } from '../constants'
 import {
   ClientDApp,
-  DappCompositeDto,
+  DappModelDto,
   GraphqlGenType,
   GraphqlGenTypeServer,
   ModeCreateResult,
@@ -22,7 +22,7 @@ export function getDappModels({
 }: {
   dapp: ClientDApp
   did?: string
-}): AxiosPromise<ApiResp<DappCompositeDto[]>> {
+}): AxiosPromise<ApiResp<DappModelDto[]>> {
   let host = APP_API_URL
 
   return axios({
@@ -134,7 +134,7 @@ export function createModel(
   })
 }
 
-export function getStarModels({
+export function getModelsInfoByIds({
   network,
   ids,
 }: {

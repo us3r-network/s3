@@ -15,7 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { deleteDappComposites, getDappComposites } from '../../api/composite'
 import { updateDapp } from '../../api/dapp'
-import { getStarModels } from '../../api/model'
+import { getDappModels, getModelsInfoByIds } from '../../api/model'
 import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useIsOwner from '../../hooks/useIsOwner'
@@ -69,7 +69,7 @@ export default function ModelList ({
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
-  const [composites, setComposites] = useState<DappCompositeDto[]>([])
+  const [dappComposites, setDappComposites] = useState<DappCompositeDto[]>([])
   const location = useLocation()
 
   const dapp = useMemo(() => {
@@ -85,7 +85,7 @@ export default function ModelList ({
     }
 
     try {
-      const resp = await getStarModels({
+      const resp = await getModelsInfoByIds({
         network: dapp.network as Network,
         ids: dapp.models || []
       })
@@ -101,6 +101,19 @@ export default function ModelList ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dapp])
 
+  // const loadDappModels = useCallback(async () => {
+  //   if (!dapp) return
+  //   try {
+  //     const resp = await getDappModels({
+  //       dapp
+  //     })
+  //     if (resp.data.code !== 0) throw new Error(resp.data.msg)
+  //     setDappModels(resp.data.data)
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }, [dapp])
+
   const loadDappComposites = useCallback(async () => {
     if (!dapp) return
     try {
@@ -108,7 +121,7 @@ export default function ModelList ({
         dapp
       })
       if (resp.data.code !== 0) throw new Error(resp.data.msg)
-      setComposites(resp.data.data)
+      setDappComposites(resp.data.data)
     } catch (error) {
       console.error(error)
     }
@@ -313,7 +326,7 @@ export default function ModelList ({
           </div>
 
           <DappCompositeList
-            composites={composites}
+            composites={dappComposites}
             editable={editable && isOwner}
             selectComposite={selectComposite}
             setSelectedComposite={setSelectComposite}
@@ -360,7 +373,7 @@ export default function ModelList ({
                   {({ close }) => (
                     <MergeModal
                       closeModal={close}
-                      composites={composites}
+                      composites={dappComposites}
                       dappModels={dappModels || []}
                     />
                   )}

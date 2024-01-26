@@ -15,7 +15,7 @@ import { updateDapp } from '../api/dapp'
 import { PAGE_SIZE } from '../constants'
 import {
   getModelStreamList,
-  getStarModels,
+  getModelsInfoByIds,
   startIndexModel
 } from '../api/model'
 import { ImgOrName } from '../components/common/ImgOrName'
@@ -87,7 +87,7 @@ export default function ExploreModel () {
     }
 
     try {
-      const resp = await getStarModels({
+      const resp = await getModelsInfoByIds({
         network: (selectedDapp?.network as Network) || Network.TESTNET,
         ids
       })
