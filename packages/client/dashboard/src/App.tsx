@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import {
+  NavLink,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams
+} from 'react-router-dom'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -141,7 +148,6 @@ function DappLayout () {
   )
 }
 
-
 const AppContainer = styled.div`
   display: flex;
   margin-top: 60px;
@@ -228,6 +234,7 @@ const EditorLayoutContainer = styled.div`
 `
 
 function ExploreLayout () {
+  const { pathname } = useLocation()
   return (
     <ExploreLayoutContainer>
       <div className='explore-catalog'>
@@ -238,13 +245,16 @@ function ExploreLayout () {
             </div>
           )}
         </NavLink>
-        <NavLink to='composite' key='model'>
-          {({ isActive }) => (
-            <div className={`item ${isActive ? 'active' : ''}`}>
-              <span>Composites</span>
-            </div>
-          )}
-        </NavLink>
+
+        {!pathname.includes('favorite') && (
+          <NavLink to='composite' key='model'>
+            {({ isActive }) => (
+              <div className={`item ${isActive ? 'active' : ''}`}>
+                <span>Composites</span>
+              </div>
+            )}
+          </NavLink>
+        )}
       </div>
       <div>
         <Outlet />

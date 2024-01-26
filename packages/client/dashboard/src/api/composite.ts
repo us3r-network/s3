@@ -1,7 +1,4 @@
-import { Composite } from '@composedb/devtools'
-import { RuntimeCompositeDefinition } from '@composedb/types'
 import axios, { AxiosPromise } from 'axios'
-import { PassedSchema } from 'graphql-editor/lib/Models/Types'
 import { ApiResp } from '.'
 import { APP_API_URL } from '../constants'
 import {

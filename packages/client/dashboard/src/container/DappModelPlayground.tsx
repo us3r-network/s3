@@ -123,7 +123,7 @@ function CompositePlayground ({
 }) {
   const runtimeDefinition = useMemo(() => {
     return JSON.parse(composite.runtimeDefinition)
-  }, [composite.id])
+  }, [composite.runtimeDefinition])
   return (
     <CompositePlaygroundGraphiQL
       definition={runtimeDefinition}
