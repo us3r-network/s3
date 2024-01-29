@@ -96,7 +96,7 @@ export type ClientDApp = {
   // modelId?: string
   icon?: string
   name: string
-  network: string
+  network: Network
   type?: string
   stage?: string
   url?: string

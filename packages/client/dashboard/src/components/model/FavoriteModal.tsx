@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { updateDapp } from '../../api/dapp'
-import { getStarModels, startIndexModel } from '../../api/model'
+import { getModelsInfoByIds, startIndexModel } from '../../api/model'
 import { S3_SCAN_URL } from '../../constants'
 import { PersonalCollection, useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
@@ -84,7 +84,7 @@ function ModelList() {
     }
 
     try {
-      const resp = await getStarModels({
+      const resp = await getModelsInfoByIds({
         network: (selectedDapp?.network as Network) || Network.TESTNET,
         ids,
       })

@@ -33,7 +33,6 @@ export default function useSelectedDapp() {
     appId,
     selectedDapp,
     selectDapps,
-
     s3ModelCollection,
   }
 }

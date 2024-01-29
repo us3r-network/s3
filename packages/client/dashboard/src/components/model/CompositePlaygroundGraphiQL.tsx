@@ -33,7 +33,7 @@ export type YogaGraphiQLProps = Omit<
   Partial<Omit<LoadFromUrlOptions, 'headers'>> & {
     title?: string
     additionalHeaders?: LoadFromUrlOptions['headers']
-    definition: string
+    definition: RuntimeCompositeDefinition
     ceramicNodeURL: string | undefined
   }
 
@@ -67,18 +67,19 @@ export default function CompositePlaygroundGraphiQL(
 ): React.ReactElement {
   const { definition, ceramicNodeURL } = props
 
-  const updateQuery = useCallback(async () => {
-    const data = JSON.parse(definition)
-    if (!data) return
-    const modelName = Object.keys(data.models)[0]
-    const objValues: any[] = Object.values(data.objects)
+  const updateQuery = useCallback(async () => { 
+    if (!definition) return
+    const modelName = Object.keys(definition.models)[0]
+    const objValues: any[] = Object.values(definition.objects)
     const modelProperties = Object.entries(objValues[0])
     const defaultQuery = createGraphqlDefaultQuery(modelName, modelProperties)
     setQuery(initialQuery + defaultQuery)
   }, [definition])
-  console.log('definition', definition, ceramicNodeURL)
+
+  // console.log('definition', definition, ceramicNodeURL)
+
   const { composeClient, composeClientAuthenticated } =
-  useComposeClient(JSON.parse(definition) as RuntimeCompositeDefinition, ceramicNodeURL)
+  useComposeClient(definition, ceramicNodeURL)
 
   useEffect(() => {
     localStorage.setItem('graphiql:theme', 'dark')

@@ -1,77 +1,43 @@
-import { AxiosError } from 'axios'
+import { Composite } from '@composedb/devtools'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { queryModelGraphql } from '../../api/model'
-import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { ModeQueryResult, Network } from '../../types.d'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
 
-export default function Definition({ streamId }: { streamId: string }) {
-  const [modelData, setModelData] = useState<ModeQueryResult>()
+export default function CompositeEditor({
+  schema,
+  encodedDefinition,
+}: {
+  schema?: string
+  encodedDefinition: string
+}) {
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
-    code: schemas.code,
+    code: schema || '',
+    libraries: schemas.library,
   })
-  const [errMsg, setErrMsg] = useState('')
-  const { selectedDapp } = useSelectedDapp()
-  const [loading, setLoading] = useState(false)
 
-  const fetchModelGraphql = useCallback(
-    async (streamId: string) => {
-      try {
-        setLoading(true)
-        setErrMsg('')
-        const resp = await queryModelGraphql(
-          streamId,
-          (selectedDapp?.network as Network) || Network.TESTNET
-        )
-        const { data } = resp.data
-        setModelData(data)
-        if (data.graphqlSchemaDefinition) {
-          setGqlSchema({
-            code: data.graphqlSchemaDefinition,
-            libraries: schemas.library,
-          })
-        } else {
-          setGqlSchema({
-            code: data.graphqlSchema,
-          })
-        }
-      } catch (error) {
-        const err = error as AxiosError
-        setErrMsg((err.response?.data as any).message || err.message)
-      } finally {
-        setLoading(false)
-      }
-    },
-    [selectedDapp]
-  )
+  const runtimeDefinition = useMemo(() => {
+    if (!encodedDefinition) {
+      return null
+    }
+    try {
+      const composite = Composite.from(JSON.parse(encodedDefinition))
+      return composite.toRuntime()
+    } catch (error) {
+      return null
+    }
+  }, [encodedDefinition])
 
   useEffect(() => {
-    if (!streamId) return
-    fetchModelGraphql(streamId)
-  }, [fetchModelGraphql, streamId])
-
-  if (loading) {
-    return (
-      <div>
-        <Loading>Loading...</Loading>
-      </div>
-    )
-  }
-
-  if (errMsg) {
-    return (
-      <div>
-        <div className="title-box" />
-        <Loading>{errMsg}</Loading>
-      </div>
-    )
-  }
+    setGqlSchema({
+      code: schema || '',
+      libraries: schemas.library,
+    })
+  }, [schema])
 
   return (
-    <div>
+    <Box>
       <EditorBox>
         <GraphQLEditor
           setSchema={(props) => {
@@ -81,27 +47,50 @@ export default function Definition({ streamId }: { streamId: string }) {
         />
       </EditorBox>
       <ResultBox>
-        {modelData?.composite && (
+        {encodedDefinition && (
           <CodeDownload
             title="Composite"
-            downloadContent={JSON.stringify(modelData.composite)}
+            downloadContent={encodedDefinition}
             downloadFileName="composite.json"
-            content={JSON.stringify(modelData.composite, null, 2)}
+            content={encodedDefinition}
           />
         )}
-        {modelData?.runtimeDefinition && (
+        {runtimeDefinition && (
           <CodeDownload
             title="Runtime Definition"
             downloadContent={`// This is an auto-generated file, do not edit manually
-export const definition = ${JSON.stringify(modelData.runtimeDefinition)}`}
+export const definition = ${runtimeDefinition}`}
             downloadFileName="runtime-composite.js"
-            content={JSON.stringify(modelData.runtimeDefinition, null, 2)}
+            content={JSON.stringify(runtimeDefinition)}
           />
         )}
       </ResultBox>
-    </div>
+    </Box>
   )
 }
+
+const Box = styled.div`
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #14171a;
+    margin-bottom: 20px;
+
+    > div {
+      display: flex;
+      align-items: center;
+    }
+
+    > span {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 28px;
+      color: #ffffff;
+    }
+  }
+`
 
 const EditorBox = styled.div`
   height: calc(100vh - 300px);
@@ -160,7 +149,7 @@ const ResultBox = styled.div`
     color: #718096;
     overflow: scroll;
     width: 100%;
-    margin-top: 0;
+
     > div {
       width: fit-content;
     }
@@ -186,10 +175,4 @@ const ResultBox = styled.div`
     font-weight: 500;
     color: #14171a;
   }
-`
-
-const Loading = styled.div`
-  padding: 20px;
-  text-align: center;
-  color: gray;
 `

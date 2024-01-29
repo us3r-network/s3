@@ -1,7 +1,4 @@
-import { Composite } from '@composedb/devtools'
-import { RuntimeCompositeDefinition } from '@composedb/types'
 import axios, { AxiosPromise } from 'axios'
-import { PassedSchema } from 'graphql-editor/lib/Models/Types'
 import { ApiResp } from '.'
 import { APP_API_URL } from '../constants'
 import {
@@ -112,7 +109,7 @@ export function getComposites({
   return axios({
     url: host + `/dapps/composites`,
     method: 'GET',
-    data: {
+    params: {
       pageSize,
       pageNumber,
       published,
