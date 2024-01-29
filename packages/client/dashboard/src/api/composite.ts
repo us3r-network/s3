@@ -102,7 +102,7 @@ export function getComposites({
   pageSize?: number
   pageNumber?: number
   network?: Network
-  published?:boolean
+  published?: boolean
 }): AxiosPromise<ApiResp<DappCompositeDto[]>> {
   let host = APP_API_URL
 

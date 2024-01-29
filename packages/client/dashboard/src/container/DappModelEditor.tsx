@@ -40,7 +40,7 @@ export default function DappModelEditor () {
         </div>
         <CompositeEditor
           schema={selectComposite.graphql}
-          encodedDefinition={selectComposite.composite}
+          encodedDefinition={JSON.parse(selectComposite.composite)}
         />
       </Box>
     )
