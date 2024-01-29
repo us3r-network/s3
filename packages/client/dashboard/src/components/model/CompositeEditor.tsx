@@ -113,8 +113,8 @@ const EditorBox = styled.div`
 `
 
 const ResultBox = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   margin-top: 20px;
   > div {
