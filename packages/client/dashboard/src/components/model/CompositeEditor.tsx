@@ -59,7 +59,7 @@ export default function CompositeEditor ({
             title='Composite Encoded Definition'
             downloadContent={JSON.stringify(encodedDefinition)}
             downloadFileName='composite.json'
-            content={JSON.stringify(encodedDefinition)}
+            content={JSON.stringify(encodedDefinition,null,2)}
           />
         )}
         {runtimeDefinition && (
@@ -68,7 +68,7 @@ export default function CompositeEditor ({
             downloadContent={`// This is an auto-generated file, do not edit manually
 export const definition = ${JSON.stringify(runtimeDefinition)}`}
             downloadFileName='runtime-composite.js'
-            content={JSON.stringify(runtimeDefinition)}
+            content={JSON.stringify(runtimeDefinition,null,2)}
           />
         )}
       </ResultBox>
