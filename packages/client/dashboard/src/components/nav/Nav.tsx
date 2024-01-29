@@ -93,7 +93,7 @@ export default function Nav({ appId }: { appId: string }) {
             )}
           </NavLink>
 
-          <NavLink to={`/dapp/${appId}/favorite/model?filterStar=filter`}>
+          <NavLink to={`/dapp/${appId}/favorite/model?filterStar=true`}>
             <div className={'item star'}>
               {(filterStar && <StarGoldIcon />) || <StarIcon />}
               <span>Favorite</span>

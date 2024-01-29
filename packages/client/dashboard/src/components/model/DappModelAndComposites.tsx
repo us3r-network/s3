@@ -25,7 +25,7 @@ import {
   DappCompositeDto,
   ModelStream,
   Network
-} from '../../types'
+} from '../../types.d'
 import { getCompositeDefaultSchema } from '../../utils/composedb-types/schemas'
 import { shortPubKey } from '../../utils/shortPubKey'
 import CopyTint from '../common/CopyTint'
