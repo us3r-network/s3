@@ -109,3 +109,28 @@ export async function createCompositeFromBrowser(
 
   return { composite: myComposite, runtimeDefinition: myRuntimeDefinition }
 }
+
+
+export async function getRuntimeDefinitionFromEncodedComposite(
+  encodedDefinition: string,
+  myCeramicNode: string = '',
+) {
+  if (!encodedDefinition) {
+    return null
+  }
+  try {
+    const ceramic = new CeramicClient(myCeramicNode)
+    const composite = await Composite.fromJSON(
+      {
+        definition: JSON.parse(JSON.stringify(encodedDefinition)),
+        ceramic,
+      })
+    // console.log('encoded definition: ', encodedDefinition)
+    // console.log('composite: ', composite)
+    // console.log('runtime definition:', composite.toRuntime())
+    return composite.toRuntime()
+  } catch (error) {
+    console.log('get runtime error', error)
+    return null
+  }
+}
