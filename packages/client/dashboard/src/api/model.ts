@@ -230,6 +230,25 @@ export function startIndexModel({
   })
 }
 
+export function startIndexModels({
+  modelIds,
+  network,
+  didSession,
+}:{
+  didSession: string,
+  modelIds: string[],
+  network: Network }) {
+  if (!modelIds || modelIds.length===0) return Promise.reject()
+  const resp = Promise.all(modelIds.map((modelId: string) => {
+    return startIndexModel({
+      modelId,
+      network,
+      didSession
+    })
+  }))
+  return resp
+}
+
 export function getStreamsCountWithModels({
   network,
   modelStreamIds,

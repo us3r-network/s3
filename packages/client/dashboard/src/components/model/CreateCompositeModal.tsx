@@ -5,11 +5,11 @@ import { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { createDappComposites } from '../../api/composite'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { ModelStream } from '../../types.d'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CloseIcon from '../icons/CloseIcon'
-import { createCompositeFromBrowser } from '../../utils/createCompositeFromBrowser'
+import { createCompositeFromBrowser } from '../../utils/composeDBUtils'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
+import { startIndexModels } from '../../api/model'
 
 export default function CreateCompositeModal ({
   closeModal,
@@ -65,6 +65,13 @@ export default function CreateCompositeModal ({
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
       }
+      const modelIds = composite.modelIDs
+      await startIndexModels({
+        modelIds,
+        network: selectedDapp.network,
+        didSession: session.serialize()
+      }).catch(console.error)
+
       if (loadDappComposites) await loadDappComposites()
       closeModal()
     } catch (error) {

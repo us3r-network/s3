@@ -1,38 +1,45 @@
-import { Composite } from '@composedb/devtools'
+import { RuntimeCompositeDefinition } from '@composedb/types'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
+import { getRuntimeDefinitionFromEncodedComposite } from '../../utils/composeDBUtils'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
 
-export default function CompositeEditor({
+export default function CompositeEditor ({
   schema,
-  encodedDefinition,
+  encodedDefinition
 }: {
   schema?: string
   encodedDefinition: string
 }) {
+  const { currCeramicNode } = useCeramicNodeCtx()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schema || '',
-    libraries: schemas.library,
+    libraries: schemas.library
   })
 
-  const runtimeDefinition = useMemo(() => {
-    if (!encodedDefinition) {
-      return null
-    }
-    try {
-      const composite = Composite.from(JSON.parse(encodedDefinition))
-      return composite.toRuntime()
-    } catch (error) {
-      return null
-    }
-  }, [encodedDefinition])
+  const [runtimeDefinition, setRuntimeDefinition] = useState<RuntimeCompositeDefinition|null>(null)
+
+  useEffect(() => {
+    if (!encodedDefinition) return
+    if (!currCeramicNode?.serviceUrl) return
+    getRuntimeDefinitionFromEncodedComposite(
+      encodedDefinition,
+      currCeramicNode?.serviceUrl
+    ).then(
+      (result)=>{
+        setRuntimeDefinition(result)
+      }
+    )
+  }, [currCeramicNode?.serviceUrl, encodedDefinition])
+
 
   useEffect(() => {
     setGqlSchema({
       code: schema || '',
-      libraries: schemas.library,
+      libraries: schemas.library
     })
   }, [schema])
 
@@ -40,7 +47,7 @@ export default function CompositeEditor({
     <Box>
       <EditorBox>
         <GraphQLEditor
-          setSchema={(props) => {
+          setSchema={props => {
             setGqlSchema(props)
           }}
           schema={gqlSchema}
@@ -49,19 +56,19 @@ export default function CompositeEditor({
       <ResultBox>
         {encodedDefinition && (
           <CodeDownload
-            title="Composite"
-            downloadContent={encodedDefinition}
-            downloadFileName="composite.json"
-            content={encodedDefinition}
+            title='Composite Encoded Definition'
+            downloadContent={JSON.stringify(encodedDefinition)}
+            downloadFileName='composite.json'
+            content={JSON.stringify(encodedDefinition,null,2)}
           />
         )}
         {runtimeDefinition && (
           <CodeDownload
-            title="Runtime Definition"
+            title='Composite Runtime Definition'
             downloadContent={`// This is an auto-generated file, do not edit manually
-export const definition = ${runtimeDefinition}`}
-            downloadFileName="runtime-composite.js"
-            content={JSON.stringify(runtimeDefinition)}
+export const definition = ${JSON.stringify(runtimeDefinition)}`}
+            downloadFileName='runtime-composite.js'
+            content={JSON.stringify(runtimeDefinition,null,2)}
           />
         )}
       </ResultBox>
@@ -106,8 +113,8 @@ const EditorBox = styled.div`
 `
 
 const ResultBox = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   margin-top: 20px;
   > div {

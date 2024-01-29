@@ -29,6 +29,7 @@ import { bindingDappComposites, getComposites } from '../api/composite'
 import { Dapps } from './ExploreModel'
 import CreateCompositeModal from '../components/model/CreateCompositeModal'
 import LayoutIcon from '../components/icons/LayoutIcon'
+import { startIndexModels } from '../api/model'
 
 export default function ExploreComposite () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -274,7 +275,23 @@ function Actions ({
         compositeId: composite.id,
         dapp: selectedDapp,
         did: session.serialize()
-      }).catch(console.error)
+      })
+      .then(
+        () => {
+          const models = JSON.parse(composite.composite).models
+          console.log(Object.keys(models))
+          const modelIds = Object.keys(models)
+          startIndexModels({
+            modelIds,
+            network: selectedDapp.network,
+            didSession: session.serialize()
+          }).catch(console.error)
+        },
+        err => {
+          console.error(err)
+        }
+      )
+      .catch(console.error)
     }
     try {
       setAdding(true)

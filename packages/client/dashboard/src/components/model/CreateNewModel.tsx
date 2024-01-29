@@ -8,7 +8,7 @@ import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { schemas } from '../../utils/composedb-types/schemas'
-import { createCompositeFromBrowser } from '../../utils/createCompositeFromBrowser'
+import { createCompositeFromBrowser } from '../../utils/composeDBUtils'
 import CloseIcon from '../icons/CloseIcon'
 import { createDappModels } from '../../api/model'
 
