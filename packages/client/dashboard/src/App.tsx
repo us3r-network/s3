@@ -36,7 +36,7 @@ import NoMatch from './container/NoMatch'
 
 import Header from './components/nav/Header'
 import Nav from './components/nav/Nav'
-import ModelList from './components/model/ModelList'
+import DappModelAndComposites from './components/model/DappModelAndComposites'
 import ExploreComposite from './container/ExploreComposite'
 
 dayjs.extend(relativeTime)
@@ -182,7 +182,7 @@ function ModelEditorLayout () {
 
   return (
     <EditorLayoutContainer>
-      <ModelList
+      <DappModelAndComposites
         selectModel={selectModel}
         setSelectModel={data => {
           setSelectModel(data)
