@@ -108,25 +108,27 @@ export default function ModelList ({
     setModels([])
     setHasMore(true)
     const resp = await getModelStreamList({
-      name: searchText,
+      name: searchText || '',
       network: (selectedDapp?.network as Network) || Network.TESTNET
     })
     const list = resp.data.data
     setModels(list)
     setHasMore(list.length >= PAGE_SIZE)
     pageNum.current = 1
-  }, [selectedDapp?.network])
+  }, [searchText, selectedDapp?.network])
 
   const fetchMoreModel = useCallback(
     async (pageNumber: number) => {
       const resp = await getModelStreamList({
+        name: searchText || '',
+        network: (selectedDapp?.network as Network) || Network.TESTNET,
         pageNumber
       })
       const list = resp.data.data
       setHasMore(list.length >= PAGE_SIZE)
       setModels([...models, ...list])
     },
-    [models]
+    [models, searchText, selectedDapp?.network]
   )
 
   useEffect(() => {
