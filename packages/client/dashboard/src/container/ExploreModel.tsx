@@ -5,7 +5,7 @@ import Search from '../components/common/Search'
 import ModelList from '../components/model/ExploreModelList'
 
 export default function ExploreModel () {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const filterStar = useMemo(() => {
     return searchParams.get('filterStar') === 'true'
   }, [searchParams])
