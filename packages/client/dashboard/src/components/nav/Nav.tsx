@@ -14,6 +14,8 @@ import NodeIcon from '../icons/NodeIcon'
 import SdkIcon from '../icons/SdkIcon'
 import TerminalIcon from '../icons/TerminalIcon'
 import ChevronDown from '../icons/ChevronDown'
+import ModelIcon from '../icons/ModelIcon'
+import CompositeIcon from '../icons/CompositeIcon'
 
 type NavItem = {
   path?: string
@@ -39,12 +41,12 @@ export default function Nav ({ appId }: { appId: string }) {
           {
             path: `/dapp/${appId}/explore/model`,
             name: 'Models',
-            icon: ExploreIcon
+            icon: ModelIcon
           },
           {
             path: `/dapp/${appId}/explore/composite`,
             name: 'Composites',
-            icon: ExploreIcon
+            icon: CompositeIcon
           },
           {
             path: `/dapp/${appId}/components`,
