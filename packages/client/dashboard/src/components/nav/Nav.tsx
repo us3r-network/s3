@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Link, NavLink, useSearchParams } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { DOCS_URL } from '../../constants'
 import ChartIcon from '../icons/ChartIcon'
@@ -12,113 +12,167 @@ import InfoIcon from '../icons/InfoIcon'
 import LayoutIcon from '../icons/LayoutIcon'
 import NodeIcon from '../icons/NodeIcon'
 import SdkIcon from '../icons/SdkIcon'
-import StarGoldIcon from '../icons/StarGoldIcon'
-import StarIcon from '../icons/StarIcon'
 import TerminalIcon from '../icons/TerminalIcon'
+import ChevronDown from '../icons/ChevronDown'
 
-export default function Nav({ appId }: { appId: string }) {
+type NavItem = {
+  path?: string
+  name: string
+  icon: any
+  items?: NavItem[]
+}
+
+export default function Nav ({ appId }: { appId: string }) {
   const [open, setOpen] = useState(true)
-  const [searchParams] = useSearchParams()
-
-  const filterStar = useMemo(() => {
-    return searchParams.get('filterStar') || ''
-  }, [searchParams])
+  const navItems = useMemo(() => {
+    return [
+      {
+        path: `/dapp/${appId}/index`,
+        name: 'Home',
+        icon: HomeIcon
+      },
+      {
+        // path: `/dapp/${appId}/explore`,
+        name: 'Explore',
+        icon: ExploreIcon,
+        items: [
+          {
+            path: `/dapp/${appId}/explore/model`,
+            name: 'Models',
+            icon: ExploreIcon
+          },
+          {
+            path: `/dapp/${appId}/explore/composite`,
+            name: 'Composites',
+            icon: ExploreIcon
+          },
+          {
+            path: `/dapp/${appId}/components`,
+            name: 'Components',
+            icon: ComponentIcon
+          }
+        ]
+      },
+      {
+        // path: `/dapp/${appId}/build`,
+        name: 'Build',
+        icon: InfoIcon,
+        items: [
+          {
+            path: `/dapp/${appId}/model-editor`,
+            name: 'Compose',
+            icon: LayoutIcon
+          },
+          {
+            path: `/dapp/${appId}/model-playground`,
+            name: 'Playground',
+            icon: TerminalIcon
+          },
+          {
+            path: `/dapp/${appId}/model-sdk`,
+            name: 'SDK',
+            icon: SdkIcon
+          },
+          {
+            path: `/dapp/${appId}/statistic`,
+            name: 'Metrics',
+            icon: ChartIcon
+          }
+        ]
+      },
+      {
+        path: `/dapp/${appId}/node`,
+        name: 'Node',
+        icon: NodeIcon
+      },
+      {
+        path: `/dapp/${appId}/info`,
+        name: 'Info',
+        icon: InfoIcon
+      }
+    ]
+  }, [appId])
 
   return (
     <NavContainer open={open}>
       <div></div>
-      <div className="nav">
-        <div className="top">
-          {[
-            {
-              path: `/dapp/${appId}/index`,
-              name: 'Home',
-              icon: HomeIcon,
-            },
-            {
-              path: `/dapp/${appId}/node`,
-              name: 'Node Deployment',
-              icon: NodeIcon,
-            },
-            {
-              path: `/dapp/${appId}/model-editor`,
-              name: 'Model Editor',
-              icon: LayoutIcon,
-            },
-            {
-              path: `/dapp/${appId}/model-playground`,
-              name: 'Model Playground',
-              icon: TerminalIcon,
-            },
-            {
-              path: `/dapp/${appId}/model-sdk`,
-              name: 'Model SDK',
-              icon: SdkIcon,
-            },
-            {
-              path: `/dapp/${appId}/statistic`,
-              name: 'Model Metrics',
-              icon: ChartIcon,
-            },
-            {
-              path: `/dapp/${appId}/components`,
-              name: 'S3 Components',
-              icon: ComponentIcon,
-            },
-            {
-              path: `/dapp/${appId}/info`,
-              name: 'Info',
-              icon: InfoIcon,
-            },
-          ].map((item) => {
-            return (
-              <NavLink to={item.path} key={item.path}>
-                {({ isActive }) => (
-                  <div className={`item ${isActive ? 'active' : ''}`}>
-                    {React.createElement(item.icon, { isActive })}
-                    <span>{item.name}</span>
-                  </div>
-                )}
-              </NavLink>
-            )
-          })}
+      <div className='nav'>
+        <div className='top'>
+          {navItems.map(item => (
+            <NavItemRenderer item={item} />
+          ))}
         </div>
-        <div className="bottom">
-          <NavLink to={`/dapp/${appId}/explore/model`}>
-            {({ isActive }) => (
-              <div className={`item ${isActive ? 'active' : ''}`}>
-                <ExploreIcon />
-                <span>Explore</span>
-              </div>
-            )}
-          </NavLink>
-
-          <NavLink to={`/dapp/${appId}/favorite/model?filterStar=filter`}>
-            <div className={'item star'}>
-              {(filterStar && <StarGoldIcon />) || <StarIcon />}
-              <span>Favorite</span>
+        <div className='bottom'>
+          <Link to={DOCS_URL} target='_blank'>
+            <div className='item'>
+              <DocIcon />
+              <span>S3 Scan</span>
             </div>
-          </NavLink>
-          <Link to={DOCS_URL} target="_blank">
-            <div className="item">
+          </Link>
+          <Link to={DOCS_URL} target='_blank'>
+            <div className='item'>
               <DocIcon />
               <span>Document</span>
             </div>
           </Link>
-          <div className="chevron" onClick={() => setOpen(!open)}>
+          {/* <div className='chevron' onClick={() => setOpen(!open)}>
             <button>
               <ChevronRight />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </NavContainer>
   )
 }
+
+function NavItemRenderer ({
+  item,
+  level = 0,
+}: {
+  item: NavItem
+  level?: number
+}) {
+  return (
+    <NavItemBox>
+      <div className='item-container'>
+        {item.path ? (
+          <NavLink to={item.path} key={item.path}>
+            {({ isActive }) => (
+              <div className={`item ${isActive ? 'active' : ''}`}>
+                {React.createElement(item.icon, { isActive })}
+                <span>{item.name}</span>
+              </div>
+            )}
+          </NavLink>
+        ) : (
+          <div className={`item`}>
+            {React.createElement(item.icon)}
+            <span>{item.name}</span>
+          </div>
+        )}
+        {item.items && (
+          <div>
+            <ChevronDown />
+          </div>
+        )}
+      </div>
+      {item.items && (
+        <div className='sub'>
+          {item.items.map(item => (
+            <NavItemRenderer item={item} level={level + 1} />
+          ))}
+        </div>
+      )}
+    </NavItemBox>
+  )
+}
+
+
 const NavContainer = styled.nav<{ open?: boolean }>`
   > div {
     height: calc(100vh - 60px);
-    width: ${(props) => (props.open ? '200px' : '57px')};
+    width: ${props => (props.open ? '200px' : '57px')};
     top: 60px;
     bottom: 0;
 
@@ -134,44 +188,46 @@ const NavContainer = styled.nav<{ open?: boolean }>`
     align-items: center;
     justify-content: space-between;
 
-    .active .item {
-      background: #14171a;
-      color: #fff;
+    .item-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1px;
     }
     .item {
-      padding: 10px;
-      border-radius: 10px;
-      color: #718096;
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-      overflow: hidden;
-      > span {
-        opacity: ${(props) => (props.open ? 1 : 0)};
-        position: absolute;
-        left: 37px;
-        width: 150px;
-        transition: opacity 0.09s ease-in-out;
-      }
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        color: #718096;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        overflow: hidden;
+        > span {
+          opacity: ${props => (props.open ? 1 : 0)};
+          transition: opacity 0.09s ease-in-out;
+        }
 
-      &.active {
-        background: #14171a;
-        color: #fff;
+        &.active {
+          background: #14171a;
+          color: #fff;
+        }
       }
-    }
 
     .top {
       width: 100%;
       padding: 10px;
       box-sizing: border-box;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .bottom {
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       padding: 10px;
       box-sizing: border-box;
       display: block;
@@ -194,14 +250,22 @@ const NavContainer = styled.nav<{ open?: boolean }>`
           justify-content: center;
           cursor: pointer;
           transition: transform 0.1s ease-in-out;
-          transform: ${(props) =>
+          transform: ${props =>
             props.open ? `rotate(180deg)` : `rotate(0deg)`};
         }
       }
     }
   }
+`
 
-  .star {
-    cursor: pointer;
+const NavItemBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  .sub {
+    margin-left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 `
