@@ -23,7 +23,7 @@ import { TableBox, TableContainer } from '../common/TableBox'
 import CheckCircleIcon from '../icons/CheckCircleIcon'
 import LayoutIcon from '../icons/LayoutIcon'
 import PlusCircleIcon from '../icons/PlusCircleIcon'
-import CreateCompositeModal from '../model/CreateCompositeModal'
+import CreateCompositeModal from './CreateNewComposite'
 import { Dapps } from '../model/ExploreModelList'
 import NoCeramicNodeModal from '../node/NoCeramicNodeModal'
 

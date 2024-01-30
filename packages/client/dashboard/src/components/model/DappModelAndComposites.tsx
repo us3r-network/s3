@@ -11,7 +11,7 @@ import {
   ModalOverlay,
   Popover
 } from 'react-aria-components'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { deleteDappComposites, getDappComposites } from '../../api/composite'
 import { updateDapp } from '../../api/dapp'
@@ -33,10 +33,12 @@ import MergeIcon from '../icons/MergeIcon'
 import PlusIcon from '../icons/PlusIcon'
 import TrashIcon from '../icons/TrashIcon'
 import NoCeramicNodeModal from '../node/NoCeramicNodeModal'
-import CreateCompositeModal from './CreateCompositeModal'
+import CreateNewComposite from './CreateNewComposite'
 import CreateNewModel from './CreateNewModel'
-import FavoriteModel from './FavoriteModal'
 import MergeModal from './MergeModal'
+import CloseIcon from '../icons/CloseIcon'
+import ModelList from './ExploreModelList'
+import { CompositeList } from './ExploreCompositeList'
 
 enum OPEN_MODAL {
   NONE,
@@ -44,8 +46,8 @@ enum OPEN_MODAL {
   ADD_FROM_ALL_MODELS,
   ADD_FROM_FAVORITE_MODELS,
   CREATE_NEW_COMPOSITE,
-  ADD_FROM_ALL_COMPOSITES,
-  ADD_FROM_FAVORITE_COMPOSITES
+  ADD_FROM_ALL_COMPOSITES
+  // ADD_FROM_FAVORITE_COMPOSITES
 }
 
 export default function DappModelAndComposites ({
@@ -66,7 +68,6 @@ export default function DappModelAndComposites ({
   const { loadDapps, currDapp } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
   const { currCeramicNode } = useCeramicNodeCtx()
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [dappModels, setDappModels] = useState<ModelStream[]>()
   const [dappComposites, setDappComposites] = useState<DappCompositeDto[]>([])
@@ -237,7 +238,7 @@ export default function DappModelAndComposites ({
                 <Menu
                   onAction={id => {
                     if (id === 'explore') {
-                      navigate(`/dapp/${appId}/explore/model`)
+                      setOpenModal(OPEN_MODAL.ADD_FROM_ALL_MODELS)
                       return
                     }
                     if (id === 'favorite') {
@@ -250,7 +251,7 @@ export default function DappModelAndComposites ({
                     }
                   }}
                 >
-                  <MenuItem id='explore'>Explore Models</MenuItem>
+                  <MenuItem id='explore'>Add From Popular Models</MenuItem>
                   <MenuItem id='favorite'>Add From Favorite</MenuItem>
                   <MenuItem id='create'>Create New Model</MenuItem>
                 </Menu>
@@ -308,7 +309,7 @@ export default function DappModelAndComposites ({
                     <Menu
                       onAction={id => {
                         if (id === 'explore') {
-                          navigate(`/dapp/${appId}/explore/composite`)
+                          setOpenModal(OPEN_MODAL.ADD_FROM_ALL_COMPOSITES)
                           return
                         }
                         if (id === 'create') {
@@ -317,7 +318,9 @@ export default function DappModelAndComposites ({
                         }
                       }}
                     >
-                      <MenuItem id='explore'>Explore Composites</MenuItem>
+                      <MenuItem id='explore'>
+                        Add From Popular Composites
+                      </MenuItem>
                       <MenuItem id='create'>Create New Composites</MenuItem>
                     </Menu>
                   </Popover>
@@ -334,19 +337,21 @@ export default function DappModelAndComposites ({
           />
         </>
       )}
+      {/* CREATE_NEW_MODEL modal */}
       <Modal
         isOpen={openModal === OPEN_MODAL.CREATE_NEW_MODEL}
         onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
       >
         <Dialog>{({ close }) => <CreateNewModel closeModal={close} />}</Dialog>
       </Modal>
+      {/* CREATE_NEW_COMPOSITE modal */}
       <Modal
         isOpen={openModal === OPEN_MODAL.CREATE_NEW_COMPOSITE}
         onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
       >
         <Dialog>
           {({ close }) => (
-            <CreateCompositeModal
+            <CreateNewComposite
               closeModal={close}
               loadDappComposites={loadDappComposites}
               defaultSchema={getCompositeDefaultSchema(dappModels || [])}
@@ -354,11 +359,68 @@ export default function DappModelAndComposites ({
           )}
         </Dialog>
       </Modal>
+      {/* ADD_FROM_FAVORITE_MODELS modal */}
       <Modal
         isOpen={openModal === OPEN_MODAL.ADD_FROM_FAVORITE_MODELS}
         onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
       >
-        <Dialog>{({ close }) => <FavoriteModel closeModal={close} />}</Dialog>
+        <Dialog>
+          {({ close }) => (
+            <DialogBox>
+              <div className='title'>
+                <h1>My Favorite Models</h1>
+                <button onClick={close}>
+                  <CloseIcon />
+                </button>
+              </div>
+              <div className='content'>
+                <ModelList filterStar />
+              </div>
+            </DialogBox>
+          )}
+        </Dialog>
+      </Modal>
+      {/* ADD_FROM_ALL_MODELS modal */}
+      <Modal
+        isOpen={openModal === OPEN_MODAL.ADD_FROM_ALL_MODELS}
+        onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
+      >
+        <Dialog>
+          {({ close }) => (
+            <DialogBox>
+              <div className='title'>
+                <h1>Popular Models</h1>
+                <button onClick={close}>
+                  <CloseIcon />
+                </button>
+              </div>
+              <div className='content'>
+                <ModelList />
+              </div>
+            </DialogBox>
+          )}
+        </Dialog>
+      </Modal>
+      {/* ADD_FROM_ALL_COMPOSITES modal */}
+      <Modal
+        isOpen={openModal === OPEN_MODAL.ADD_FROM_ALL_COMPOSITES}
+        onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
+      >
+        <Dialog>
+          {({ close }) => (
+            <DialogBox>
+              <div className='title'>
+                <h1>Popular Composites</h1>
+                <button onClick={close}>
+                  <CloseIcon />
+                </button>
+              </div>
+              <div className='content'>
+                <CompositeList />
+              </div>
+            </DialogBox>
+          )}
+        </Dialog>
       </Modal>
       {editable && isOwner && (
         <MergeBox>
@@ -649,5 +711,38 @@ const MergeBox = styled.div`
     align-items: center;
     justify-content: center;
     gap: 10px;
+  }
+`
+const DialogBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  height: calc(100vh - 100px);
+  position: relative;
+  width: 1240px;
+  margin: 0 auto;
+
+  background: #1b1e23;
+  border-radius: 20px;
+
+  > div.title {
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #ffffff;
+    > h1 {
+      margin: 0;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 28px;
+    }
+  }
+  > div.content {
+    height: 0;
+    flex: 1;
   }
 `

@@ -11,7 +11,7 @@ import { createCompositeFromBrowser } from '../../utils/composeDBUtils'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import { startIndexModels } from '../../api/model'
 
-export default function CreateCompositeModal ({
+export default function CreateNewComposite ({
   closeModal,
   loadDappComposites,
   defaultName,

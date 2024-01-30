@@ -149,7 +149,7 @@ export default function ModelList ({
   }, [filterStar, models, starModels])
 
   return (
-    <>
+    <Box>
       <InfiniteScroll
         dataLength={lists.length}
         next={() => {
@@ -272,7 +272,7 @@ export default function ModelList ({
         </TableBox>
       </InfiniteScroll>
       {!filterStar && !hasMore && <Loading>no more data</Loading>}
-    </>
+    </Box>
   )
 }
 
@@ -304,6 +304,12 @@ export function Dapps ({ dapps }: { dapps: ClientDApp[] }) {
     </DappBox>
   )
 }
+
+const Box = styled.div`
+  height: 100%;
+  overflow: auto;
+  position: relative;
+`
 
 const DappBox = styled.div`
   display: flex;
