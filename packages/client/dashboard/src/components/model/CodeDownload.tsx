@@ -1,7 +1,7 @@
 import FileSaver from 'file-saver'
 import { useState } from 'react'
 import styled from 'styled-components'
-import ChevronDown from '../icons/CheckronDown'
+import ChevronDown from '../icons/ChevronDown'
 import DownloadIcon from '../icons/DownloadIcon'
 import { Code } from './ModelSDK'
 
