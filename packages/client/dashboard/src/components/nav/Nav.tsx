@@ -189,7 +189,7 @@ const NavContainer = styled.nav<{ open?: boolean }>`
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-
+    z-index: 100;
     .item-container {
       display: flex;
       flex-direction: row;
