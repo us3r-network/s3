@@ -14,6 +14,8 @@ import NodeIcon from '../icons/NodeIcon'
 import SdkIcon from '../icons/SdkIcon'
 import TerminalIcon from '../icons/TerminalIcon'
 import ChevronDown from '../icons/ChevronDown'
+import ModelIcon from '../icons/ModelIcon'
+import CompositeIcon from '../icons/CompositeIcon'
 
 type NavItem = {
   path?: string
@@ -39,15 +41,15 @@ export default function Nav ({ appId }: { appId: string }) {
           {
             path: `/dapp/${appId}/explore/model`,
             name: 'Models',
-            icon: ExploreIcon
+            icon: ModelIcon
           },
           {
             path: `/dapp/${appId}/explore/composite`,
             name: 'Composites',
-            icon: ExploreIcon
+            icon: CompositeIcon
           },
           {
-            path: `/dapp/${appId}/components`,
+            path: `/dapp/${appId}/explore/components`,
             name: 'Components',
             icon: ComponentIcon
           }
@@ -59,22 +61,22 @@ export default function Nav ({ appId }: { appId: string }) {
         icon: InfoIcon,
         items: [
           {
-            path: `/dapp/${appId}/model-editor`,
+            path: `/dapp/${appId}/build/editor`,
             name: 'Compose',
             icon: LayoutIcon
           },
           {
-            path: `/dapp/${appId}/model-playground`,
+            path: `/dapp/${appId}/build/playground`,
             name: 'Playground',
             icon: TerminalIcon
           },
           {
-            path: `/dapp/${appId}/model-sdk`,
+            path: `/dapp/${appId}/build/sdk`,
             name: 'SDK',
             icon: SdkIcon
           },
           {
-            path: `/dapp/${appId}/statistic`,
+            path: `/dapp/${appId}/build/metrics`,
             name: 'Metrics',
             icon: ChartIcon
           }
@@ -187,7 +189,7 @@ const NavContainer = styled.nav<{ open?: boolean }>`
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-
+    z-index: 100;
     .item-container {
       display: flex;
       flex-direction: row;

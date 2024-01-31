@@ -1,9 +1,9 @@
 import { useOutletContext } from 'react-router-dom'
-import styled from 'styled-components'
 import ModelSDK from '../components/model/ModelSDK'
-import { DappCompositeDto, ModelStream } from '../types.d'
+import { DappCompositeDto, ModelStream } from '../types'
+import { BuildContentBox } from './DappEditor'
 
-export default function DappModelSdk() {
+export default function DappSdk () {
   const { selectModel } = useOutletContext<{
     selectModel: ModelStream
     selectComposite: DappCompositeDto
@@ -14,22 +14,16 @@ export default function DappModelSdk() {
     const modelId = selectModel.stream_id
 
     return (
-      <div className="ops">
-        <SDKContainer>
-          <div className="dapp-title-bar">
-            <span>{name}SDK</span>
-          </div>
+      <BuildContentBox>
+        <div className='title-bar'>
+          <span>{name} SDK</span>
+        </div>
+        <div className='content-box'>
           <ModelSDK modelId={modelId} modelName={name} />
-        </SDKContainer>
-      </div>
+        </div>
+      </BuildContentBox>
     )
   }
 
   return null
 }
-
-const SDKContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`

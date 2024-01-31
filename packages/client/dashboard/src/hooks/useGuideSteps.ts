@@ -100,28 +100,28 @@ export function useGuideStepsState(dapps: ClientDApp[], loadingDApps: boolean) {
   useEffect(() => {
     if (!validStep(1)) {
       if (!validStep2SubStep(0)) {
-        const isModelEditor = location.pathname.endsWith('model-editor')
+        const isModelEditor = location.pathname.endsWith('editor')
         if (isModelEditor) {
           completeStep2SubStep(0)
         }
       }
 
       if (!validStep2SubStep(1)) {
-        const isModelPlayground = location.pathname.endsWith('model-playground')
+        const isModelPlayground = location.pathname.endsWith('playground')
         if (isModelPlayground) {
           completeStep2SubStep(1)
         }
       }
 
       if (!validStep2SubStep(2)) {
-        const isModelSdk = location.pathname.endsWith('model-sdk')
+        const isModelSdk = location.pathname.endsWith('sdk')
         if (isModelSdk) {
           completeStep2SubStep(2)
         }
       }
 
       if (!validStep2SubStep(3)) {
-        const isStatistic = location.pathname.endsWith('statistic')
+        const isStatistic = location.pathname.endsWith('metrics')
         if (isStatistic) {
           completeStep2SubStep(3)
         }

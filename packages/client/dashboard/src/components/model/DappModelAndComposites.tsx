@@ -195,7 +195,7 @@ export default function DappModelAndComposites ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appId])
 
-  const isMetrics = location.pathname.endsWith('statistic')
+  const isMetrics = location.pathname.endsWith('metrics')
   const isSdk = location.pathname.endsWith('sdk')
 
   const [openModal, setOpenModal] = useState(OPEN_MODAL.NONE)

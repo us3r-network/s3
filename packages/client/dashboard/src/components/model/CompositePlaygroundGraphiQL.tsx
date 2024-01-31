@@ -144,12 +144,8 @@ export default function CompositePlaygroundGraphiQL(
 const GraphiqlContainer = styled.div`
   border-radius: 20px;
   overflow: hidden;
-  height: calc(100vh - 200px);
+  height: 100%;
   > div {
     height: 100%;
-    .graphiql-container {
-      height: 100%;
-      width: 100%;
-    }
   }
 `
