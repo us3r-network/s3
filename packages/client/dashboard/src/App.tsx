@@ -171,7 +171,7 @@ function BuildLayout () {
   const [selectModel, setSelectModel] = useState<ModelStream>()
   const [selectComposite, setSelectComposite] = useState<DappCompositeDto>()
   const { pathname } = useLocation()
-  const defaultKey = pathname.split('/explore/')[1]
+  const defaultKey = pathname.split('/build/')[1]
   const PAGES = [
     {
       id: 'editor',
