@@ -83,7 +83,7 @@ const Box = styled.div`
     justify-content: space-between;
     background-color: #14171a;
     margin-bottom: 20px;
-
+    height: 100%;
     > div {
       display: flex;
       align-items: center;
@@ -100,7 +100,6 @@ const Box = styled.div`
 `
 
 const EditorBox = styled.div`
-  height: calc(100vh - 300px);
   max-height: 800px;
   background: #14171a;
   border: 1px solid #39424c;
@@ -110,6 +109,7 @@ const EditorBox = styled.div`
   * {
     box-sizing: border-box;
   }
+  flex: 1;
 `
 
 const ResultBox = styled.div`
@@ -117,6 +117,7 @@ const ResultBox = styled.div`
   flex-direction: column;
   gap: 20px;
   margin-top: 20px;
+  flex: 0 0 100px;
   > div {
     background: #1b1e23;
     border: 1px solid #39424c;

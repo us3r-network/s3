@@ -70,7 +70,6 @@ export default function Components() {
 }
 
 const Box = styled.div`
-  margin: 25px 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -110,7 +109,7 @@ const BannerDesc = styled.ul`
 
   font-weight: 500;
   font-size: 18px;
-  line-height: 21px;
+  line-height: 24px;
 
   color: #ffffff;
 

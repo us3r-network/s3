@@ -12,8 +12,9 @@ import {
   Network
 } from '../types.d'
 import useSelectedDapp from '../hooks/useSelectedDapp'
+import { BuildContentBox } from './DappEditor'
 
-export default function DappModelPlayground () {
+export default function DappPlayground () {
   const { selectModel, selectComposite } = useOutletContext<{
     selectModel: ModelStream
     selectComposite: DappCompositeDto
@@ -22,23 +23,33 @@ export default function DappModelPlayground () {
   const { selectedDapp } = useSelectedDapp()
   if (selectModel) {
     return (
-      <div className='playground-ops'>
-        <ModelPlayground
-          streamId={selectModel.stream_id}
-          ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
-          network={selectedDapp?.network}
-        />
-      </div>
+      <BuildContentBox>
+        <div className='title-bar'>
+          <span>{selectModel.stream_content.name}</span>
+        </div>
+        <div className='content-box playground-ops'>
+          <ModelPlayground
+            streamId={selectModel.stream_id}
+            ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
+            network={selectedDapp?.network}
+          />
+        </div>
+      </BuildContentBox>
     )
   }
   if (selectComposite) {
     return (
-      <div className='playground-ops'>
-        <CompositePlayground
-          composite={selectComposite}
-          ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
-        />
-      </div>
+      <BuildContentBox>
+        <div className='title-bar'>
+          <span>{selectComposite.name}</span>
+        </div>
+        <div className='content-box playground-ops'>
+          <CompositePlayground
+            composite={selectComposite}
+            ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
+          />
+        </div>
+      </BuildContentBox>
     )
   }
   return null

@@ -15,7 +15,7 @@ import PlusIcon from '../icons/PlusIcon'
 import ModelInstanceFormModal from './ModelInstanceFormModal'
 import ModelStreamList from './ModelStreamList'
 
-export default function Instance ({
+export default function ModelInstance ({
   streamId,
   network,
   schema,
@@ -271,7 +271,7 @@ export default function Instance ({
         onSubmit={() => submitStream()}
       />
       <ListHeading>
-        <h3>{name}</h3>
+        {/* <h3>{name}</h3> */}
         {composeClientAuthenticated && (
           <PlusButton
             onPress={() => {

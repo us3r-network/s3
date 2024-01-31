@@ -1,0 +1,17 @@
+/* Dialog */
+.react-aria-Dialog {
+  outline: none;
+
+  .react-aria-Heading {
+    line-height: 1em;
+    margin-top: 0;
+  }
+
+  .react-aria-Button {
+    margin-top: 20px;
+  }
+
+  .favorite {
+    margin: 0;
+  }
+}

@@ -1,4 +1,9 @@
+import { Us3rAuthWithRainbowkitProvider } from '@us3r-network/auth-with-rainbowkit'
+import { ProfileStateProvider } from '@us3r-network/profile'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { useEffect, useState } from 'react'
+import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import {
   NavLink,
   Outlet,
@@ -7,37 +12,29 @@ import {
   useLocation,
   useParams
 } from 'react-router-dom'
-import styled from 'styled-components'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { Us3rAuthWithRainbowkitProvider } from '@us3r-network/auth-with-rainbowkit'
-import { ProfileStateProvider } from '@us3r-network/profile'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
-
-import { DappCompositeDto, ModelStream } from './types.d'
-import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
-
-import AppProvider, { useAppCtx } from './context/AppCtx'
-import CeramicNodeProvider from './context/CeramicNodeCtx'
-
-import MyDapps from './container/MyDapps'
-import DappCreate from './container/DappCreate'
-import DappHome from './container/DappHome'
-import DappInfo from './container/DappInfo'
-import DappModelEditor from './container/DappModelEditor'
-import DappModelPlayground from './container/DappModelPlayground'
-import DappModelSdk from './container/DappModelSdk'
-import DappDataStatistic from './container/DappDataStatistic'
-import Components from './container/Components'
-import CeramicNodes from './container/CeramicNodes'
-import ExploreModel from './container/ExploreModel'
-import NoMatch from './container/NoMatch'
-
+import styled from 'styled-components'
+import DappModelAndComposites from './components/model/DappModelAndComposites'
 import Header from './components/nav/Header'
 import Nav from './components/nav/Nav'
-import DappModelAndComposites from './components/model/DappModelAndComposites'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
+import CeramicNodes from './container/CeramicNodes'
+import Components from './container/Components'
+import DappCreate from './container/DappCreate'
+import DappEditor from './container/DappEditor'
+import DappHome from './container/DappHome'
+import DappInfo from './container/DappInfo'
+import DappMetrics from './container/DappMetrics'
+import DappPlayground from './container/DappPlayground'
+import DappSdk from './container/DappSdk'
 import ExploreComposite from './container/ExploreComposite'
+import ExploreModel from './container/ExploreModel'
+import MyDapps from './container/MyDapps'
+import NoMatch from './container/NoMatch'
+import AppProvider, { useAppCtx } from './context/AppCtx'
+import CeramicNodeProvider from './context/CeramicNodeCtx'
+import { DappCompositeDto, ModelStream } from './types.d'
 
 dayjs.extend(relativeTime)
 
@@ -49,23 +46,19 @@ function Routers () {
         <Route path='dapp/create' element={<DappCreate />} />
         <Route path='dapp/:appId' element={<DappLayout />}>
           <Route path='index' element={<DappHome />} />
-          <Route path='node' element={<CeramicNodes />} />
-          <Route element={<ModelEditorLayout />}>
-            <Route path='model-editor' element={<DappModelEditor />} />
-            <Route path='model-playground' element={<DappModelPlayground />} />
-            <Route path='model-sdk' element={<DappModelSdk />} />
-            <Route path='statistic' element={<DappDataStatistic />} />
-          </Route>
-          <Route path='info' element={<DappInfo />} />
           <Route path='explore' element={<ExploreLayout />}>
             <Route path='model' element={<ExploreModel />} />
             <Route path='composite' element={<ExploreComposite />} />
+            <Route path='components' element={<Components />} />
           </Route>
-          <Route path='favorite' element={<ExploreLayout />}>
-            <Route path='model' element={<ExploreModel />} />
-            <Route path='composite' element={<ExploreComposite />} />
+          <Route path='build' element={<BuildLayout />}>
+            <Route path='editor' element={<DappEditor />} />
+            <Route path='playground' element={<DappPlayground />} />
+            <Route path='sdk' element={<DappSdk />} />
+            <Route path='metrics' element={<DappMetrics />} />
           </Route>
-          <Route path='components' element={<Components />} />
+          <Route path='info' element={<DappInfo />} />
+          <Route path='node' element={<CeramicNodes />} />
         </Route>
       </Route>
       <Route path='*' element={<NoMatch />} />
@@ -174,14 +167,31 @@ const AppContainer = styled.div`
   }
 `
 
-function ModelEditorLayout () {
+function BuildLayout () {
   const [selectModel, setSelectModel] = useState<ModelStream>()
   const [selectComposite, setSelectComposite] = useState<DappCompositeDto>()
-
   const { pathname } = useLocation()
-
+  const defaultKey = pathname.split('/explore/')[1]
+  const PAGES = [
+    {
+      id: 'editor',
+      label: 'Editor'
+    },
+    {
+      id: 'playground',
+      label: 'Playground'
+    },
+    {
+      id: 'sdk',
+      label: 'SDK'
+    },
+    {
+      id: 'metrics',
+      label: 'Metrics'
+    }
+  ]
   return (
-    <EditorLayoutContainer>
+    <LayoutContainer>
       <DappModelAndComposites
         selectModel={selectModel}
         setSelectModel={data => {
@@ -195,93 +205,99 @@ function ModelEditorLayout () {
         selectComposite={selectComposite}
         editable={pathname.includes('model-editor')}
       />
-      <Outlet
-        context={{
-          selectModel,
-          selectComposite
-        }}
-      />
-    </EditorLayoutContainer>
+      <div className='build-content'>
+        <Tabs selectedKey={defaultKey}>
+          {PAGES.map(page => (
+            <div className='tab-panel'>
+              <TabPanel id={page.id}>
+                <Outlet
+                  context={{
+                    selectModel,
+                    selectComposite
+                  }}
+                />
+              </TabPanel>
+            </div>
+          ))}
+          <div className='tab-list'>
+            <TabList aria-label='Explore'>
+              {PAGES.map(page => (
+                <Tab id={page.id}>
+                  <NavLink to={page.id} key={page.id}>
+                    {page.label}
+                  </NavLink>
+                </Tab>
+              ))}
+            </TabList>
+          </div>
+        </Tabs>
+      </div>
+    </LayoutContainer>
   )
 }
-
-const EditorLayoutContainer = styled.div`
-  margin-top: 25px;
-  margin-bottom: 25px;
-  display: flex;
-  gap: 20px;
-
-  > .list {
-    flex-grow: 1;
-  }
-
-  .ops {
-    flex-grow: 1;
-    overflow: hidden;
-  }
-
-  .playground-ops {
-    flex-grow: 1;
-    overflow: hidden;
-
-    > div {
-      height: calc(100vh - 100px);
-    }
-    .graphiql-container {
-      height: 100%;
-    }
-  }
-`
 
 function ExploreLayout () {
   const { pathname } = useLocation()
+  const defaultExploreKey = pathname.split('/explore/')[1]
+  const EXPLORE_PAGES = [
+    {
+      id: 'model',
+      label: 'Models'
+    },
+    {
+      id: 'composite',
+      label: 'Composites'
+    },
+    {
+      id: 'components',
+      label: 'Components'
+    }
+  ]
   return (
-    <ExploreLayoutContainer>
-      <div className='explore-catalog'>
-        <NavLink to='model' key='model'>
-          {({ isActive }) => (
-            <div className={`item ${isActive ? 'active' : ''}`}>
-              <span>Models</span>
-            </div>
-          )}
-        </NavLink>
-
-        {!pathname.includes('favorite') && (
-          <NavLink to='composite' key='model'>
-            {({ isActive }) => (
-              <div className={`item ${isActive ? 'active' : ''}`}>
-                <span>Composites</span>
-              </div>
-            )}
-          </NavLink>
-        )}
-      </div>
-      <div>
-        <Outlet />
-      </div>
-    </ExploreLayoutContainer>
+    <LayoutContainer>
+      <Tabs selectedKey={defaultExploreKey}>
+        {EXPLORE_PAGES.map(page => (
+          <div className='tab-panel'>
+            <TabPanel id={page.id}>
+              <Outlet />
+            </TabPanel>
+          </div>
+        ))}
+        <div className='tab-list'>
+          <TabList aria-label='Explore'>
+            {EXPLORE_PAGES.map(page => (
+              <Tab id={page.id}>
+                <NavLink to={page.id} key={page.id}>
+                  {page.label}
+                </NavLink>
+              </Tab>
+            ))}
+          </TabList>
+        </div>
+      </Tabs>
+    </LayoutContainer>
   )
 }
 
-const ExploreLayoutContainer = styled.div`
-  margin-top: 25px;
-  margin-bottom: 25px;
-
-  .explore-catalog {
+const LayoutContainer = styled.div`
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  .tab-list {
     position: absolute;
-    display: flex;
-    gap: 20px;
-    .item {
-      font-size: 24px;
-      font-weight: 700;
-      color: #718096;
-      > span {
-        transition: opacity 0.09s ease-in-out;
-      }
-      &.active {
-        background: #14171a;
-        color: #fff;
-      }
-    }
+    top: 0px;
+    right: 0px;
+  }
+  .tab-panel {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .build-content{
+    flex-grow: 1;
   }
 `

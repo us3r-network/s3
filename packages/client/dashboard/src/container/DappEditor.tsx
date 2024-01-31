@@ -14,7 +14,7 @@ import {
 } from '../types.d'
 import { schemas } from '../utils/composedb-types/schemas'
 
-export default function DappModelEditor () {
+export default function DappEditor () {
   const { selectedDapp } = useSelectedDapp()
   const { selectModel, selectComposite } = useOutletContext<{
     selectModel: ModelStream
@@ -23,26 +23,31 @@ export default function DappModelEditor () {
 
   if (selectModel) {
     return (
-      <Box className='ops'>
-          <div className='dapp-title-bar'>
-            <span>{selectModel.stream_content?.name}</span>
-          </div>
-          <ModelEditor streamId={selectModel.stream_id} network={selectedDapp?.network} />
-      </Box>
+      <BuildContentBox>
+        <div className='title-bar'>
+          <span>{selectModel.stream_content?.name}</span>
+        </div>
+        <ModelEditor
+          streamId={selectModel.stream_id}
+          network={selectedDapp?.network}
+        />
+      </BuildContentBox>
     )
   }
   if (selectComposite) {
     return (
-      <Box className='ops'>
-        <div className='dapp-title-bar'>
+      <BuildContentBox>
+        <div className='title-bar'>
           <span>{selectComposite.name}</span>
           <CompositePublish composite={selectComposite} />
         </div>
-        <CompositeEditor
-          schema={selectComposite.graphql}
-          encodedDefinition={JSON.parse(selectComposite.composite)}
-        />
-      </Box>
+        <div className='content-box'>
+          <CompositeEditor
+            schema={selectComposite.graphql}
+            encodedDefinition={JSON.parse(selectComposite.composite)}
+          />
+        </div>
+      </BuildContentBox>
     )
   }
   return null
@@ -121,8 +126,26 @@ const Loading = styled.div`
   color: gray;
 `
 
-const Box = styled.div`
+export const BuildContentBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-top: 10px;
+
+  .title-bar {
+    border-bottom: none;
+    position: relative;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 30px;
+    > span {
+      font-weight: 700;
+      font-size: 24px;
+    }
+  }
+  .content-box {
+    height: calc(100vh - 160px);
+  }
 `

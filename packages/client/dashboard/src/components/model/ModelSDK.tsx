@@ -176,6 +176,8 @@ export function Code({ name, content }: { name: string; content: string }) {
 }
 
 const SDKContainer = styled.div`
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -194,10 +196,12 @@ const SDKContainer = styled.div`
 `
 
 const SDKBox = styled.div`
+  height: 100%;
   padding: 12px 20px 0 20px;
   border-radius: 20px;
   border: 1px solid #39424c;
   background: #1b1e23;
+  overflow: scroll;
 `
 
 const CodeBox = styled.div`
