@@ -8,20 +8,19 @@ import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
 import { useCallback, useEffect, useState } from 'react'
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import styled from 'styled-components'
-import { getModelSDK } from '../../api/model'
-import useSelectedDapp from '../../hooks/useSelectedDapp'
+import { getModelSDK, getModelsInfoByIds } from '../../api/model'
 import { GraphqlGenType, Network } from '../../types.d'
 import { sdkTemplate } from './sdkTemplate'
 
-export default function ModelSDK({
+export default function ModelSDK ({
   modelId,
-  modelName,
+  network,
+  modelName
 }: {
   modelId: string
-  modelName: string
+  network: Network
+  modelName?: string
 }) {
-  const { selectedDapp } = useSelectedDapp()
-
   const [codes, setCodes] = useState<
     { id: number; title: string; content: string }[]
   >([])
@@ -35,25 +34,26 @@ export default function ModelSDK({
     }
     const zip = new JSZip()
 
-    codes.forEach((item) => {
+    codes.forEach(item => {
       zip.file(item.title, item.content)
     })
     zip
       .generateAsync({ type: 'blob' })
       .then(function (content) {
-        FileSaver.saveAs(content, `${camelCase(modelName)}SDK.zip`)
+        FileSaver.saveAs(content, `${camelCase(modelName ||'')}SDK.zip`)
       })
       .catch(console.error)
   }, [codes, modelName])
 
   const fetchModelSDK = useCallback(async () => {
+    if (!modelId || !network || !modelName) return
     try {
       setLoading(true)
       setErrMsg('')
       const resp = await getModelSDK({
-        network: selectedDapp?.network as Network,
+        network: network,
         modelId: modelId,
-        type: genType,
+        type: genType
       })
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
@@ -66,7 +66,7 @@ export default function ModelSDK({
       }
 
       const runtimeComposite = data.find(
-        (item) => item.filename === 'runtime-composite.ts'
+        item => item.filename === 'runtime-composite.ts'
       )
       if (!runtimeComposite) {
         throw new Error('no runtime-composite')
@@ -89,14 +89,14 @@ export const definition = ${JSON.stringify(
         [
           {
             filename: `S3${modelName}Model.ts`,
-            content: sdkContent,
+            content: sdkContent
           },
           runtimeComposite,
-          graphql,
+          graphql
         ].map((item, i) => ({
           title: item.filename,
           content: item.content,
-          id: i,
+          id: i
         }))
       )
     } catch (error) {
@@ -105,11 +105,23 @@ export const definition = ${JSON.stringify(
     } finally {
       setLoading(false)
     }
-  }, [selectedDapp?.network, modelId, genType, modelName])
+  }, [network, modelId, genType, modelName])
 
   useEffect(() => {
     fetchModelSDK()
   }, [fetchModelSDK])
+
+  useEffect(() => {
+    if (!modelId || !network) return
+    if (!modelName) {
+      getModelsInfoByIds({
+        network,
+        ids: [modelId]
+      }).then(resp => {
+        modelName = resp.data.data[0].stream_content.name
+      })
+    }
+  }, [network, modelId, genType, modelName])
 
   return (
     <SDKContainer>
@@ -121,9 +133,9 @@ export const definition = ${JSON.stringify(
       /> */}
 
       {(errMsg && (
-        <div className="err-msg">
+        <div className='err-msg'>
           <p>An Error Occurred Please Try Again Later.</p>
-          <p className="info">{errMsg}</p>
+          <p className='info'>{errMsg}</p>
         </div>
       )) || (
         <>
@@ -137,16 +149,20 @@ export const definition = ${JSON.stringify(
                 <TabBox>
                   <TabList
                     className={'code-tabs'}
-                    aria-label="Dynamic tabs"
+                    aria-label='Dynamic tabs'
                     items={codes}
                   >
-                    {(item) => <Tab id={String(item.id)} className={'code-tab'}>{item.title}</Tab>}
+                    {item => (
+                      <Tab id={String(item.id)} className={'code-tab'}>
+                        {item.title}
+                      </Tab>
+                    )}
                   </TabList>
 
                   <button onClick={downloadCurr}>Download</button>
                 </TabBox>
-                {codes.map((item) => (
-                  <TabPanel id={String(item.id)} key={item.id} >
+                {codes.map(item => (
+                  <TabPanel id={String(item.id)} key={item.id}>
                     <Code name={item.title} content={item.content} />
                   </TabPanel>
                 ))}
@@ -159,7 +175,7 @@ export const definition = ${JSON.stringify(
   )
 }
 
-export function Code({ name, content }: { name: string; content: string }) {
+export function Code ({ name, content }: { name: string; content: string }) {
   useEffect(() => {
     Prism.highlightAll()
   }, [content])
@@ -168,7 +184,7 @@ export function Code({ name, content }: { name: string; content: string }) {
   return (
     <CodeBox>
       <div
-        className="line-numbers"
+        className='line-numbers'
         dangerouslySetInnerHTML={{ __html: preCode }}
       ></div>
     </CodeBox>

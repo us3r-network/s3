@@ -18,8 +18,8 @@ export default function CreateCeramicNodeModal ({
   onSussess
 }: {
   fixedNetwork?: CeramicNetwork
-  closeModal: () => void
-  onSussess: () => void
+  closeModal?: () => void
+  onSussess?: () => void
 }) {
   const [submitting, setSubmitting] = useState(false)
   const [network, setNetwork] = useState<CeramicNetwork>(
@@ -55,8 +55,8 @@ export default function CreateCeramicNodeModal ({
       if (resp.data.code !== 0) {
         throw new Error(resp.data.msg)
       }
-      onSussess()
-      closeModal()
+      onSussess?.()
+      closeModal?.()
     } catch (error) {
       console.error(error)
     } finally {

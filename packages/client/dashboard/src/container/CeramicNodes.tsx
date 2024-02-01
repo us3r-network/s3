@@ -159,7 +159,7 @@ function DeleteNodeButton ({ node }: { node: CeramicDto }) {
   )
 }
 
-function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
+export function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
   const session = useSession()
   return (
     <NodeInfoContainer>
