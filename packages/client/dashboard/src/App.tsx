@@ -3,7 +3,7 @@ import { ProfileStateProvider } from '@us3r-network/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useEffect, useState } from 'react'
-import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
+import { Radio, RadioGroup } from 'react-aria-components'
 import {
   NavLink,
   Outlet,
@@ -21,12 +21,12 @@ import Nav from './components/nav/Nav'
 import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
 import CeramicNodes from './container/CeramicNodes'
 import Components from './container/Components'
-import DappCreate from './container/DappQuickStart'
 import DappEditor from './container/DappEditor'
 import DappHome from './container/DappHome'
 import DappInfo from './container/DappInfo'
 import DappMetrics from './container/DappMetrics'
 import DappPlayground from './container/DappPlayground'
+import DappCreate from './container/DappQuickStart'
 import DappSdk from './container/DappSdk'
 import ExploreComposite from './container/ExploreComposite'
 import ExploreModel from './container/ExploreModel'
@@ -203,34 +203,26 @@ function BuildLayout () {
           setSelectComposite(data)
         }}
         selectComposite={selectComposite}
-        editable={pathname.includes('model-editor')}
+        editable={pathname.includes('editor')}
       />
       <div className='build-content'>
-        <Tabs selectedKey={defaultKey}>
+        <Outlet
+          context={{
+            selectModel,
+            selectComposite
+          }}
+        />
+        <RadioGroup
+          className='tabs'
+          aria-label='Build'
+          defaultValue={defaultKey}
+        >
           {PAGES.map(page => (
-            <div className='tab-panel' key={page.id}>
-              <TabPanel id={page.id}>
-                <Outlet
-                  context={{
-                    selectModel,
-                    selectComposite
-                  }}
-                />
-              </TabPanel>
-            </div>
+            <Radio className='tab' value={page.id} key={page.id}>
+              <NavLink to={page.id}>{page.label}</NavLink>
+            </Radio>
           ))}
-          <div className='tab-list'>
-            <TabList aria-label='Explore'>
-              {PAGES.map(page => (
-                <Tab id={page.id} key={page.id}>
-                  <NavLink to={page.id}>
-                    {page.label}
-                  </NavLink>
-                </Tab>
-              ))}
-            </TabList>
-          </div>
-        </Tabs>
+        </RadioGroup>
       </div>
     </LayoutContainer>
   )
@@ -238,8 +230,8 @@ function BuildLayout () {
 
 function ExploreLayout () {
   const { pathname } = useLocation()
-  const defaultExploreKey = pathname.split('/explore/')[1]
-  const EXPLORE_PAGES = [
+  const defaultKey = pathname.split('/explore/')[1]
+  const PAGES = [
     {
       id: 'model',
       label: 'Models'
@@ -255,26 +247,18 @@ function ExploreLayout () {
   ]
   return (
     <LayoutContainer>
-      <Tabs selectedKey={defaultExploreKey}>
-        {EXPLORE_PAGES.map(page => (
-          <div className='tab-panel' key={page.id}>
-            <TabPanel id={page.id}>
-              <Outlet />
-            </TabPanel>
-          </div>
+      <Outlet />
+      <RadioGroup
+        className='tabs'
+        aria-label='Explore'
+        defaultValue={defaultKey}
+      >
+        {PAGES.map(page => (
+          <Radio className='tab' value={page.id} key={page.id}>
+            <NavLink to={page.id}>{page.label}</NavLink>
+          </Radio>
         ))}
-        <div className='tab-list'>
-          <TabList aria-label='Explore'>
-            {EXPLORE_PAGES.map(page => (
-              <Tab id={page.id} key={page.id}>
-                <NavLink to={page.id}>
-                  {page.label}
-                </NavLink>
-              </Tab>
-            ))}
-          </TabList>
-        </div>
-      </Tabs>
+      </RadioGroup>
     </LayoutContainer>
   )
 }
@@ -283,21 +267,70 @@ const LayoutContainer = styled.div`
   width: 100%;
   margin-top: 20px;
   margin-bottom: 20px;
+  position: relative;
   display: flex;
+  flex-direction: row;
   gap: 20px;
-  .tab-list {
+  .tabs {
     position: absolute;
     top: 0px;
     right: 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    border-radius: 999px;
   }
-  .tab-panel {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    margin: 0;
-    padding: 0;
+
+  .tab {
+    --text-color-base: black;
+    --text-color-disabled: var(--text-color-base);
+    --highlight-background: white;
+    --border-color: transparent;
+
+    padding: 10px 20px;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    color: white;
+    transition: color 200ms;
+    forced-color-adjust: none;
+    border-radius: 999px;
+    a {
+      color: var(--text-color);
+    }
+
+    &[data-hovered],
+    &[data-focused] {
+      color: white;
+    }
+
+    &[data-selected] {
+      background-color: var(--highlight-background);
+      color: var(--text-color-base);
+      a {
+        color: var(--text-color-base);
+      }
+    }
+
+    &[data-disabled] {
+      color: var(--text-color-disabled);
+      &[data-selected] {
+        --border-color: var(--text-color-disabled);
+      }
+    }
+
+    &[data-focus-visible]:after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 4px;
+      border: 2px solid var(--focus-ring-color);
+    }
   }
-  .build-content{
+  .build-content {
     flex-grow: 1;
+    width: 0;
   }
 `
