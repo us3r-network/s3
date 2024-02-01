@@ -208,7 +208,7 @@ function BuildLayout () {
       <div className='build-content'>
         <Tabs selectedKey={defaultKey}>
           {PAGES.map(page => (
-            <div className='tab-panel'>
+            <div className='tab-panel' key={page.id}>
               <TabPanel id={page.id}>
                 <Outlet
                   context={{
@@ -222,8 +222,8 @@ function BuildLayout () {
           <div className='tab-list'>
             <TabList aria-label='Explore'>
               {PAGES.map(page => (
-                <Tab id={page.id}>
-                  <NavLink to={page.id} key={page.id}>
+                <Tab id={page.id} key={page.id}>
+                  <NavLink to={page.id}>
                     {page.label}
                   </NavLink>
                 </Tab>
@@ -257,7 +257,7 @@ function ExploreLayout () {
     <LayoutContainer>
       <Tabs selectedKey={defaultExploreKey}>
         {EXPLORE_PAGES.map(page => (
-          <div className='tab-panel'>
+          <div className='tab-panel' key={page.id}>
             <TabPanel id={page.id}>
               <Outlet />
             </TabPanel>
@@ -266,8 +266,8 @@ function ExploreLayout () {
         <div className='tab-list'>
           <TabList aria-label='Explore'>
             {EXPLORE_PAGES.map(page => (
-              <Tab id={page.id}>
-                <NavLink to={page.id} key={page.id}>
+              <Tab id={page.id} key={page.id}>
+                <NavLink to={page.id}>
                   {page.label}
                 </NavLink>
               </Tab>

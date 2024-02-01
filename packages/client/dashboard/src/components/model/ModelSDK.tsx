@@ -40,7 +40,7 @@ export default function ModelSDK ({
     zip
       .generateAsync({ type: 'blob' })
       .then(function (content) {
-        FileSaver.saveAs(content, `${camelCase(modelName ||'')}SDK.zip`)
+        FileSaver.saveAs(content, `${camelCase(modelName || '')}SDK.zip`)
       })
       .catch(console.error)
   }, [codes, modelName])
@@ -153,7 +153,7 @@ export const definition = ${JSON.stringify(
                     items={codes}
                   >
                     {item => (
-                      <Tab id={String(item.id)} className={'code-tab'}>
+                      <Tab id={'sdk-'+String(item.id)} className={'code-tab'}>
                         {item.title}
                       </Tab>
                     )}
@@ -161,11 +161,14 @@ export const definition = ${JSON.stringify(
 
                   <button onClick={downloadCurr}>Download</button>
                 </TabBox>
-                {codes.map(item => (
-                  <TabPanel id={String(item.id)} key={item.id}>
-                    <Code name={item.title} content={item.content} />
-                  </TabPanel>
-                ))}
+                {codes.map(item => {
+                  console.log('item', item)
+                  return (
+                    <TabPanel id={'sdk-'+String(item.id)} key={'sdk-'+String(item.id)}>
+                      <Code name={item.title} content={item.content} />
+                    </TabPanel>
+                  )
+                })}
               </TabsStyle>
             </SDKBox>
           )}

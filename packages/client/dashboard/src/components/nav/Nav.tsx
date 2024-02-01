@@ -3,7 +3,6 @@ import { Link, NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { DOCS_URL } from '../../constants'
 import ChartIcon from '../icons/ChartIcon'
-import ChevronRight from '../icons/ChevronRight'
 import ComponentIcon from '../icons/ComponentIcon'
 import DocIcon from '../icons/DocIcon'
 import ExploreIcon from '../icons/ExploreIcon'
@@ -101,7 +100,7 @@ export default function Nav ({ appId }: { appId: string }) {
       <div className='nav'>
         <div className='top'>
           {navItems.map(item => (
-            <NavItemRenderer item={item} />
+            <NavItemRenderer item={item} key={item.name}/>
           ))}
         </div>
         <div className='bottom'>
@@ -162,7 +161,7 @@ function NavItemRenderer ({
       {item.items && (
         <div className='sub'>
           {item.items.map(item => (
-            <NavItemRenderer item={item} level={level + 1} />
+            <NavItemRenderer item={item} level={level + 1} key={item.name}/>
           ))}
         </div>
       )}
