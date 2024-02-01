@@ -111,17 +111,17 @@ export const definition = ${JSON.stringify(
     fetchModelSDK()
   }, [fetchModelSDK])
 
-  useEffect(() => {
-    if (!modelId || !network) return
-    if (!modelName) {
-      getModelsInfoByIds({
-        network,
-        ids: [modelId]
-      }).then(resp => {
-        modelName = resp.data.data[0].stream_content.name
-      })
-    }
-  }, [network, modelId, genType, modelName])
+  // useEffect(() => {
+  //   if (!modelId || !network) return
+  //   if (!modelName) {
+  //     getModelsInfoByIds({
+  //       network,
+  //       ids: [modelId]
+  //     }).then(resp => {
+  //       modelName = resp.data.data[0].stream_content.name
+  //     })
+  //   }
+  // }, [network, modelId, genType, modelName])
 
   return (
     <SDKContainer>

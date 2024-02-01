@@ -10,9 +10,14 @@ import { useAppCtx } from '../context/AppCtx'
 import { ClientDApp } from '../types.d'
 import { createImageFromInitials } from '../utils/createImage'
 import { getRandomColor } from '../utils/randomColor'
+import { useEffect } from 'react'
 
 export default function MyDapps() {
-  const { dapps } = useAppCtx()
+  const { dapps, setCurrAppId } = useAppCtx()
+  setCurrAppId('')
+  useEffect(() => {
+    setCurrAppId('')
+  }, [setCurrAppId])
   return (
     <MyDappsContainer className="container">
       <div className="list">

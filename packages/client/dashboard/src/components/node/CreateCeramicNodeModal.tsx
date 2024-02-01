@@ -19,7 +19,7 @@ export default function CreateCeramicNodeModal ({
 }: {
   fixedNetwork?: CeramicNetwork
   closeModal?: () => void
-  onSussess?: () => void
+  onSussess: () => void
 }) {
   const [submitting, setSubmitting] = useState(false)
   const [network, setNetwork] = useState<CeramicNetwork>(
@@ -77,9 +77,11 @@ export default function CreateCeramicNodeModal ({
     <CreateBox>
       <div className='title'>
         <h1>Create Ceramic Node</h1>
-        <button onClick={closeModal}>
-          <CloseIcon />
-        </button>
+        {closeModal && (
+          <button onClick={closeModal}>
+            <CloseIcon />
+          </button>
+        )}
       </div>
       <EditorBox>
         <div className='node-name'>
@@ -124,7 +126,11 @@ export default function CreateCeramicNodeModal ({
             <img src='/loading.gif' alt='' />
           </button>
         )) || (
-          <button className='submit' onClick={submit} disabled={!userEmailVerified}>
+          <button
+            className='submit'
+            onClick={submit}
+            disabled={!userEmailVerified}
+          >
             Submit
           </button>
         )}

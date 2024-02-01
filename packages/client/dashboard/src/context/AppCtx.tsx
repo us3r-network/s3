@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useState
 } from 'react'
 import { getDapp, getDappWithDid } from '../api/dapp'
 import { useGuideStepsState } from '../hooks/useGuideSteps'
@@ -22,13 +22,14 @@ export interface AppContextData {
   currAppId: string
   setCurrAppId: React.Dispatch<React.SetStateAction<string>>
   loadDapps: () => Promise<void>
+  loadCurrDapp: () => Promise<void>
   guideSteps: ReturnType<typeof useGuideStepsState>
 }
 
 const AppContext = createContext<AppContextData | null>(null)
 
-export default function AppProvider({
-  children,
+export default function AppProvider ({
+  children
 }: {
   children: React.ReactNode
 }) {
@@ -93,8 +94,9 @@ export default function AppProvider({
         currAppId,
         setCurrAppId,
         loadDapps,
+        loadCurrDapp,
         loadingDApps: loadingDApps || loadingDApp,
-        guideSteps,
+        guideSteps
       }}
     >
       {children}
@@ -102,12 +104,12 @@ export default function AppProvider({
   )
 }
 
-export function useAppCtx() {
+export function useAppCtx () {
   const context = useContext(AppContext)
   if (!context) {
     throw new Error('Missing connection context')
   }
   return {
-    ...context,
+    ...context
   }
 }
