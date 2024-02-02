@@ -574,7 +574,7 @@ function RemoveButton ({
   if (removing) {
     return (
       <div className='removing'>
-        <img src='/loading.gif' title='loading' alt='' />{' '}
+        <img src='/loading.gif' title='loading' alt='' />
       </div>
     )
   }

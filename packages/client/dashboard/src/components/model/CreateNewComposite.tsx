@@ -100,7 +100,7 @@ export default function CreateNewComposite ({
         </button>
       </div>
       <div className='name'>
-        <span>Composite Name:</span>{' '}
+        <span>Composite Name:</span>
         <input
           type='text'
           placeholder='Enter composite name'

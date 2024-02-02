@@ -216,11 +216,10 @@ function Actions ({
     }
   }, [session, selectedDapp, ceramicNodeId, hasIndexed, composite, loadDapps])
   return (
-    <OpsBox className={''}>
+    <OpsBox>
       <DialogTrigger>
         <Button>
-          {' '}
-          <LayoutIcon isActive />{' '}
+          <LayoutIcon isActive />
         </Button>
         <ModalOverlay>
           <Modal>

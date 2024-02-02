@@ -4,7 +4,7 @@ import {
   Heading,
   Modal,
   ModalOverlay,
-  ModalOverlayProps,
+  ModalOverlayProps
 } from 'react-aria-components'
 import styled, { keyframes } from 'styled-components'
 import CloseIcon from '../icons/CloseIcon'
@@ -20,7 +20,7 @@ export interface ModalBaseProps extends ModalOverlayProps {
   closeBtnClassName?: string
 }
 
-export default function ModalBase({
+export default function ModalBase ({
   children,
   title,
   showCloseBtn = true,
@@ -38,7 +38,6 @@ export default function ModalBase({
         <DialogStyled className={dialogClassName}>
           {(!!title || showCloseBtn) && (
             <HeadingStyled className={headingClassName}>
-              {' '}
               <span className={titleClassName}>{title}</span>
               {showCloseBtn && (
                 <CloseBtnStyled
