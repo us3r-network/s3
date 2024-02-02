@@ -27,7 +27,7 @@ export default function DappPlayground () {
         <div className='title-bar'>
           <span>{selectModel.stream_content.name}</span>
         </div>
-        <div className='content-box playground-ops'>
+        <div className='content-box'>
           <ModelPlayground
             streamId={selectModel.stream_id}
             ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
@@ -43,7 +43,7 @@ export default function DappPlayground () {
         <div className='title-bar'>
           <span>{selectComposite.name}</span>
         </div>
-        <div className='content-box playground-ops'>
+        <div className='content-box'>
           <CompositePlayground
             composite={selectComposite}
             ceramicNodeURL={currCeramicNode?.serviceUrl + '/'}
