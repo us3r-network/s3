@@ -104,6 +104,7 @@ export type ClientDApp = {
   socialLinks?: { platform: string; url: string }[]
   tags?: string[]
   models?: string[]
+  modelDetails?: ModelStream[]
   composites?: DappCompositeDto[];
   createdAt?: number
   lastModifiedAt?: number
@@ -184,9 +185,9 @@ export type ModelStream = {
   stream_id: string
   controller_did: string
   tip: string
-  streamContent: {
-    name: string
-  }
+  // streamContent: {
+  //   name: string
+  // }
   stream_content: {
     name: string
     description: string | null

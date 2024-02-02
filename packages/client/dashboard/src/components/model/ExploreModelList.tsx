@@ -379,7 +379,7 @@ function Actions ({
   const { s3ModelCollection } = useSelectedDapp()
   const [staring, setStaring] = useState(false)
 
-  const { loadDapps } = useAppCtx()
+  const { loadDapps, loadCurrDapp } = useAppCtx()
   const { selectedDapp } = useSelectedDapp()
   const [adding, setAdding] = useState(false)
   const addModelToDapp = useCallback(
@@ -403,13 +403,14 @@ function Actions ({
           ceramicNodeId
         )
         await loadDapps()
+        await loadCurrDapp()
       } catch (err) {
         console.error(err)
       } finally {
         setAdding(false)
       }
     },
-    [loadDapps, selectedDapp, session, setAdding, hasIndexed, ceramicNodeId]
+    [session, selectedDapp, ceramicNodeId, hasIndexed, loadDapps, loadCurrDapp]
   )
 
   const collectModel = useCallback(

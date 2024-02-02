@@ -6,7 +6,7 @@ import { useAppCtx } from '../context/AppCtx'
 import { Network } from '../types.d'
 
 export default function useSelectedDapp() {
-  const { dapps } = useAppCtx()
+  const { dapps, currAppId } = useAppCtx()
   const { appId } = useParams()
   const selectDapps = useMemo(() => {
     return (
@@ -19,8 +19,8 @@ export default function useSelectedDapp() {
   }, [dapps])
 
   const selectedDapp = useMemo(() => {
-    return selectDapps?.find((item) => item.id === Number(appId))
-  }, [selectDapps, appId])
+    return selectDapps?.find((item) => item.id === Number(currAppId || appId))
+  }, [selectDapps, currAppId, appId])
 
   const s3ModelCollection = useMemo(() => {
     if (selectedDapp?.network === Network.MAINNET) {

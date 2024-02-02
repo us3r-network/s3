@@ -10,7 +10,13 @@
 import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { Button, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components'
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  Modal,
+  ModalOverlay
+} from 'react-aria-components'
 import styled from 'styled-components'
 import PlusIcon from '../components/icons/PlusIcon'
 import TrashIcon from '../components/icons/TrashIcon'
@@ -41,7 +47,7 @@ export default function CeramicNodes () {
         }, 5000)
       }
     }
-    return ()=>{
+    return () => {
       if (timer) clearTimeout(timer)
     }
   }, [ceramicNodes, loadCeramicNodes])
@@ -86,9 +92,7 @@ export default function CeramicNodes () {
               const active = currCeramicNode?.id === item.id
               return (
                 <div key={item.id} className={active ? 'active' : ''}>
-                  <div
-                    className='title'
-                  >
+                  <div className='title'>
                     <div>{item.name}</div>
                   </div>
                   {active && (
@@ -104,7 +108,7 @@ export default function CeramicNodes () {
             })}
           </NodesListBox>
         </ListBox>
-        {currCeramicNode && <CeramicNodeInfo node={currCeramicNode} />}
+        {currCeramicNode && <CeramicNodeInfo node={currCeramicNode} showTerminal/>}
       </Container>
     )
   }
@@ -159,7 +163,13 @@ function DeleteNodeButton ({ node }: { node: CeramicDto }) {
   )
 }
 
-function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
+export function CeramicNodeInfo ({
+  node,
+  showTerminal
+}: {
+  node: CeramicDto
+  showTerminal?: boolean
+}) {
   const session = useSession()
   return (
     <NodeInfoContainer>
@@ -171,7 +181,7 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
           </div>
           <DeleteNodeButton node={node} />
         </div>
-        <NodeStatus status={node.status}/>
+        <NodeStatus status={node.status} />
         {node.status === CeramicStatus.PREPARING ? (
           <div className='prepareing-info'>
             {/* <img src='/loading.gif' alt='' /> */}
@@ -209,7 +219,7 @@ function CeramicNodeInfo ({ node }: { node: CeramicDto }) {
           </div>
         ) : null}
       </NodeInfoBox>
-      {node?.id &&
+      {showTerminal && node?.id && 
         (node.status === CeramicStatus.STARTING ||
           node.status === CeramicStatus.RUNNING) &&
         session?.did && (
@@ -341,9 +351,11 @@ const NodesListBox = styled.div`
   }
 `
 const NodeInfoContainer = styled.div`
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* justify-content: center; */
   gap: 20px;
   flex-shrink: 1;
   flex-grow: 1;
@@ -351,6 +363,7 @@ const NodeInfoContainer = styled.div`
 const NodeInfoBox = styled.div`
   width: 100%;
   padding: 20px;
+  box-sizing: border-box;
   border-radius: 20px;
   border: 1px solid #39424c;
   background: #1b1e23;
