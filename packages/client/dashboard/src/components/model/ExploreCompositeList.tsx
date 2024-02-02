@@ -12,7 +12,6 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { bindingDappComposites, getComposites } from '../../api/composite'
 import { updateDapp } from '../../api/dapp'
-import { startIndexModels } from '../../api/model'
 import { PAGE_SIZE, S3_SCAN_URL } from '../../constants'
 import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
@@ -26,6 +25,7 @@ import PlusCircleIcon from '../icons/PlusCircleIcon'
 import CreateCompositeModal from './CreateNewComposite'
 import { Dapps } from '../model/ExploreModelList'
 import NoCeramicNodeModal from '../node/NoCeramicNodeModal'
+import { startIndexModelsFromBrowser } from '../../utils/composeDBUtils'
 
 export function CompositeList ({
   searchText
@@ -167,14 +167,14 @@ function Actions ({
   ceramicNodeId?: number
 }) {
   const session = useSession()
-
+  const { currCeramicNode } = useCeramicNodeCtx()
   const { loadDapps } = useAppCtx()
   const { selectedDapp } = useSelectedDapp()
   const [adding, setAdding] = useState(false)
 
   const bindComposite = useCallback(async () => {
     if (!session || !selectedDapp) return
-    if (!ceramicNodeId) return
+    if (!currCeramicNode) return
     if (!hasIndexed) {
       bindingDappComposites({
         compositeId: composite.id,
@@ -185,11 +185,12 @@ function Actions ({
         () => {
           const models = JSON.parse(composite.composite).models
           const modelIds = Object.keys(models)
-          startIndexModels({
+          startIndexModelsFromBrowser(
             modelIds,
-            network: selectedDapp.network,
-            didSession: session.serialize()
-          }).catch(console.error)
+            selectedDapp.network,
+            currCeramicNode.serviceUrl + '/',
+            currCeramicNode.privateKey
+          )
         },
         err => {
           console.error(err)
@@ -204,7 +205,6 @@ function Actions ({
       await updateDapp(
         { ...selectedDapp, composites },
         session.serialize(),
-        ceramicNodeId
       )
       await loadDapps()
     } catch (err) {
@@ -212,7 +212,7 @@ function Actions ({
     } finally {
       setAdding(false)
     }
-  }, [session, selectedDapp, ceramicNodeId, hasIndexed, composite, loadDapps])
+  }, [session, selectedDapp, currCeramicNode, hasIndexed, composite, loadDapps])
   return (
     <OpsBox>
       <DialogTrigger>

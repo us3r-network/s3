@@ -3,23 +3,22 @@ import { AxiosError } from 'axios'
 import { GraphQLEditor, PassedSchema } from 'graphql-editor'
 import { useCallback, useState } from 'react'
 import styled from 'styled-components'
-import { updateDapp } from '../../api/dapp'
-import { useAppCtx } from '../../context/AppCtx'
+import { createDappModels } from '../../api/model'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { schemas } from '../../utils/composedb-types/schemas'
 import { createCompositeFromBrowser } from '../../utils/composeDBUtils'
+import { schemas } from '../../utils/composedb-types/schemas'
 import CloseIcon from '../icons/CloseIcon'
-import { createDappModels } from '../../api/model'
 
 export default function CreateNewModel ({
+  loadDappModels,
   closeModal
 }: {
+  loadDappModels?: () => Promise<void>
   closeModal: () => void
 }) {
   const { selectedDapp } = useSelectedDapp()
   const { currCeramicNode } = useCeramicNodeCtx()
-  const { loadDapps } = useAppCtx()
   const session = useSession()
   const [submitting, setSubmitting] = useState(false)
 
@@ -45,26 +44,20 @@ export default function CreateNewModel ({
       // const { composite, runtimeDefinition } = resp.data.data
       // const newModelIDs = Object.key(composite.models)
 
-      // create model directly through the ceramic node
+      // create model directly through the ceramic node and index it
       const result = await createCompositeFromBrowser(
         gqlSchema.code,
         currCeramicNode.serviceUrl + '/',
         // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
         currCeramicNode.privateKey,
-        session
+        session,
+        true, // start index model on my private node
       )
       if (!result) return
       const { composite, runtimeDefinition } = result
       const newModelIDs = Object.values(composite.modelIDs)
-      // const models = selectedDapp.models || []
-      // models.push(...newModelIDs)
-      // await updateDapp(
-      //   { ...selectedDapp, models },
-      //   session.serialize(),
-      //   currCeramicNode.id
-      // )
-      // await loadDapps()
-      const resp = await Promise.all(
+      //save new model to dapp
+      await Promise.all(
         newModelIDs.map(async mdoelStreamId => {
           return await createDappModels({
             data: { mdoelStreamId, gqlSchema, composite, runtimeDefinition },
@@ -73,7 +66,7 @@ export default function CreateNewModel ({
           })
         })
       )
-      await loadDappModels()
+      loadDappModels?.()
       closeModal()
     } catch (error) {
       const err = error as AxiosError
@@ -81,7 +74,7 @@ export default function CreateNewModel ({
     } finally {
       setSubmitting(false)
     }
-  }, [submitting, selectedDapp, session, gqlSchema, currCeramicNode, closeModal])
+  }, [submitting, selectedDapp, session, gqlSchema, currCeramicNode, loadDappModels, closeModal])
 
   return (
     <CreateBox>
@@ -190,6 +183,3 @@ const CreateBox = styled.div`
     }
   }
 `
-function loadDappModels () {
-  throw new Error('Function not implemented.')
-}

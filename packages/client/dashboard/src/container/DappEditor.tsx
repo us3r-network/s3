@@ -78,8 +78,8 @@ function ModelEditor ({
         )
         const { data } = resp.data
         setModelData(data)
-        if (data.graphqlSchemaDefinition) {
-          setGqlSchema(data.graphqlSchemaDefinition)
+        if (data.graphqlSchema) {
+          setGqlSchema(data.graphqlSchema)
         } else {
           setGqlSchema(schemas.code)
         }

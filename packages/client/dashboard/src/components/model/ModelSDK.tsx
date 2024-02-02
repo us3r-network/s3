@@ -8,7 +8,7 @@ import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
 import { useCallback, useEffect, useState } from 'react'
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import styled from 'styled-components'
-import { getModelSDK, getModelsInfoByIds } from '../../api/model'
+import { getModelSDK } from '../../api/model'
 import { GraphqlGenType, Network } from '../../types.d'
 import { sdkTemplate } from './sdkTemplate'
 
