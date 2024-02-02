@@ -162,7 +162,6 @@ export const definition = ${JSON.stringify(
                   <button onClick={downloadCurr}>Download</button>
                 </TabBox>
                 {codes.map(item => {
-                  console.log('item', item)
                   return (
                     <TabPanel id={'sdk-'+String(item.id)} key={'sdk-'+String(item.id)}>
                       <Code name={item.title} content={item.content} />

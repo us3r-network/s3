@@ -14,7 +14,6 @@ import { useEffect } from 'react'
 
 export default function MyDapps() {
   const { dapps, setCurrAppId } = useAppCtx()
-  setCurrAppId('')
   useEffect(() => {
     setCurrAppId('')
   }, [setCurrAppId])

@@ -58,7 +58,6 @@ export default function CreateNewModel ({
       const newModelIDs = Object.values(composite.modelIDs)
       // const models = selectedDapp.models || []
       // models.push(...newModelIDs)
-      // // console.log("models: ", newModelIDs, models)
       // await updateDapp(
       //   { ...selectedDapp, models },
       //   session.serialize(),
@@ -74,7 +73,6 @@ export default function CreateNewModel ({
           })
         })
       )
-      console.log(resp)
       await loadDappModels()
       closeModal()
     } catch (error) {

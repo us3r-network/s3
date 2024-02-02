@@ -11,7 +11,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { updateDapp } from '../../api/dapp'
-import { PAGE_SIZE } from '../../constants'
+import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST, PAGE_SIZE } from '../../constants'
 import {
   getModelStreamList,
   getModelsInfoByIds,
@@ -30,6 +30,7 @@ import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { CeramicStatus, ClientDApp, ModelStream, Network } from '../../types.d'
 import { shortPubKey } from '../../utils/shortPubKey'
+import { S3ModelCollectionModel } from '@us3r-network/data-model'
 
 export default function ModelList ({
   searchText,
@@ -39,7 +40,7 @@ export default function ModelList ({
   filterStar?: boolean
 }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { s3ModelCollection, selectedDapp } = useSelectedDapp()
+  const { selectedDapp } = useSelectedDapp()
   const { currCeramicNode } = useCeramicNodeCtx()
   const session = useSession()
   const [models, setModels] = useState<Array<ModelStream>>([])
@@ -49,9 +50,16 @@ export default function ModelList ({
   const [personalCollections, setPersonalCollections] = useState<
     PersonalCollection[]
   >([])
+
+  const s3ModelCollection = useMemo(() => {
+    if (selectedDapp?.network === Network.MAINNET) {
+      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
+    }
+    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
+  }, [selectedDapp?.network])
+  
   const fetchPersonalCollections = useCallback(async () => {
     if (!session) return
-    s3ModelCollection.authComposeClient(session)
     try {
       const personal = await s3ModelCollection.queryPersonalCollections({
         first: 500
@@ -155,7 +163,6 @@ export default function ModelList ({
         next={() => {
           pageNum.current += 1
           fetchMoreModel(pageNum.current)
-          console.log('fetch more')
         }}
         hasMore={filterStar ? false : hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -376,12 +383,19 @@ function Actions ({
   ceramicNodeId?: number
 }) {
   const session = useSession()
-  const { s3ModelCollection } = useSelectedDapp()
   const [staring, setStaring] = useState(false)
 
   const { loadDapps, loadCurrDapp } = useAppCtx()
   const { selectedDapp } = useSelectedDapp()
   const [adding, setAdding] = useState(false)
+
+  const s3ModelCollection = useMemo(() => {
+    if (selectedDapp?.network === Network.MAINNET) {
+      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
+    }
+    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
+  }, [selectedDapp?.network])
+
   const addModelToDapp = useCallback(
     async (modelId: string) => {
       if (!session || !selectedDapp) return

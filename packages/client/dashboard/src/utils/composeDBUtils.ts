@@ -130,7 +130,7 @@ export async function getRuntimeDefinitionFromEncodedComposite(
     // console.log('runtime definition:', composite.toRuntime())
     return composite.toRuntime()
   } catch (error) {
-    console.log('get runtime error', error)
+    console.error('get runtime error', error)
     return null
   }
 }

@@ -31,7 +31,6 @@ export default function DeleteCeramicNodeModal ({
       return
     }
     if (nodeName.trim() !== node.name.trim()) {
-      console.log('Node Name: ', nodeName, node.name)
       alert('Node name is not correct!')
       return
     }

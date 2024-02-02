@@ -77,7 +77,6 @@ function ModelPlayground ({
           streamId,
           network || Network.TESTNET
         )
-        console.log('data', resp)
         setModelData(resp.data.data)
       } catch (error) {
         const err = error as AxiosError

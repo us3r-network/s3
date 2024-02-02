@@ -76,7 +76,6 @@ export function CompositeList ({
         next={() => {
           pageNum.current += 1
           fetchMoreComposites(pageNum.current)
-          console.log('fetch more')
         }}
         hasMore={hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -185,7 +184,6 @@ function Actions ({
       .then(
         () => {
           const models = JSON.parse(composite.composite).models
-          console.log(Object.keys(models))
           const modelIds = Object.keys(models)
           startIndexModels({
             modelIds,
