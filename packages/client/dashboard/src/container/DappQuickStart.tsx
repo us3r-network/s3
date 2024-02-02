@@ -293,7 +293,7 @@ export default function DappQuickStart () {
                   navigate(`/dapp/${currDapp.id}/index`)
                 }}
               >
-                Start Build
+                Skip & Start Building
               </Button>
             )}
         </div>
