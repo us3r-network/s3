@@ -56,16 +56,17 @@ export default function ModelList ({
       return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
     }
     return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
-  }, [selectedDapp?.network])
+  }, [selectedDapp])
   
   const fetchPersonalCollections = useCallback(async () => {
-    if (!session) return
+    if (!session || !s3ModelCollection) return
     try {
+      s3ModelCollection.authComposeClient(session)
       const personal = await s3ModelCollection.queryPersonalCollections({
         first: 500
       })
       if (personal.errors) throw new Error(personal.errors[0].message)
-      const collected = personal.data?.viewer.modelCollectionList
+      const collected = personal.data?.viewer?.modelCollectionList
 
       if (collected) {
         setPersonalCollections(
@@ -141,8 +142,11 @@ export default function ModelList ({
 
   useEffect(() => {
     fetchModel()
+  }, [fetchModel])
+
+  useEffect(() => {
     fetchPersonalCollections()
-  }, [fetchModel, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
 
   useEffect(() => {
     fetchStarModels().catch(err => {
