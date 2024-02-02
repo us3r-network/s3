@@ -60,15 +60,20 @@ const CreateDapp = () => {
 
   return (
     <DappCreateContainer className='container'>
-      <div>
-        {currDapp ? (
+      {currDapp ? (
+        <div>
           <div>
             <h1>App Name: {currDapp.name}</h1>
             <p>Network: {currDapp.network}</p>
             <p>App ID: {currDapp.id}</p>
             <p>Created At: {currDapp.createdAt}</p>
           </div>
-        ) : (
+          <p>
+            Your dapp has been created; proceed to the next step to continue.
+          </p>
+        </div>
+      ) : (
+        <div>
           <div>
             <div className='app-name'>
               <span>* App Name:</span>
@@ -97,8 +102,12 @@ const CreateDapp = () => {
               )}
             </div>
           </div>
-        )}
-      </div>
+          <p>
+            Fill in the required information to create a dapp, and testnet
+            network is recommended during the development.
+          </p>
+        </div>
+      )}
     </DappCreateContainer>
   )
 }
@@ -121,18 +130,40 @@ const DeployNode = () => {
     }
   }, [ceramicNodes, loadCeramicNodes])
   if (currCeramicNode) {
-    return <CeramicNodeInfo node={currCeramicNode} />
+    return (
+      <>
+        <CeramicNodeInfo node={currCeramicNode} />
+        <p>
+          Since you already have a Ceramic node set up, you can proceed to the
+          next step.
+        </p>
+      </>
+    )
   }
   return (
-    <CreateCeramicNodeModal
-      onSussess={loadCeramicNodes}
-      fixedNetwork={CeramicNetwork.TESTNET}
-    />
+    <>
+      <CreateCeramicNodeModal
+        onSussess={loadCeramicNodes}
+        fixedNetwork={CeramicNetwork.TESTNET}
+      />{' '}
+      <p>
+        You must create a Ceramic node, as all data operations will be executed
+        on this node.
+      </p>
+    </>
   )
 }
 
 const Explore = () => {
-  return <ModelList />
+  return (
+    <>
+      <ModelList />
+      <p>
+        Browse through the current collection of models and choose a model that
+        you wish to incorporate into your dapp.
+      </p>
+    </>
+  )
 }
 
 const StartBuilding = () => {
@@ -140,11 +171,18 @@ const StartBuilding = () => {
   const firstModel = currDapp?.modelDetails?.[0]
   if (firstModel) {
     return (
-      <ModelSDK
-        modelId={firstModel.stream_id}
-        modelName={firstModel.stream_content.name}
-        network={currDapp.network}
-      />
+      <>
+        {' '}
+        <ModelSDK
+          modelId={firstModel.stream_id}
+          modelName={firstModel.stream_content.name}
+          network={currDapp.network}
+        />
+        <p>
+          Using the automatically generated SDK, you can now directly perform
+          CRUD operations on data; let's begin coding.
+        </p>
+      </>
     )
   } else {
     return <div>No Model in this Dapp!</div>
@@ -235,7 +273,6 @@ export default function DappQuickStart () {
   return (
     <Box>
       <div className='step-action'>
-        <p>{STEPS[currentStep - 1]?.guideText}</p>
         {<step.component />}
         <div>
           {currentStep < STEPS.length &&
@@ -283,6 +320,7 @@ export default function DappQuickStart () {
         <div>
           <img src={STEPS[currentStep - 1]?.icon} alt='' />
           <h3>{STEPS[currentStep - 1]?.title}</h3>
+          <p>{STEPS[currentStep - 1]?.guideText}</p>
         </div>
       </div>
     </Box>
