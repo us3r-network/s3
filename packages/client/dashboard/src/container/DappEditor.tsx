@@ -46,6 +46,7 @@ export default function DappEditor () {
         <div className='content-box'>
           <CompositeEditor
             schema={selectComposite.graphql}
+            library={schemas.library}
             encodedDefinition={JSON.parse(selectComposite.composite)}
           />
         </div>
