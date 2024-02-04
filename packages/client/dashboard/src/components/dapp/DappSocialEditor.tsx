@@ -61,7 +61,7 @@ export default function DappSocialEditor({
             <div key={item.platform} className="social-item">
               <div>
                 {IconMap[item.platform] &&
-                  React.createElement(IconMap[item.platform])}{' '}
+                  React.createElement(IconMap[item.platform])}
                 <span>{item.platform}</span>
               </div>
               <a href={item.url} target="_blank" rel="noreferrer">

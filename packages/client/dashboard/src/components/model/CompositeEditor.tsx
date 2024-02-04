@@ -77,6 +77,7 @@ export const definition = ${JSON.stringify(runtimeDefinition)}`}
 }
 
 const Box = styled.div`
+  height: 100%;
   .title {
     display: flex;
     align-items: center;
@@ -100,7 +101,7 @@ const Box = styled.div`
 `
 
 const EditorBox = styled.div`
-  max-height: 800px;
+  height: 100%;
   background: #14171a;
   border: 1px solid #39424c;
   border-radius: 20px;

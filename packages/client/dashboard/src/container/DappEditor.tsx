@@ -27,10 +27,12 @@ export default function DappEditor () {
         <div className='title-bar'>
           <span>{selectModel.stream_content?.name}</span>
         </div>
-        <ModelEditor
-          streamId={selectModel.stream_id}
-          network={selectedDapp?.network}
-        />
+        <div className='content-box'>
+          <ModelEditor
+            streamId={selectModel.stream_id}
+            network={selectedDapp?.network}
+          />
+        </div>
       </BuildContentBox>
     )
   }
@@ -76,8 +78,8 @@ function ModelEditor ({
         )
         const { data } = resp.data
         setModelData(data)
-        if (data.graphqlSchemaDefinition) {
-          setGqlSchema(data.graphqlSchemaDefinition)
+        if (data.graphqlSchema) {
+          setGqlSchema(data.graphqlSchema)
         } else {
           setGqlSchema(schemas.code)
         }

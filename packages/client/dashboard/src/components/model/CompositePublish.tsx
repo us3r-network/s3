@@ -42,14 +42,12 @@ export default function CompositePublish ({
       encodedDefinition: composite.composite,
       createAt: new Date().toISOString()
     }
-    console.log('compositeInput', compositeInput)
     setPublishing(true)
     const s3Composite = new S3CompositeModel(CERAMIC_TESTNET_HOST)
     s3Composite.authComposeClient(session)
     const stream = await s3Composite.createComposite({
       content: compositeInput
     })
-    console.log(stream)
     const streamId = stream?.data?.createComposite?.document?.id
     if (!streamId) {
       toast.error('Publish failed')

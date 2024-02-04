@@ -15,7 +15,7 @@ import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { deleteDappComposites, getDappComposites } from '../../api/composite'
 import { updateDapp } from '../../api/dapp'
-import { getModelsInfoByIds } from '../../api/model'
+import { getDappModels, getModelsInfoByIds } from '../../api/model'
 import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useIsOwner from '../../hooks/useIsOwner'
@@ -65,7 +65,7 @@ export default function DappModelAndComposites ({
   editable?: boolean
 }) {
   const session = useSession()
-  const { loadDapps, currDapp } = useAppCtx()
+  const { loadDapps, currDapp, loadCurrDapp } = useAppCtx()
   const { appId, selectedDapp } = useSelectedDapp()
   const { currCeramicNode } = useCeramicNodeCtx()
   const [loading, setLoading] = useState(false)
@@ -102,18 +102,19 @@ export default function DappModelAndComposites ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dapp])
 
-  // const loadDappModels = useCallback(async () => {
-  //   if (!dapp) return
-  //   try {
-  //     const resp = await getDappModels({
-  //       dapp
-  //     })
-  //     if (resp.data.code !== 0) throw new Error(resp.data.msg)
-  //     setDappModels(resp.data.data)
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }, [dapp])
+  const loadDappModels = useCallback(async () => {
+    if (!dapp) return
+    // try {
+    //   const resp = await getDappModels({
+    //     dapp
+    //   })
+    //   if (resp.data.code !== 0) throw new Error(resp.data.msg)
+    //   setDappModels(resp.data.data)
+    // } catch (error) {
+    //   console.error(error)
+    // }
+    await loadCurrDapp()
+  }, [dapp, loadCurrDapp])
 
   const loadDappComposites = useCallback(async () => {
     if (!dapp) return
@@ -342,7 +343,8 @@ export default function DappModelAndComposites ({
         isOpen={openModal === OPEN_MODAL.CREATE_NEW_MODEL}
         onOpenChange={() => setOpenModal(OPEN_MODAL.NONE)}
       >
-        <Dialog>{({ close }) => <CreateNewModel closeModal={close} />}</Dialog>
+        <Dialog>{({ close }) => <CreateNewModel closeModal={close} 
+              loadDappModels={loadDappModels}/>}</Dialog>
       </Modal>
       {/* CREATE_NEW_COMPOSITE modal */}
       <Modal
@@ -574,7 +576,7 @@ function RemoveButton ({
   if (removing) {
     return (
       <div className='removing'>
-        <img src='/loading.gif' title='loading' alt='' />{' '}
+        <img src='/loading.gif' title='loading' alt='' />
       </div>
     )
   }

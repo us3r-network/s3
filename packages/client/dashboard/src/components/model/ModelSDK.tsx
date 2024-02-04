@@ -8,7 +8,7 @@ import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
 import { useCallback, useEffect, useState } from 'react'
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import styled from 'styled-components'
-import { getModelSDK, getModelsInfoByIds } from '../../api/model'
+import { getModelSDK } from '../../api/model'
 import { GraphqlGenType, Network } from '../../types.d'
 import { sdkTemplate } from './sdkTemplate'
 
@@ -162,7 +162,6 @@ export const definition = ${JSON.stringify(
                   <button onClick={downloadCurr}>Download</button>
                 </TabBox>
                 {codes.map(item => {
-                  console.log('item', item)
                   return (
                     <TabPanel id={'sdk-'+String(item.id)} key={'sdk-'+String(item.id)}>
                       <Code name={item.title} content={item.content} />

@@ -7,9 +7,11 @@ import { createDappComposites } from '../../api/composite'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { schemas } from '../../utils/composedb-types/schemas'
 import CloseIcon from '../icons/CloseIcon'
-import { createCompositeFromBrowser } from '../../utils/composeDBUtils'
+import {
+  createCompositeFromBrowser,
+  startIndexModelsFromBrowser
+} from '../../utils/composeDBUtils'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
-import { startIndexModels } from '../../api/model'
 
 export default function CreateNewComposite ({
   closeModal,
@@ -44,18 +46,17 @@ export default function CreateNewComposite ({
       const result = await createCompositeFromBrowser(
         gqlSchema.code,
         currCeramicNode.serviceUrl + '/',
-        // `http://${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalanceHost}:${ceramicNodes[0].serviceK8sMetadata.ceramicLoadbalancePort}`,
         currCeramicNode.privateKey,
         session
       )
       if (!result) return
       const { composite, runtimeDefinition } = result
-      
+
       const newCompositeData = {
         graphql: gqlSchema.code,
         name,
-        composite:JSON.stringify(composite),
-        runtimeDefinition:JSON.stringify(runtimeDefinition),
+        composite: JSON.stringify(composite),
+        runtimeDefinition: JSON.stringify(runtimeDefinition)
       }
       const resp = await createDappComposites({
         data: newCompositeData,
@@ -66,11 +67,12 @@ export default function CreateNewComposite ({
         throw new Error(resp.data.msg)
       }
       const modelIds = composite.modelIDs
-      await startIndexModels({
+      await startIndexModelsFromBrowser(
         modelIds,
-        network: selectedDapp.network,
-        didSession: session.serialize()
-      }).catch(console.error)
+        selectedDapp.network,
+        currCeramicNode.serviceUrl + '/',
+        currCeramicNode.privateKey
+      )
 
       if (loadDappComposites) await loadDappComposites()
       closeModal()
@@ -100,7 +102,7 @@ export default function CreateNewComposite ({
         </button>
       </div>
       <div className='name'>
-        <span>Composite Name:</span>{' '}
+        <span>Composite Name:</span>
         <input
           type='text'
           placeholder='Enter composite name'

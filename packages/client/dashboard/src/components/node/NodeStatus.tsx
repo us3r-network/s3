@@ -17,7 +17,7 @@ export default function NodeStatus ({
   useEffect(() => {
     if (status !== CeramicStatus.PREPARING) return
     if (prepageingPercentage < 100) {
-      console.log('set prepare timeout', prepageingPercentage)
+      // console.log('set prepare timeout', prepageingPercentage)
       setTimeout(() => {
         setPrepageingPercentage(prepageingPercentage + 1)
       }, 350)
@@ -27,7 +27,7 @@ export default function NodeStatus ({
   useEffect(() => {
     if (status !== CeramicStatus.STARTING) return
     if (startingPercentage < 100) {
-      console.log('set start timeout', startingPercentage)
+      // console.log('set start timeout', startingPercentage)
       setTimeout(() => {
         setStartingPercentage(startingPercentage + 1)
       }, 200)

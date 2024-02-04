@@ -3,17 +3,17 @@ import { useMemo } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Item } from 'react-stately'
 import styled from 'styled-components'
-import useSelectedDapp from '../../hooks/useSelectedDapp'
 import { Label } from '../common/ListBox'
 import { Select } from '../common/Select'
 import LoginButton from './LoginButton'
 import { LogoWhite } from './Logo'
+import { useAppCtx } from '../../context/AppCtx'
+import { ClientDApp } from '../../types'
 
 
 export default function Header() {
-  const { appId, selectDapps } = useSelectedDapp()
   const session = useSession()
-
+  const { dapps, currAppId } = useAppCtx()
   return (
     <HeaderContainer>
       <div className="left">
@@ -21,8 +21,8 @@ export default function Header() {
           <LogoWhite />
           <h2>CONSOLE</h2>
         </Link>
-        {session?.id && appId && (
-          <DappSelector selected={appId} dapps={selectDapps} />
+        {session?.id && currAppId && (
+          <DappSelector selected={currAppId} dapps={dapps} />
         )}
       </div>
       <div>
@@ -82,7 +82,7 @@ function DappSelector({
   dapps,
   selected,
 }: {
-  dapps: { id: number; name: string }[]
+  dapps: ClientDApp[]
   selected: string
 }) {
   const navigate = useNavigate()

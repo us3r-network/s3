@@ -11,11 +11,10 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { updateDapp } from '../../api/dapp'
-import { PAGE_SIZE } from '../../constants'
+import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST, PAGE_SIZE } from '../../constants'
 import {
   getModelStreamList,
   getModelsInfoByIds,
-  startIndexModel
 } from '../../api/model'
 import { ImgOrName } from '../common/ImgOrName'
 import { TableBox, TableContainer } from '../common/TableBox'
@@ -28,8 +27,10 @@ import { S3_SCAN_URL } from '../../constants'
 import { PersonalCollection, useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { CeramicStatus, ClientDApp, ModelStream, Network } from '../../types.d'
+import { ClientDApp, ModelStream, Network } from '../../types.d'
 import { shortPubKey } from '../../utils/shortPubKey'
+import { S3ModelCollectionModel } from '@us3r-network/data-model'
+import { startIndexModelsFromBrowser } from '../../utils/composeDBUtils'
 
 export default function ModelList ({
   searchText,
@@ -39,8 +40,7 @@ export default function ModelList ({
   filterStar?: boolean
 }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { s3ModelCollection, selectedDapp } = useSelectedDapp()
-  const { currCeramicNode } = useCeramicNodeCtx()
+  const { selectedDapp } = useSelectedDapp()
   const session = useSession()
   const [models, setModels] = useState<Array<ModelStream>>([])
   const [starModels, setStarModels] = useState<Array<ModelStream>>([])
@@ -49,15 +49,23 @@ export default function ModelList ({
   const [personalCollections, setPersonalCollections] = useState<
     PersonalCollection[]
   >([])
+
+  const s3ModelCollection = useMemo(() => {
+    if (selectedDapp?.network === Network.MAINNET) {
+      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
+    }
+    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
+  }, [selectedDapp])
+  
   const fetchPersonalCollections = useCallback(async () => {
-    if (!session) return
-    s3ModelCollection.authComposeClient(session)
+    if (!session || !s3ModelCollection) return
     try {
+      s3ModelCollection.authComposeClient(session)
       const personal = await s3ModelCollection.queryPersonalCollections({
         first: 500
       })
       if (personal.errors) throw new Error(personal.errors[0].message)
-      const collected = personal.data?.viewer.modelCollectionList
+      const collected = personal.data?.viewer?.modelCollectionList
 
       if (collected) {
         setPersonalCollections(
@@ -133,8 +141,11 @@ export default function ModelList ({
 
   useEffect(() => {
     fetchModel()
+  }, [fetchModel])
+
+  useEffect(() => {
     fetchPersonalCollections()
-  }, [fetchModel, fetchPersonalCollections])
+  }, [fetchPersonalCollections])
 
   useEffect(() => {
     fetchStarModels().catch(err => {
@@ -155,7 +166,6 @@ export default function ModelList ({
         next={() => {
           pageNum.current += 1
           fetchMoreModel(pageNum.current)
-          console.log('fetch more')
         }}
         hasMore={filterStar ? false : hasMore}
         loader={<Loading>Loading...</Loading>}
@@ -253,15 +263,9 @@ export default function ModelList ({
                       {/* <OpsBtns modelId={item.stream_id} /> */}
                       <Actions
                         stream_id={item.stream_id}
-                        hasIndexed={!!item.isIndexed}
+                        hasIndexed={false}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
-                        ceramicNodeId={
-                          currCeramicNode &&
-                          currCeramicNode.status === CeramicStatus.RUNNING
-                            ? currCeramicNode?.id
-                            : undefined
-                        }
                       />
                     </td>
                   </tr>
@@ -361,7 +365,6 @@ function Actions ({
   fetchPersonal,
   stream_id,
   hasIndexed,
-  ceramicNodeId
 }: {
   hasIndexed: boolean
   stream_id: string
@@ -373,25 +376,39 @@ function Actions ({
       }
     | undefined
   fetchPersonal: () => void
-  ceramicNodeId?: number
 }) {
   const session = useSession()
-  const { s3ModelCollection } = useSelectedDapp()
+  const { currCeramicNode } = useCeramicNodeCtx()
   const [staring, setStaring] = useState(false)
 
   const { loadDapps, loadCurrDapp } = useAppCtx()
   const { selectedDapp } = useSelectedDapp()
   const [adding, setAdding] = useState(false)
+
+  const s3ModelCollection = useMemo(() => {
+    if (selectedDapp?.network === Network.MAINNET) {
+      return new S3ModelCollectionModel(CERAMIC_MAINNET_HOST, 'mainnet')
+    }
+    return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
+  }, [selectedDapp?.network])
+
   const addModelToDapp = useCallback(
     async (modelId: string) => {
       if (!session || !selectedDapp) return
-      if (!ceramicNodeId) return
+      if (!currCeramicNode) return
+      console.log('currCeramicNode', currCeramicNode, hasIndexed)
       if (!hasIndexed) {
-        startIndexModel({
-          modelId,
-          network: selectedDapp.network as Network,
-          didSession: session.serialize()
-        }).catch(console.error)
+        // await startIndexModel({
+        //   modelId,
+        //   network: selectedDapp.network as Network,
+        //   didSession: session.serialize()
+        // }).catch(console.error)
+        await startIndexModelsFromBrowser(
+          [modelId],
+           selectedDapp.network as Network,
+           currCeramicNode.serviceUrl + '/',
+           currCeramicNode.privateKey,
+           )
       }
       try {
         setAdding(true)
@@ -400,7 +417,7 @@ function Actions ({
         await updateDapp(
           { ...selectedDapp, models },
           session.serialize(),
-          ceramicNodeId
+          // ceramicNodeId
         )
         await loadDapps()
         await loadCurrDapp()
@@ -410,7 +427,7 @@ function Actions ({
         setAdding(false)
       }
     },
-    [session, selectedDapp, ceramicNodeId, hasIndexed, loadDapps, loadCurrDapp]
+    [session, selectedDapp, hasIndexed, loadDapps, loadCurrDapp,currCeramicNode]
   )
 
   const collectModel = useCallback(
@@ -482,11 +499,11 @@ function Actions ({
             <button disabled>
               <CheckCircleIcon />
             </button>
-          ) : ceramicNodeId ? (
+          ) : currCeramicNode ? (
             <button
-              disabled={!ceramicNodeId}
+              disabled={!currCeramicNode}
               title={
-                ceramicNodeId
+                currCeramicNode
                   ? 'Add this model to Dapp'
                   : 'There is no available node now, Deploy a private node first!'
               }

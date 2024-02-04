@@ -212,42 +212,42 @@ export function getModelSDK({
   })
 }
 
-export function startIndexModel({
-  network,
-  modelId,
-  didSession,
-}: {
-  network: Network
-  modelId: string
-  didSession?: string
-}): AxiosPromise<ApiResp<null>> {
-  return axios({
-    url: `${APP_API_URL}/models/indexing?network=${network.toUpperCase()}&model=${modelId}`,
-    method: 'post',
-    headers: {
-      'did-session': didSession || '',
-    },
-  })
-}
+// export function startIndexModel({
+//   network,
+//   modelId,
+//   didSession,
+// }: {
+//   network: Network
+//   modelId: string
+//   didSession?: string
+// }): AxiosPromise<ApiResp<null>> {
+//   return axios({
+//     url: `${APP_API_URL}/models/indexing?network=${network.toUpperCase()}&model=${modelId}`,
+//     method: 'post',
+//     headers: {
+//       'did-session': didSession || '',
+//     },
+//   })
+// }
 
-export function startIndexModels({
-  modelIds,
-  network,
-  didSession,
-}:{
-  didSession: string,
-  modelIds: string[],
-  network: Network }) {
-  if (!modelIds || modelIds.length===0) return Promise.reject()
-  const resp = Promise.all(modelIds.map((modelId: string) => {
-    return startIndexModel({
-      modelId,
-      network,
-      didSession
-    })
-  }))
-  return resp
-}
+// export function startIndexModels({
+//   modelIds,
+//   network,
+//   didSession,
+// }:{
+//   didSession: string,
+//   modelIds: string[],
+//   network: Network }) {
+//   if (!modelIds || modelIds.length===0) return Promise.reject()
+//   const resp = Promise.all(modelIds.map((modelId: string) => {
+//     return startIndexModel({
+//       modelId,
+//       network,
+//       didSession
+//     })
+//   }))
+//   return resp
+// }
 
 export function getStreamsCountWithModels({
   network,

@@ -145,7 +145,7 @@ const DeployNode = () => {
       <CreateCeramicNodeModal
         onSussess={loadCeramicNodes}
         fixedNetwork={CeramicNetwork.TESTNET}
-      />{' '}
+      />
       <p>
         You must create a Ceramic node, as all data operations will be executed
         on this node.
@@ -172,7 +172,6 @@ const StartBuilding = () => {
   if (firstModel) {
     return (
       <>
-        {' '}
         <ModelSDK
           modelId={firstModel.stream_id}
           modelName={firstModel.stream_content.name}
