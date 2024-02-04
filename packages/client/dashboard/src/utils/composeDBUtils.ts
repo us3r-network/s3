@@ -9,6 +9,7 @@ import { Ed25519Provider } from 'key-did-provider-ed25519'
 import { getResolver } from 'key-did-resolver'
 import { fromString } from 'uint8arrays/from-string'
 import { Network } from '../types'
+import { StreamID } from '@ceramicnetwork/streamid'
 
 export async function createCompositeFromBrowser(
   graphql: string,
@@ -130,7 +131,7 @@ export async function startIndexModelsFromBrowser(
     console.error('Please specify a CeramicNodeAdminPrivateKey')
     return
   }
-  console.log('Start index models on private node: ', models, network, myCeramicNode)
+
   // 0 Login
   console.log('Connecting to the ceramic node: ', myCeramicNode)
   const ceramic = new CeramicClient(myCeramicNode)
@@ -166,40 +167,22 @@ export async function startIndexModelsFromBrowser(
     return
   }
 
-  //1 Create My Composite
-  let myComposite: Composite
-  try {
-    console.log('Creating the composite...')
-    myComposite = await Composite.fromModels({
-      ceramic: ceramic as unknown as CeramicApi,
-      models,
-      index: false,
-    })
-    console.log(`Creating the composite... Done! The encoded representation:`)
-    console.log(myComposite)
-  } catch (e) {
-    console.error((e as Error).message)
-    return
-  }
-
-  //2 Deploy My Composite
-  if (myCeramicNodeAdminPrivateKey)
+  // 1 Start indexing models on private node
+  console.log('Start index models on private node: ', models, network, myCeramicNode)
+  const indexedModels = []
+  for await (const m of models) {
+    const modelStreamId = StreamID.fromString(m)
     try {
-      console.log('Deploying the composite...')
-      // Notify the Ceramic node to index the models present in the composite
-      await myComposite.startIndexingOn(ceramic as unknown as CeramicApi)
-      // Logging the model stream IDs to stdout, so that they can be piped using standard I/O or redirected to a file
-      console.log(
-        JSON.stringify(Object.keys(myComposite.toParams().definition.models))
-      )
-      console.log(`Deploying the composite... Done!`)
-    } catch (e) {
-      console.error((e as Error).message)
-      return
+      console.log(`Index models, stream id:${m}`);
+      const res = await ceramic.admin.startIndexingModels([modelStreamId]);
+      console.log(`Indexed model: ${m}.`, res);
+      indexedModels.push(m)
+    } catch (error) {
+      console.error(`Add model ${m} index err: ${error}`);
     }
-  return myComposite
+  }
+  return indexedModels
 }
-
 
 export async function getRuntimeDefinitionFromEncodedComposite(
   encodedDefinition: string,

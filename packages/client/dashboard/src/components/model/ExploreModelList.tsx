@@ -11,11 +11,12 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { updateDapp } from '../../api/dapp'
-import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST, PAGE_SIZE } from '../../constants'
 import {
-  getModelStreamList,
-  getModelsInfoByIds,
-} from '../../api/model'
+  CERAMIC_MAINNET_HOST,
+  CERAMIC_TESTNET_HOST,
+  PAGE_SIZE
+} from '../../constants'
+import { getModelStreamList, getModelsInfoByIds } from '../../api/model'
 import { ImgOrName } from '../common/ImgOrName'
 import { TableBox, TableContainer } from '../common/TableBox'
 import CheckCircleIcon from '../icons/CheckCircleIcon'
@@ -56,7 +57,7 @@ export default function ModelList ({
     }
     return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
   }, [selectedDapp])
-  
+
   const fetchPersonalCollections = useCallback(async () => {
     if (!session || !s3ModelCollection) return
     try {
@@ -263,7 +264,6 @@ export default function ModelList ({
                       {/* <OpsBtns modelId={item.stream_id} /> */}
                       <Actions
                         stream_id={item.stream_id}
-                        hasIndexed={false}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
                       />
@@ -364,9 +364,7 @@ function Actions ({
   hasStarItem,
   fetchPersonal,
   stream_id,
-  hasIndexed,
 }: {
-  hasIndexed: boolean
   stream_id: string
   hasStarItem:
     | {
@@ -396,27 +394,19 @@ function Actions ({
     async (modelId: string) => {
       if (!session || !selectedDapp) return
       if (!currCeramicNode) return
-      console.log('currCeramicNode', currCeramicNode, hasIndexed)
-      if (!hasIndexed) {
-        // await startIndexModel({
-        //   modelId,
-        //   network: selectedDapp.network as Network,
-        //   didSession: session.serialize()
-        // }).catch(console.error)
+      setAdding(true)
+      try {
         await startIndexModelsFromBrowser(
           [modelId],
-           selectedDapp.network as Network,
-           currCeramicNode.serviceUrl + '/',
-           currCeramicNode.privateKey,
-           )
-      }
-      try {
-        setAdding(true)
+          selectedDapp.network as Network,
+          currCeramicNode.serviceUrl + '/',
+          currCeramicNode.privateKey
+        )
         const models = selectedDapp.models || []
         models.push(modelId)
         await updateDapp(
           { ...selectedDapp, models },
-          session.serialize(),
+          session.serialize()
           // ceramicNodeId
         )
         await loadDapps()
@@ -427,7 +417,13 @@ function Actions ({
         setAdding(false)
       }
     },
-    [session, selectedDapp, hasIndexed, loadDapps, loadCurrDapp,currCeramicNode]
+    [
+      session,
+      selectedDapp,
+      loadDapps,
+      loadCurrDapp,
+      currCeramicNode
+    ]
   )
 
   const collectModel = useCallback(
