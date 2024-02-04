@@ -85,7 +85,7 @@ export default function CreateCeramicNodeModal ({
       </div>
       <EditorBox>
         <div className='node-name'>
-          <span>* App Name:</span>
+          <span>* Node Name:</span>
           <input
             type='text'
             value={nodeName}
