@@ -359,7 +359,6 @@ export class DappController {
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
     const dappModel = new DappModel();
-    // TODO store composites to composite table
     dappModel.setComposite = dto.composite;
     dappModel.setModelStreamId = dto.mdoelStreamId;
     dappModel.setGraphql = dto.graphql;
