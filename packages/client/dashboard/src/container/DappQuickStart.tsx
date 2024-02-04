@@ -24,6 +24,7 @@ import { CeramicNodeInfo } from './CeramicNodes'
 import { uniq } from 'lodash'
 import ModelList from '../components/model/ExploreModelList'
 import React from 'react'
+import dayjs from 'dayjs'
 
 const CreateDapp = () => {
   const [network, setNetwork] = useState(Network.TESTNET)
@@ -58,59 +59,142 @@ const CreateDapp = () => {
     }
   }, [session, signIn, appName, network, setCurrAppId, loadDapps])
 
-  return (
-    <DappCreateContainer className='container'>
-      {currDapp ? (
-        <div>
-          <div>
-            <h1>App Name: {currDapp.name}</h1>
-            <p>Network: {currDapp.network}</p>
-            <p>App ID: {currDapp.id}</p>
-            <p>Created At: {currDapp.createdAt}</p>
-          </div>
-          <p>
-            Your dapp has been created; proceed to the next step to continue.
-          </p>
-        </div>
-      ) : (
-        <div>
-          <div>
-            <div className='app-name'>
-              <span>* App Name:</span>
-              <input
-                type='text'
-                value={appName}
-                onChange={e => setAppName(e.target.value)}
-              />
-            </div>
-
-            <EnumSelect
-              {...{ value: network, setValue: setNetwork }}
-              labelText='* Network:'
-              values={Network}
+  if (currDapp)
+    return (
+      <>
+        <p>Your dapp has been created; proceed to the next step to continue.</p>
+        <DappCreateBox className='app-info'>
+          <h3>App Name: {currDapp.name}</h3>
+          <p>Network: {currDapp.network}</p>
+          <p>App ID: {currDapp.id}</p>
+          <p>Created At: {dayjs(currDapp.createdAt).format('YYYY-MM-DD')}</p>
+        </DappCreateBox>
+      </>
+    )
+  else
+    return (
+      <>
+        <p>
+          Fill in the required information to create a dapp, Testnet is
+          recommended for development.
+        </p>
+        <DappCreateBox>
+          <div className='app-name'>
+            <span>* App Name:</span>
+            <input
+              type='text'
+              value={appName}
+              onChange={e => setAppName(e.target.value)}
             />
-
-            <div className='btns'>
-              {creating ? (
-                <button>
-                  <img src='/loading.gif' alt='' />
-                </button>
-              ) : (
-                <button className='create' onClick={createAction}>
-                  Create
-                </button>
-              )}
-            </div>
           </div>
-          <p>
-            Fill in the required information to create a dapp, and testnet
-            network is recommended during the development.
-          </p>
-        </div>
-      )}
-    </DappCreateContainer>
-  )
+          <EnumSelect
+            {...{ value: network, setValue: setNetwork }}
+            labelText='* Network:'
+            values={Network}
+          />
+          <div className='btns'>
+            {creating ? (
+              <button>
+                <img src='/loading.gif' alt='' />
+              </button>
+            ) : (
+              <button className='create' onClick={createAction}>
+                Create
+              </button>
+            )}
+          </div>
+        </DappCreateBox>
+      </>
+    )
 }
+const DappCreateBox = styled.div`
+  width: 100%;
+  background: #1b1e23;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  gap: 20px;
+  border: 1px solid #39424c;
+
+  .app-info{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    h3 {
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 36px;
+    }
+    p {
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+  .app-name {
+    display: flex;
+    flex-direction: column;
+
+    > span {
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 24px;
+      margin-bottom: 8px;
+    }
+
+    > input {
+      background: #1a1e23;
+      outline: none;
+      border: 1px solid #39424c;
+      border-radius: 12px;
+      height: 48px;
+      padding: 0px 16px;
+      color: #ffffff;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+
+  .btns {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 20px;
+
+    button {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 24px;
+      text-align: center;
+      width: 120px;
+      background: none;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      border: 1px solid #39424c;
+      border-radius: 24px;
+      height: 48px;
+      &.cancel {
+        background: #1b1e23;
+
+        color: #ffffff;
+      }
+
+      &.create {
+        color: #14171a;
+        background: #ffffff;
+        border-radius: 24px;
+      }
+
+      > img {
+        height: 27px;
+      }
+    }
+  }
+`
 
 const DeployNode = () => {
   const { ceramicNodes, currCeramicNode, loadCeramicNodes } =
@@ -132,24 +216,24 @@ const DeployNode = () => {
   if (currCeramicNode) {
     return (
       <>
-        <CeramicNodeInfo node={currCeramicNode} />
         <p>
           Since you already have a Ceramic node set up, you can proceed to the
           next step.
         </p>
+        <CeramicNodeInfo node={currCeramicNode} />
       </>
     )
   }
   return (
     <>
-      <CreateCeramicNodeModal
-        onSussess={loadCeramicNodes}
-        fixedNetwork={CeramicNetwork.TESTNET}
-      />
       <p>
         You must create a Ceramic node, as all data operations will be executed
         on this node.
       </p>
+      <CreateCeramicNodeModal
+        onSussess={loadCeramicNodes}
+        fixedNetwork={CeramicNetwork.TESTNET}
+      />
     </>
   )
 }
@@ -157,11 +241,11 @@ const DeployNode = () => {
 const Explore = () => {
   return (
     <>
-      <ModelList />
       <p>
         Browse through the current collection of models and choose a model that
         you wish to incorporate into your dapp.
       </p>
+      <ModelList />
     </>
   )
 }
@@ -172,15 +256,15 @@ const StartBuilding = () => {
   if (firstModel) {
     return (
       <>
+        <p>
+          Using the automatically generated SDK, you can now directly perform
+          CRUD operations on data; let's begin coding.
+        </p>
         <ModelSDK
           modelId={firstModel.stream_id}
           modelName={firstModel.stream_content.name}
           network={currDapp.network}
         />
-        <p>
-          Using the automatically generated SDK, you can now directly perform
-          CRUD operations on data; let's begin coding.
-        </p>
       </>
     )
   } else {
@@ -271,23 +355,17 @@ export default function DappQuickStart () {
   const step = STEPS[currentStep - 1]
   return (
     <Box>
-      <div className='step-action'>
-        {<step.component />}
-        <div>
-          {currentStep < STEPS.length &&
-            !disabledSteps.includes(String(currentStep + 1)) && (
-              <Button
-                onPress={() => {
-                  setCurrentStep(currentStep + 1)
-                }}
-              >
-                Next Step
-              </Button>
-            )}
+      <div className='step-title-bar'>
+        <h3 className='step-title'>
+          <span>SETP {String(currentStep)}</span>
+          {STEPS[currentStep - 1]?.title}
+        </h3>
+        <div className='buttons'>
           {currDapp &&
             completedSteps.includes(0) &&
             completedSteps.includes(1) && (
               <Button
+                className='skip-button'
                 onPress={() => {
                   navigate(`/dapp/${currDapp.id}/index`)
                 }}
@@ -295,31 +373,44 @@ export default function DappQuickStart () {
                 Skip & Start Building
               </Button>
             )}
+          {currentStep < STEPS.length && (
+            <Button
+              className='next-button'
+              isDisabled={disabledSteps.includes(String(currentStep + 1))}
+              onPress={() => {
+                setCurrentStep(currentStep + 1)
+              }}
+            >
+              {`Next Step  >>`}
+            </Button>
+          )}
         </div>
       </div>
-      <div className='step-info'>
-        <RadioGroup
-          className='step-tabs'
-          aria-label='Quick Start Guide'
-          defaultValue='1'
-          value={String(currentStep)}
-          onChange={value => setCurrentStep(Number(value))}
-        >
-          {STEPS.map(item => (
-            <Radio
-              key={item.id}
-              value={String(item.id)}
-              className='step'
-              isDisabled={disabledSteps.includes(String(item.id))}
-            >
-              {item.id}
-            </Radio>
-          ))}
-        </RadioGroup>
-        <div>
-          <img src={STEPS[currentStep - 1]?.icon} alt='' />
-          <h3>{STEPS[currentStep - 1]?.title}</h3>
-          <p>{STEPS[currentStep - 1]?.guideText}</p>
+      <div className='steps-container'>
+        <div className='step-action'>{<step.component />}</div>
+        <div className='step-info'>
+          <RadioGroup
+            className='step-tabs'
+            aria-label='Quick Start Guide'
+            defaultValue='1'
+            value={String(currentStep)}
+            onChange={value => setCurrentStep(Number(value))}
+          >
+            {STEPS.map(item => (
+              <Radio
+                key={item.id}
+                value={String(item.id)}
+                className='step'
+                isDisabled={disabledSteps.includes(String(item.id))}
+              >
+                {item.id}
+              </Radio>
+            ))}
+          </RadioGroup>
+          <div>
+            <img src={STEPS[currentStep - 1]?.icon} alt='' />
+            <p>{STEPS[currentStep - 1]?.guideText}</p>
+          </div>
         </div>
       </div>
     </Box>
@@ -327,16 +418,88 @@ export default function DappQuickStart () {
 }
 
 const Box = styled.main`
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 20px auto;
   width: 100%;
+  max-width: 1200px;
   height: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: start;
   justify-content: center;
   gap: 20px;
+  .step-title-bar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid #39424c;
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      span {
+        background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%),
+          linear-gradient(0deg, #ffffff, #ffffff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        font-style: italic;
+        color: transparent;
+        display: inline-block;
+        padding-right: 5px;
+      }
+    }
+    .buttons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: end;
+      .next-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        gap: 10px;
+        background: linear-gradient(52.42deg, #cd62ff 35.31%, #62aaff 89.64%);
+        padding: 12px 24px 12px 24px;
+        border-radius: 999px;
 
+        //styleName: Text/Medium 16pt · 1rem;
+        font-family: Rubik;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0em;
+        text-align: center;
+        white-space: nowrap;
+        &[data-disabled] {
+          background: #39424c;
+          color: #ffffff;
+        }
+      }
+      .skip-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: black;
+        gap: 10px;
+        background: white;
+        padding: 12px 24px 12px 24px;
+        border-radius: 999px;
+
+        //styleName: Text/Medium 16pt · 1rem;
+        font-family: Rubik;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        letter-spacing: 0em;
+        text-align: center;
+        white-space: nowrap;
+      }
+    }
+  }
   .steps-container {
     display: flex;
     flex-direction: row;
@@ -346,7 +509,7 @@ const Box = styled.main`
   }
   .step-info {
     width: 300px;
-    margin-top: 100px;
+    margin-top: 60px;
     /* height: 600px; */
     display: flex;
     flex-direction: row;
@@ -390,105 +553,25 @@ const Box = styled.main`
     }
   }
   .step-action {
-    width: 800px;
-    height: 600px;
+    width: 900px;
+    max-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
     gap: 20px;
-  }
-`
-
-const DappCreateContainer = styled.div`
-  width: 100%;
-  > div {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    h1 {
-      font-style: italic;
-      font-weight: 700;
-      font-size: 24px;
-      line-height: 28px;
+    > p {
+      width: 100%;
+      padding: 0;
       margin: 0;
-      margin-top: 20px;
-      color: #ffffff;
     }
-
     > div {
-      background: #1b1e23;
-      border-radius: 20px;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 40px;
-      gap: 40px;
-
-      .app-name {
-        display: flex;
-        flex-direction: column;
-
-        > span {
-          font-weight: 500;
-          font-size: 16px;
-          line-height: 24px;
-          margin-bottom: 8px;
-        }
-
-        > input {
-          background: #1a1e23;
-          outline: none;
-          border: 1px solid #39424c;
-          border-radius: 12px;
-          height: 48px;
-          padding: 0px 16px;
-          color: #ffffff;
-          font-weight: 400;
-          font-size: 16px;
-          line-height: 24px;
-        }
-      }
-
-      .btns {
-        display: flex;
-        align-items: center;
-        justify-content: end;
-        gap: 20px;
-
-        button {
-          font-weight: 500;
-          font-size: 16px;
-          line-height: 24px;
-
-          text-align: center;
-
-          width: 120px;
-          background: none;
-          outline: none;
-          border: none;
-          cursor: pointer;
-          border: 1px solid #39424c;
-          border-radius: 24px;
-          height: 48px;
-          &.cancel {
-            background: #1b1e23;
-
-            color: #ffffff;
-          }
-
-          &.create {
-            color: #14171a;
-            background: #ffffff;
-            border-radius: 24px;
-          }
-
-          > img {
-            height: 27px;
-          }
-        }
-      }
+      gap: 20px;
+      box-sizing: border-box;
     }
   }
 `
