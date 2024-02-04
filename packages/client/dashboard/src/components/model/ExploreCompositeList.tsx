@@ -11,12 +11,11 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { bindingDappComposites, getComposites } from '../../api/composite'
-import { updateDapp } from '../../api/dapp'
 import { PAGE_SIZE, S3_SCAN_URL } from '../../constants'
 import { useAppCtx } from '../../context/AppCtx'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import useSelectedDapp from '../../hooks/useSelectedDapp'
-import { CeramicStatus, DappCompositeDto, Network } from '../../types.d'
+import { DappCompositeDto, Network } from '../../types.d'
 import { shortPubKey } from '../../utils/shortPubKey'
 import { TableBox, TableContainer } from '../common/TableBox'
 import CheckCircleIcon from '../icons/CheckCircleIcon'
@@ -26,14 +25,11 @@ import CreateCompositeModal from './CreateNewComposite'
 import { Dapps } from '../model/ExploreModelList'
 import NoCeramicNodeModal from '../node/NoCeramicNodeModal'
 import { startIndexModelsFromBrowser } from '../../utils/composeDBUtils'
+import { updateDapp } from '../../api/dapp'
+import { difference, uniq } from 'lodash'
 
-export function CompositeList ({
-  searchText
-}: {
-  searchText?: string
-}) {
+export function CompositeList ({ searchText }: { searchText?: string }) {
   const { selectedDapp } = useSelectedDapp()
-  const { currCeramicNode } = useCeramicNodeCtx()
   const [composites, setComposites] = useState<Array<DappCompositeDto>>([])
   const [hasMore, setHasMore] = useState(true)
   const pageNum = useRef(1)
@@ -130,20 +126,7 @@ export function CompositeList ({
                     </td>
                     <td>
                       {/* <OpsBtns modelId={item.stream_id} /> */}
-                      <Actions
-                        composite={item}
-                        hasIndexed={
-                          item.dapps?.findIndex(
-                            dapp => dapp.id === selectedDapp?.id
-                          ) !== -1
-                        }
-                        ceramicNodeId={
-                          currCeramicNode &&
-                          currCeramicNode.status === CeramicStatus.RUNNING
-                            ? currCeramicNode?.id
-                            : undefined
-                        }
-                      />
+                      <Actions composite={item} />
                     </td>
                   </tr>
                 )
@@ -157,62 +140,66 @@ export function CompositeList ({
   )
 }
 
-function Actions ({
-  composite,
-  hasIndexed,
-  ceramicNodeId
-}: {
-  composite: DappCompositeDto
-  hasIndexed: boolean
-  ceramicNodeId?: number
-}) {
+function Actions ({ composite }: { composite: DappCompositeDto }) {
   const session = useSession()
   const { currCeramicNode } = useCeramicNodeCtx()
-  const { loadDapps } = useAppCtx()
+  const { loadDapps, loadCurrDapp } = useAppCtx()
   const { selectedDapp } = useSelectedDapp()
   const [adding, setAdding] = useState(false)
 
   const bindComposite = useCallback(async () => {
     if (!session || !selectedDapp) return
     if (!currCeramicNode) return
-    if (!hasIndexed) {
-      bindingDappComposites({
+    try {
+      setAdding(true)
+      const compsiteModels = JSON.parse(composite.composite).models
+      const modelIds = Object.keys(compsiteModels)
+      const dappModels = selectedDapp.models || []
+      const newModels = difference(modelIds,dappModels)
+      if (newModels.length > 0) {
+        console.log('start indexing new models in composite on private node')
+        startIndexModelsFromBrowser(
+          modelIds,
+          selectedDapp.network,
+          currCeramicNode.serviceUrl + '/',
+          currCeramicNode.privateKey
+        ).then((result) => {
+          console.log('indexd models on private node:', result)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+        console.log('store new models in composite of dapp to server')
+        const models = uniq([...dappModels, ...newModels])
+        await updateDapp(
+          { ...selectedDapp, models },
+          session.serialize()
+          // ceramicNodeId
+        )
+      }
+      console.log('store composite of dapp to server')
+      await bindingDappComposites({
         compositeId: composite.id,
         dapp: selectedDapp,
         did: session.serialize()
       })
-      .then(
-        () => {
-          const models = JSON.parse(composite.composite).models
-          const modelIds = Object.keys(models)
-          startIndexModelsFromBrowser(
-            modelIds,
-            selectedDapp.network,
-            currCeramicNode.serviceUrl + '/',
-            currCeramicNode.privateKey
-          )
-        },
-        err => {
-          console.error(err)
-        }
-      )
-      .catch(console.error)
-    }
-    try {
-      setAdding(true)
-      const composites = selectedDapp.composites || []
-      composites.push(composite)
-      await updateDapp(
-        { ...selectedDapp, composites },
-        session.serialize(),
-      )
+      console.log('reload dapps')
       await loadDapps()
+      await loadCurrDapp()
     } catch (err) {
       console.error(err)
     } finally {
       setAdding(false)
     }
-  }, [session, selectedDapp, currCeramicNode, hasIndexed, composite, loadDapps])
+  }, [
+    session,
+    selectedDapp,
+    currCeramicNode,
+    composite.id,
+    composite.composite,
+    loadDapps,
+    loadCurrDapp
+  ])
   return (
     <OpsBox>
       <DialogTrigger>
@@ -240,18 +227,14 @@ function Actions ({
         </button>
       ) : (
         <>
-          {hasIndexed ? (
-            <button disabled>
+          {selectedDapp?.composites?.map(c=>c.id).includes(composite.id) ? (
+            <button disabled title='This composite has been added to Dapp'>
               <CheckCircleIcon />
             </button>
-          ) : ceramicNodeId ? (
+          ) : currCeramicNode ? (
             <button
-              disabled={!ceramicNodeId}
-              title={
-                ceramicNodeId
-                  ? 'Add this model to Dapp'
-                  : 'There is no available node now, Deploy a private node first!'
-              }
+              disabled={!currCeramicNode}
+              title='Add this model to Dapp'
               onClick={() => {
                 bindComposite()
               }}

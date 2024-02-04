@@ -11,11 +11,12 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styled from 'styled-components'
 import { updateDapp } from '../../api/dapp'
-import { CERAMIC_MAINNET_HOST, CERAMIC_TESTNET_HOST, PAGE_SIZE } from '../../constants'
 import {
-  getModelStreamList,
-  getModelsInfoByIds,
-} from '../../api/model'
+  CERAMIC_MAINNET_HOST,
+  CERAMIC_TESTNET_HOST,
+  PAGE_SIZE
+} from '../../constants'
+import { getModelStreamList, getModelsInfoByIds } from '../../api/model'
 import { ImgOrName } from '../common/ImgOrName'
 import { TableBox, TableContainer } from '../common/TableBox'
 import CheckCircleIcon from '../icons/CheckCircleIcon'
@@ -56,7 +57,7 @@ export default function ModelList ({
     }
     return new S3ModelCollectionModel(CERAMIC_TESTNET_HOST, 'testnet')
   }, [selectedDapp])
-  
+
   const fetchPersonalCollections = useCallback(async () => {
     if (!session || !s3ModelCollection) return
     try {
@@ -263,7 +264,6 @@ export default function ModelList ({
                       {/* <OpsBtns modelId={item.stream_id} /> */}
                       <Actions
                         stream_id={item.stream_id}
-                        hasIndexed={false}
                         hasStarItem={hasStarItem}
                         fetchPersonal={fetchPersonalCollections}
                       />
@@ -361,12 +361,10 @@ const DappBox = styled.div`
 `
 
 function Actions ({
+  stream_id,
   hasStarItem,
   fetchPersonal,
-  stream_id,
-  hasIndexed,
 }: {
-  hasIndexed: boolean
   stream_id: string
   hasStarItem:
     | {
@@ -396,29 +394,30 @@ function Actions ({
     async (modelId: string) => {
       if (!session || !selectedDapp) return
       if (!currCeramicNode) return
-      console.log('currCeramicNode', currCeramicNode, hasIndexed)
-      if (!hasIndexed) {
-        // await startIndexModel({
-        //   modelId,
-        //   network: selectedDapp.network as Network,
-        //   didSession: session.serialize()
-        // }).catch(console.error)
-        await startIndexModelsFromBrowser(
-          [modelId],
-           selectedDapp.network as Network,
-           currCeramicNode.serviceUrl + '/',
-           currCeramicNode.privateKey,
-           )
-      }
+      const models = selectedDapp.models || []
+      if (models.includes(modelId)) return
+      setAdding(true)
       try {
-        setAdding(true)
-        const models = selectedDapp.models || []
+        console.log('start indexing on private node')
+        startIndexModelsFromBrowser(
+          [modelId],
+          selectedDapp.network as Network,
+          currCeramicNode.serviceUrl + '/',
+          currCeramicNode.privateKey
+        ).then((result) => {
+          console.log('indexd models on private node:', result)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+        console.log('store models of dapp to server')
         models.push(modelId)
         await updateDapp(
           { ...selectedDapp, models },
-          session.serialize(),
+          session.serialize()
           // ceramicNodeId
         )
+        console.log('reload dapps')
         await loadDapps()
         await loadCurrDapp()
       } catch (err) {
@@ -427,7 +426,13 @@ function Actions ({
         setAdding(false)
       }
     },
-    [session, selectedDapp, hasIndexed, loadDapps, loadCurrDapp,currCeramicNode]
+    [
+      session,
+      selectedDapp,
+      loadDapps,
+      loadCurrDapp,
+      currCeramicNode
+    ]
   )
 
   const collectModel = useCallback(
@@ -496,17 +501,12 @@ function Actions ({
       ) : (
         <>
           {selectedDapp?.models?.includes(modelId) ? (
-            <button disabled>
+            <button disabled  title='This model has been added to Dapp'>
               <CheckCircleIcon />
             </button>
           ) : currCeramicNode ? (
             <button
-              disabled={!currCeramicNode}
-              title={
-                currCeramicNode
-                  ? 'Add this model to Dapp'
-                  : 'There is no available node now, Deploy a private node first!'
-              }
+              title='Add this model to Dapp'
               onClick={() => {
                 addModelToDapp(modelId)
               }}
