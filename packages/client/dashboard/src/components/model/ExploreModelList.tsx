@@ -361,9 +361,9 @@ const DappBox = styled.div`
 `
 
 function Actions ({
+  stream_id,
   hasStarItem,
   fetchPersonal,
-  stream_id,
 }: {
   stream_id: string
   hasStarItem:
@@ -394,21 +394,30 @@ function Actions ({
     async (modelId: string) => {
       if (!session || !selectedDapp) return
       if (!currCeramicNode) return
+      const models = selectedDapp.models || []
+      if (models.includes(modelId)) return
       setAdding(true)
       try {
-        await startIndexModelsFromBrowser(
+        console.log('start indexing on private node')
+        startIndexModelsFromBrowser(
           [modelId],
           selectedDapp.network as Network,
           currCeramicNode.serviceUrl + '/',
           currCeramicNode.privateKey
-        )
-        const models = selectedDapp.models || []
+        ).then((result) => {
+          console.log('indexd models on private node:', result)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+        console.log('store models of dapp to server')
         models.push(modelId)
         await updateDapp(
           { ...selectedDapp, models },
           session.serialize()
           // ceramicNodeId
         )
+        console.log('reload dapps')
         await loadDapps()
         await loadCurrDapp()
       } catch (err) {
@@ -492,17 +501,12 @@ function Actions ({
       ) : (
         <>
           {selectedDapp?.models?.includes(modelId) ? (
-            <button disabled>
+            <button disabled  title='This model has been added to Dapp'>
               <CheckCircleIcon />
             </button>
           ) : currCeramicNode ? (
             <button
-              disabled={!currCeramicNode}
-              title={
-                currCeramicNode
-                  ? 'Add this model to Dapp'
-                  : 'There is no available node now, Deploy a private node first!'
-              }
+              title='Add this model to Dapp'
               onClick={() => {
                 addModelToDapp(modelId)
               }}
