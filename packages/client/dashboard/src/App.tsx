@@ -3,9 +3,9 @@ import { ProfileStateProvider } from '@us3r-network/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useEffect, useState } from 'react'
-import { Radio, RadioGroup } from 'react-aria-components'
+// import { Radio, RadioGroup } from 'react-aria-components'
 import {
-  NavLink,
+  // NavLink,
   Outlet,
   Route,
   Routes,
@@ -171,25 +171,25 @@ function BuildLayout () {
   const [selectModel, setSelectModel] = useState<ModelStream>()
   const [selectComposite, setSelectComposite] = useState<DappCompositeDto>()
   const { pathname } = useLocation()
-  const defaultKey = pathname.split('/build/')[1]
-  const PAGES = [
-    {
-      id: 'editor',
-      label: 'Editor'
-    },
-    {
-      id: 'playground',
-      label: 'Playground'
-    },
-    {
-      id: 'sdk',
-      label: 'SDK'
-    },
-    {
-      id: 'metrics',
-      label: 'Metrics'
-    }
-  ]
+  // const defaultKey = pathname.split('/build/')[1]
+  // const PAGES = [
+  //   {
+  //     id: 'editor',
+  //     label: 'Editor'
+  //   },
+  //   {
+  //     id: 'playground',
+  //     label: 'Playground'
+  //   },
+  //   {
+  //     id: 'sdk',
+  //     label: 'SDK'
+  //   },
+  //   {
+  //     id: 'metrics',
+  //     label: 'Metrics'
+  //   }
+  // ]
   return (
     <LayoutContainer>
       <DappModelAndComposites
@@ -212,7 +212,7 @@ function BuildLayout () {
             selectComposite
           }}
         />
-        <RadioGroup
+        {/* <RadioGroup
           className='tabs'
           aria-label='Build'
           defaultValue={defaultKey}
@@ -222,33 +222,33 @@ function BuildLayout () {
               <NavLink to={page.id}>{page.label}</NavLink>
             </Radio>
           ))}
-        </RadioGroup>
+        </RadioGroup> */}
       </div>
     </LayoutContainer>
   )
 }
 
 function ExploreLayout () {
-  const { pathname } = useLocation()
-  const defaultKey = pathname.split('/explore/')[1]
-  const PAGES = [
-    {
-      id: 'model',
-      label: 'Models'
-    },
-    {
-      id: 'composite',
-      label: 'Composites'
-    },
-    {
-      id: 'components',
-      label: 'Components'
-    }
-  ]
+  // const { pathname } = useLocation()
+  // const defaultKey = pathname.split('/explore/')[1]
+  // const PAGES = [
+  //   {
+  //     id: 'model',
+  //     label: 'Models'
+  //   },
+  //   {
+  //     id: 'composite',
+  //     label: 'Composites'
+  //   },
+  //   {
+  //     id: 'components',
+  //     label: 'Components'
+  //   }
+  // ]
   return (
     <LayoutContainer>
       <Outlet />
-      <RadioGroup
+      {/* <RadioGroup
         className='tabs'
         aria-label='Explore'
         defaultValue={defaultKey}
@@ -258,7 +258,7 @@ function ExploreLayout () {
             <NavLink to={page.id}>{page.label}</NavLink>
           </Radio>
         ))}
-      </RadioGroup>
+      </RadioGroup> */}
     </LayoutContainer>
   )
 }

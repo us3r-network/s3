@@ -4,20 +4,21 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useCeramicNodeCtx } from '../../context/CeramicNodeCtx'
 import { getRuntimeDefinitionFromEncodedComposite } from '../../utils/composeDBUtils'
-import { schemas } from '../../utils/composedb-types/schemas'
 import CodeDownload from './CodeDownload'
 
 export default function CompositeEditor ({
   schema,
+  library,
   encodedDefinition
 }: {
   schema?: string
+  library?: string
   encodedDefinition: string
 }) {
   const { currCeramicNode } = useCeramicNodeCtx()
   const [gqlSchema, setGqlSchema] = useState<PassedSchema>({
     code: schema || '',
-    libraries: schemas.library
+    libraries: library || ''
   })
 
   const [runtimeDefinition, setRuntimeDefinition] = useState<RuntimeCompositeDefinition|null>(null)
@@ -39,9 +40,9 @@ export default function CompositeEditor ({
   useEffect(() => {
     setGqlSchema({
       code: schema || '',
-      libraries: schemas.library
+      libraries: library || ''
     })
-  }, [schema])
+  }, [library, schema])
 
   return (
     <Box>
