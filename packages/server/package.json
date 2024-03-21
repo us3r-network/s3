@@ -67,7 +67,6 @@
     "@self.id/core": "^0.4.0",
     "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^8.5.0",
-    "better-sqlite3": "^7.1.2",
     "class-transformer": "^0.3.2",
     "class-validator": "^0.13.1",
     "cors": "^2.8.5",
@@ -87,7 +86,6 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.8.1",
-    "sqlite3": "^5.0.1",
     "swagger-ui-express": "^4.4.0",
     "typeorm": "^0.2.31",
     "uint8arrays": "^4.0.3"
