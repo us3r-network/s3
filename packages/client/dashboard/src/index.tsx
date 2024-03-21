@@ -1,19 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 
-import './index.css'
-import './styles/tab.css'
-import './styles/playground.css'
-import './styles/menu.css'
-import './styles/checkbox.css'
-import './styles/prism-vsc-dark-plus.css'
+import './styles/index.css'
+import './styles/react-aria/index.css'
 
 import '@graphiql/plugin-explorer/dist/style.css'
 import 'graphiql/graphiql.css'
+import './styles/prism-vsc-dark-plus.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(

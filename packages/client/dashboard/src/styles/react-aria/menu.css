@@ -1,0 +1,103 @@
+  .react-aria-Menu {
+    --highlight-background: #14171a;
+    --highlight-foreground: white;
+    --separator-color: var(--spectrum-global-color-gray-500);
+    --text-color: var(--spectrum-alias-text-color);
+    --text-color-disabled: var(--spectrum-alias-text-color-disabled);
+  
+    max-height: inherit;
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 2px;
+    margin: 0;
+    min-width: 150px;
+    box-sizing: border-box;
+    outline: none;
+  
+    .react-aria-Section:not(:first-child) {
+      margin-top: 12px;
+    }
+  
+    .react-aria-Header {
+      font-size: 1.143rem;
+      font-weight: bold;
+      padding: 0 0.714rem;
+    }
+  
+    [role=separator] {
+      height: 1px;
+      background: var(--separator-color);
+      margin: 2px 4px;
+    }
+  
+    .react-aria-MenuItem {
+      margin: 2px;
+      padding: 10px;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+      color: var(--text-color);
+      font-size: 1.072rem;
+      position: relative;
+      display: grid;
+      grid-template-areas: "label kbd"
+                          "desc  kbd";
+      align-items: center;
+      column-gap: 20px;
+  
+      &[data-focused] {
+        background: var(--highlight-background);
+        color: var(--highlight-foreground);
+      }
+  
+      &[aria-disabled] {
+        color: var(--text-color-disabled);
+      }
+  
+      [slot=label] {
+        font-weight: bold;
+        grid-area: label;
+      }
+  
+      [slot=description] {
+        font-size: small;
+        grid-area: desc;
+      }
+  
+      & kbd {
+        grid-area: kbd;
+        font-family: monospace;
+        text-align: end;
+      }
+  
+      &[aria-checked] {
+        padding-left: 24px;
+
+      }
+    }
+  }
+  
+  
+  @keyframes slide {
+    from {
+      transform: var(--origin);
+      opacity: 0;
+    }
+  
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @media (forced-colors: active) {
+    .react-aria-Menu {
+      forced-color-adjust: none;
+  
+      --highlight-background: Highlight;
+      --highlight-foreground: HighlightText;
+      --separator-color: ButtonBorder;
+      --text-color: ButtonText;
+      --text-color-disabled: GrayText;
+    }
+  }

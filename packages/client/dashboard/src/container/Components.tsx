@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import ChevronRightDouble from '../components/Icons/ChevronRightDouble'
+import ChevronRightDouble from '../components/icons/ChevronRightDouble'
 import { DOCS_URL } from '../constants'
 
 const pkgs = [
@@ -70,7 +70,6 @@ export default function Components() {
 }
 
 const Box = styled.div`
-  margin: 25px 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -110,7 +109,7 @@ const BannerDesc = styled.ul`
 
   font-weight: 500;
   font-size: 18px;
-  line-height: 21px;
+  line-height: 24px;
 
   color: #ffffff;
 

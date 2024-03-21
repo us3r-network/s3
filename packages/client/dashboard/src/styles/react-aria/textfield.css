@@ -1,0 +1,13 @@
+/* TextField */
+.react-aria-TextField {
+  margin-bottom: 8px;
+
+  .react-aria-Label {
+    display: inline-block;
+    width: 5.357rem;
+  }
+
+  .react-aria-Input {
+    font-size: 16px;
+  }
+}

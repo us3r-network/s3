@@ -1,9 +1,102 @@
+/*
+ * @Author: bufan bufan@hotmail.com
+ * @Date: 2023-12-15 10:06:03
+ * @LastEditors: bufan bufan@hotmail.com
+ * @LastEditTime: 2023-12-27 16:19:42
+ * @FilePath: /s3/packages/client/dashboard/src/types.d.ts
+ * @Description: 
+ */
+
+/************************ App ******************************/
+export enum Stage {
+  DEVELOPMENT = 'Under development',
+  NOT_RELEASE = 'Completed but not released',
+  RELEASE = 'Completed and released',
+}
+
+export enum Network {
+  MAINNET = 'Mainnet',
+  TESTNET = 'Testnet',
+}
+
+export enum AppType {
+  GAME = 'Game',
+  SOCIAL = 'Social',
+  MARKETPLACE = 'Marketplace',
+  TOOL = 'Tool',
+  DEFI = 'DeFi',
+  OTHER = 'Other',
+}
+
+export type DappCompositeDto = {
+  id: number;
+  dappId?: number;
+  name: string;
+  composite: string;
+  graphql: string;
+  streamId: string;
+  runtimeDefinition: string;
+  dapps: DappDto[];
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type CompositeInput = {
+  name: string;
+  composite: string;
+  graphql: string;
+  streamId?: string;
+  runtimeDefinition?: string;
+}
+// export type DappComposite = {
+//   id: number
+//   name: string
+//   dappId: number
+//   graphql: string
+//   composite: string
+//   runtimeDefinition: string
+//   createdAt: number
+//   lastModifiedAt: number
+// }
+
+export type DappModelDto = {
+  id: number;
+  dappId: number;
+  mdoelStreamId: string;
+  composite: string;
+  graphql: string;
+  runtimeDefinition: string;
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type DappDto = {
+  id: number;
+  name: string;
+  description: string;
+  stage: string;
+  type: string;
+  network: Network;
+  icon: string;
+  url: string;
+  socialLinks: SocialLink[];
+  tags: string[];
+  models: string[];
+  composites: DappCompositeDto[];
+  schemas: string[];
+  modelDetails: any[];
+  ceramicId?: number;
+  schemaDetails: any[];
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
 export type ClientDApp = {
   id?: number
-  modelId?: string
+  // modelId?: string
   icon?: string
   name: string
-  network: string
+  network: Network
   type?: string
   stage?: string
   url?: string
@@ -11,17 +104,90 @@ export type ClientDApp = {
   socialLinks?: { platform: string; url: string }[]
   tags?: string[]
   models?: string[]
+  modelDetails?: ModelStream[]
+  composites?: DappCompositeDto[];
   createdAt?: number
   lastModifiedAt?: number
+}
+/************************ Account ******************************/
+export enum AccountType {
+  EMAIL = 'email',
+  ALL = 'all',
+}
+/************************ Node ******************************/
+export type CeramicDto = {
+  id: number;
+  name: string;
+  network: CeramicNetwork;
+  status: CeramicStatus;
+  privateKey: string;
+  apiKey: string;
+  namespace: string;
+  serviceHost: string;
+  serviceUrl: string;
+  serviceK8sMetadata: CeramicServiceK8sMetadata;
+  createdAt: number;
+  lastModifiedAt: number;
+}
+
+export type CeramicRequestDto = {
+  name: string;
+  network: CeramicNetwork;
+  ceramicDbType?: CeramicDBType;
+  ceramicEnableHistoricalSync?: boolean;
+}
+
+export enum CeramicDBType {
+  SQLITE = 'sqlite',
+  PGSQL = 'postgres',
+}
+
+export enum CeramicNetwork {
+  MAINNET = 'mainnet',
+  TESTNET = 'testnet-clay',
+  ALL = 'all',
+}
+
+export enum CeramicStatus {
+  PREPARING = 'Preparing',
+  STARTING = 'Starting',
+  RUNNING = 'Running',
+  // PAUSE = 'Pause',
+  // RESUMING = 'Resuming',
+  TERMINATE = 'Terminate',
+  FAILED = 'Failed',
+  ALL = 'All',
+}
+
+export type CeramicServiceK8sMetadata = {
+  // k8s namespace is created by `ns_${creater_did}_${id}`
+  keramikObjectName: string;
+  ceramicLoadbalanceHost: string;
+  ceramicLoadbalancePort: number;
+  ceramicDbType: CeramicDBType;
+  ceramicEnableHistoricalSync: boolean;
+}
+
+/************************ Model ******************************/
+export enum GraphqlGenType {
+  CLIENT_PRESET = 'Client preset',
+  REACT_QUERY_HOOKS = 'React-Query Hooks',
+  REACT_APOLLO_HOOKS = 'React-Apollo Hooks',
+}
+
+export enum GraphqlGenTypeServer {
+  'Client preset' = 'ClientPreset',
+  'React-Query Hooks' = 'ReactQueryHooks',
+  'React-Apollo Hooks' = 'ReactApolloHooks',
 }
 
 export type ModelStream = {
   stream_id: string
   controller_did: string
   tip: string
-  streamContent: {
-    name: string
-  }
+  // streamContent: {
+  //   name: string
+  // }
   stream_content: {
     name: string
     description: string | null
@@ -51,6 +217,7 @@ export type ModelStream = {
   recentlyUseCount?: number
   firstRecordTime?: string
   isIndexed?: boolean
+  dapps?: ClientDApp[]
 }
 
 export type ModeCreateResult = {
@@ -71,15 +238,4 @@ export type ModelMid = {
   controllerDid: string
   createdAt: number
   updatedAt: number
-}
-
-export type DappComposite = {
-  id: number
-  name: string
-  dappId: number
-  graphql: string
-  composite: string
-  runtimeDefinition: string
-  createdAt: number
-  lastModifiedAt: number
 }

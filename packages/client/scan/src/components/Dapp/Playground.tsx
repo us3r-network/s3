@@ -17,7 +17,6 @@ import { RuntimeCompositeDefinition } from '@composedb/types'
 
 import 'graphiql/graphiql.css'
 import '../../styles/playground.css'
-import { useParams } from 'react-router-dom'
 import { queryModelGraphql } from '../../api'
 import { AxiosError } from 'axios'
 import styled from 'styled-components'
@@ -158,7 +157,7 @@ export default function PlaygroundGraphiQL(
           network === Network.MAINNET
             ? CERAMIC_MAINNET_HOST
             : CERAMIC_TESTNET_HOST,
-        definition: definition as RuntimeCompositeDefinition,
+        definition: definition as unknown as RuntimeCompositeDefinition,
       }),
     [definition, network]
   )

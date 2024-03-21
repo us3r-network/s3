@@ -1,15 +1,14 @@
+import { useSession } from '@us3r-network/auth-with-rainbowkit'
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useState
 } from 'react'
-
-import { useSession } from '@us3r-network/auth-with-rainbowkit'
-import { ClientDApp } from '../types'
-import { getDapp, getDappWithDid } from '../api'
+import { getDapp, getDappWithDid } from '../api/dapp'
 import { useGuideStepsState } from '../hooks/useGuideSteps'
+import { ClientDApp } from '../types.d'
 
 export type PersonalCollection = {
   modelId: string
@@ -23,13 +22,14 @@ export interface AppContextData {
   currAppId: string
   setCurrAppId: React.Dispatch<React.SetStateAction<string>>
   loadDapps: () => Promise<void>
+  loadCurrDapp: () => Promise<void>
   guideSteps: ReturnType<typeof useGuideStepsState>
 }
 
 const AppContext = createContext<AppContextData | null>(null)
 
-export default function AppProvider({
-  children,
+export default function AppProvider ({
+  children
 }: {
   children: React.ReactNode
 }) {
@@ -94,8 +94,9 @@ export default function AppProvider({
         currAppId,
         setCurrAppId,
         loadDapps,
+        loadCurrDapp,
         loadingDApps: loadingDApps || loadingDApp,
-        guideSteps,
+        guideSteps
       }}
     >
       {children}
@@ -103,12 +104,12 @@ export default function AppProvider({
   )
 }
 
-export function useAppCtx() {
+export function useAppCtx () {
   const context = useContext(AppContext)
   if (!context) {
     throw new Error('Missing connection context')
   }
   return {
-    ...context,
+    ...context
   }
 }

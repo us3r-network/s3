@@ -4,7 +4,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Network } from './entities/stream/stream.entity';
-import CeramicSubscriberService from './stream/ceramic.subscriber.service';
+import CeramicSubscriberService from './stream/subscriber/ceramic.subscriber.service';
+import HistorySyncService from './stream/sync/history-sync.service';
 
 async function bootstrap() {
   // init the apm
@@ -24,10 +25,17 @@ async function bootstrap() {
 
   await app.listen(3000);
 
-  const ceramicSubscriberService = app.get(CeramicSubscriberService);
-
-  // Sub ceramic test network.
+  // Sync and subscribe to ceramic.
   if (!process.env.DISABLE_P2P_SUB){
+    const ceramicSubscriberService = app.get(CeramicSubscriberService);
+    await ceramicSubscriberService.initJobQueue();
+
+    // Sync history data from ceramic.
+    const historySyncService = app.get(HistorySyncService);
+    await historySyncService.init(ceramicSubscriberService.jobQueue);
+    await historySyncService.startHistorySync();
+
+    // Subsciber ceramic test network.
     await ceramicSubscriberService.subCeramic(
       Network.TESTNET,
       [
@@ -37,10 +45,9 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/20000/ws'],
       '/ceramic/testnet-clay',
-      'http://34.92.232.17:7007/',
     );
   
-    // Sub ceramic main network.
+    // Subsciber ceramic main network.
     await ceramicSubscriberService.subCeramic(
       Network.MAINNET,
       [
@@ -49,7 +56,6 @@ async function bootstrap() {
       ],
       ['/ip4/127.0.0.1/tcp/30000/ws'],
       '/ceramic/mainnet',
-      'http://35.220.227.2:7007/',
     );
   }
 }

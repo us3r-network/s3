@@ -1,19 +1,16 @@
-import styled from 'styled-components'
-import { Button, Dialog, DialogTrigger, Modal } from 'react-aria-components'
-
-import useSelectedDapp from '../hooks/useSelectedDapp'
-
-import DappTitleEditor from '../components/DappTitleEditor'
-import DappSocialEditor from '../components/DappSocialEditor'
 import { useCallback, useMemo, useState } from 'react'
-import CopyIcon from '../components/Icons/CopyIcon'
-
-import DelConfirmModal from '../components/DelDappConfirmModal'
+import { Button, Dialog, DialogTrigger, Modal } from 'react-aria-components'
 import { useNavigate } from 'react-router-dom'
-import { createImageFromInitials } from '../utils/createImage'
-import { getRandomColor } from '../utils/randomColor'
+import styled from 'styled-components'
+import DappSocialEditor from '../components/dapp/DappSocialEditor'
+import DappTitleEditor from '../components/dapp/DappTitleEditor'
+import DelConfirmModal from '../components/dapp/DelDappConfirmModal'
+import CopyIcon from '../components/icons/CopyIcon'
 import { useAppCtx } from '../context/AppCtx'
 import useIsOwner from '../hooks/useIsOwner'
+import useSelectedDapp from '../hooks/useSelectedDapp'
+import { createImageFromInitials } from '../utils/createImage'
+import { getRandomColor } from '../utils/randomColor'
 
 export default function DappInfo() {
   const { selectedDapp } = useSelectedDapp()

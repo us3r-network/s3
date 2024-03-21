@@ -10,20 +10,26 @@ import 'dotenv/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { DappModule } from './dapp/dapp.module';
+import { S3SeverBizDbName } from './common/constants';
 
 const env: string | undefined = process.env.NODE_ENV;
-
+function scheduleModule() {
+  if (process.env.SCHEDULED) {
+    return [ScheduleModule.forRoot()];
+  }
+  return [];
+}
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      name: 's3-server-db',
+      name: S3SeverBizDbName,
       port: 5432,
       host: process.env.DATABASE_HOST,
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
       logging: false,
-      entities: ['dist/**/dapp.entity{.ts,.js}'],
+      entities: ['dist/**/dapp.entity{.ts,.js}', 'dist/**/stream.entity{.ts,.js}'],
       type: 'postgres',
       pool: {
         max: 70,
@@ -95,8 +101,7 @@ const env: string | undefined = process.env.NODE_ENV;
         url: process.env.REDIS_URL,
       },
     }),
-    ScheduleModule.forRoot(),
-  ],
+  ].concat(scheduleModule()),
   controllers: [],
   providers: [
     {
@@ -105,4 +110,5 @@ const env: string | undefined = process.env.NODE_ENV;
     },
   ],
 })
-export class AppModule {}
+
+export class AppModule { }

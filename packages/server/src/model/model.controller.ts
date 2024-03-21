@@ -244,7 +244,6 @@ export class ModelController {
         if (!useCount) {
           useCountMap.set(m, 0);
         }
-        this.logger.log(`model ${m} usecount: ${useCountMap.get(m)}`);
       });
       this.logger.log(`${network} model usecount size: ${useCountMap.size}`);
       await this.modelService.updateModelUseCount(network, useCountMap);

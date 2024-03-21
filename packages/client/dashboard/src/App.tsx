@@ -1,78 +1,96 @@
-import { Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
-import styled from 'styled-components'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { Us3rAuthWithRainbowkitProvider } from '@us3r-network/auth-with-rainbowkit'
 import { ProfileStateProvider } from '@us3r-network/profile'
-
-import { useAppCtx } from './context/AppCtx'
-
-import MyDapps from './container/MyDapps'
-import NoMatch from './container/NoMatch'
-import CeramicProvider from './context/AppCtx'
-import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
-import DappHome from './container/DappHome'
-import DappCreate from './container/DappCreate'
-import Header from './components/Header'
-import Nav from './components/Nav'
-import DappInfo from './container/DappInfo'
-import ExploreModel from './container/ExploreModel'
-
-import DappModelEditor from './container/DappModelEditor'
-import DappModelPlayground from './container/DappModelPlayground'
-import DappDataStatistic from './container/DappDataStatistic'
-import Components from './container/Components'
-
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { useEffect, useState } from 'react'
-import ModelList from './components/ModelList'
-import { DappComposite, ModelStream } from './types'
+// import { Radio, RadioGroup } from 'react-aria-components'
+import {
+  // NavLink,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams
+} from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
-import DappModelSdk from './container/DappModelSdk'
+import styled from 'styled-components'
+import DappModelAndComposites from './components/model/DappModelAndComposites'
+import Header from './components/nav/Header'
+import Nav from './components/nav/Nav'
+import { CERAMIC_TESTNET_HOST, WALLET_CONNECT_PROJECT_ID } from './constants'
+import CeramicNodes from './container/CeramicNodes'
+import Components from './container/Components'
+import DappEditor from './container/DappEditor'
+import DappHome from './container/DappHome'
+import DappInfo from './container/DappInfo'
+import DappMetrics from './container/DappMetrics'
+import DappPlayground from './container/DappPlayground'
+import DappCreate from './container/DappQuickStart'
+import DappSdk from './container/DappSdk'
+import ExploreComposite from './container/ExploreComposite'
+import ExploreModel from './container/ExploreModel'
+import MyDapps from './container/MyDapps'
+import NoMatch from './container/NoMatch'
+import AppProvider, { useAppCtx } from './context/AppCtx'
+import CeramicNodeProvider from './context/CeramicNodeCtx'
+import { DappCompositeDto, ModelStream } from './types.d'
 
 dayjs.extend(relativeTime)
 
-function Routers() {
+function Routers () {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route path='/' element={<Layout />}>
         <Route index element={<MyDapps />} />
-        <Route path="dapp/create" element={<DappCreate />} />
-        <Route path="dapp/:appId" element={<DappLayout />}>
-          <Route path="index" element={<DappHome />} />
-          <Route element={<ModelEditorLayout />}>
-            <Route path="model-editor" element={<DappModelEditor />} />
-            <Route path="model-playground" element={<DappModelPlayground />} />
-            <Route path="model-sdk" element={<DappModelSdk />} />
-            <Route path="statistic" element={<DappDataStatistic />} />
+        <Route path='dapp/create' element={<DappCreate />} />
+        <Route path='dapp/:appId' element={<DappLayout />}>
+          <Route path='index' element={<DappHome />} />
+          <Route path='explore' element={<ExploreLayout />}>
+            <Route path='model' element={<ExploreModel />} />
+            <Route path='composite' element={<ExploreComposite />} />
+            <Route path='components' element={<Components />} />
           </Route>
-          <Route path="info" element={<DappInfo />} />
-          <Route path="explore" element={<ExploreModel />} />
-          <Route path="favorite" element={<ExploreModel />} />
-          <Route path="components" element={<Components />} />
+          <Route path='build' element={<BuildLayout />}>
+            <Route path='editor' element={<DappEditor />} />
+            <Route path='playground' element={<DappPlayground />} />
+            <Route path='sdk' element={<DappSdk />} />
+            <Route path='metrics' element={<DappMetrics />} />
+          </Route>
+          <Route path='info' element={<DappInfo />} />
+          <Route path='node' element={<CeramicNodes />} />
         </Route>
       </Route>
-      <Route path="*" element={<NoMatch />} />
+      <Route path='*' element={<NoMatch />} />
     </Routes>
   )
 }
 
-export default function App() {
+export default function App () {
   return (
     <Us3rAuthWithRainbowkitProvider
       projectId={WALLET_CONNECT_PROJECT_ID}
-      appName="S3 Console"
+      appName='S3 Console'
+      authOpts={{
+        resources: [
+          'ceramic://*',
+          'ceramic://*?model=kh4q0ozorrgaq2mezktnrmdwleo1d'
+        ],
+        expirationTime: ''
+      }}
     >
       <ProfileStateProvider ceramicHost={CERAMIC_TESTNET_HOST}>
-        <CeramicProvider>
-          <Routers />
-        </CeramicProvider>
+        <CeramicNodeProvider>
+          <AppProvider>
+            <Routers />
+          </AppProvider>
+        </CeramicNodeProvider>
       </ProfileStateProvider>
     </Us3rAuthWithRainbowkitProvider>
   )
 }
 
-function Layout() {
+function Layout () {
   return (
     <div>
       <Header />
@@ -80,7 +98,7 @@ function Layout() {
         <Outlet />
       </AppContainer>
       <ToastContainer
-        position="top-right"
+        position='top-right'
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -89,13 +107,13 @@ function Layout() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme='dark'
       />
     </div>
   )
 }
 
-function DappLayout() {
+function DappLayout () {
   const { loadingDApps, setCurrAppId } = useAppCtx()
   const { appId } = useParams()
 
@@ -105,52 +123,21 @@ function DappLayout() {
 
   if (!appId || loadingDApps) {
     return (
-      <main className="container">
-        <div className="login-first">
-          <img src="/loading.gif" alt="" />
+      <main className='container'>
+        <div className='login-first'>
+          <img src='/loading.gif' alt='' />
         </div>
       </main>
     )
   }
 
   return (
-    <main className="container">
+    <main className='container'>
       <Nav appId={appId} />
       <div>
         <Outlet />
       </div>
     </main>
-  )
-}
-
-function ModelEditorLayout() {
-  const [selectModel, setSelectModel] = useState<ModelStream>()
-  const [selectComposite, setSelectComposite] = useState<DappComposite>()
-
-  const { pathname } = useLocation()
-
-  return (
-    <EditorLayoutContainer>
-      <ModelList
-        selectModel={selectModel}
-        setSelectModel={(data) => {
-          setSelectModel(data)
-          setSelectComposite(undefined)
-        }}
-        setSelectComposite={(data) => {
-          setSelectModel(undefined)
-          setSelectComposite(data)
-        }}
-        selectComposite={selectComposite}
-        editable={pathname.includes('model-editor')}
-      />
-      <Outlet
-        context={{
-          selectModel,
-          selectComposite,
-        }}
-      />
-    </EditorLayoutContainer>
   )
 }
 
@@ -180,30 +167,170 @@ const AppContainer = styled.div`
   }
 `
 
-const EditorLayoutContainer = styled.div`
-  margin-top: 25px;
-  margin-bottom: 25px;
+function BuildLayout () {
+  const [selectModel, setSelectModel] = useState<ModelStream>()
+  const [selectComposite, setSelectComposite] = useState<DappCompositeDto>()
+  const { pathname } = useLocation()
+  // const defaultKey = pathname.split('/build/')[1]
+  // const PAGES = [
+  //   {
+  //     id: 'editor',
+  //     label: 'Editor'
+  //   },
+  //   {
+  //     id: 'playground',
+  //     label: 'Playground'
+  //   },
+  //   {
+  //     id: 'sdk',
+  //     label: 'SDK'
+  //   },
+  //   {
+  //     id: 'metrics',
+  //     label: 'Metrics'
+  //   }
+  // ]
+  return (
+    <LayoutContainer>
+      <DappModelAndComposites
+        selectModel={selectModel}
+        setSelectModel={data => {
+          setSelectModel(data)
+          setSelectComposite(undefined)
+        }}
+        setSelectComposite={data => {
+          setSelectModel(undefined)
+          setSelectComposite(data)
+        }}
+        selectComposite={selectComposite}
+        editable={pathname.includes('editor')}
+      />
+      <div className='build-content'>
+        <Outlet
+          context={{
+            selectModel,
+            selectComposite
+          }}
+        />
+        {/* <RadioGroup
+          className='tabs'
+          aria-label='Build'
+          defaultValue={defaultKey}
+        >
+          {PAGES.map(page => (
+            <Radio className='tab' value={page.id} key={page.id}>
+              <NavLink to={page.id}>{page.label}</NavLink>
+            </Radio>
+          ))}
+        </RadioGroup> */}
+      </div>
+    </LayoutContainer>
+  )
+}
+
+function ExploreLayout () {
+  // const { pathname } = useLocation()
+  // const defaultKey = pathname.split('/explore/')[1]
+  // const PAGES = [
+  //   {
+  //     id: 'model',
+  //     label: 'Models'
+  //   },
+  //   {
+  //     id: 'composite',
+  //     label: 'Composites'
+  //   },
+  //   {
+  //     id: 'components',
+  //     label: 'Components'
+  //   }
+  // ]
+  return (
+    <LayoutContainer>
+      <Outlet />
+      {/* <RadioGroup
+        className='tabs'
+        aria-label='Explore'
+        defaultValue={defaultKey}
+      >
+        {PAGES.map(page => (
+          <Radio className='tab' value={page.id} key={page.id}>
+            <NavLink to={page.id}>{page.label}</NavLink>
+          </Radio>
+        ))}
+      </RadioGroup> */}
+    </LayoutContainer>
+  )
+}
+
+const LayoutContainer = styled.div`
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  position: relative;
   display: flex;
+  flex-direction: row;
   gap: 20px;
-
-  > .list {
-    flex-grow: 1;
+  .tabs {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    border-radius: 999px;
   }
 
-  .ops {
-    flex-grow: 1;
-    overflow: hidden;
+  .tab {
+    --text-color-base: black;
+    --text-color-disabled: var(--text-color-base);
+    --highlight-background: white;
+    --border-color: transparent;
+
+    padding: 10px 20px;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    color: white;
+    transition: color 200ms;
+    forced-color-adjust: none;
+    border-radius: 999px;
+    a {
+      color: var(--text-color);
+    }
+
+    &[data-hovered],
+    &[data-focused] {
+      color: white;
+    }
+
+    &[data-selected] {
+      background-color: var(--highlight-background);
+      color: var(--text-color-base);
+      a {
+        color: var(--text-color-base);
+      }
+    }
+
+    &[data-disabled] {
+      color: var(--text-color-disabled);
+      &[data-selected] {
+        --border-color: var(--text-color-disabled);
+      }
+    }
+
+    &[data-focus-visible]:after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 4px;
+      border: 2px solid var(--focus-ring-color);
+    }
   }
-
-  .playground-ops {
+  .build-content {
     flex-grow: 1;
-    overflow: hidden;
-
-    > div {
-      height: calc(100vh - 100px);
-    }
-    .graphiql-container {
-      height: 100%;
-    }
+    width: 0;
   }
 `
