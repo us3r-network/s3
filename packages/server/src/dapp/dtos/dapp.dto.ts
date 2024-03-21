@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SocialLink, Dapp, DappComposite } from 'src/entities/dapp/dapp.entity';
+import { SocialLink, Dapp, DappComposite, DappModel } from 'src/entities/dapp/dapp.entity';
 import { Network } from '../../entities/dapp/dapp.entity';
 
 export class DappCompositeDto {
@@ -14,6 +14,29 @@ export class DappCompositeDto {
   @ApiProperty()
   graphql: string;
   @ApiProperty()
+  streamId: string;
+  @ApiProperty()
+  runtimeDefinition: string;
+  @ApiProperty()
+  dapps: DappDto[];
+  @ApiProperty()
+  createdAt: number;
+  @ApiProperty()
+  lastModifiedAt: number;
+}
+
+export class DappModelDto {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  dappId: number;
+  @ApiProperty()
+  mdoelStreamId: string;
+  @ApiProperty()
+  composite: string;
+  @ApiProperty()
+  graphql: string;
+  @ApiProperty()
   runtimeDefinition: string;
   @ApiProperty()
   createdAt: number;
@@ -21,16 +44,31 @@ export class DappCompositeDto {
   lastModifiedAt: number;
 }
 
-export function convertToCompositeDto(composite: DappComposite): DappCompositeDto {
+
+export function convertToModelDto(model: DappModel): DappModelDto {
+  const dto = new DappModelDto();
+  dto.id = model.getId;
+  dto.dappId = model.getDappId;
+  dto.mdoelStreamId = model.getModelStreamId;
+  dto.graphql = model.getGraphql;
+  dto.composite = model.getComposite;
+  dto.runtimeDefinition = model.getRuntimeDefinition;
+  dto.createdAt = model.getCreatedAt?.getTime();
+  dto.lastModifiedAt = model.getLastModifiedAt?.getTime();
+  return dto;
+}
+
+export function convertToCompositeDto(composite: DappComposite, dappDtos?: DappDto[]): DappCompositeDto {
   const dto = new DappCompositeDto();
   dto.id = composite.getId;
-  dto.dappId = composite.getDappId;
   dto.name = composite.getName;
   dto.graphql = composite.getGraphql;
   dto.composite = composite.getComposite;
   dto.runtimeDefinition = composite.getRuntimeDefinition;
+  dto.streamId = composite.getStreamId;
   dto.createdAt = composite.getCreatedAt?.getTime();
   dto.lastModifiedAt = composite.getLastModifiedAt?.getTime();
+  dto.dapps = dappDtos?? [];
   return dto;
 }
 
@@ -58,6 +96,8 @@ export class DappDto {
   @ApiProperty()
   models: string[];
   @ApiProperty()
+  composites: DappCompositeDto[];
+  @ApiProperty()
   schemas: string[];
   @ApiProperty()
   modelDetails: any[];
@@ -74,7 +114,7 @@ export class DappDto {
   lastModifiedAt: number;
 }
 
-export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>, schemaDetails?: Map<number, any[]>): DappDto {
+export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]>, schemaDetails?: Map<number, any[]>, composites?: DappCompositeDto[]): DappDto {
   const dto = new DappDto();
   dto.id = dapp.getId;
   dto.name = dapp.getName;
@@ -89,6 +129,7 @@ export function convertToDappDto(dapp: Dapp, modelDetailsMap?: Map<number, any[]
   dto.modelDetals = modelDetailsMap?.get(dapp.getId)??[];
   dto.schemaDetails = schemaDetails?.get(dapp.getId)??[];
   dto.stage = dapp.getStage;
+  dto.composites = composites;
   dto.type = dapp.getType;
   dto.network = dapp.getNetwork;
   dto.createdAt = dapp.getCreatedAt?.getTime();

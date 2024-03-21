@@ -16,9 +16,9 @@ import {
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { BasicMessageDto } from '../common/dto';
 import DappService from './dapp.service';
-import { DappCompositeDto, DappDto, convertToCompositeDto, convertToDapp, convertToDappDto } from './dtos/dapp.dto';
+import { DappCompositeDto, DappDto, DappModelDto, convertToModelDto, convertToDapp, convertToDappDto, convertToCompositeDto } from './dtos/dapp.dto';
 import IUserRequest from 'src/interfaces/user-request';
-import { Dapp, DappComposite, DappDomain, Network } from 'src/entities/dapp/dapp.entity';
+import { Dapp, DappComposite, DappDomain, DappModel, Network } from 'src/entities/dapp/dapp.entity';
 import ModelService from 'src/model/model.service';
 import { Network as StreamNetwork } from 'src/entities/stream/stream.entity';
 import { getDidStrFromDidSession } from 'src/utils/user/user-util';
@@ -37,12 +37,86 @@ export class DappController {
     this.logger.log(
       `Save req did ${req.did} dapp. dto: ${JSON.stringify(dto)}`,
     );
-    if (dto.ceramicId && dto.models?.length > 0) {
-      await this.modelService.indexModels(dto.models, dto.ceramicId, req.did);
-    }
+    // if (dto.ceramicId && dto.models?.length > 0) {
+    //   await this.modelService.indexModels(dto.models, dto.ceramicId, req.did);
+    // }
     const dapp = convertToDapp(dto, req.did);
     const savedDapp = await this.dappService.save(dapp);
     return new BasicMessageDto('OK.', 0, convertToDappDto(savedDapp));
+  }
+
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/composites/:id')
+  async findComposite(@Req() req: IUserRequest, @Param('id') compositeId: string) {
+    this.logger.log(`Find the composite by id ${compositeId}`);
+    const composite = await this.dappService.findCompositeById(+compositeId);
+    if (!composite) throw new NotFoundException(`The composite not found. id: ${compositeId}`);
+
+    const dapps = await this.dappService.findDappsByCompositeId(+compositeId);
+    let dappDtos: DappDto[];
+    if (dapps.length > 0) {
+      dappDtos = dapps.map(d => convertToDappDto(d));
+    }
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      convertToCompositeDto(composite, dappDtos),
+    );
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/composites/:id')
+  async updateComposite(@Req() req: IUserRequest, @Param('id') id: string, @Body() dto: DappCompositeDto) {
+    this.logger.log(
+      `Update req did ${req.did} dapp. dto: ${JSON.stringify(dto)}`,
+    );
+
+    const dappComposite = new DappComposite();
+    dappComposite.id =+id;
+    dappComposite.setComposite = dto.composite;
+    dappComposite.setName = dto.name;
+    dappComposite.setGraphql = dto.graphql;
+    dappComposite.setStreamId = dto.streamId
+    dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
+    const savedDappComposite = await this.dappService.updateComposite(dappComposite);
+    return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/composites')
+  async findComposites(@Req() req: IUserRequest,
+    @Query('pageSize')
+    pageSize: number = 10,
+    @Query('pageNumber')
+    pageNumber: number = 1,
+    @Query('published')
+    published: boolean = false) {
+    this.logger.log(`Find the composite by pageSize: ${pageSize}, pageNumber: ${pageNumber}, published: ${published}`);
+    const composites = await this.dappService.findCompositeByOrder(pageSize, pageNumber, published) ?? [];
+
+    if (composites.length > 0) {
+      const compositeIds = composites.map(c => c.id);
+      const compositeIdDappsMap = await this.dappService.findDappsByCompositeIds(compositeIds);
+      return new BasicMessageDto(
+        'OK.',
+        0,
+        composites.map(c => {
+          const dapps = compositeIdDappsMap?.get(c.id);
+          let dappDto: DappDto[];
+          if (dapps?.length > 0) {
+            dappDto = dapps.map(d => convertToDappDto(d));
+          }
+          return convertToCompositeDto(c, dappDto);
+        }),
+      );
+    }
+
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      composites.map(c => convertToCompositeDto(c)),
+    );
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
@@ -187,10 +261,24 @@ export class DappController {
       });
     }
 
+    // build composites
+    const dappCompositesMap = await this.dappService.findCompositesByDappIds(dapps.map(dapp => dapp.getId));
+
     return new BasicMessageDto(
       'OK.',
       0,
-      dapps?.map((dapp) => convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap)),
+      dapps?.map((dapp) => {
+        const dappComposites = dappCompositesMap?.get(dapp.getId);
+        console.log('dappComposites', dappComposites);
+        let dappCompositeDtos: DappCompositeDto[];
+        if (dappComposites) {
+          dappCompositeDtos = dappComposites.map(composite => {
+            return convertToCompositeDto(composite);
+          });
+        }
+
+      return convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos)
+      }),
     );
   }
 
@@ -208,10 +296,21 @@ export class DappController {
     const schemaDetails = await this.streamService.findStreamsByStreamIds(dapp.getNetwork == Network.TESTNET ? StreamNetwork.TESTNET : StreamNetwork.MAINNET, dapp.getSchemas);
     const schemaDetailsMap = new Map<number, any[]>();
     schemaDetailsMap.set(dapp.getId, schemaDetails?.map(schemaDetail => ConvertToStream(schemaDetail)) ?? []);
+
+    // build composites
+    const dappCompositesMap = await this.dappService.findCompositesByDappIds([+id]);
+    const dappComposites = dappCompositesMap?.get(+id);
+    let dappCompositeDtos: DappCompositeDto[];
+    if (dappComposites) {
+      dappCompositeDtos = dappComposites.map(composite => {
+        return convertToCompositeDto(composite);
+      });
+    }
+
     return new BasicMessageDto(
       'OK.',
       0,
-      convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap),
+      convertToDappDto(dapp, modelDetailsMap, schemaDetailsMap, dappCompositeDtos),
     );
   }
 
@@ -238,29 +337,63 @@ export class DappController {
     );
     const dapp = await this.dappService.findDappById(+dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
-    const compositeInfo = await this.modelService.createAndDeployModel({ network: dapp.getNetwork, graphql: dto.graphql })
 
     const dappComposite = new DappComposite();
-    dappComposite.setComposite = compositeInfo.composite;
+    dappComposite.setComposite = dto.composite;
     dappComposite.setName = dto.name;
     dappComposite.setGraphql = dto.graphql;
-    dappComposite.setRuntimeDefinition = compositeInfo.runtimeDefinition;
+    dappComposite.setStreamId = dto.streamId
+    dappComposite.setIsDeleted = false;
+    dappComposite.setRuntimeDefinition = dto.runtimeDefinition;
     const savedDappComposite = await this.dappService.saveComposite(+dappId, dappComposite);
     return new BasicMessageDto('OK.', 0, convertToCompositeDto(savedDappComposite));
   }
 
   @ApiOkResponse({ type: BasicMessageDto })
-  @Get('/:dappId/composites')
-  async findCompositesByDappId(@Req() req: IUserRequest, @Param('dappId') dappId: string) {
-    this.logger.log(`Find composites by dappId ${dappId}`);
+  @Post('/:dappId/models')
+  async saveModel(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Body() dto: DappModelDto) {
+    this.logger.log(
+      `Save model req did ${req.did} dapp. dto: ${JSON.stringify(dto)}`,
+    );
     const dapp = await this.dappService.findDappById(+dappId);
     if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
 
-    const composites = await this.dappService.findCompositesByDappId(+dappId);
+    const dappModel = new DappModel();
+    dappModel.setComposite = dto.composite;
+    dappModel.setModelStreamId = dto.mdoelStreamId;
+    dappModel.setGraphql = dto.graphql;
+    dappModel.setRuntimeDefinition = dto.runtimeDefinition;
+    const savedDappModel = await this.dappService.saveModel(+dappId, dappModel);
+    return new BasicMessageDto('OK.', 0, convertToModelDto(savedDappModel));
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/:dappId/models')
+  async findModelsByDappId(@Req() req: IUserRequest, @Param('dappId') dappId: string) {
+    this.logger.log(`Find models by dappId ${dappId}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+
+    const models = await this.dappService.findModelsByDappId(+dappId);
     return new BasicMessageDto(
       'OK.',
       0,
-      composites?.map((composite) => convertToCompositeDto(composite)) ?? [],
+      models?.map((model) => convertToModelDto(model)) ?? [],
+    );
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Get('/:dappId/composites')
+  async findCompositesByDappId(@Req() req: IUserRequest, @Param('dappId') dappId: string) {
+    this.logger.log(`Find models by dappId ${dappId}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+
+    const conposites = await this.dappService.findCompositesByDappId(+dappId);
+    return new BasicMessageDto(
+      'OK.',
+      0,
+      conposites?.map((conposite) => convertToCompositeDto(conposite)) ?? [],
     );
   }
 
@@ -275,7 +408,37 @@ export class DappController {
         `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
       );
 
-    await this.dappService.deleteCompositeById(+id);
+    await this.dappService.deleteCompositeMapping(+dappId, +id);
+    return new BasicMessageDto('OK.', 0);
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Post('/:dappId/composites/:id/bindings')
+  async bindingCompositeById(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Param('id') id: string) {
+    this.logger.log(`Bind dapp ${dappId} with composite by id ${id}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+    if (dapp.getCreatedByDid !== req.did)
+      throw new BadRequestException(
+        `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
+      );
+
+    await this.dappService.createCompositeMapping(+dappId, +id);
+    return new BasicMessageDto('OK.', 0);
+  }
+
+  @ApiOkResponse({ type: BasicMessageDto })
+  @Delete('/:dappId/models/:id')
+  async deleteModelById(@Req() req: IUserRequest, @Param('dappId') dappId: string, @Param('id') id: string) {
+    this.logger.log(`Delete model by id ${id}`);
+    const dapp = await this.dappService.findDappById(+dappId);
+    if (!dapp) throw new NotFoundException(`Dapp not found. id: ${dappId}`);
+    if (dapp.getCreatedByDid !== req.did)
+      throw new BadRequestException(
+        `Dapp did not match. dapp.did: ${dapp.getCreatedByDid}, req.did: ${req.did}`,
+      );
+
+    await this.dappService.deleteModelById(+id);
     return new BasicMessageDto('OK.', 0);
   }
 }
