@@ -11,6 +11,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { DappModule } from './dapp/dapp.module';
 import { S3NodeServiceDbName, S3SeverBizDbName } from './common/constants';
+import { UserModule } from './user/user.module';
 
 const env: string | undefined = process.env.NODE_ENV;
 function scheduleModule() {
@@ -29,7 +30,8 @@ function scheduleModule() {
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE,
       logging: false,
-      entities: ['dist/**/dapp.entity{.ts,.js}', 'dist/**/stream.entity{.ts,.js}'],
+      synchronize: true,
+      entities: ['dist/**/dapp.entity{.ts,.js}', 'dist/**/stream.entity{.ts,.js}', 'dist/**/account.entity{.ts,.js}'],
       type: 'postgres',
       pool: {
         max: 70,
@@ -118,6 +120,7 @@ function scheduleModule() {
     StreamModule,
     ModelModule,
     DappModule,
+    UserModule,
     RedisModule.forRoot({
       config: {
         url: process.env.REDIS_URL,
